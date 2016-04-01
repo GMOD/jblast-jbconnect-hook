@@ -1,0 +1,1 @@
+# JBrowse Galaxy Blaster Plugin
