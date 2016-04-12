@@ -1,7 +1,7 @@
 module.exports = function galaxyKueSyncHook(sails) {
    return {};
 }
-console.log("Sails Hook: Galaxy Kue Sync");
+console.log("Sails Hook: JBrowse-Galaxy Kue Sync");
 
 
 var request = require('request');
@@ -90,7 +90,7 @@ var apiKey = "2bb67717b99a37e92e59003f93625c9b";
 // rescan every 5 sec
 var intervalCount = 0;
 setInterval(function(){
-    console.log("intervalCount "+intervalCount++);
+    //console.log("intervalCount "+intervalCount++);
     syncGalaxyJobs();
 },5000);
 
@@ -105,7 +105,7 @@ setInterval(function(){
  * @returns {undefined}
  */
 function syncGalaxyJobs() {
-    console.log('loadGalaxyJobs()');
+    //console.log('loadGalaxyJobs()');
     n = 1000000;
     
     request(galaxyUrl +"/api/jobs"+"?key="+apiKey, function (error, response, body) {
@@ -122,7 +122,7 @@ function syncGalaxyJobs() {
                 }
                 
                 // get kue queue
-                console.log("get kue queue");
+                //console.log("get kue queue");
                 
                 forEachKueJob('galaxy-job', function(kJob) {
                     var found = false;
@@ -134,7 +134,7 @@ function syncGalaxyJobs() {
                             jobCount--;
                             kJob.state(convertGalaxyState(gJobs[x].state));
                             kJob.save();
-                            console.log("existing id "+kJob.data.galaxy_data.id);
+                            //console.log("existing id "+kJob.data.galaxy_data.id);
                             break;
                         }
                     }
@@ -216,7 +216,7 @@ function forEachKueJob(jobType,callback) {
     kue.Job.rangeByType(jobType, 'inactive', 0 , n, 'asc', function(err, kJobs) {
         jobCount += kJobs.length;
         typeCount--;
-        console.log(kJobs.length);
+        //console.log(kJobs.length);
         kJobs.forEach(function(kJob) {
             callback(kJob);
         });
@@ -224,7 +224,7 @@ function forEachKueJob(jobType,callback) {
     kue.Job.rangeByType(jobType, 'active', 0 , n, 'asc', function(err, kJobs) {
         jobCount += kJobs.length;
         typeCount--;
-        console.log(kJobs.length);
+        //console.log(kJobs.length);
         kJobs.forEach(function(kJob) {
             callback(kJob);
         });
@@ -232,7 +232,7 @@ function forEachKueJob(jobType,callback) {
     kue.Job.rangeByType(jobType, 'complete', 0 , n, 'asc', function(err, kJobs) {
         jobCount += kJobs.length;
         typeCount--;
-        console.log(kJobs.length);
+        //console.log(kJobs.length);
         kJobs.forEach(function(kJob) {
             callback(kJob);
         });
@@ -240,7 +240,7 @@ function forEachKueJob(jobType,callback) {
     kue.Job.rangeByType(jobType, 'delayed', 0 , n, 'asc', function(err, kJobs) {
         jobCount += kJobs.length;
         typeCount--;
-        console.log(kJobs.length);
+        //console.log(kJobs.length);
         kJobs.forEach(function(kJob) {
             callback(kJob);
         });
@@ -248,7 +248,7 @@ function forEachKueJob(jobType,callback) {
     kue.Job.rangeByType(jobType, 'failed', 0 , n, 'asc', function(err, kJobs) {
         jobCount += kJobs.length;
         typeCount--;
-        console.log(kJobs.length);
+        //console.log(kJobs.length);
         kJobs.forEach(function(kJob) {
             callback(kJob);
         });
