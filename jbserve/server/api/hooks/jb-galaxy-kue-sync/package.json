@@ -1,0 +1,16 @@
+{
+  "name": "galaxy-blaster",
+  "version": "1.0.0",
+  "description": "JBrowse Server Module - Galaxy Blaster",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "jbrowse",
+    "galaxy",
+    "blast"
+  ],
+  "author": "ey",
+  "license": "ISC"
+}
