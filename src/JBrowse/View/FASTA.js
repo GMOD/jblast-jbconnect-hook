@@ -40,7 +40,7 @@ return declare([InHook],
                 title: 'BLAST this feature',
                 disabled: ! has('save-generated-files'),
                 onClick: function() {
-                    thisB.blastDialog();
+                    thisB.blastDialog(text);
                 }
             }));
                               
@@ -69,7 +69,8 @@ return declare([InHook],
         textArea.innerHTML = text.replace(/\n/g, function() { return c++ ? '' : "\n"; });
         return container;
     },
-    blastDialog: function () {
+    blastDialog: function (region) {
+        var regionB = region;
         var thisB = this;
         if (!this.dialog) {
 
@@ -84,7 +85,23 @@ return declare([InHook],
             var submitBtn = new Button({
                 label: "Submit",
                 onClick: function(){
+                    // do http post
+                    var xhrArgs = {
+                      url: 'http://192.168.56.102:3000/testapi',
+                      postData: {region: regionB},
+                      handleAs: "json",
+                      load: function(data){
+                        console.log("POST result");
+                        console.dir(data);
+                      },
+                      error: function(error){
+                          alert(error);
+                      }
+                    }
+                    var deferred = dojo.xhrPost(xhrArgs);
 
+
+                    // show confirm submit box
                     var confirmBox = new Dialog({ title: 'Confirmation' });
                     dojo.create('div', {
                         id: 'confirm-btn',

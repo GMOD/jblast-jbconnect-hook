@@ -1,5 +1,5 @@
 /* 
-    JBrowse Galaxy Blaster - Client Side Plugin
+    JBrowse Galaxy Blaster - Client Side Plugin X
 
     Created on : Mar 20, 2016, 6:38:33 PM
     Author     : ey
