@@ -11,6 +11,23 @@
 
 module.exports.http = {
 
+    // custom middleware (body-parser) for jbrowse for handling CORS
+    // reference: http://sailsjs.org/documentation/concepts/middleware
+    customMiddleware: function (app) {
+        console.log("config of Middleware config/http.js for jbrowse");
+        // for handling POST requests 
+        var bodyParser = require('body-parser')
+        app.use( bodyParser.json() );       // to support JSON-encoded bodies
+        app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+          extended: true
+        }));
+        /* for debugging
+        app.use(function (req, res, next) {
+          console.log("installed customMiddleware is used");
+          next();
+        })
+        */
+    }
   /****************************************************************************
   *                                                                           *
   * Express middleware to use for every Sails request. To add custom          *
@@ -21,7 +38,7 @@ module.exports.http = {
   *                                                                           *
   ****************************************************************************/
 
-  // middleware: {
+   //middleware: {
 
   /***************************************************************************
   *                                                                          *

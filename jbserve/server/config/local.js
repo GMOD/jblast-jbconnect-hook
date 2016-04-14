@@ -29,24 +29,6 @@
 
 module.exports = {
 
-// added express middleware
-    http: {
-        customMiddleware: function (app) {
-            console.log("config of Middleware config/local.js for jbrowse");
-            // for handling POST requests 
-            var bodyParser = require('body-parser')
-            app.use( bodyParser.json() );       // to support JSON-encoded bodies
-            app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
-              extended: true
-            }));
-            /* for debugging
-            app.use(function (req, res, next) {
-              console.log("installed customMiddleware is used");
-              next();
-            })
-            */
-        }
-      }
   /***************************************************************************
    * Your SSL certificate and key, if you want to be able to serve HTTP      *
    * responses over https:// and/or use websockets over the wss:// protocol  *
