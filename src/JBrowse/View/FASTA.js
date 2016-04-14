@@ -87,7 +87,7 @@ return declare([InHook],
                 onClick: function(){
                     // do http post
                     var xhrArgs = {
-                      url: 'http://192.168.56.102:3001/jbapi/blastregion',
+                      url: 'http://192.168.56.102:1337/jbapi/blastregion',
                       postData: {region: regionB},
                       handleAs: "json",
                       load: function(data){
