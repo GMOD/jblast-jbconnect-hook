@@ -3,9 +3,37 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-module.exports = function galaxyBlastHook(sails) {
-   return {};
-}
+
+module.exports = function (sails) {
+
+   return {
+
+        initialize: function(cb) {
+           console.log("jb-galaxy-blast initialize"); 
+           // todo: check that galaxy is running
+
+           return cb();
+        },
+        routes: {
+           after: {
+              'post /jbapi/blastregion': rest_BlastRegion,
+
+                'post /jbapi/posttest': function (req, res, next) {
+                  console.log("jb-galaxy-blast /jbapi/posttest called");
+                  res.header("Access-Control-Allow-Origin", "*");
+                  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+                  res.send(req.body);
+              },
+              'get /jbapi/test': function (req, res, next) {
+                  console.log("jb-galaxy-blast /jbapi/gettest called");
+                  res.send({result:"jb-galaxy-blast gettest success"});
+                  //return next();
+              }
+           }
+        }
+
+    }
+};
 console.log("Sails Hook: JBrowse-Galaxy Blaster");
 
 
@@ -14,10 +42,21 @@ var request = require('request');
 //var prompt = require('prompt');
 var fs = require('fs');
 
+var filePath = "/var/www/html/jb-galaxy-blaster/tmp/";
+var urlPath = "http://localhost/jb-galaxy-blaster/tmp/";
+
+// api key on local
+var galaxyUrl = "http://192.168.56.102:8080";
+var apiKey = "2bb67717b99a37e92e59003f93625c9b";
+
+/*
+ * this stuff used for standard express
+ * 
+ 
 var express = require('express');
 var app = express();
 
-/* for handling POST requests */
+// for handling POST requests 
 var bodyParser = require('body-parser')
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -30,21 +69,26 @@ app.use(function(req, res, next) {
   next();
 });
 
-var filePath = "/var/www/html/jb-galaxy-blaster/tmp/";
-var urlPath = "http://localhost/jb-galaxy-blaster/tmp/";
-
-// api key on local
-var galaxyUrl = "http://192.168.56.102:8080";
-var apiKey = "2bb67717b99a37e92e59003f93625c9b";
 
 // Mount kue JSON api
-app.post('/jbapi/blastregion', function(req, res) {
+app.post('/jbapi/blastregion', rest_BlastRegion);
+
+app.listen(3001);
+*/
+
+// REST function for /jbapi/blastregion
+function rest_BlastRegion(req,res) {
     var region = req.body.region;
     
     //console.dir(req.body);
     
     console.log("/jbapi/blastregion");
     console.log(region);
+
+    
+    //todo: verify the operation can be run
+    // for example, if it is already running, don't run again.
+    
     
     var d = new Date();
     
@@ -71,13 +115,10 @@ app.post('/jbapi/blastregion', function(req, res) {
 
     });
     
-    // process megablast
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     res.send({result:"success"});
-});
-// Mount UI
-
-app.listen(3001);
-
+}
 
 // fetch file(s) from url (import file into galaxy)
 function importFiles(theFile,postFn) {
