@@ -4,34 +4,10 @@
  */
 
 var request = require('request');
-//var kue = require('kue');
-//var kue_ui = require('kue-ui');
-//var kue_queue = kue.createQueue();
-/*
-this.kue.createQueue({
-    redis: REDIS_URL
-});
-*/
 
 // api key on local galaxy 
 var galaxyUrl = "http://localhost:8080";
 var apiKey = "2bb67717b99a37e92e59003f93625c9b";
-
-/*
-kue_ui.setup({
-    apiURL: '/api', // IMPORTANT: specify the api url
-    baseURL: '/kue', // IMPORTANT: specify the base url
-    updateInterval: 5000 // Optional: Fetches new data every 5000 ms
-});
-*/
-// rescan every 5 sec
-var intervalCount = 0;
-/*
-setInterval(function(){
-    //console.log("intervalCount "+intervalCount++);
-    syncGalaxyJobs();
-},5000);
-*/
 
 module.exports = function galaxyKueSyncHook(sails) {
    return {
@@ -50,88 +26,6 @@ module.exports = function galaxyKueSyncHook(sails) {
    };
 }
 console.log("Sails Hook: JBrowse-Galaxy Kue Sync");
-
-
-//var request = require('request');
-//var prettyjson = require('prettyjson');
-//var prompt = require('prompt');
-//var fs = require('fs');
-
-// enables http debugging
-//require('request-debug')(request);  
-
-
-
-/*
- * setup kui ui
- * 
- */
-/*
-var kue = require('kue');
-var express = require('express');
-var ui = require('kue-ui');
-var app = express();
-
-// for handling POST requests 
-var bodyParser = require('body-parser')
-app.use( bodyParser.json() );       // to support JSON-encoded bodies
-app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
-  extended: true
-})); 
-
-// connect kue to appropriate redis, or omit for default localhost
-
-kue.createQueue({
-    redis: REDIS_URL
-});
-
-ui.setup({
-    apiURL: '/api', // IMPORTANT: specify the api url
-    baseURL: '/kue', // IMPORTANT: specify the base url
-    updateInterval: 5000 // Optional: Fetches new data every 5000 ms
-});
-
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
-
-// Mount kue JSON api
-app.use('/api', kue.app);
-// Mount UI
-app.use('/kue', ui.app);
-app.use('/cleanup', cleanupQueue);
-// rest api handling POST data
-
-app.listen(3000);
-
-// prettyjson options
-var pOptions = {
-  keysColor: 'yellow',
-  dashColor: 'magenta',
-  stringColor: 'white'
-};
-
-
-var kue = require('kue')
-  , queue = kue.createQueue();
-
-
-
-
-
-// rescan every 5 sec
-var intervalCount = 0;
-setInterval(function(){
-    //console.log("intervalCount "+intervalCount++);
-    syncGalaxyJobs();
-},5000);
-
-*/
-
-
-
 
 
 /*
