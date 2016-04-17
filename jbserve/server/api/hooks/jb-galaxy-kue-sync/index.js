@@ -1,13 +1,61 @@
+/*
+ * JBrowse Server Plugin - Galaxy Kue Sync module
+ * 
+ */
+
+var request = require('request');
+//var kue = require('kue');
+//var kue_ui = require('kue-ui');
+//var kue_queue = kue.createQueue();
+/*
+this.kue.createQueue({
+    redis: REDIS_URL
+});
+*/
+
+// api key on local galaxy 
+var galaxyUrl = "http://localhost:8080";
+var apiKey = "2bb67717b99a37e92e59003f93625c9b";
+
+/*
+kue_ui.setup({
+    apiURL: '/api', // IMPORTANT: specify the api url
+    baseURL: '/kue', // IMPORTANT: specify the base url
+    updateInterval: 5000 // Optional: Fetches new data every 5000 ms
+});
+*/
+// rescan every 5 sec
+var intervalCount = 0;
+/*
+setInterval(function(){
+    //console.log("intervalCount "+intervalCount++);
+    syncGalaxyJobs();
+},5000);
+*/
+
 module.exports = function galaxyKueSyncHook(sails) {
-   return {};
+   return {
+
+        initialize: function(cb) {
+            console.log("jb-galaxy-kue-sync initialize"); 
+            // todo: check that galaxy is running
+            
+            setInterval(function(){
+                //console.log("intervalCount "+intervalCount++);
+                syncGalaxyJobs();
+            },5000);
+            
+            return cb();
+        }
+   };
 }
 console.log("Sails Hook: JBrowse-Galaxy Kue Sync");
 
 
-var request = require('request');
-var prettyjson = require('prettyjson');
+//var request = require('request');
+//var prettyjson = require('prettyjson');
 //var prompt = require('prompt');
-var fs = require('fs');
+//var fs = require('fs');
 
 // enables http debugging
 //require('request-debug')(request);  
@@ -18,13 +66,13 @@ var fs = require('fs');
  * setup kui ui
  * 
  */
-
+/*
 var kue = require('kue');
 var express = require('express');
 var ui = require('kue-ui');
 var app = express();
 
-/* for handling POST requests */
+// for handling POST requests 
 var bodyParser = require('body-parser')
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -32,11 +80,11 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 })); 
 
 // connect kue to appropriate redis, or omit for default localhost
-/*
+
 kue.createQueue({
     redis: REDIS_URL
 });
-*/
+
 ui.setup({
     apiURL: '/api', // IMPORTANT: specify the api url
     baseURL: '/kue', // IMPORTANT: specify the base url
@@ -55,14 +103,6 @@ app.use('/api', kue.app);
 app.use('/kue', ui.app);
 app.use('/cleanup', cleanupQueue);
 // rest api handling POST data
-/*
-app.post('/testapi', function(req, res) {
-    //var name = req.body.name,
-    //    color = req.body.color;
-    console.log(req.body);
-    res.send(req.body);
-});
-*/
 
 app.listen(3000);
 
@@ -74,17 +114,11 @@ var pOptions = {
 };
 
 
-/*
- * 
- */
 var kue = require('kue')
   , queue = kue.createQueue();
 
 
 
-// api key on local galaxy
-var galaxyUrl = "http://192.168.56.102:8080";
-var apiKey = "2bb67717b99a37e92e59003f93625c9b";
 
 
 // rescan every 5 sec
@@ -94,7 +128,7 @@ setInterval(function(){
     syncGalaxyJobs();
 },5000);
 
-
+*/
 
 
 
@@ -107,6 +141,8 @@ setInterval(function(){
 function syncGalaxyJobs() {
     //console.log('loadGalaxyJobs()');
     n = 1000000;
+    var thisB = this;
+    var g = sails.config.globals;
     
     request(galaxyUrl +"/api/jobs"+"?key="+apiKey, function (error, response, body) {
         if (!error && response.statusCode === 200) {
@@ -153,7 +189,7 @@ function syncGalaxyJobs() {
                         var c = 0;
                         for(var x in gJobs) {
                               if (!done[x]) {
-                                  var job = queue.create('galaxy-job', {
+                                  var job = g.kue_queue.create('galaxy-job', {
                                       galaxy_data: gJobs[x]
                                   });
                                   job.state(convertGalaxyState(gJobs[x].state));
@@ -209,11 +245,12 @@ function convertGalaxyState(gState) {
 var jobCount = 0;
 var typeCount = 0;
 function forEachKueJob(jobType,callback) {
+    var g = sails.config.globals;
     var n = 100000;
     jobCount = 0;
     typeCount = 5;
 
-    kue.Job.rangeByType(jobType, 'inactive', 0 , n, 'asc', function(err, kJobs) {
+    g.kue.Job.rangeByType(jobType, 'inactive', 0 , n, 'asc', function(err, kJobs) {
         jobCount += kJobs.length;
         typeCount--;
         //console.log(kJobs.length);
@@ -221,7 +258,7 @@ function forEachKueJob(jobType,callback) {
             callback(kJob);
         });
     });
-    kue.Job.rangeByType(jobType, 'active', 0 , n, 'asc', function(err, kJobs) {
+    g.kue.Job.rangeByType(jobType, 'active', 0 , n, 'asc', function(err, kJobs) {
         jobCount += kJobs.length;
         typeCount--;
         //console.log(kJobs.length);
@@ -229,7 +266,7 @@ function forEachKueJob(jobType,callback) {
             callback(kJob);
         });
     });
-    kue.Job.rangeByType(jobType, 'complete', 0 , n, 'asc', function(err, kJobs) {
+    g.kue.Job.rangeByType(jobType, 'complete', 0 , n, 'asc', function(err, kJobs) {
         jobCount += kJobs.length;
         typeCount--;
         //console.log(kJobs.length);
@@ -237,7 +274,7 @@ function forEachKueJob(jobType,callback) {
             callback(kJob);
         });
     });
-    kue.Job.rangeByType(jobType, 'delayed', 0 , n, 'asc', function(err, kJobs) {
+    g.kue.Job.rangeByType(jobType, 'delayed', 0 , n, 'asc', function(err, kJobs) {
         jobCount += kJobs.length;
         typeCount--;
         //console.log(kJobs.length);
@@ -245,7 +282,7 @@ function forEachKueJob(jobType,callback) {
             callback(kJob);
         });
     });
-    kue.Job.rangeByType(jobType, 'failed', 0 , n, 'asc', function(err, kJobs) {
+    g.kue.Job.rangeByType(jobType, 'failed', 0 , n, 'asc', function(err, kJobs) {
         jobCount += kJobs.length;
         typeCount--;
         //console.log(kJobs.length);
@@ -256,39 +293,40 @@ function forEachKueJob(jobType,callback) {
 }
 
 function cleanupQueue (req, res) {
+    var g = sails.config.globals;
     var n = 100000; // some large number
     
     console.log("cleaning Kue");
     
-    kue.Job.rangeByState( 'inactive', 0, n, 'asc', function( err, jobs ) {
+    g.kue.Job.rangeByState( 'inactive', 0, n, 'asc', function( err, jobs ) {
       jobs.forEach( function( job ) {
         job.remove( function(){
           console.log( 'removed ', job.id );
         });
       });
     });
-    kue.Job.rangeByState( 'active', 0, n, 'asc', function( err, jobs ) {
+    g.kue.Job.rangeByState( 'active', 0, n, 'asc', function( err, jobs ) {
       jobs.forEach( function( job ) {
         job.remove( function(){
           console.log( 'removed ', job.id );
         });
       });
     });
-    kue.Job.rangeByState( 'failed', 0, n, 'asc', function( err, jobs ) {
+    g.kue.Job.rangeByState( 'failed', 0, n, 'asc', function( err, jobs ) {
       jobs.forEach( function( job ) {
         job.remove( function(){
           console.log( 'removed ', job.id );
         });
       });
     });
-    kue.Job.rangeByState( 'delayed', 0, n, 'asc', function( err, jobs ) {
+    g.kue.Job.rangeByState( 'delayed', 0, n, 'asc', function( err, jobs ) {
       jobs.forEach( function( job ) {
         job.remove( function(){
           console.log( 'removed ', job.id );
         });
       });
     });
-    kue.Job.rangeByState( 'complete', 0, n, 'asc', function( err, jobs ) {
+    g.kue.Job.rangeByState( 'complete', 0, n, 'asc', function( err, jobs ) {
       jobs.forEach( function( job ) {
         job.remove( function(){
           console.log( 'removed ', job.id );

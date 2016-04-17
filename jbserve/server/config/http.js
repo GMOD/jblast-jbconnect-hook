@@ -13,14 +13,34 @@ module.exports.http = {
 
     // custom middleware (body-parser) for jbrowse for handling CORS
     // reference: http://sailsjs.org/documentation/concepts/middleware
+    
     customMiddleware: function (app) {
         console.log("config of Middleware config/http.js for jbrowse");
-        // for handling POST requests 
+        // for handling POST requests - JSON bodies
         var bodyParser = require('body-parser')
         app.use( bodyParser.json() );       // to support JSON-encoded bodies
         app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
           extended: true
         }));
+        
+        // setup kue and kue-ui
+        var g = sails.config.globals;
+        
+        g.kue = require('kue');
+        g.kue_ui = require('kue-ui');
+        g.kue_queue = g.kue.createQueue();
+        
+        g.kue_ui.setup({
+            apiURL: '/api', // IMPORTANT: specify the api url
+            baseURL: '/kue', // IMPORTANT: specify the base url
+            //updateInterval: 5000 // Optional: Fetches new data every 5000 ms
+        });
+        
+        // These are used for kue testing and diagnostics - disable for production
+        app.use('/api', g.kue.app);
+        app.use('/kue', g.kue_ui.app);
+        
+        
         /* for debugging
         app.use(function (req, res, next) {
           console.log("installed customMiddleware is used");
