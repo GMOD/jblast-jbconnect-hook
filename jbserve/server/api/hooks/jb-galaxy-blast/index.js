@@ -45,9 +45,6 @@ var fs = require('fs');
 var filePath = "/var/www/html/jb-galaxy-blaster/tmp/";
 var urlPath = "http://localhost/jb-galaxy-blaster/tmp/";
 
-// api key on local
-var galaxyUrl = "http://192.168.56.102:8080";
-var apiKey = "2bb67717b99a37e92e59003f93625c9b";
 
 /*
  * this stuff used for standard express
@@ -78,6 +75,8 @@ app.listen(3001);
 
 // REST function for /jbapi/blastregion
 function rest_BlastRegion(req,res) {
+
+    var g = sails.config.globals;
     var region = req.body.region;
     
     //console.dir(req.body);
@@ -95,12 +94,12 @@ function rest_BlastRegion(req,res) {
     var theFile = d.getTime()+".fasta";
     
     // write the received region into a file
-    ws = fs.createWriteStream(filePath+theFile);
+    ws = fs.createWriteStream(g.filePath+theFile);
     ws.write(region);
     ws.end();
     
     // import into galaxy
-    importFiles(urlPath+theFile,function(data) {
+    importFiles(g.urlPath+theFile,function(data) {
         console.log("completed import");
         
         var args = {
@@ -124,6 +123,7 @@ function rest_BlastRegion(req,res) {
 function importFiles(theFile,postFn) {
     console.log('uploadFiles()');
     
+    var g = sails.config.globals;
     var myPostFn = postFn;
     
     var params = 
@@ -143,17 +143,13 @@ function importFiles(theFile,postFn) {
     var jsonstr = JSON.stringify(params);
 
     request.post({
-        url: galaxyUrl+"/api/tools"+"?key="+apiKey, 
+        url: g.galaxyUrl+"/api/tools"+"?key="+g.galaxyAPIKey, 
         method: 'POST',
         //qs: params,
         headers: {
-            //'Content-Type': 'application/json',
-            //'Accept':'application/json, text/javascript, */*; q=0.01',
             'Accept-Encoding' : 'gzip, deflate',
             'Accept-Language' : 'en-US,en;q=0.5',
             'Content-Length' : jsonstr.length
-            //'Referrer':galaxyUrl,
-            //'X-Requested-With':'XMLHttpRequest'
         },
         json: params
     }, function(error, response, body){
@@ -181,6 +177,7 @@ function execTool_megablast(args,postFn){
     console.log('execTool_blastPlus()');
     console.dir(args);
     var myPostFn = postFn;
+    var g = sails.config.globals;
     
     // todo: pass in the current history somehow
     
@@ -211,7 +208,7 @@ function execTool_megablast(args,postFn){
     var jsonstr = JSON.stringify(params);
 
     request.post({
-        url: galaxyUrl+"/api/tools"+"?key="+apiKey, 
+        url: g.galaxyUrl+"/api/tools"+"?key="+g.galaxyAPIKey, 
         method: 'POST',
         //qs: params,
         headers: {
