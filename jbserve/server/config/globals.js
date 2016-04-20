@@ -9,6 +9,16 @@
  * http://sailsjs.org/#!/documentation/reference/sails.config/sails.config.globals.html
  */
 module.exports.globals = {
+    
+    // jbrowse - galaxy keys
+    // eventually, the fixed API key should give way to a per user API key
+    galaxyUrl: "http://localhost:8080",
+    galaxyAPIKey: "2bb67717b99a37e92e59003f93625c9b",
+
+    // jbrowse temp directory location 
+    filePath: "/var/www/html/jb-galaxy-blaster/tmp/",
+    urlPath: "http://localhost/jb-galaxy-blaster/tmp/"
+
 
   /****************************************************************************
   *                                                                           *
