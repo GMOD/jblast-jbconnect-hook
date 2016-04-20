@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+
+http://getfuelux.com/2.6/#datagrid
+-->
+<html>
+    <body>
+        <style>
+            .joblist {
+                width: 100%;
+                height: 100px;
+                background-color:#eee;
+            }
+            .extruder.right div.flap {
+                left: -29px;
+            }
+            span.flapLabel {
+                left: -7px;
+            }
+        </style>
+        <div id="joblist" class="joblist">
+
+<table id="MyGrid" class="table table-bordered datagrid">
+	<thead>
+	<tr>
+		<th>
+			<span class="datagrid-header-title">Galaxy History</span>
+ 
+			<div class="datagrid-header-right">
+				<div class="select filter" data-resize="auto">
+					<button type="button" data-toggle="dropdown" class="btn dropdown-toggle">
+						<span class="dropdown-label"></span>
+						<span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+						<li data-value="all" data-selected="true"><a href="#">All</a></li>
+						<li data-value="active"><a href="#">Active</a></li>
+						<li data-value="completed"><a href="#">Completed</a></li>
+						<li data-value="error"><a href="#">Error</a></li>
+						<li data-value="hold"><a href="#">Hold</a></li>
+					</ul>
+				</div>
+			</div>
+		</th>
+	</tr>
+	</thead>
+	<tfoot>
+	<tr>
+		<th>
+			<div class="datagrid-footer-left" style="display:none;">
+				<div class="grid-controls">
+					<span>
+						<span class="grid-start"></span> -
+						<span class="grid-end"></span> of
+						<span class="grid-count"></span>
+					</span>
+					<div class="select grid-pagesize" data-resize="auto">
+						<button type="button" data-toggle="dropdown" class="btn dropdown-toggle">
+							<span class="dropdown-label"></span>
+							<span class="caret"></span>
+						</button>
+						<ul class="dropdown-menu">
+							<li data-value="5" data-selected="true"><a href="#">5</a></li>
+							<li data-value="10"><a href="#">10</a></li>
+							<li data-value="20"><a href="#">20</a></li>
+							<li data-value="50"><a href="#">50</a></li>
+							<li data-value="100"><a href="#">100</a></li>
+						</ul>
+					</div>
+					<span>Per Page</span>
+				</div>
+			</div>
+		</th>
+	</tr>
+	</tfoot>
+</table>            
+        </div>
+    </body>
+</html>
