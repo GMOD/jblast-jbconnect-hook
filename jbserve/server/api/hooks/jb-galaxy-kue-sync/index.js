@@ -5,10 +5,6 @@
 
 var request = require('request');
 
-// api key on local galaxy 
-var galaxyUrl = "http://localhost:8080";
-var apiKey = "2bb67717b99a37e92e59003f93625c9b";
-
 module.exports = function galaxyKueSyncHook(sails) {
    return {
 
@@ -16,12 +12,36 @@ module.exports = function galaxyKueSyncHook(sails) {
             console.log("jb-galaxy-kue-sync initialize"); 
             // todo: check that galaxy is running
             
+            //console.log(sails.models);
+            
             setInterval(function(){
                 //console.log("intervalCount "+intervalCount++);
                 syncGalaxyJobs();
             },5000);
             
             return cb();
+        },
+        routes: {
+           before: {
+              'get /jbapi/cleankue': function (req, res, next) {
+                  console.log("jb-galaxy-kue-sync /jbJob/cleankue called");
+                  cleanupQueue (req, res);
+                  res.send({result:"jb-galaxy-kue-sync cleankue"});
+                  //return next();
+              },
+              'get /jbapi/cleanquemodel': function (req, res, next) {
+                  console.log("jb-galaxy-kue-sync /jbJob/cleanquemodel called");
+                  cleanupQueueModel (req, res);
+                  res.send({result:"jb-galaxy-kue-sync cleanquemodel"});
+                  //return next();
+              },
+              'get /jbapi/testmsg': function (req, res, next) {
+                    console.log("jb-galaxy-kue-sync /jbapi/testmsg called");
+                    console.dir(req.params);
+                    Test.message(1, {hello:"there"});
+                    return res.send("Hi there!");
+              }
+           }
         }
    };
 }
@@ -38,7 +58,7 @@ function syncGalaxyJobs() {
     var thisB = this;
     var g = sails.config.globals;
     
-    request(galaxyUrl +"/api/jobs"+"?key="+apiKey, function (error, response, body) {
+    request(g.galaxyUrl +"/api/jobs"+"?key="+g.galaxyAPIKey, function (error, response, body) {
         if (!error && response.statusCode === 200) {
             //console.log(body);
             //console.log(prettyjson.render(jobs,pOptions)); // Print the body of response.
@@ -87,10 +107,27 @@ function syncGalaxyJobs() {
                                       galaxy_data: gJobs[x]
                                   });
                                   job.state(convertGalaxyState(gJobs[x].state));
-                                  job.save();
+                                  job.save(function(err){
+                                      if (!err) {
+                                        /*
+                                        console.log("id = "+job.id);
+                                        sails.models.jbjob.create({
+                                          id:job.id,
+                                          name: "galaxy_job_"+job.id,
+                                          galaxy_data: gJobs[x]
+                                        }).exec(function createCB(err, created){
+                                          console.log('Created user with name ' + created.name);
+                                        });                                  
+                                        */
+                                      }
+                                  });
+                                  
+        
+                                  
                                   done[x] = true;
                                   c++;
                                   console.log('adding galaxy job: '+gJobs[x].id);
+                                  //console.dir(job);
                               }
                         }
                     }
@@ -137,7 +174,9 @@ function convertGalaxyState(gState) {
     return kState;
 }
 var jobCount = 0;
+var lastJobCount = 0;
 var typeCount = 0;
+var lastActiveCount = 0;
 function forEachKueJob(jobType,callback) {
     var g = sails.config.globals;
     var n = 100000;
@@ -153,6 +192,13 @@ function forEachKueJob(jobType,callback) {
         });
     });
     g.kue.Job.rangeByType(jobType, 'active', 0 , n, 'asc', function(err, kJobs) {
+        
+        // report changes in active count
+        if (kJobs.length != lastActiveCount) {
+            Test.message(1, {message:"active",count:kJobs.length});
+            lastActiveCount = kJobs.length;
+        }
+        
         jobCount += kJobs.length;
         typeCount--;
         //console.log(kJobs.length);
@@ -184,6 +230,11 @@ function forEachKueJob(jobType,callback) {
             callback(kJob);
         });
     });
+    
+    if (jobCount != lastJobCount) {
+        Test.message(1, {message:"jobs",count:jobCount});
+        lastJobCount = jobCount;
+    }
 }
 
 function cleanupQueue (req, res) {
@@ -228,4 +279,17 @@ function cleanupQueue (req, res) {
       });
     });
     res.send("success");
+}
+
+// destroy all jbjob model records
+function cleanupQueueModel (req, res) {
+
+    sails.models.jbjob.destroy({}).exec(function (err){
+      if (err) {
+          sails.error("err="+err);
+        //return res.negotiate(err);
+      }
+      sails.log('All jbjobs records destroyed.');
+      //return res.ok();
+    });
 }
