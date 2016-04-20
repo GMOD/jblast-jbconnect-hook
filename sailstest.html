@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>SAILS test</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
+        <script type="text/javascript" src="//192.168.56.102:1337/js/dependencies/sails.io.js"></script>
+        <script>
+            
+            io.socket.on('test', function (event){
+              console.log(event);
+            });
+            io.socket.get('/test', function gotResponse(body, response) {
+              console.log('Current users: ', body);
+            })            
+            
+            function callkue() {
+                console.log("getjobs");
+                $.ajax({
+                    url: "http://192.168.56.102:1337/api/jobs/galaxy-job/complete/1..10000",
+                    dataType: "text",
+                    success: function (data) {
+                      console.log(data);
+                      //alert(data);
+                    }
+                });
+                
+            };
+        </script>
+    </head>
+    <body>
+        <div>SAILS test</div>
+        <button onclick="callkue();">GET kue api</button>
+    </body>
+</html>
