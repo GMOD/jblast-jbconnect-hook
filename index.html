@@ -5,28 +5,32 @@
     <title>JBrowse</title>
     <link rel="stylesheet" type="text/css" href="css/genome.css">
     <!-- Fuel UX -->
-        <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
-        <link href="//www.fuelcdn.com/fuelux/3.13.0/css/fuelux.min.css" rel="stylesheet">    
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+    <link href="//www.fuelcdn.com/fuelux/3.13.0/css/fuelux.min.css" rel="stylesheet">    
     
-    <!-- jQuery -->
-    <!--script   src="https://code.jquery.com/jquery-1.12.3.min.js" crossorigin="anonymous"></script-->
-    <!--script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.js"></script-->
-    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
-        <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-        <script src="//www.fuelcdn.com/fuelux/3.13.0/js/fuelux.min.js"></script>    
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="//www.fuelcdn.com/fuelux/3.13.0/js/fuelux.min.js"></script>
+    <!-- not sure if these are required -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>    
+    <script src="//www.fuelcdn.com/fuelux-utilities/1.0.0/js/fuelux-utilities.min.js"></script>    
+
     <!-- Include all compiled plugins (below), or include individual files as needed -->
 
     <script type="text/javascript" src="//192.168.56.102:1337/js/dependencies/sails.io.js"></script>
    
     <link href="//code.jquery.com/ui/1.11.4/themes/cupertino/jquery-ui.css" rel="stylesheet">
-    <!--link href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet"-->
 
     <link href="src/mb.extruder/css/mbExtruder.css" media="all" rel="stylesheet" type="text/css">
 
     <script type="text/javascript" src="src/mb.extruder/inc/jquery.hoverIntent.min.js"></script>
     <script type="text/javascript" src="src/mb.extruder/inc/jquery.mb.flipText.js"></script>
     <script type="text/javascript" src="src/mb.extruder/inc/mbExtruder.js"></script>
+
+    <script type="text/javascript" src="src/test/gridDataSource.js"></script>
+
     <script type="text/javascript">
+        
         console.log("setup io.socket.on test");
         io.socket.on('test', function (event){
           console.dir("message "+event.data.message + " count "+event.data.count);
@@ -53,7 +57,7 @@
                 });
             };
         });
-        $(function(){
+        $(document).ready(function() {
 
             if (self.location.href == top.location.href){
                 $("body").css({font:"normal 13px/16px 'trebuchet MS', verdana, sans-serif"});
@@ -72,14 +76,24 @@
                 onExtContentLoad:function(){},
                 onExtClose:function(){}
             });
+            
+            //adjust grid height
             setInterval(function() {
                 var h = $("div.extruder-content").height();
-                $("#joblist").height(h);
+                $("#myRepeater").height(h);
             },1000);
         });
         
     </script>
 
+    <script>
+        setTimeout(function() {
+            // Initialize the repeater.
+            $('#myRepeater').repeater({dataSource: staticDataSource, list_noItemsHTML: "No items found." });
+        }, 3000);
+        
+    </script>
+    
     <script type="text/javascript">
             // jshint unused: false
             var dojoConfig = {
@@ -183,9 +197,9 @@
     </script>
   </head>
 
-  <body>
+  <body class="fuelux">
     <div id="GenomeBrowser" style="height: 100%; width: 100%; padding: 0; border: 0;"></div>
     <div style="display: none">JBrowseDefaultMainPage</div>
-    <div id="extruderLeft" class="{title:'Galaxy ', url:'datagrid.html'}"><!--div id="joblist" style="width:100%;height:200px;background-color: #eee;overflow:scroll"></div--></div>
+    <div id="extruderLeft" class="{title:'Galaxy ', url:'datagrid.html'}"></div>
   </body>
 </html>

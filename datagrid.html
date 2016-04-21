@@ -7,76 +7,113 @@ and open the template in the editor.
 http://getfuelux.com/2.6/#datagrid
 -->
 <html>
-    <body>
-        <style>
-            .joblist {
-                width: 100%;
-                height: 100px;
-                background-color:#eee;
-            }
-            .extruder.right div.flap {
-                left: -29px;
-            }
-            span.flapLabel {
-                left: -7px;
-            }
-        </style>
-        <div id="joblist" class="joblist">
+<body>
+    <style>
+        #myRepeater {
+            position: absolute;
+            background-color:#eee;
+        }
+        .extruder.right div.flap {
+            left: -29px;
+        }
+        span.flapLabel {
+            left: -7px;
+        }
+    </style>
+<div id="myRepeater" class="repeater" data-staticheight="true">
 
-<table id="MyGrid" class="table table-bordered datagrid">
-	<thead>
-	<tr>
-		<th>
-			<span class="datagrid-header-title">Galaxy History</span>
- 
-			<div class="datagrid-header-right">
-				<div class="select filter" data-resize="auto">
-					<button type="button" data-toggle="dropdown" class="btn dropdown-toggle">
-						<span class="dropdown-label"></span>
-						<span class="caret"></span>
-					</button>
-					<ul class="dropdown-menu">
-						<li data-value="all" data-selected="true"><a href="#">All</a></li>
-						<li data-value="active"><a href="#">Active</a></li>
-						<li data-value="completed"><a href="#">Completed</a></li>
-						<li data-value="error"><a href="#">Error</a></li>
-						<li data-value="hold"><a href="#">Hold</a></li>
-					</ul>
-				</div>
-			</div>
-		</th>
-	</tr>
-	</thead>
-	<tfoot>
-	<tr>
-		<th>
-			<div class="datagrid-footer-left" style="display:none;">
-				<div class="grid-controls">
-					<span>
-						<span class="grid-start"></span> -
-						<span class="grid-end"></span> of
-						<span class="grid-count"></span>
-					</span>
-					<div class="select grid-pagesize" data-resize="auto">
-						<button type="button" data-toggle="dropdown" class="btn dropdown-toggle">
-							<span class="dropdown-label"></span>
-							<span class="caret"></span>
-						</button>
-						<ul class="dropdown-menu">
-							<li data-value="5" data-selected="true"><a href="#">5</a></li>
-							<li data-value="10"><a href="#">10</a></li>
-							<li data-value="20"><a href="#">20</a></li>
-							<li data-value="50"><a href="#">50</a></li>
-							<li data-value="100"><a href="#">100</a></li>
-						</ul>
-					</div>
-					<span>Per Page</span>
-				</div>
-			</div>
-		</th>
-	</tr>
-	</tfoot>
-</table>            
+    <div class="repeater-header">
+        <div class="repeater-header-left">
+            <!--div class="repeater-search">
+                <div class="search disabled input-group">
+                    <input type="search" class="form-control" placeholder="Search" />
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button">
+                            <span class="glyphicon glyphicon-search"></span>
+                            <span class="sr-only">Search</span>
+                        </button>
+                    </span>
+                </div>
+            </div-->
         </div>
-    </body>
+        <div class="repeater-header-right">
+            <div class="btn-group selectlist disabled repeater-filters">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                    <span class="selected-label"></span>
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Filters</span>
+                </button>
+                <ul class="dropdown-menu pull-right" role="menu">
+                    <li data-value="all" data-selected="true" data-property="all"><a href="#">All Items</a></li>
+                    <li class="divider"></li>
+                    <li data-value="draft" data-property="status"><a href="#">Draft</a></li>
+                    <li data-value="archived" data-property="status"><a href="#">Archived</a></li>
+                    <li data-value="active" data-property="status"><a href="#">Active</a></li>
+                </ul>
+                <input class="hidden hidden-field" name="filterSelection" readonly="readonly" aria-hidden="true" type="text" />
+            </div>
+        </div>
+    </div>
+
+
+    <div class="repeater-viewport">
+        <div class="repeater-canvas"></div>
+        <div class="loader repeater-loader"></div>
+    </div>
+
+
+    <div class="repeater-footer">
+        <!--div class="repeater-footer-left">
+            <div class="repeater-itemization">
+                <span>
+                    <span class="repeater-start"></span> - <span class="repeater-end"></span> of <span class="repeater-count"></span> items
+                </span>
+                <div class="btn-group selectlist dropup" data-resize="auto">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                        <span class="selected-label"></span>
+                        <span class="caret"></span>
+                        <span class="sr-only">Toggle Dropdown</span>
+                    </button>
+                    <ul class="dropdown-menu" role="menu">
+                        <li data-value="10" data-selected="true"><a href="#">10</a></li>
+                        <li data-value="25"><a href="#">25</a></li>
+                        <li data-value="50"><a href="#">50</a></li>
+                    </ul>
+                    <input class="hidden hidden-field" name="itemsPerPage" readonly="readonly" aria-hidden="true" type="text" />
+                </div>
+                <span>Per Page</span>
+            </div>
+        </div-->
+        <div class="repeater-footer-right">
+            <div class="repeater-pagination">
+                <button type="button" class="btn btn-default btn-sm repeater-prev">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                    <span class="sr-only">Previous Page</span>
+                </button>
+                <label class="page-label" id="myPageLabel">Page</label>
+                <div class="repeater-primaryPaging active">
+                    <div class="input-group input-append dropdown combobox dropup">
+                        <input type="text" class="form-control" aria-labelledby="myPageLabel" />
+                        <div class="input-group-btn">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                <span class="caret"></span>
+                                <span class="sr-only">Toggle Dropdown</span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-right"></ul>
+                        </div>
+                    </div>
+                </div>
+                <input type="text" class="form-control repeater-secondaryPaging" aria-labelledby="myPageLabel" />
+                <span>of <span class="repeater-pages"></span></span>
+                <button type="button" class="btn btn-default btn-sm repeater-next">
+                    <span class="glyphicon glyphicon-chevron-right"></span>
+                    <span class="sr-only">Next Page</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+</body>
 </html>
