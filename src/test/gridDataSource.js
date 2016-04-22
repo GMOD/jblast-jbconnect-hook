@@ -1,19 +1,21 @@
+/* global jobItems */
+
 console.log("gridDataSource.js");
 // Define the data to be displayed in the repeater.
 function staticDataSource(options, callback) {
     console.log("staticDataSource");
     // Define the columns for the grid
     var columns = [{
-        'label': 'Name', // Column header label.
-        'property': 'name', // The JSON property you are binding to.
+        'label': 'Job', // Column header label.
+        'property': 'id', // The JSON property you are binding to.
         'sortable': true // Is the column sortable.
     }, {
-        'label': 'Description',
-        'property': 'description',
+        'label': 'State',
+        'property': 'state',
         'sortable': true
     }, {
-        'label': 'Status',
-        'property': 'status',
+        'label': 'Date',
+        'property': 'created_at',
         'sortable': true
 /*    }, {
         'label': 'Category',
@@ -60,7 +62,8 @@ function staticDataSource(options, callback) {
         return items;
     }
 
-    var items = generateDummyData();
+    //var items = generateDummyData();
+    var items = jobItems;
 
     // These are the visible UI options of the repeater,
     // such as how many items to display per page. They
