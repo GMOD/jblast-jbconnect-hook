@@ -12,9 +12,10 @@
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script src="//www.fuelcdn.com/fuelux/3.13.0/js/fuelux.min.js"></script>
     <!-- not sure if these are required -->
+    <!--
     <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>    
     <script src="//www.fuelcdn.com/fuelux-utilities/1.0.0/js/fuelux-utilities.min.js"></script>    
-
+    -->
     <!-- Include all compiled plugins (below), or include individual files as needed -->
 
     <script type="text/javascript" src="//192.168.56.102:1337/js/dependencies/sails.io.js"></script>
@@ -28,44 +29,71 @@
     <script type="text/javascript" src="src/mb.extruder/inc/mbExtruder.js"></script>
 
     <script type="text/javascript" src="src/test/gridDataSource.js"></script>
-
+    <style>
+        div.flapEx {
+            padding-top:35px !important;
+        }
+        div.hidden {
+            display:none;
+        }
+        img.cogwheel {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 22px;
+            height: 22px;
+        }
+    </style>
     <script type="text/javascript">
         
         console.log("setup io.socket.on test");
         io.socket.on('test', function (event){
-          console.dir("message "+event.data.message + " count "+event.data.count);
+            if (typeof event.data.count !== 'undefined') {
+                console.dir("message "+event.data.message + " count "+event.data.count);
+            }
+            if (typeof event.data.job !== 'undefined') {
+                console.dir("message "+event.data.message + " job "+event.data.job);
+            }
+            if (event.data.message==="job-active") {
+                if (0+event.data.count===0) $("img.cogwheel").addClass("hidden");
+                else $("img.cogwheel").removeClass("hidden");
+            }
         });            
         io.socket.get('/test', function gotResponse(body, response) {
           console.log('Current test: ', body);
         });            
         
-        $(function(){
+        $(document).ready(function() {
             
-            setInterval(function(){
-                getJobs();
+            setTimeout(function(){
+                getJobs(function(data){
+                    jdata = $.parseJSON(data);
+                    console.log("jdata="+jdata);
+                    
+                    jobItems = jdata;
+                    $('#myRepeater').repeater({dataSource: staticDataSource, list_noItemsHTML: "No items found." });
+                });
             },3000);
-            function getJobs() {
+            function getJobs(callback) {
 
                 console.log("getjobs");
                 $.ajax({
                     url: "http://192.168.56.102:1337/api/jobs/galaxy-job/complete/1..10000",
                     dataType: "text",
                     success: function (data) {
-                      //console.log(data);
-                      //alert(data);
+                      callback(data);
                     }
+                    // todo: handle errors
                 });
             };
-        });
-        $(document).ready(function() {
 
+            // setup extruder sidebar
             if (self.location.href == top.location.href){
                 $("body").css({font:"normal 13px/16px 'trebuchet MS', verdana, sans-serif"});
                 var logo=$("<a href='http://pupunzi.com'><img id='logo' border='0' src='http://pupunzi.com/images/logo.png' alt='mb.ideas.repository' style='display:none;'></a>").css({position:"absolute"});
                 //$("body").prepend(logo);
                 //$("#logo").fadeIn();
             }
-
             $("#extruderLeft").buildMbExtruder({
                 position:"right",
                 width:300,
@@ -77,22 +105,28 @@
                 onExtClose:function(){}
             });
             
+            setTimeout(function(){
+                $("div.flap").addClass("flapEx");
+                $("div.flap").prepend("<img class='cogwheel hidden' src='img/loading-gear-3.gif' />");
+            },3000);
+            
             //adjust grid height
             setInterval(function() {
                 var h = $("div.extruder-content").height();
                 $("#myRepeater").height(h);
             },1000);
+            
         });
         
     </script>
 
-    <script>
+    <!--script>
         setTimeout(function() {
-            // Initialize the repeater.
+            // Initialize the repeater (the job datagrid)
             $('#myRepeater').repeater({dataSource: staticDataSource, list_noItemsHTML: "No items found." });
         }, 3000);
         
-    </script>
+    </script-->
     
     <script type="text/javascript">
             // jshint unused: false

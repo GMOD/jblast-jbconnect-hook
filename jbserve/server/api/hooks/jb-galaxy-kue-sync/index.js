@@ -16,8 +16,9 @@ module.exports = function galaxyKueSyncHook(sails) {
             
             setInterval(function(){
                 //console.log("intervalCount "+intervalCount++);
-                syncGalaxyJobs();
-            },5000);
+                //syncGalaxyJobs();
+                syncGalaxyHistories();
+            },3000);
             
             return cb();
         },
@@ -38,7 +39,6 @@ module.exports = function galaxyKueSyncHook(sails) {
               'get /jbapi/testmsg': function (req, res, next) {
                     console.log("jb-galaxy-kue-sync /jbapi/testmsg called");
                     console.dir(req.params);
-                    Test.message(1, {hello:"there"});
                     return res.send("Hi there!");
               }
            }
@@ -48,33 +48,66 @@ module.exports = function galaxyKueSyncHook(sails) {
 console.log("Sails Hook: JBrowse-Galaxy Kue Sync");
 
 
+function syncGalaxyHistories() {
+    var g = sails.config.globals;
+    
+    // find out the default history
+    request(g.galaxyUrl +"/api/histories"+"?key="+g.galaxyAPIKey, function (error, response, body) {
+        if (!error && response.statusCode === 200) {
+            var hist = JSON.parse(body);
+            syncGalaxyJobs(hist[0].id);    // currently only gets the first history.
+            
+            // todo: handle multiple histories
+        }
+    });
+};
+
 /*
  * Synchronizes kue queue with galaxy job queue.
  * @returns {undefined}
  */
-function syncGalaxyJobs() {
+var jobCount = 0;
+var lastJobCount = 0;
+
+function syncGalaxyJobs(hist) {
     //console.log('loadGalaxyJobs()');
     n = 1000000;
     var thisB = this;
     var g = sails.config.globals;
     
-    request(g.galaxyUrl +"/api/jobs"+"?key="+g.galaxyAPIKey, function (error, response, body) {
+    //request(g.galaxyUrl +"/api/jobs"+"?key="+g.galaxyAPIKey, function (error, response, body) {
+    request(g.galaxyUrl +"/api/histories/"+hist+"/contents"+"?key="+g.galaxyAPIKey, function (error, response, body) {
         if (!error && response.statusCode === 200) {
             //console.log(body);
             //console.log(prettyjson.render(jobs,pOptions)); // Print the body of response.
             try {
-                var gJobs = JSON.parse(body);
-                
-                // mark all gJobs as unprocessed.
-                var done = [];
-                for(var x in gJobs) {
-                    done[x] = false;
+                var jobs = JSON.parse(body);
+
+                // filter deleted history entries
+                var gJobs = [];
+                jobCount = 0;
+                for(var x in jobs) {
+                    if (jobs[x].deleted==false) {
+                        gJobs.push(jobs[x]);
+                        jobCount++;
+                    }
                 }
+                // send job count change event
+                if (jobCount != lastJobCount) {
+                    console.log("job event count "+jobCount);
+                    Test.message(1, {message:"job-count",count:jobCount});
+                    lastJobCount = jobCount;
+                }
+                
+                // mark all gJobs as unprocessed, for bookkeeping
+                var done = [];
+                for(var x in gJobs) done[x] = false;
                 
                 // get kue queue
                 //console.log("get kue queue");
-                
+                // compare gjobs to kjobs; if they don't exist, delete
                 forEachKueJob('galaxy-job', function(kJob) {
+                    
                     var found = false;
                     for(var x in gJobs) {
                         var gJob = gJobs[x];
@@ -89,49 +122,50 @@ function syncGalaxyJobs() {
                         }
                     }
                     if (!found) {
-                      // delete
-                      kJob.remove( function(){
-                        console.log( 'removed ', gJob.id );
-                      });
-                    }
+                        // delete
+                        var id = kJob.id;
+                        Test.message(1, {message:"job-remove",job:kJob});
+                        //console.dir(kJob);
+                        kJob.remove( function(){
+                          console.log( 'removed job '+id+" "+gJob.id );
+                        });
+                      }
                 });
                 
-                // add new gJobs to kue
-                setInterval(function() {
-                    if (jobCount === 0 && typeCount === 0) {
-                        //console.log("adding triggered");
-                        var c = 0;
-                        for(var x in gJobs) {
-                              if (!done[x]) {
-                                  var job = g.kue_queue.create('galaxy-job', {
-                                      galaxy_data: gJobs[x]
-                                  });
-                                  job.state(convertGalaxyState(gJobs[x].state));
-                                  job.save(function(err){
-                                      if (!err) {
-                                        /*
-                                        console.log("id = "+job.id);
-                                        sails.models.jbjob.create({
-                                          id:job.id,
-                                          name: "galaxy_job_"+job.id,
-                                          galaxy_data: gJobs[x]
-                                        }).exec(function createCB(err, created){
-                                          console.log('Created user with name ' + created.name);
-                                        });                                  
-                                        */
-                                      }
-                                  });
-                                  
-        
-                                  
-                                  done[x] = true;
-                                  c++;
-                                  console.log('adding galaxy job: '+gJobs[x].id);
-                                  //console.dir(job);
-                              }
+                // creates new kJobs if there are any
+                // we call recursively because multiple kue_queue.create does not yield the correct job id.
+                // so we must create the next after the first one completes, in .save
+                function jobCreateAny() {
+                    for(var x in gJobs) {
+                        if (!done[x]) {
+                            var job = g.kue_queue.create('galaxy-job', {
+                                galaxy_data: gJobs[x]
+                            })
+                            .state(convertGalaxyState(gJobs[x].state))
+                            .save(function(err){
+                                if (!err) {
+                                    done[x] = true;
+                                    console.log("adding job id = "+job.id+" "+job.data.galaxy_data.id);
+                                    console.dir(job);
+                                    //Test.message(1, {message:"job-add",job:job});
+                                    jobCreateAny();
+                                }
+                                // todo: handle errors
+                            });
+                            return;
                         }
                     }
+                }
+                
+                // add new gJobs to kue when all the other jobs are done
+                
+                var t1 = setInterval(function() {
+                    if (jobCount === 0 && typeCount === 0) {
+                        clearInterval(t1);
+                        jobCreateAny();
+                    }
                 },1000);
+                
             }
             catch (ex) {
                     console.error(ex);
@@ -173,8 +207,6 @@ function convertGalaxyState(gState) {
     }
     return kState;
 }
-var jobCount = 0;
-var lastJobCount = 0;
 var typeCount = 0;
 var lastActiveCount = 0;
 function forEachKueJob(jobType,callback) {
@@ -186,7 +218,7 @@ function forEachKueJob(jobType,callback) {
     g.kue.Job.rangeByType(jobType, 'inactive', 0 , n, 'asc', function(err, kJobs) {
         jobCount += kJobs.length;
         typeCount--;
-        //console.log(kJobs.length);
+        //console.log("inactive "+kJobs.length);
         kJobs.forEach(function(kJob) {
             callback(kJob);
         });
@@ -195,13 +227,14 @@ function forEachKueJob(jobType,callback) {
         
         // report changes in active count
         if (kJobs.length != lastActiveCount) {
-            Test.message(1, {message:"active",count:kJobs.length});
+            console.log("job event active "+kJobs.length);
+            Test.message(1, {message:"job-active",count:kJobs.length});
             lastActiveCount = kJobs.length;
         }
         
         jobCount += kJobs.length;
         typeCount--;
-        //console.log(kJobs.length);
+        //console.log("active "+kJobs.length);
         kJobs.forEach(function(kJob) {
             callback(kJob);
         });
@@ -209,7 +242,7 @@ function forEachKueJob(jobType,callback) {
     g.kue.Job.rangeByType(jobType, 'complete', 0 , n, 'asc', function(err, kJobs) {
         jobCount += kJobs.length;
         typeCount--;
-        //console.log(kJobs.length);
+        //console.log("complete "+kJobs.length);
         kJobs.forEach(function(kJob) {
             callback(kJob);
         });
@@ -217,7 +250,7 @@ function forEachKueJob(jobType,callback) {
     g.kue.Job.rangeByType(jobType, 'delayed', 0 , n, 'asc', function(err, kJobs) {
         jobCount += kJobs.length;
         typeCount--;
-        //console.log(kJobs.length);
+        //console.log("delayed "+kJobs.length);
         kJobs.forEach(function(kJob) {
             callback(kJob);
         });
@@ -225,16 +258,12 @@ function forEachKueJob(jobType,callback) {
     g.kue.Job.rangeByType(jobType, 'failed', 0 , n, 'asc', function(err, kJobs) {
         jobCount += kJobs.length;
         typeCount--;
-        //console.log(kJobs.length);
+        //console.log("failed "+kJobs.length);
         kJobs.forEach(function(kJob) {
             callback(kJob);
         });
     });
     
-    if (jobCount != lastJobCount) {
-        Test.message(1, {message:"jobs",count:jobCount});
-        lastJobCount = jobCount;
-    }
 }
 
 function cleanupQueue (req, res) {
@@ -278,7 +307,7 @@ function cleanupQueue (req, res) {
         });
       });
     });
-    res.send("success");
+    //res.send("success");
 }
 
 // destroy all jbjob model records
