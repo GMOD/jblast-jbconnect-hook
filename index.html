@@ -44,40 +44,7 @@
             height: 22px;
         }
     </style>
-    <script type="text/javascript">
-        
-        console.log("setup io.socket.on test");
-        io.socket.on('test', function (event){
-            console.log("message "+event.data.message);
-            console.dir(event.data);
-       
-            if (event.data.message==="job-active") {
-                console.log("event job-active "+event.data.count);
-                if (0+event.data.count===0) $("img.cogwheel").addClass("hidden");
-                else $("img.cogwheel").removeClass("hidden");
-            }
-            else if (event.data.message==="job-remove") {
-                console.log("event job-remove "+event.data.job_id);
-                $("#j-hist-grid tr#"+event.data.job_id).remove();
-            }
-            else if (event.data.message==="job-add") {
-                console.log("event job-add "+event.data.job.id);
-                var jdata = event.data.job;
-                $('#j-hist-grid #head').after("<tr id='"+jdata.id+"'><td class='state'>"+jdata.data.galaxy_data.state+"</td><td>"+jdata.data.galaxy_data.hid+"</td><td>"+jdata.data.galaxy_data.name+"</td></tr>");                
-            }
-            else if (event.data.message==="job-change") {
-                console.log("event job-change "+event.data.job.id);
-                var jdata = event.data.job;
-                var id = jdata.id;
-                var newState = jdata.data.galaxy_data.state;
-                $('#j-hist-grid #'+id+" .class").html(newState);
-            }
-            
-        });            
-        io.socket.get('/test', function gotResponse(body, response) {
-          console.log('Current test: ', body);
-        });            
-        
+    <script>
         $(document).ready(function() {
             
 
