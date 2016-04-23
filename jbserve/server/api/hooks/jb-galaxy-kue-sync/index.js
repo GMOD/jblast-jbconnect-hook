@@ -4,6 +4,27 @@
  */
 
 var request = require('request');
+var prettyjson = require('prettyjson');
+
+var $ = 0;
+
+require("jsdom").env("", function(err, window) {
+	if (err) {
+		console.error(err);
+		return;
+	}
+ 
+	$ = require("jquery")(window);
+});
+
+
+// prettyjson options
+var pOptions = {
+  keysColor: 'yellow',
+  dashColor: 'magenta',
+  stringColor: 'white'
+};
+
 
 module.exports = function galaxyKueSyncHook(sails) {
    return {
@@ -18,7 +39,7 @@ module.exports = function galaxyKueSyncHook(sails) {
                 //console.log("intervalCount "+intervalCount++);
                 //syncGalaxyJobs();
                 syncGalaxyHistories();
-            },3000);
+            },5000);
             
             return cb();
         },
@@ -94,7 +115,7 @@ function syncGalaxyJobs(hist) {
                 }
                 // send job count change event
                 if (jobCount != lastJobCount) {
-                    console.log("job event count "+jobCount);
+                    console.log("job event job count "+jobCount);
                     Test.message(1, {message:"job-count",count:jobCount});
                     lastJobCount = jobCount;
                 }
@@ -104,7 +125,7 @@ function syncGalaxyJobs(hist) {
                 for(var x in gJobs) done[x] = false;
                 
                 // get kue queue
-                console.log("get kue queue");
+                console.log("job count "+jobCount);
                 // compare gjobs to kjobs; if they don't exist, delete
                 forEachKueJob('galaxy-job', function(kJob) {
                     
@@ -115,20 +136,22 @@ function syncGalaxyJobs(hist) {
                             done[x] = true;
                             found = true;
                             jobCount--;
+
+                            console.log(prettyjson.render(gJob,pOptions));
                             
                             // make a copy of kJob to for sending
                             var kJob1 = jData(kJob);
                             kJob1.data.galaxy_data = gJob;
                             kJob1.state = convertGalaxyState(gJob.state);
                             
-                            console.log(kJob.id+" "+kJob.data.galaxy_data.state+" "+gJob.state);
+                            console.log(gJob.hid+" "+kJob.data.galaxy_data.state+" "+gJob.state);
                             
                             if (kJob.data.galaxy_data.state !== gJob.state) {   // todo: handle more than state change
-                                console.log("event job-change "+kJob.id+" "+gJob.hid);
+                                console.log(gJob.hid+" event job-change "+kJob.id);
                                 Test.message(1, {message:"job-change",job:kJob1});
                             }
-                            kJob.state(convertGalaxyState(gJob.state));
-                            kJob.data.galaxy_data.state = gJob.state;
+                            //kJob.state(convertGalaxyState(gJob.state));
+                            //kJob.data.galaxy_data.state = gJob.state;
                             kJob.save();
                             //console.log("existing id "+kJob.data.galaxy_data.id);
                             break;
@@ -140,7 +163,7 @@ function syncGalaxyJobs(hist) {
                         Test.message(1, {message:"job-remove",job_id:id});
                         //console.dir(kJob);
                         kJob.remove( function(){
-                          console.log( 'removed job '+id+" "+gJob.hid );
+                          console.log(kJob.data.galaxy_data.hid+' event removed job '+id);
                         });
                       }
                 });
@@ -158,7 +181,7 @@ function syncGalaxyJobs(hist) {
                             .save(function(err){
                                 if (!err) {
                                     done[x] = true;
-                                    console.log("adding job id = "+kJob.id+" "+kJob.data.galaxy_data.hid);
+                                    console.log(kJob.data.galaxy_data.hid+" adding job id = "+kJob.id);
                                     
                                     Test.message(1, {message:"job-add",job:jData(kJob)});
                                     jobCreateAny();     // call again when we are done, to look for the next thingy
@@ -253,7 +276,7 @@ function forEachKueJob(jobType,callback) {
         
         // report changes in active count
         if (kJobs.length != lastActiveCount) {
-            console.log("job event active "+kJobs.length);
+            console.log("job event active count "+kJobs.length);
             Test.message(1, {message:"job-active",count:kJobs.length});
             lastActiveCount = kJobs.length;
         }
@@ -297,7 +320,16 @@ function cleanupQueue (req, res) {
     var n = 100000; // some large number
     
     console.log("cleaning Kue");
+
+    g.kue.Job.rangeByType( 'galaxy-job', '*', 0, n, 'asc', function( err, jobs ) {
+      jobs.forEach( function( job ) {
+        job.remove( function(){
+          console.log( 'removed ', job.id );
+        });
+      });
+    });    
     
+/*    
     g.kue.Job.rangeByState( 'inactive', 0, n, 'asc', function( err, jobs ) {
       jobs.forEach( function( job ) {
         job.remove( function(){
@@ -333,7 +365,7 @@ function cleanupQueue (req, res) {
         });
       });
     });
-    //res.send("success");
+*/
 }
 
 // destroy all jbjob model records
