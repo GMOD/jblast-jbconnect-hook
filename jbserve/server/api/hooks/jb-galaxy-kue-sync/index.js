@@ -104,7 +104,7 @@ function syncGalaxyJobs(hist) {
                 for(var x in gJobs) done[x] = false;
                 
                 // get kue queue
-                //console.log("get kue queue");
+                console.log("get kue queue");
                 // compare gjobs to kjobs; if they don't exist, delete
                 forEachKueJob('galaxy-job', function(kJob) {
                     
@@ -115,7 +115,20 @@ function syncGalaxyJobs(hist) {
                             done[x] = true;
                             found = true;
                             jobCount--;
-                            kJob.state(convertGalaxyState(gJobs[x].state));
+                            
+                            // make a copy of kJob to for sending
+                            var kJob1 = jData(kJob);
+                            kJob1.data.galaxy_data = gJob;
+                            kJob1.state = convertGalaxyState(gJob.state);
+                            
+                            console.log(kJob.id+" "+kJob.data.galaxy_data.state+" "+gJob.state);
+                            
+                            if (kJob.data.galaxy_data.state !== gJob.state) {   // todo: handle more than state change
+                                console.log("event job-change "+kJob.id+" "+gJob.hid);
+                                Test.message(1, {message:"job-change",job:kJob1});
+                            }
+                            kJob.state(convertGalaxyState(gJob.state));
+                            kJob.data.galaxy_data.state = gJob.state;
                             kJob.save();
                             //console.log("existing id "+kJob.data.galaxy_data.id);
                             break;
@@ -124,10 +137,10 @@ function syncGalaxyJobs(hist) {
                     if (!found) {
                         // delete
                         var id = kJob.id;
-                        Test.message(1, {message:"job-remove",job:kJob});
+                        Test.message(1, {message:"job-remove",job_id:id});
                         //console.dir(kJob);
                         kJob.remove( function(){
-                          console.log( 'removed job '+id+" "+gJob.id );
+                          console.log( 'removed job '+id+" "+gJob.hid );
                         });
                       }
                 });
@@ -138,17 +151,17 @@ function syncGalaxyJobs(hist) {
                 function jobCreateAny() {
                     for(var x in gJobs) {
                         if (!done[x]) {
-                            var job = g.kue_queue.create('galaxy-job', {
+                            var kJob = g.kue_queue.create('galaxy-job', {
                                 galaxy_data: gJobs[x]
                             })
                             .state(convertGalaxyState(gJobs[x].state))
                             .save(function(err){
                                 if (!err) {
                                     done[x] = true;
-                                    console.log("adding job id = "+job.id+" "+job.data.galaxy_data.id);
-                                    console.dir(job);
-                                    //Test.message(1, {message:"job-add",job:job});
-                                    jobCreateAny();
+                                    console.log("adding job id = "+kJob.id+" "+kJob.data.galaxy_data.hid);
+                                    
+                                    Test.message(1, {message:"job-add",job:jData(kJob)});
+                                    jobCreateAny();     // call again when we are done, to look for the next thingy
                                 }
                                 // todo: handle errors
                             });
@@ -156,7 +169,20 @@ function syncGalaxyJobs(hist) {
                         }
                     }
                 }
-                
+                function jData (kJob) {
+                    return {
+                        id: kJob.id,
+                        type: kJob.type,
+                        data: kJob.data,
+                        priority: kJob.priority,
+                        progress: kJob.progress,
+                        state: kJob.state,
+                        created_at: kJob.created_at,
+                        promote_at: kJob.promote_at,
+                        updated_at: kJob.updated_at,
+                        attempts: kJob.attempts
+                    };
+                }
                 // add new gJobs to kue when all the other jobs are done
                 
                 var t1 = setInterval(function() {

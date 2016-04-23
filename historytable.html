@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <style>
+        #j-hist-grid {
+            position: absolute;
+            background-color:#eee;
+            overflow:auto;
+            width: 100%;
+            height:100%;
+        }
+        .extruder.right div.flap {
+            left: -29px;
+        }
+        span.flapLabel {
+            left: -7px;
+        }
+    </style>
+    <link rel="stylesheet" type="text/css" href="css/JobTable.css">
+
+    <script>
+        // fix position of flap
+        $("div.flap").addClass("flapEx");
+        
+        // add gear icon (activity indicator)
+        $("div.flap").prepend("<img class='cogwheel hidden' src='img/loading-gear-3.gif' />");
+
+        //adjust grid height
+        setInterval(function() {
+            var h = $("div.extruder-content").height();
+            //$("#j-hist-grid").height(h);
+        },1000);
+        
+        setTimeout(function(){
+            getJobs(function(data){
+                jdata = $.parseJSON(data);
+                
+                console.dir(jdata);
+
+                jdata.sort(function(a,b) {
+                    if (a.id > b.id) return -1;
+                    if (a.id < b.id) return 1;
+                    else return 0;
+                });
+                
+                for (var x in jdata) {
+                    $("#j-hist-grid table").append("<tr id='"+jdata[x].id+"'><td class='state'>"+jdata[x].data.galaxy_data.state+"</td><td>"+jdata[x].data.galaxy_data.hid+"</td><td>"+jdata[x].data.galaxy_data.name+"</td></tr>")
+                }
+                
+            });
+        },3000);
+        function getJobs(callback) {
+
+            console.log("getjobs");
+            $.ajax({
+                url: "http://192.168.56.102:1337/api/jobs/galaxy-job/complete/1..10000",
+                dataType: "text",
+                success: function (data) {
+                  callback(data);
+                }
+                // todo: handle errors
+            });
+        };
+        
+    </script>
+
+    
+    <div id="j-hist-grid">
+        <div class="CSSTableGenerator" >
+                <table >
+                    <tr id="head">
+                        <td>
+                            State
+                        </td>
+                        <td >
+                            ID
+                        </td>
+                        <td>
+                            Operation
+                        </td>
+                    </tr>
+                </table>
+        </div>
+            
+    </div>
+</body>
+</html>
+
+    

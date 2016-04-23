@@ -48,16 +48,31 @@
         
         console.log("setup io.socket.on test");
         io.socket.on('test', function (event){
-            if (typeof event.data.count !== 'undefined') {
-                console.dir("message "+event.data.message + " count "+event.data.count);
-            }
-            if (typeof event.data.job !== 'undefined') {
-                console.dir("message "+event.data.message + " job "+event.data.job);
-            }
+            console.log("message "+event.data.message);
+            console.dir(event.data);
+       
             if (event.data.message==="job-active") {
+                console.log("event job-active "+event.data.count);
                 if (0+event.data.count===0) $("img.cogwheel").addClass("hidden");
                 else $("img.cogwheel").removeClass("hidden");
             }
+            else if (event.data.message==="job-remove") {
+                console.log("event job-remove "+event.data.job_id);
+                $("#j-hist-grid tr#"+event.data.job_id).remove();
+            }
+            else if (event.data.message==="job-add") {
+                console.log("event job-add "+event.data.job.id);
+                var jdata = event.data.job;
+                $('#j-hist-grid #head').after("<tr id='"+jdata.id+"'><td class='state'>"+jdata.data.galaxy_data.state+"</td><td>"+jdata.data.galaxy_data.hid+"</td><td>"+jdata.data.galaxy_data.name+"</td></tr>");                
+            }
+            else if (event.data.message==="job-change") {
+                console.log("event job-change "+event.data.job.id);
+                var jdata = event.data.job;
+                var id = jdata.id;
+                var newState = jdata.data.galaxy_data.state;
+                $('#j-hist-grid #'+id+" .class").html(newState);
+            }
+            
         });            
         io.socket.get('/test', function gotResponse(body, response) {
           console.log('Current test: ', body);
@@ -65,27 +80,6 @@
         
         $(document).ready(function() {
             
-            setTimeout(function(){
-                getJobs(function(data){
-                    jdata = $.parseJSON(data);
-                    console.log("jdata="+jdata);
-                    
-                    jobItems = jdata;
-                    $('#myRepeater').repeater({dataSource: staticDataSource, list_noItemsHTML: "No items found." });
-                });
-            },3000);
-            function getJobs(callback) {
-
-                console.log("getjobs");
-                $.ajax({
-                    url: "http://192.168.56.102:1337/api/jobs/galaxy-job/complete/1..10000",
-                    dataType: "text",
-                    success: function (data) {
-                      callback(data);
-                    }
-                    // todo: handle errors
-                });
-            };
 
             // setup extruder sidebar
             if (self.location.href == top.location.href){
@@ -105,16 +99,6 @@
                 onExtClose:function(){}
             });
             
-            setTimeout(function(){
-                $("div.flap").addClass("flapEx");
-                $("div.flap").prepend("<img class='cogwheel hidden' src='img/loading-gear-3.gif' />");
-            },3000);
-            
-            //adjust grid height
-            setInterval(function() {
-                var h = $("div.extruder-content").height();
-                $("#myRepeater").height(h);
-            },1000);
             
         });
         
@@ -234,6 +218,6 @@
   <body class="fuelux">
     <div id="GenomeBrowser" style="height: 100%; width: 100%; padding: 0; border: 0;"></div>
     <div style="display: none">JBrowseDefaultMainPage</div>
-    <div id="extruderLeft" class="{title:'Galaxy ', url:'datagrid.html'}"></div>
+    <div id="extruderLeft" class="{title:'Galaxy ', url:'historytable.html'}"></div>
   </body>
 </html>
