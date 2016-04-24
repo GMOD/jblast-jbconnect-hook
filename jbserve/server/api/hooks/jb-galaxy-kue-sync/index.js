@@ -39,7 +39,7 @@ module.exports = function galaxyKueSyncHook(sails) {
                 //console.log("intervalCount "+intervalCount++);
                 //syncGalaxyJobs();
                 syncGalaxyHistories();
-            },5000);
+            },2500);
             
             return cb();
         },
@@ -125,7 +125,7 @@ function syncGalaxyJobs(hist) {
                 for(var x in gJobs) done[x] = false;
                 
                 // get kue queue
-                console.log("job count "+jobCount);
+                //console.log("job count "+jobCount);
                 // compare gjobs to kjobs; if they don't exist, delete
                 forEachKueJob('galaxy-job', function(kJob) {
                     
@@ -137,21 +137,22 @@ function syncGalaxyJobs(hist) {
                             found = true;
                             jobCount--;
 
-                            console.log(prettyjson.render(gJob,pOptions));
+                            //console.log(prettyjson.render(gJob,pOptions));
                             
                             // make a copy of kJob to for sending
-                            var kJob1 = jData(kJob);
+                            //var kJob1 = jData(kJob);
+                            var kJob1 = JSON.parse(JSON.stringify(jData(kJob)));    // deep copy
                             kJob1.data.galaxy_data = gJob;
                             kJob1.state = convertGalaxyState(gJob.state);
                             
-                            console.log(gJob.hid+" "+kJob.data.galaxy_data.state+" "+gJob.state);
+                            //console.log(gJob.hid+" "+kJob.data.galaxy_data.state+" "+gJob.state);
                             
                             if (kJob.data.galaxy_data.state !== gJob.state) {   // todo: handle more than state change
                                 console.log(gJob.hid+" event job-change "+kJob.id);
                                 Test.message(1, {message:"job-change",job:kJob1});
                             }
-                            //kJob.state(convertGalaxyState(gJob.state));
-                            //kJob.data.galaxy_data.state = gJob.state;
+                            kJob.state(convertGalaxyState(gJob.state));
+                            kJob.data.galaxy_data = gJob;
                             kJob.save();
                             //console.log("existing id "+kJob.data.galaxy_data.id);
                             break;
