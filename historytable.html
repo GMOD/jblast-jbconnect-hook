@@ -38,8 +38,8 @@
                 console.dir(jdata);
 
                 jdata.sort(function(a,b) {
-                    if (a.id > b.id) return -1;
-                    if (a.id < b.id) return 1;
+                    if (a.data.galaxy_data.hid > b.data.galaxy_data.hid) return -1;
+                    if (a.data.galaxy_data.hid < b.data.galaxy_data.hid) return 1;
                     else return 0;
                 });
                 
