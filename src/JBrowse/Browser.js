@@ -142,6 +142,16 @@ constructor: function(params) {
 
     this.startTime = new Date();
 
+    // add <script> tags to load non-AMD modules - notification
+    [
+        'src/faye/faye-browser-min.js'
+    ].forEach(function(src) {
+        var script = document.createElement('script');
+        script.src = src;
+        script.async = false;
+        document.head.appendChild(script);
+    });
+
     // start the initialization process
     var thisB = this;
     dojo.addOnLoad( function() {
@@ -1548,6 +1558,7 @@ _initEventRouting: function() {
                            delete storeConfig.name;
                            that.addStoreConfig( name, storeConfig );
                        });
+        that.publish ('/jbrowse/v1/c/store/new', storeConfigs); // notification
     });
 
 
@@ -1705,8 +1716,11 @@ getStore: function( storeName, callback ) {
  * @private
  */
 uniqCounter: 0,
+_uniqueStoreName: function() {	// notification
+    return 'addStore'+this.uniqCounter++;
+},
 addStoreConfig: function( /**String*/ name, /**Object*/ storeConfig ) {
-    name = name || 'addStore'+this.uniqCounter++;
+    name = name || this._uniqueStoreName();
 
     if( ! this.config.stores )
         this.config.stores = {};
@@ -3243,11 +3257,62 @@ teardown: function() {
     while (this.container && this.container.firstChild) {
         this.container.removeChild(this.container.firstChild);
     }
+},
+
+/**
+ * Initialize notification subscriptions
+ */
+subscribeToChannel: function(channel,listener) {
+    var thisB = this;
+    var channelPrefix = thisB.config.notifications.channel || "";
+    return thisB.fayeClient.subscribe (channelPrefix + channel, listener)
+        .then (function() {
+            console.log ("Subscribed to " + channelPrefix + channel + " at " + thisB.config.notifications.url);
+        })
+},
+
+initNotifications: function() {
+    var thisB = this;
+    return thisB._milestoneFunction('initNotifications', function( deferred ) {
+        if ("notifications" in thisB.config) {
+            thisB.fayeClient = new Faye.Client (thisB.config.notifications.url,
+                            thisB.config.notifications.params || {});
+            deferred.resolve ({success:true});
+            // try subscribing to /log first; wait until this succeeds before subscribing to all the others
+            thisB.subscribeToChannel ('/log', function(message) {
+                console.log (message);
+            }).then (function() {
+                var newTrackHandler = function (eventType) {
+                    return function (message) {
+                        var notifyStoreConf = dojo.clone (message);
+                        var notifyTrackConf = dojo.clone (message);
+                        notifyStoreConf.browser = thisB;
+                        notifyStoreConf.type = notifyStoreConf.storeClass;
+                        notifyTrackConf.store = thisB.addStoreConfig(undefined, notifyStoreConf);
+                        thisB.publish ('/jbrowse/v1/v/tracks/' + eventType, [notifyTrackConf]);
+                    }
+                }
+
+                thisB.subscribeToChannel ('/tracks/new', newTrackHandler ('new'))
+                thisB.subscribeToChannel ('/tracks/replace', newTrackHandler ('replace'))
+
+                thisB.subscribeToChannel ('/tracks/delete', function (trackConfigs) {
+                    thisB.publish ('/jbrowse/v1/v/tracks/delete', trackConfigs);
+                })
+
+                thisB.subscribeToChannel ('/alert', alert)
+
+                thisB.passMilestone( 'notificationsConnected', { success: true } );
+            });
+
+        } else {
+            deferred.resolve ({success:false});
+        }
+    });
 }
 
+      });
 });
-});
-
 
 /*
 
