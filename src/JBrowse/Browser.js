@@ -139,18 +139,8 @@ constructor: function(params) {
     // if we're in the unit tests, stop here and don't do any more initialization
     if( this.config.unitTestMode )
         return;
-    
-    this.startTime = new Date();
 
-    // add <script> tags to load non-AMD modules
-    [
-        'src/faye/faye-browser-min.js'
-    ].forEach(function(src) {
-        var script = document.createElement('script');
-        script.src = src;
-        script.async = false;
-        document.head.appendChild(script);
-    });
+    this.startTime = new Date();
 
     // start the initialization process
     var thisB = this;
@@ -197,16 +187,10 @@ constructor: function(params) {
                            //    or should this be changed to always force DNA to show?
                            if (tracksToShow.length == 0) { tracksToShow.push("DNA"); }
                            // eliminate track duplicates (may have specified in both alwaysOnTracks and defaultTracks)
-//                           console.log(tracksToShow);
                            tracksToShow = Util.uniq(tracksToShow);
                            thisB.showTracks( tracksToShow );
 
-                           // subscribe to server notifications
-                           thisB.initNotifications().then (function() {
-
-                               // all done
-                               thisB.passMilestone( 'completely initialized', { success: true } );
-                           })
+                           thisB.passMilestone( 'completely initialized', { success: true } );
                        });
                        thisB.reportUsageStats();
                     });
@@ -747,6 +731,16 @@ initView: function() {
                   }
                 )
             );
+            this.addGlobalMenuItem(this.config.classicMenu ? 'file':'dataset',
+              new dijitMenuItem(
+                  {
+                      id: 'menubar_dataset_home',
+                      label: "Return to main menu",
+                      iconClass: 'dijitIconTask',
+                      onClick: dojo.hitch( this, function() { var container = thisObj.container || document.body;thisObj.welcomeScreen(container); } )
+                  }
+                )
+            );
         }
         else if( !this.config.hideGenomeOptions ) {
             this.addGlobalMenuItem(this.config.classicMenu ? 'file':'dataset',
@@ -1132,16 +1126,16 @@ saveData: function() {
     var dir = this.config.dataRoot;
 
     // use getstore to access the files that were loaded from local files, and create standard configs
-    var trackConfs = array.map( this.view.tracks, function(track) {
-        var temp = dojo.clone( track.config );
-        this.getStore( temp.store, dojo.hitch( this, function( obj ) {
+    var trackConfs = array.map( this.config.tracks, function(trackConfig) {
+        var temp = lang.clone( trackConfig );
+        this.getStore( temp.store, lang.hitch( this, function( obj ) {
             temp.storeClass = obj.config.type;
             if( !temp.urlTemplate ) {
-                dojo.mixin( temp, obj.saveStore() );
+                lang.mixin( temp, obj.saveStore() );
 
                 if( temp.histograms && temp.histograms.store ) {
                     this.getStore( temp.histograms.store, function( obj ) {
-                        dojo.mixin( temp.histograms, obj.saveStore() );
+                        lang.mixin( temp.histograms, obj.saveStore() );
                     });
                 }
             }
@@ -1152,7 +1146,7 @@ saveData: function() {
 
     var plugins = array.filter( Util.uniq( this.config.plugins ), function(elt) { return elt!="RegexSequenceSearch" });
     var tmp = {};
-    
+
     if( lang.isArray( this.config.plugins ) ) {
         array.forEach( this.config.plugins, function( p ) {
             tmp[ p ] = typeof p == 'object' ? p : { 'name': p };
@@ -1163,7 +1157,7 @@ saveData: function() {
         tracks: trackConfs,
         refSeqs: this.config.refSeqs,
         refSeqOrder: this.config.refSeqOrder,
-        plugins:tmp 
+        plugins:tmp
     };
     try {
         fs.writeFileSync( Util.unReplacePath(dir) + "/trackList.json", JSON.stringify(minTrackList, null, 2) );
@@ -1184,7 +1178,7 @@ openFastaElectron: function() {
           var confs = results.trackConfs || [];
 
           if( confs.length ) {
-            if( confs[0].store.fasta ) {
+            if( confs[0].store.fasta && confs[0].store.fai ) {
                 var fasta = Util.replacePath( confs[0].store.fasta.url );
                 var fai = Util.replacePath( confs[0].store.fai.url );
 
@@ -1217,7 +1211,7 @@ openFastaElectron: function() {
                 } catch(e) { alert(e); }
             }
             else {
-                var fasta = Util.replacePath( confs[0].store.blob.url );
+                var fasta = Util.replacePath( confs[0].store.fasta.url );
                 try {
                     var stats = fs.statSync( fasta );
                     if(stats.size>100000000) {
@@ -1252,7 +1246,7 @@ openFastaElectron: function() {
                         thisB.saveSessionDir( dir );
                         window.location = window.location.href.split('?')[0] + "?data=" + Util.replacePath( dir );
                     } catch(e) { alert(e); }
-                }, function() { console.log('error'); });
+                }, function(err) { console.error('error', err); });
             }
           }
         })
@@ -1291,22 +1285,7 @@ openFasta: function() {
               });
           }
           if( confs.length ) {
-            if( confs[0].store.blob ) {
-                if( confs[0].store.blob.size > 100000000 ) {
-                   if(!confirm('Warning: you are opening a non-indexed fasta larger than 100MB. It is recommended to load a fasta (.fa) and the fasta index (.fai) to provide speedier loading. Do you wish to continue anyways?')) {
-                       return;
-                   }
-                }
-                new UnindexedFasta({
-                    browser: this,
-                    fasta: confs[0].store.blob
-                })
-                .getRefSeqs(
-                    function(refSeqs) { loadNewRefSeq( refSeqs, confs ); },
-                    function(error) { alert('Error getting refSeq: '+error); }
-                );
-            }
-            else {
+            if( confs[0].store.fasta && confs[0].store.fai ) {
                 new IndexedFasta({
                     browser: this,
                     fai: confs[0].store.fai,
@@ -1317,6 +1296,22 @@ openFasta: function() {
                     function(error) { alert('Error getting refSeq: '+error); }
                 );
             }
+            else if( confs[0].store.fasta ) {
+                if( confs[0].store.fasta.size > 100000000 ) {
+                   if(!confirm('Warning: you are opening a non-indexed fasta larger than 100MB. It is recommended to load a fasta (.fa) and the fasta index (.fai) to provide speedier loading. Do you wish to continue anyways?')) {
+                       return;
+                   }
+                }
+                new UnindexedFasta({
+                    browser: this,
+                    fasta: confs[0].store.fasta
+                })
+                .getRefSeqs(
+                    function(refSeqs) { loadNewRefSeq( refSeqs, confs ); },
+                    function(error) { alert('Error getting refSeq: '+error); }
+                );
+            }
+
           }
         })
       });
@@ -1553,7 +1548,6 @@ _initEventRouting: function() {
                            delete storeConfig.name;
                            that.addStoreConfig( name, storeConfig );
                        });
-        that.publish ('/jbrowse/v1/c/store/new', storeConfigs);
     });
 
 
@@ -1711,11 +1705,8 @@ getStore: function( storeName, callback ) {
  * @private
  */
 uniqCounter: 0,
-_uniqueStoreName: function() {
-    return 'addStore'+this.uniqCounter++;
-},
 addStoreConfig: function( /**String*/ name, /**Object*/ storeConfig ) {
-    name = name || this._uniqueStoreName();
+    name = name || 'addStore'+this.uniqCounter++;
 
     if( ! this.config.stores )
         this.config.stores = {};
@@ -2555,13 +2546,14 @@ makeSnapLink: function () {
             onClick: function() {
                 var fs = electronRequire('fs');
                 var screenshot = electronRequire('electron-screenshot')
-                console.log(window.location.href.split('?')[0]+'?data='+Util.replacePath( dataRoot ));
-
-                screenshot({
-                  filename: './out.png',
-                  delay: 5
-                }, function() { alert('Finished!') })
-                
+                var remote = electronRequire('remote');
+                var dialog = remote.require('dialog');
+                dialog.showSaveDialog(function (fileName) {
+                    screenshot({
+                      filename: fileName,
+                      delay: 1
+                    }, function() { console.log('Saved screenshot',fileName); });
+                });
             }
         }
     );
@@ -2866,7 +2858,7 @@ cookie: function(keyWithoutId,value) {
 
 createNavBox: function( parent ) {
     var thisB = this;
-    var align = 'left';
+    var align = 'center';
     var navbox = dojo.create( 'div', { id: 'navbox', style: { 'text-align': align } }, parent );
 
     // container adds a white backdrop to the locationTrap.
@@ -3251,62 +3243,11 @@ teardown: function() {
     while (this.container && this.container.firstChild) {
         this.container.removeChild(this.container.firstChild);
     }
-},
-
-/**
- * Initialize notification subscriptions
- */
-subscribeToChannel: function(channel,listener) {
-    var thisB = this;
-    var channelPrefix = thisB.config.notifications.channel || "";
-    return thisB.fayeClient.subscribe (channelPrefix + channel, listener)
-        .then (function() {
-            console.log ("Subscribed to " + channelPrefix + channel + " at " + thisB.config.notifications.url);
-        })
-},
-
-initNotifications: function() {
-    var thisB = this;
-    return thisB._milestoneFunction('initNotifications', function( deferred ) {
-        if ("notifications" in thisB.config) {
-            thisB.fayeClient = new Faye.Client (thisB.config.notifications.url,
-                            thisB.config.notifications.params || {});
-            deferred.resolve ({success:true});
-            // try subscribing to /log first; wait until this succeeds before subscribing to all the others
-            thisB.subscribeToChannel ('/log', function(message) {
-                console.log (message);
-            }).then (function() {
-                var newTrackHandler = function (eventType) {
-                    return function (message) {
-                        var notifyStoreConf = dojo.clone (message);
-                        var notifyTrackConf = dojo.clone (message);
-                        notifyStoreConf.browser = thisB;
-                        notifyStoreConf.type = notifyStoreConf.storeClass;
-                        notifyTrackConf.store = thisB.addStoreConfig(undefined, notifyStoreConf);
-                        thisB.publish ('/jbrowse/v1/v/tracks/' + eventType, [notifyTrackConf]);
-                    }
-                }
-
-                thisB.subscribeToChannel ('/tracks/new', newTrackHandler ('new'))
-                thisB.subscribeToChannel ('/tracks/replace', newTrackHandler ('replace'))
-
-                thisB.subscribeToChannel ('/tracks/delete', function (trackConfigs) {
-                    thisB.publish ('/jbrowse/v1/v/tracks/delete', trackConfigs);
-                })
-
-                thisB.subscribeToChannel ('/alert', alert)
-
-                thisB.passMilestone( 'notificationsConnected', { success: true } );
-            });
-
-        } else {
-            deferred.resolve ({success:false});
-        }
-    });
 }
 
-      });
 });
+});
+
 
 /*
 
