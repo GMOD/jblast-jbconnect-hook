@@ -1,0 +1,11 @@
+{
+  "name": "jb-trackwatch",
+  "version": "1.0.0",
+  "description": "watch jbrowse track configuration file",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "EY",
+  "license": "ISC"
+}
