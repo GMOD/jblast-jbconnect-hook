@@ -11,7 +11,8 @@
         "urlTemplate" : "tracks/NameTest/{refseq}/trackData.json",
         "compress" : 0,
         "category" : "Miscellaneous",
-        "type" : "FeatureTrack",
-        "label" : "AddTest"
+        "type" : "JBrowse/View/Track/HTMLFeatures",
+        "label" : "AddTest",
+        "baseUrl": "http://192.168.56.102/jb-galaxy-blaster/sample_data/json/volvox/"
     }
 ]
