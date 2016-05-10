@@ -35,7 +35,7 @@
             getJobs(function(data){
                 jdata = $.parseJSON(data);
                 
-                console.dir(jdata);
+                //console.dir(jdata);
 
                 jdata.sort(function(a,b) {
                     if (a.data.galaxy_data.hid > b.data.galaxy_data.hid) return -1;
@@ -51,7 +51,7 @@
         },3000);
         function getJobs(callback) {
 
-            console.log("getjobs");
+            console.log("Load History");
             $.ajax({
                 url: "http://192.168.56.102:1337/api/jobs/0..10000",
                 dataType: "text",
