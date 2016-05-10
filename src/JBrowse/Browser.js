@@ -143,6 +143,7 @@ constructor: function(params) {
     this.startTime = new Date();
 
     // add <script> tags to load non-AMD modules - notification
+    /*
     [
         'src/faye/faye-browser-min.js'
     ].forEach(function(src) {
@@ -151,7 +152,21 @@ constructor: function(params) {
         script.async = false;
         document.head.appendChild(script);
     });
-
+    */
+    console.log("old jbtrack init");
+    /*
+    console.log("jbtrack init");
+    io.socket.on('jbtrack', function (event){
+            if (event.data.msg==="track-test") {
+                console.log("event track-test "+event.data.value);
+                alert("event track-test value = "+event.data.value)
+            }
+        
+    });
+    io.socket.get('/jbtrack', function gotResponse(body, response) {
+      console.log('Current jbtrack: ', body);
+    });            
+    */
     // start the initialization process
     var thisB = this;
     dojo.addOnLoad( function() {
