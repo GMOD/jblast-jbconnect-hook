@@ -1,0 +1,17 @@
+[
+    {
+        "autocomplete" : "all",
+        "track" : "Add Track Test",
+        "key" : "HTMLFeatures - Test Add Track",
+        "feature" : [
+           "protein_coding_primary_transcript",
+           "polypeptide"
+        ],
+        "storeClass" : "JBrowse/Store/SeqFeature/NCList",
+        "urlTemplate" : "tracks/NameTest/{refseq}/trackData.json",
+        "compress" : 0,
+        "category" : "Miscellaneous",
+        "type" : "FeatureTrack",
+        "label" : "AddTest"
+    }
+]
