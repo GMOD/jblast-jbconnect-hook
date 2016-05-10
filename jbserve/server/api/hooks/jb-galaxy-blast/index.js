@@ -18,7 +18,7 @@ module.exports = function (sails) {
            after: {
               'post /jbapi/blastregion': rest_BlastRegion,
 
-                'post /jbapi/posttest': function (req, res, next) {
+              'post /jbapi/posttest': function (req, res, next) {
                   console.log("jb-galaxy-blast /jbapi/posttest called");
                   res.header("Access-Control-Allow-Origin", "*");
                   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -91,9 +91,10 @@ function rest_BlastRegion(req,res) {
     
     var d = new Date();
     
-    var theFile = d.getTime()+".fasta";
+    var theFile = "jbrowse_"+d.getTime()+".fa";
     
     // write the received region into a file
+    // todo: handle errors
     ws = fs.createWriteStream(g.filePath+theFile);
     ws.write(region);
     ws.end();
