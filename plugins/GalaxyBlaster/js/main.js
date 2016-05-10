@@ -29,6 +29,59 @@ return declare( JBrowsePlugin,
 
         var thisB = this;
         var browser = this.browser;
+        
+        // setup additional functions (necessary?)
+        //browser.subscribeToChannel = ext_subscribeToChannel;
+        //browser.initNotifications = ext_initNotifications;
+
+
+        // subscribe to server track events
+        io.socket.on('jbtrack', function (event){
+            console.log("msg "+event.data.msg);
+            console.dir(event.data);
+
+            var data = event.data.value;
+
+            if (typeof event.data.msg === 'undefined') return;
+            
+            var newTrackHandler = function (eventType) {
+                //return function (message) {
+                    
+                    console.log("trackhandler "+eventType);
+                    var notifyStoreConf = dojo.clone (data);
+                    var notifyTrackConf = dojo.clone (data);
+                    notifyStoreConf.browser = browser;
+                    notifyStoreConf.type = notifyStoreConf.storeClass;
+                    notifyTrackConf.store = browser.addStoreConfig(undefined, notifyStoreConf);
+                    browser.publish ('/jbrowse/v1/v/tracks/' + eventType, [notifyTrackConf]);
+                //}
+            }
+
+            switch(event.data.msg) {
+                case "track-new":
+                    newTrackHandler ('new');
+                    break;
+                case "track-replace":
+                    newTrackHandler ('replace');
+                    break;
+                case "track-delete":
+                    browser.publish ('/jbrowse/v1/v/tracks/delete', browser.trackConfigs);
+                    break;
+                case "track-test":
+                    if (event.data.msg==="track-test") {
+                        console.log("event track-test "+event.data.value);
+                        alert("event track-test value = "+event.data.value)
+                    }
+                    break;
+                default:
+                    break;
+            }
+            
+        });            
+        io.socket.get('/jbtrack', function gotResponse(body, response) {
+          console.log('Current test: ', body);
+        });            
+
 
         /*
         dojo.subscribe("/jbrowse/v1/v/tracks/show", function(data){
@@ -79,3 +132,55 @@ return declare( JBrowsePlugin,
     }
 });
 });
+
+/**
+ * Initialize notification subscriptions
+ */
+function ext_subscribeToChannel(channel,listener) {
+    var thisB = this;
+    var channelPrefix = thisB.config.notifications.channel || "";
+    return thisB.fayeClient.subscribe (channelPrefix + channel, listener)
+        .then (function() {
+            console.log ("Subscribed to " + channelPrefix + channel + " at " + thisB.config.notifications.url);
+        })
+}
+
+function ext_initNotifications() {
+    var thisB = this;
+    return thisB._milestoneFunction('initNotifications', function( deferred ) {
+        if ("notifications" in thisB.config) {
+            thisB.fayeClient = new Faye.Client (thisB.config.notifications.url,
+                            thisB.config.notifications.params || {});
+            deferred.resolve ({success:true});
+            // try subscribing to /log first; wait until this succeeds before subscribing to all the others
+            thisB.subscribeToChannel ('/log', function(message) {
+                console.log (message);
+            }).then (function() {
+                var newTrackHandler = function (eventType) {
+                    return function (message) {
+                        var notifyStoreConf = dojo.clone (message);
+                        var notifyTrackConf = dojo.clone (message);
+                        notifyStoreConf.browser = thisB;
+                        notifyStoreConf.type = notifyStoreConf.storeClass;
+                        notifyTrackConf.store = thisB.addStoreConfig(undefined, notifyStoreConf);
+                        thisB.publish ('/jbrowse/v1/v/tracks/' + eventType, [notifyTrackConf]);
+                    }
+                }
+
+                thisB.subscribeToChannel ('/tracks/new', newTrackHandler ('new'))
+                thisB.subscribeToChannel ('/tracks/replace', newTrackHandler ('replace'))
+
+                thisB.subscribeToChannel ('/tracks/delete', function (trackConfigs) {
+                    thisB.publish ('/jbrowse/v1/v/tracks/delete', trackConfigs);
+                })
+
+                thisB.subscribeToChannel ('/alert', alert)
+
+                thisB.passMilestone( 'notificationsConnected', { success: true } );
+            });
+
+        } else {
+            deferred.resolve ({success:false});
+        }
+    });
+}
