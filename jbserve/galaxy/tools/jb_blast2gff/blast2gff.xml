@@ -1,0 +1,27 @@
+<tool id="jb_blast2gff" name="Blast2Gff" version="1.0.0">
+  <description>Convert BLAST to GFF</description>
+  <command interpreter="perl">Blast2Gff.pl -i $input1 -o $output -d "/var/www/html/galaxy/data/blastdb/wgs/20apr2014/wgs" -s $input2</command>
+  <inputs>
+    <param format="tabular" name="input1" type="data" label="Blast Result file (tabular)"/>
+    <param format="fasta" name="input2" type="data" label="Original Sequence file (FASTA)"/>
+  </inputs>
+  <outputs>
+    <data format="GFF" name="output" label="Output GFF file"/>
+  </outputs>
+
+  <help>
+Blast2Gff.pl                                           
+AUTHOR: James C. Estill                                  
+CONTACT: JamesEstill_at_gmail.com                         
+STARTED: 04/17/2007                                       
+UPDATED: 04/18/2007                                       
+DESCRIPTION:                                              
+ Converts BLAST output to GFF format. This the the GFF    
+ format that is used with the Apollo Genome Annotation    
+ curation program.                                        
+ Currently this only works with m8 blast output.   
+
+Galaxy Script by: ey 5/11/2016 
+  </help>
+
+</tool>
