@@ -24,6 +24,6 @@
     <tool file="genomespace/genomespace_exporter.xml" />
   </section>
   <section id="jbrowseTools" name="JBrowse Tools">
-	<tool file="jbrowse_blast/blast2gff.xml" />
+	<tool file="jb_blast2gff/blast2gff.xml" />
   </section>
 </toolbox>
