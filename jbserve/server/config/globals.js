@@ -12,18 +12,19 @@ module.exports.globals = {
     
     // jbrowse - galaxy keys
     // eventually, the fixed API key should give way to a per user API key
-    galaxyUrl: "http://localhost:8080",
-    galaxyAPIKey: "2bb67717b99a37e92e59003f93625c9b",
+    jbrowse: {
+        galaxyUrl: "http://localhost:8080",
+        galaxyAPIKey: "2bb67717b99a37e92e59003f93625c9b",
 
-    jbrowsePath: "/var/www/html/jb-galaxy-blaster/",
-    jbrowseURL: "http://localhost/jb-galaxy-blaster/",
-    
-    // jbrowse temp directory location 
-    filePath: "/var/www/html/jb-galaxy-blaster/tmp/",
-    urlPath: "http://localhost/jb-galaxy-blaster/tmp/",
-    
-    jbrowseRest: "http://localhost:1337"
+        jbrowsePath: "/var/www/html/jb-galaxy-blaster/",
+        jbrowseURL: "http://localhost/jb-galaxy-blaster/",
 
+        // jbrowse temp directory location 
+        filePath: "/var/www/html/jb-galaxy-blaster/tmp/",
+        urlPath: "http://localhost/jb-galaxy-blaster/tmp/",
+
+        jbrowseRest: "http://localhost:1337"
+    }
 
   /****************************************************************************
   *                                                                           *

@@ -76,7 +76,7 @@ app.listen(3001);
 // REST function for /jbapi/blastregion
 function rest_BlastRegion(req,res) {
 
-    var g = sails.config.globals;
+    var g = sails.config.globals.jbrowse;
     var region = req.body.region;
     
     //console.dir(req.body);
@@ -124,7 +124,7 @@ function rest_BlastRegion(req,res) {
 function importFiles(theFile,postFn) {
     console.log('uploadFiles()');
     
-    var g = sails.config.globals;
+    var g = sails.config.globals.jbrowse;
     var myPostFn = postFn;
     
     var params = 
@@ -178,7 +178,7 @@ function execTool_megablast(args,postFn){
     console.log('execTool_blastPlus()');
     console.dir(args);
     var myPostFn = postFn;
-    var g = sails.config.globals;
+    var g = sails.config.globals.jbrowse;
     
     // todo: pass in the current history somehow
     

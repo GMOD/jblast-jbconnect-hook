@@ -73,7 +73,7 @@ function startTracking(tracklist) {
 
 function addTrackJson(req,res,next) {
 
-    var g = sails.config.globals;
+    var g = sails.config.globals.jbrowse;
     
     var newTrackJson = req.body.addTracks;
     var trackListPath = req.body.trackListPath;
