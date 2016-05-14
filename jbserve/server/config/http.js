@@ -17,7 +17,7 @@ module.exports.http = {
     customMiddleware: function (app) {
         console.log("config of Middleware config/http.js for jbrowse");
         // setup kue and kue-ui
-        var g = sails.config.globals.jbrowse;
+        var g = sails.config.globals;
 
         g.kue = require('kue');
         g.kue_ui = require('kue-ui');

@@ -76,7 +76,7 @@ app.listen(3001);
 // REST function for /jbapi/blastregion
 function rest_BlastRegion(req,res) {
 
-    var g = sails.config.globals.jbrowse;
+    var g = sails.config.globals;
     var region = req.body.region;
     
     //console.dir(req.body);
@@ -95,12 +95,12 @@ function rest_BlastRegion(req,res) {
     
     // write the received region into a file
     // todo: handle errors
-    ws = fs.createWriteStream(g.filePath+theFile);
+    ws = fs.createWriteStream(g.jbrowse.filePath+theFile);
     ws.write(region);
     ws.end();
     
     // import into galaxy
-    importFiles(g.urlPath+theFile,function(data) {
+    importFiles(g.jbrowse.urlPath+theFile,function(data) {
         console.log("completed import");
         
         var args = {
@@ -124,7 +124,7 @@ function rest_BlastRegion(req,res) {
 function importFiles(theFile,postFn) {
     console.log('uploadFiles()');
     
-    var g = sails.config.globals.jbrowse;
+    var g = sails.config.globals;
     var myPostFn = postFn;
     
     var params = 
@@ -144,7 +144,7 @@ function importFiles(theFile,postFn) {
     var jsonstr = JSON.stringify(params);
 
     request.post({
-        url: g.galaxyUrl+"/api/tools"+"?key="+g.galaxyAPIKey, 
+        url: g.jbrowse.galaxyUrl+"/api/tools"+"?key="+g.jbrowse.galaxyAPIKey, 
         method: 'POST',
         //qs: params,
         headers: {
@@ -178,7 +178,7 @@ function execTool_megablast(args,postFn){
     console.log('execTool_blastPlus()');
     console.dir(args);
     var myPostFn = postFn;
-    var g = sails.config.globals.jbrowse;
+    var g = sails.config.globals;
     
     // todo: pass in the current history somehow
     
@@ -209,7 +209,7 @@ function execTool_megablast(args,postFn){
     var jsonstr = JSON.stringify(params);
 
     request.post({
-        url: g.galaxyUrl+"/api/tools"+"?key="+g.galaxyAPIKey, 
+        url: g.jbrowse.galaxyUrl+"/api/tools"+"?key="+g.jbrowse.galaxyAPIKey, 
         method: 'POST',
         //qs: params,
         headers: {

@@ -73,7 +73,7 @@ function startTracking(tracklist) {
 
 function addTrackJson(req,res,next) {
 
-    var g = sails.config.globals.jbrowse;
+    var g = sails.config.globals;
     
     var newTrackJson = req.body.addTracks;
     var trackListPath = req.body.trackListPath;
@@ -82,7 +82,7 @@ function addTrackJson(req,res,next) {
     console.log("newTrackJson = ",newTrackJson);
     //var trackListPath = req.body.trackListPath;
     
-    var filePath = g.jbrowsePath+trackListPath;
+    var filePath = g.jbrowse.jbrowsePath+trackListPath;
     
     fs.readFile (filePath, function (err, trackListData) {
         if (err) {

@@ -70,10 +70,10 @@ console.log("Sails Hook: JBrowse-Galaxy Kue Sync");
 
 
 function syncGalaxyHistories() {
-    var g = sails.config.globals.jbrowse;
+    var g = sails.config.globals;
     
     // find out the default history
-    request(g.galaxyUrl +"/api/histories"+"?key="+g.galaxyAPIKey, function (error, response, body) {
+    request(g.jbrowse.galaxyUrl +"/api/histories"+"?key="+g.jbrowse.galaxyAPIKey, function (error, response, body) {
         if (!error && response.statusCode === 200) {
             var hist = JSON.parse(body);
             syncGalaxyJobs(hist[0].id);    // currently only gets the first history.
@@ -94,10 +94,10 @@ function syncGalaxyJobs(hist) {
     //console.log('loadGalaxyJobs()');
     n = 1000000;
     var thisB = this;
-    var g = sails.config.globals.jbrowse;
+    var g = sails.config.globals;
     
-    //request(g.galaxyUrl +"/api/jobs"+"?key="+g.galaxyAPIKey, function (error, response, body) {
-    request(g.galaxyUrl +"/api/histories/"+hist+"/contents"+"?key="+g.galaxyAPIKey, function (error, response, body) {
+    //request(g.jbrowse.galaxyUrl +"/api/jobs"+"?key="+g.jbrowse.galaxyAPIKey, function (error, response, body) {
+    request(g.jbrowse.galaxyUrl +"/api/histories/"+hist+"/contents"+"?key="+g.jbrowse.galaxyAPIKey, function (error, response, body) {
         if (!error && response.statusCode === 200) {
             //console.log(body);
             //console.log(prettyjson.render(jobs,pOptions)); // Print the body of response.
@@ -260,7 +260,7 @@ function convertGalaxyState(gState) {
 var typeCount = 0;
 var lastActiveCount = 0;
 function forEachKueJob(jobType,callback) {
-    var g = sails.config.globals.jbrowse;
+    var g = sails.config.globals;
     var n = 100000;
     jobCount = 0;
     typeCount = 5;
@@ -317,7 +317,7 @@ function forEachKueJob(jobType,callback) {
 }
 
 function cleanupQueue (req, res) {
-    var g = sails.config.globals.jbrowse;
+    var g = sails.config.globals;
     var n = 100000; // some large number
     
     console.log("cleaning Kue");
