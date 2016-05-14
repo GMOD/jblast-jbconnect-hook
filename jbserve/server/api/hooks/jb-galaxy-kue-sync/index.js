@@ -1,6 +1,6 @@
 /*
  * JBrowse Server Plugin - Galaxy Kue Sync module
- * 
+ * note g.kue, g.kue_queue are defined in config/http.js
  */
 
 var request = require('request');
