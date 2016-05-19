@@ -25,5 +25,6 @@
   </section>
   <section id="jbrowseTools" name="JBrowse Tools">
 	<tool file="jb_blast2gff/blast2gff.xml" />
+	<tool file="jb_exportgff/exportgff.xml" />
   </section>
 </toolbox>
