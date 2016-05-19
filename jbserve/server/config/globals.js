@@ -18,6 +18,11 @@ module.exports.globals = {
 
         jbrowsePath: "/var/www/html/jb-galaxy-blaster/",
         jbrowseURL: "http://localhost/jb-galaxy-blaster/",
+        dataSet: [
+            {
+                dataPath: "sample_data/json/volvox"
+            }
+        ]
 
         // jbrowse temp directory location 
         filePath: "/var/www/html/jb-galaxy-blaster/tmp/",
