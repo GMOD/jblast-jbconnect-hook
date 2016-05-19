@@ -22,7 +22,7 @@ module.exports.globals = {
             {
                 dataPath: "sample_data/json/volvox"
             }
-        ]
+        ],
 
         // jbrowse temp directory location 
         filePath: "/var/www/html/jb-galaxy-blaster/tmp/",
