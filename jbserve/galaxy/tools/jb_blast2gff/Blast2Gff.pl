@@ -127,6 +127,8 @@ sub TabBlast2Gff
 #    my $UseScore = $_[5]; # Score format to use
     
     my $HitNum = "0";
+    my $HspNum = 1;
+    my $LastSubId = "";
     #-----------------------------+
     # FILE I/O                    |
     #-----------------------------+
@@ -157,7 +159,7 @@ sub TabBlast2Gff
 	my $Frame = ".";
 	
 	# Set the start to be less then the end
-	# This info can be used to dedeuct the strand
+	# This info can be used to dedeuce the strand
 	if ($QStart < $QEnd)
 	{
 	    $GStart = $QStart;
@@ -174,6 +176,15 @@ sub TabBlast2Gff
 	# Trim leading white space from Bit score
 	$BitScore =~ s/^\s*(.*?)\s*$/$1/;
 	
+        # Figure HSP number
+        if ($SubId eq $LastSubId) {
+            $HspNum++;
+        }
+        else {
+            $HspNum = 1;
+        }
+        $LastSubId = $SubId;
+
 	# Currently working with this to get it to draw
 	# the items as separate items
 	print GFFOUT 
@@ -190,7 +201,7 @@ sub TabBlast2Gff
 	    $BitScore."\t".        # Score
 	    $Strand."\t".          # Strand
 	    $Frame."\t".           # Frame
-	    $SubId.                # Attribute
+	    "blastHit=".$SubId.";blastHsp=".$HspNum.                # Attribute
 	    "\n";
 	
     } # END OF WHILE BLASTIN
