@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <style>
+        #j-hist-grid {
+            position: absolute;
+            background-color:#eee;
+            overflow:auto;
+            width: 300px;
+            height:300px;
+        }
+        #j-blast {
+            position:absolute;
+            background-color:#eee;
+            overflow-x:auto;
+            overflow-y:auto;
+            width: 100%;
+            padding:10px;
+            white-space:nowrap;
+        }
+        .extruder.right div.flap {
+            left: -29px;
+        }
+        span.flapLabel {
+            left: -7px;
+        }
+        // table
+        .tg  {border-collapse:collapse;border-spacing:0;}
+        .tg td{font-family:Arial, sans-serif;font-size:14px;padding:0px 0px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+        .tg .tg-yw4l{vertical-align:top}
+    </style>
+    <link rel="stylesheet" type="text/css" href="css/JobTable.css">
+    
+    <script type="text/javascript">
+        // fix position of flap
+        //$("div.flap").addClass("flapEx");
+        
+        // add gear icon (activity indicator)
+        //$("div.flap").prepend("<img class='cogwheel hidden' src='img/st_processing.gif' />");
+
+        //adjust grid height
+        
+        setInterval(function() {
+            var h = $("div.extruder-content").height();
+            var w = $('.tg-yw4l').width();
+            $("#j-hist-grid").height(h);
+            $("#j-blast").height(h-20);
+            $('#j-blast').width(w-15);
+        },1000);
+        
+        setTimeout(function(){
+            $('.extruder-container').css('height','250px');     // for some reason, we must do this, why?
+            doGetJobs();
+        },3000);
+        
+        
+        function doGetJobs() {
+            getJobs(function(data){
+                jdata = $.parseJSON(data);
+                
+                //console.dir(jdata);
+
+                jdata.sort(function(a,b) {
+                    if (a.data.galaxy_data.hid > b.data.galaxy_data.hid) return -1;
+                    if (a.data.galaxy_data.hid < b.data.galaxy_data.hid) return 1;
+                    else return 0;
+                });
+                
+                for (var x in jdata) {
+                    $("#j-hist-grid table").append("<tr id='"+jdata[x].id+"'><td class='state'>"
+                            +getJobState(jdata[x].data.galaxy_data.state)+"</td><td>"
+                            +jdata[x].data.galaxy_data.hid+"</td><td>"+jdata[x].data.galaxy_data.name+"</td></tr>");
+                }
+                
+            });
+        };
+        
+        
+        function getJobs(callback) {
+
+            console.log("Load History");
+            $.ajax({
+                url: "http://192.168.56.102:1337/api/jobs/0..10000",
+                dataType: "text",
+                success: function (data) {
+                  callback(data);
+                }
+                // todo: handle errors
+            });
+        };
+        
+        // convert state info image or text
+        
+        function getJobState(state){
+            switch(state) {
+                case "running":
+                    $("img.cogwheel").removeClass("hidden");        // turn on the tab progress cog
+                    return "<img style='width:20px' src='img/st_processing.gif' />";
+                case "ok":
+                    return "<img style='width:20px' src='img/st_green_check.png' />";
+                case "error":
+                    return "<img style='width:20px' src='img/st_red_x.png' />";
+                case "queued":
+                case "new":
+                    return "<span style='color:green;font-weight:bold'>"+state+"</span>";
+                default:
+                    return state;
+            }
+        }
+        
+    </script>
+    <script type="text/javascript">
+        
+        io.socket.on('test', function (event){
+            console.log("message "+event.data.message);
+            console.dir(event.data);
+       
+            if (event.data.message==="job-active") {
+                console.log("event job-active "+event.data.count);
+                if (0+event.data.count===0) $("img.cogwheel").addClass("hidden");
+                else $("img.cogwheel").removeClass("hidden");
+            }
+            else if (event.data.message==="job-remove") {
+                console.log("event job-remove "+event.data.job_id);
+                $("#j-hist-grid tr#"+event.data.job_id).remove();
+            }
+            else if (event.data.message==="job-add") {
+                console.log("event job-add "+event.data.job.id);
+                var jdata = event.data.job;
+                $('#j-hist-grid #head').after("<tr id='"+jdata.id+"'><td class='state'>"+getJobState(jdata.data.galaxy_data.state)+"</td><td>"+jdata.data.galaxy_data.hid+"</td><td>"+jdata.data.galaxy_data.name+"</td></tr>");                
+            }
+            else if (event.data.message==="job-change") {
+                console.log("event job-change "+event.data.job.id);
+                var jdata = event.data.job;
+                var id = jdata.id;
+                var newState = jdata.data.galaxy_data.state;
+                $('#j-hist-grid #'+id+" .state").html(getJobState(newState));
+            }
+            
+        });            
+        io.socket.get('/test', function gotResponse(body, response) {
+          console.log('Current test: ', body);
+        });            
+</script>
+  <div style="width:100%;padding-left:5px;padding-right:5px;padding-top:2px">
+    <table class="tg" style="width:100%">
+      <tr>
+        <td class="tg-yw4l">
+            <div id="j-blast">
+                
+            </div>
+        </td>
+        <td class="tg-yw4l" style="width: 300px">
+            <div id="j-hist-grid">
+                <div class="CSSTableGenerator"  >
+                        <table >
+                            <tr id="head">
+                                <td>
+                                    State
+                                </td>
+                                <td >
+                                    ID
+                                </td>
+                                <td>
+                                    Operation
+                                </td>
+                            </tr>
+                        </table>
+                </div>
+            </div>
+            
+        </td>
+      </tr>
+    </table>    
+  </div>          
+</body>
+</html>
+

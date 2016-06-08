@@ -51,7 +51,7 @@
             // setup extruder sidebar
             if (self.location.href == top.location.href){
                 $("body").css({font:"normal 13px/16px 'trebuchet MS', verdana, sans-serif"});
-                var logo=$("<a href='http://pupunzi.com'><img id='logo' border='0' src='http://pupunzi.com/images/logo.png' alt='mb.ideas.repository' style='display:none;'></a>").css({position:"absolute"});
+                //var logo=$("<a href='http://pupunzi.com'><img id='logo' border='0' src='http://pupunzi.com/images/logo.png' alt='mb.ideas.repository' style='display:none;'></a>").css({position:"absolute"});
                 //$("body").prepend(logo);
                 //$("#logo").fadeIn();
             }
@@ -66,6 +66,16 @@
                 onExtClose:function(){}
             });
             
+            $("#blastPanel").buildMbExtruder({
+                position:"bottom",
+                width:2000,
+                extruderOpacity:.8,
+                //hidePanelsOnClose:true,
+                //accordionPanels:false,
+                onExtOpen:function(){},
+                onExtContentLoad:function(){},
+                onExtClose:function(){}
+            });
             
         });
         
@@ -185,6 +195,7 @@
   <body class="fuelux">
     <div id="GenomeBrowser" style="height: 100%; width: 100%; padding: 0; border: 0;"></div>
     <div style="display: none">JBrowseDefaultMainPage</div>
-    <div id="extruderLeft" class="{title:'Galaxy ', url:'historytable.html'}"></div>
+    <!--div id="extruderLeft" class="{title:'Galaxy ', url:'plugins/GalaxyBlaster/historytable.html'}"></div-->
+    <div id="blastPanel" class="{title:'BLAST ', url:'plugins/GalaxyBlaster/BlastPanel.html'}"></div>
   </body>
 </html>
