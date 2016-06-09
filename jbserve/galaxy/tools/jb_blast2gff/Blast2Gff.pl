@@ -201,7 +201,7 @@ sub TabBlast2Gff
 	    $BitScore."\t".        # Score
 	    $Strand."\t".          # Strand
 	    $Frame."\t".           # Frame
-	    "blastHit=".$SubId.";blastHsp=".$HspNum.                # Attribute
+	    "blastHit=".$SubId.";".$HspNum.                # Attribute
 	    "\n";
 	
     } # END OF WHILE BLASTIN
