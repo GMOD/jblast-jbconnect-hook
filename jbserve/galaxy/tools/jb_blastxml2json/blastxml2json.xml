@@ -1,0 +1,16 @@
+<tool id="jb_blastxml2json" name="BlastXml2json" version="1.0.0">
+  <description>Convert BlastXML to JSON - for JBrowse Blaster</description>
+  <command interpreter="node">blastxml2json.js -x $input1 -o $output -o $output</command>
+  <inputs>
+    <param format="blastxml" name="input1" type="data" label="BlastXML input file"/>
+  </inputs>
+  <outputs>
+    <data format="json" name="output" label="JSON output file"/>
+  </outputs>
+
+  <help>
+BlastXML to JSON for JBrowse Blaster      
+AUTHOR: eyao                               
+  </help>
+
+</tool>
