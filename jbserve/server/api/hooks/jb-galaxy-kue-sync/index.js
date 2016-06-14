@@ -65,7 +65,7 @@ module.exports = function galaxyKueSyncHook(sails) {
            }
         }
    };
-}
+};
 console.log("Sails Hook: JBrowse-Galaxy Kue Sync");
 
 
@@ -276,7 +276,7 @@ function forEachKueJob(jobType,callback) {
     g.kue.Job.rangeByType(jobType, 'active', 0 , n, 'asc', function(err, kJobs) {
         
         // report changes in active count
-        if (kJobs.length != lastActiveCount) {
+        if (kJobs.length !== lastActiveCount) {
             console.log("job event active count "+kJobs.length);
             Test.message(1, {message:"job-active",count:kJobs.length});
             lastActiveCount = kJobs.length;
