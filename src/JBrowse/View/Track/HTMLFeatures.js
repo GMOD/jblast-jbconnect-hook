@@ -81,6 +81,7 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
         this.blastReadXML(args);
     },
     
+    // retrieve blast data json into this.blastData
     blastReadXML: function(args) {
         console.log("BLAST READ XML");
         //console.log(this,args);
@@ -104,46 +105,119 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
             });            
         }
     },
-    
+    // render data into blast panel
     blastRenderData: function() {
+        var thisB = this;
         var obj = this.blastData;
-        var hits = obj.BlastOutput.BlastOutput_iterations.Iteration.Iteration_hits.Hit;
+        //console.log("blastRenderData");
+        var hits = obj.BlastOutput.BlastOutput_iterations.Iteration.Hit;
         
-        //console.log('hits',hits);
-        //return;
         var txt = "";
         
         for (var x in hits) {
-            txt += '<div id="'+hits[x].Hit_id+'" class="blast-hit-item">';
-            txt += '<a href="#'+hits[x].Hit_id+'">'+hits[x].Hit_def+'</a>';
-            txt += " " + hits[x].Hit_accession;
-            txt += this.blastRenderHsp(hits[x].Hit_hsps.Hsp,txt);
-            txt += '</div>';
-            //console.log(txt);
+            var key = x;
+            blast_addPanel(key,hits[x].Hit_def);
         }
+        $('#blast-accordion').on('show.bs.collapse', function(e) {
+            var key = $(e.target).attr('id');
+            //console.log(e.target);
+            var hit = thisB.blastData.BlastOutput.BlastOutput_iterations.Iteration.Hit[key];
+            var txt = thisB.blastRenderHit(hit);
+            txt += thisB.blastRenderHitBp(hit);
+            $('.panel-body',e.target).html(txt);
+        });
         
-        $('#j-blast').html(txt);
+        // setup the feature tooltip
+        setTimeout(function() {
+            // setup tooltip
+            $('.blast-feature').each(function() {
+                var key = $(this).attr('blastkey');
+                var hit = thisB.blastData.BlastOutput.BlastOutput_iterations.Iteration.Hit[key];
+                //console.log('key-hit ',key,hit);
+                
+                var text = '<div>'+thisB.blastRenderHit(hit)+'<button blastkey="'+key+'"onclick="JBrowse.blastGoto(this)">Goto</button></div>';
+                
+                $(this).qtip({
+                    content: {
+                        text: text,
+                        title: hit.Hit_def
+                    },
+                    style: {
+                        classes: 'qtip-tipped', //'qtip-tipped' 'ui-tooltip-blue
+                        width: "400px"
+                    },
+                    position: { // tooltip shows up near mouse
+                        //target: 'mouse'
+                        // language: 'my' tooltip positioned 'at' position of target 
+                        my: 'top left',
+                        at: 'bottom left'
+                    },
+                    hide: {     // allow mouse to move into tip
+                        //event:'unfocus'
+                        delay: 500,
+                        fixed: true
+                    }
+                });
+                
+                //$(this).mouseover(function() {
+                //    var key = $(this).attr('blastkey');
+                    //$('#test-test').html(key);
+                //});
+            });            
+        },1000);
         
     },
-    blastRenderHsp: function(hsp, txt) {
-        var txt1 = '';
-        if (Array.isArray(hsp)) {
-            for(var x in hsp) {
-                txt1 += this.blastRenderHsp1(hsp[x],txt);
-            }
-        }
-        else {
-            txt1 += this.blastRenderHsp1(hsp);
-        }
-        return txt1;
+    blastRenderHit: function(hit){
+        //console.log("blastRenderHit");
+        var txt = '';
+        
+        //txt += '<span>'+hit.Hit_def+'</span>';
+        txt += '<span>Sequence ID: '+hit.Hit_id+' Length: '+hit.Hit_len+' Matches: '+hit.Hit_count+'</span>';
+        //txt += '<div class="CSSTableGenerator">';
+        txt += '<table class="CSSTableGenerator" style="width:100px"><tr id="head">';
+        txt +=    '<td>Score</td>';
+        txt +=    '<td>Expect</td>';
+        txt +=    '<td>Identities</td>';
+        txt +=    '<td>Gaps</td>';
+        txt +=    '<td>Strand</td>';
+        txt += '</tr><tr>';
+        txt +=    '<td>'+hit.Hsp['Hsp_bit-score']+'('+hit.Hsp.Hsp_score+')</td>';
+        txt +=    '<td>'+hit.Hsp.Hsp_evalue+'</td>';
+        txt +=    '<td>'+hit.Hsp.Hsp_identity+'/'+hit.Hsp['Hsp_align-len']+'</td>';
+        txt +=    '<td>'+hit.Hsp.Hsp_gaps+'/'+hit.Hsp['Hsp_align-len']+'</td>';
+        txt +=    '<td>'+hit.Hsp['Hsp_query-strand']+'/'+hit.Hsp['Hsp_hit-strand-len']+'</td>';
+        txt += '</tr></table>';
+        //txt += '</div>'
+        
+        return txt;
     },
-    blastRenderHsp1: function(hsp, txt) {
-        var txt1 = '<div style="padding-left: 20px;font-family: monospace;">';
-        txt1 += hsp.Hsp_hseq + '<br/>';
-        txt1 += hsp.Hsp_midline + '<br/>';
-        txt1 += hsp.Hsp_qseq;
-        txt1 += '</div>';
-        return txt1;
+    blastRenderHitBp: function(hit){
+        
+        var coordHstr = repeatChar(hit.Hsp.Hsp_hseq.length,".");
+        var coordQstr = repeatChar(hit.Hsp.Hsp_hseq.length,".");
+        var len = hit.Hsp['Hsp_align-len'];
+        console.log("hitlen",len,hit);
+        
+        var coordHbase = 0;
+        var coordH = parseInt(hit.Hsp['Hsp_hit-from']);
+        var coordQbase = 0;
+        var coordQ = parseInt(hit.Hsp['Hsp_query-from']);
+        
+        var inc = 20;
+        for(var i = 0; i < len;i += inc) {
+            coordHstr = overwriteStr(coordHstr,coordHbase+i,"|"+(coordH+i));
+            coordQstr = overwriteStr(coordQstr,coordQbase+i,"|"+(coordQ+i));
+        }
+        
+        var txt = '';
+        txt += '<div style="font-family: monospace;white-space:pre; width:100%;overflow:auto">';
+        txt += '<span style="background-color:#eee">'+coordHstr+'</span><br/>';
+        txt += hit.Hsp.Hsp_hseq + '<br/>';
+        txt += hit.Hsp.Hsp_midline + '<br/>';
+        txt += hit.Hsp.Hsp_qseq + '<br/>';
+        txt += '<span style="background-color:#eee">'+coordQstr+'</span>';
+        txt += '</div>';
+        return txt;
     },
     /**
      * Returns object holding the default configuration for HTML-based feature tracks.
@@ -1071,11 +1145,15 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
         // blast attributes
         */
         var blastHit = feature.get('blasthit');
-        var blastHsp = feature.get('blasthsp');
+        //var blastHsp = feature.get('blasthsp');
         if (typeof blastHit !== 'undefined') {
             //console.log(blastHit,blastHsp);
-            var blastKey = blastHit+";"+blastHsp;
-            dojo.attr(featDiv,'blastKey',blastKey);
+            var blastKey = blastHit;
+            //var blastKey = blastKey.replace(/[|]/g,"-");
+            //var blastKey = blastKey.replace(/[.]/g,"+");
+            //console.log('blastHit',blastHit)
+            dojo.attr(featDiv,'blastkey',blastKey);
+            dojo.addClass(featDiv,'blast-feature');
         }
 
 

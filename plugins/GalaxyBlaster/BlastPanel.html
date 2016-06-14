@@ -7,7 +7,7 @@
             background-color:#eee;
             overflow:auto;
             width: 300px;
-            height:300px;
+            height:500px;
         }
         #j-blast {
             position:absolute;
@@ -142,11 +142,75 @@
           console.log('Current test: ', body);
         });            
 </script>
+<script type="text/javascript">
+    // accordion operations
+    var blast_hash = 0;
+    var $blast_template = $(".blast-panel-template");
+    
+    var blast_addPanel = function(id,text) {
+        var $newPanel = $blast_template.clone();
+        //console.log($newPanel);
+
+        //$newPanel.attr("id",id);
+        $newPanel.find(".collapse").removeClass("in");
+        $newPanel.find(".accordion-toggle").attr("href",  "#" + id)
+                 .text(text);
+        $newPanel.find(".panel-collapse").attr("id", id).addClass("collapse").removeClass("in");
+        $("#blast-accordion").append($newPanel.fadeIn());
+    };
+    
+    // overwrite a string with another string at the given location
+    function overwriteStr(subjStr, at, withStr) {
+      var partL = subjStr;
+      var withLen = withStr.length;
+      if (at >= subjStr.length) return subjStr;
+      var partL = subjStr.substring(0, at);
+            if ((at + withLen) > subjStr.length) {
+        var cut = (at + withLen) - subjStr.length;
+        return partL + withStr.substring(0,withLen-cut);
+      }
+      if ((withLen+partL.length) == subjStr.length) return partL + withStr;
+      var lenR = subjStr.length - withLen - partL.length;
+      var partR = subjStr.substring(subjStr.length - lenR, subjStr.length);
+      return partL + withStr + partR;
+    }
+
+    // return a string of characters (ch) length (count)
+    // "33333" = repearChar(5,"3");
+    function repeatChar(count, ch) {
+      if (count == 0) return "";
+      var count2 = count / 2,
+        result = ch;
+
+      while (result.length <= count2) {
+        result += result;
+      }
+      return result + result.substring(0, count - result.length);
+    };
+    
+        /*
+        var toggleChevron = function (e) {
+          $(e.target)
+            .prev('.panel-heading')
+            .find("i.indicator")
+            .toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
+        };
+        
+        //$('#j-blast').html(txt);
+        
+        $('#blast-accordion').on('hidden.bs.collapse', toggleChevron);
+        $('#blast-accordion').on('shown.bs.collapse', toggleChevron);
+        */
+    
+</script>
+
   <div style="width:100%;padding-left:5px;padding-right:5px;padding-top:2px">
     <table class="tg" style="width:100%">
       <tr>
         <td class="tg-yw4l">
             <div id="j-blast">
+                <div class="panel-group" id="blast-accordion">
+                </div>
                 
             </div>
         </td>
@@ -171,8 +235,24 @@
             
         </td>
       </tr>
-    </table>    
-  </div>          
+    </table>
+  </div> 
+
+    <div style="display:none">
+      <div class="panel panel-default blast-panel-template">
+        <div class="panel-heading">
+          <h4 class="panel-title">
+            <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseThree">
+              Collapsible Group Item #2 (template panel)
+            </a>
+          </h4>
+        </div>
+        <div id="collapseThree" class="panel-collapse collapse">
+          <div class="panel-body">
+          </div>
+        </div>
+      </div>
+    </div>
 </body>
 </html>
 
