@@ -6,7 +6,7 @@
     <param format="fasta" name="input2" type="data" label="Original Sequence file (FASTA)"/>
   </inputs>
   <outputs>
-    <data format="gff3" name="output" label="BLAST to GFF3 output file"/>
+    <data format="gff3" name="output" label="BLAST to GFF3 output"/>
   </outputs>
 
   <help>
