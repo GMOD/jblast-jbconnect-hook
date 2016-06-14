@@ -185,6 +185,9 @@ sub TabBlast2Gff
         }
         $LastSubId = $SubId;
 
+        # convert in $SubId, | and . to -
+        $SubId =~ s/[|.]/-/g;
+
 	# Currently working with this to get it to draw
 	# the items as separate items
 	print GFFOUT 
@@ -201,7 +204,7 @@ sub TabBlast2Gff
 	    $BitScore."\t".        # Score
 	    $Strand."\t".          # Strand
 	    $Frame."\t".           # Frame
-	    "blastHit=".$SubId.";".$HspNum.                # Attribute
+	    "blastHit=".$SubId."-".$HspNum.                # Attribute
 	    "\n";
 	
     } # END OF WHILE BLASTIN

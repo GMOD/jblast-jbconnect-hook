@@ -45,8 +45,11 @@ fs.readFile(blastxml, function(err, xml) {
         var hits = data.BlastOutput.BlastOutput_iterations.Iteration.Iteration_hits.Hit;
         
         //console.log(hits);
+        
+        //create & build our custom hit table, where we index different from original layout for jbrowse
+        data.BlastOutput.BlastOutput_iterations.Iteration.Hit = new Object();
 
-        var obj = new Object();
+        var obj = data.BlastOutput.BlastOutput_iterations.Iteration.Hit;
         var count = 0;
         for (var x in hits) {
             
@@ -62,6 +65,7 @@ fs.readFile(blastxml, function(err, xml) {
             };
             
             var hspNum = 1;
+            var sep = '-'
             
             /*// debug
             console.log("hit num ", hits[x].Hit_num);
@@ -71,17 +75,27 @@ fs.readFile(blastxml, function(err, xml) {
             }
             */
             if (typeof hits[x].Hit_hsps.Hsp.Hsp_num !== 'undefined') { 
-                console.log("hit single hsp", hits[x].Hit_num);
-                var key = hits[x].Hit_id + ';' + hits[x].Hit_hsps.Hsp.Hsp_num;
+                //console.log("hit single hsp", hits[x].Hit_num);
+                var key = hits[x].Hit_id + sep + hits[x].Hit_hsps.Hsp.Hsp_num;
+                key = key.replace(/[|.]/g,'-');
+                hits[x].Hit_hsps.Hsp.Hsp_count = 1;     // hsps in this group
                 obj[key] = insertHsp(hits[x],hits[x].Hit_hsps.Hsp);
             }
             else { 
-                console.log("hit multiple hsp ", hits[x].Hit_num);
+                //console.log("hit multiple hsp ", hits[x].Hit_num);
                 // multiple hsp
                 var hsps = hits[x].Hit_hsps.Hsp;
                 
+                // count HSPs in this group
+                var hsp_count = 0;
+                for(var h in hsps){
+                    hsp_count++;
+                }
+                
                 for (var h in hsps) {
-                    var key = hits[x].Hit_id + ';' + hsps[h].Hsp_num;
+                    var key = hits[x].Hit_id + sep + hsps[h].Hsp_num;
+                    key = key.replace(/[|.]/g,'-');
+                    hsps[h].Hsp_count = hsp_count; 
                     obj[key] = insertHsp(hits[x],hsps[h]);
                     hspNum++;
                 }
@@ -91,10 +105,12 @@ fs.readFile(blastxml, function(err, xml) {
             
             //if (count++ > 30) return;   // debug
         }
-
+        // remove the original hit list
+        delete data.BlastOutput.BlastOutput_iterations.Iteration.Iteration_hits;
+        
         //console.log(obj);
 
-        fs.writeFile(jsonfile,JSON.stringify(obj,null,2), function (err) {
+        fs.writeFile(jsonfile,JSON.stringify(data,null,2), function (err) {
             if (err) {
                 console.log(err);
                 process.exit(1);
