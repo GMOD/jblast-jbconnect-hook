@@ -115,20 +115,38 @@ return declare( JBrowsePlugin,
                 */
             });
         });
+        
         // create function intercept after view initialization (because the view object doesn't exist before that)
         browser.afterMilestone( 'loadConfig', function() {
-            if (typeof browser.config.classInterceptList === 'undefined') {
-                browser.config.classInterceptList = {};
-            }
             
-            // override ProcessedTranscripts
-            browser.config.classInterceptList["ProcessedTranscript"] = [function(obj) {
-	    	console.log("intercepting ProcessedTranscript");
-                obj._getFeatureHeight = function() {
-                    return 11;
-                };
-            }];
-        });      
+            require(["dojo/_base/lang", "JBrowse/View/FASTA"], function(lang, FASTA){
+                /*
+                lang.extend(FASTA, {
+                    renderHTML: function( region, seq, parent ) {
+                        console.log("intercept renderHTML()");
+                        console.dir(this);
+                        //return this.old_renderHTML( region, seq, parent );
+                    }
+                    
+                });
+                */
+            });
+        });
+        // setup goto button for features
+        browser.afterMilestone( 'initView', function() {
+            
+            browser.blastGoto = function(obj) {
+                //alert($(obj).attr('blastkey'));
+                $('#blastPanel').openMbExtruder(true);$('#blastPanel').openPanel();
+                var i = '#'+$(obj).attr('blastkey');
+                console.log(i);
+                console.log($(i).html());
+                $('#j-blast').animate({
+                    scrollTop: $(i).position().top
+                }, 500);
+            };
+        });
+        
     }
 });
 });
