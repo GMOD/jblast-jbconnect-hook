@@ -3,13 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+var request = require('request');
+//var prettyjson = require('prettyjson');   // for debugging
+var fs = require('fs');
+var path = require('path');
+
+var filePath = "/var/www/html/jb-galaxy-blaster/tmp/";
+var urlPath = "http://localhost/jb-galaxy-blaster/tmp/";
 
 module.exports = function (sails) {
 
    return {
 
         initialize: function(cb) {
-           console.log("jb-galaxy-blast initialize"); 
+           console.log("Sails Hook: jb-galaxy-blast initialize"); 
            // todo: check that galaxy is running
 
            return cb();
@@ -34,44 +41,7 @@ module.exports = function (sails) {
 
     }
 };
-console.log("Sails Hook: JBrowse-Galaxy Blaster");
 
-
-var request = require('request');
-//var prettyjson = require('prettyjson');
-//var prompt = require('prompt');
-var fs = require('fs');
-
-var filePath = "/var/www/html/jb-galaxy-blaster/tmp/";
-var urlPath = "http://localhost/jb-galaxy-blaster/tmp/";
-
-
-/*
- * this stuff used for standard express
- * 
- 
-var express = require('express');
-var app = express();
-
-// for handling POST requests 
-var bodyParser = require('body-parser')
-app.use( bodyParser.json() );       // to support JSON-encoded bodies
-app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
-  extended: true
-}));
-
-app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
-
-
-// Mount kue JSON api
-app.post('/jbapi/blastregion', rest_BlastRegion);
-
-app.listen(3001);
-*/
 
 // REST function for /jbapi/blastregion
 function rest_BlastRegion(req,res) {
@@ -106,11 +76,21 @@ function rest_BlastRegion(req,res) {
         var args = {
             hid: data.outputs[0].hid,
             id: data.outputs[0].id,
-            name: data.outputs[0].name
+            name: "blast "+path.basename(data.outputs[0].name)
         };
         
-        execTool_megablast(args,function(results) {
-            console.log("completed megablast submission");
+        execTool_megablast(args,function(data) {
+            console.log("completed blast submit");
+            
+            var args = {
+                hid: data.outputs[0].hid,
+                id: data.outputs[0].id,
+                name: data.outputs[0].name
+            };
+            
+            execTool_blastxml2tab(args,function(data) {
+               console.log("completed blastxml2tabular submit ") 
+            });
         });
 
     });
@@ -138,7 +118,8 @@ function importFiles(theFile,postFn) {
                 "files_0|type":"upload_dataset",
                 "files_0|space_to_tab":null,
                 "files_0|to_posix_lines":"Yes",
-                "files_0|url_paste":theFile
+                "files_0|url_paste":theFile,
+                "files_0|name":"test-test"
             }
     };  
     var jsonstr = JSON.stringify(params);
@@ -161,7 +142,7 @@ function importFiles(theFile,postFn) {
             //JSON.stringify(eval("(" + str + ")"));
             //var result = JSON.parse(body);
             var result = body;
-            //console.dir(result);
+            console.dir(result);
             console.log("imported:");
             console.log(result.outputs[0].hid);
             console.log(result.outputs[0].id);
@@ -173,7 +154,7 @@ function importFiles(theFile,postFn) {
 }
 
 
-// run megablast
+// run blast
 function execTool_megablast(args,postFn){
     console.log('execTool_blastPlus()');
     console.dir(args);
@@ -182,6 +163,8 @@ function execTool_megablast(args,postFn){
     
     // todo: pass in the current history somehow
     
+    // megablast
+    /*
     var params = 
     {
       "tool_id":"toolshed.g2.bx.psu.edu/repos/devteam/megablast_wrapper/megablast_wrapper/1.2.0",
@@ -192,12 +175,13 @@ function execTool_megablast(args,postFn){
           "batch":false,
           "values":[
             {
-              "hid": args.hid,
-              "id": args.id,
+              "hid": args.hid, 
+              "id": args.id, 
               "name": args.name,
               "src":"hda"
             }
           ]
+                
         },
         "source_select":"13apr2014-htgs",   // todo: make this all the following configurable
         "word_size":"28",
@@ -206,6 +190,96 @@ function execTool_megablast(args,postFn){
         "filter_query":"yes"
       }
     };
+    */
+   // NCBI Blast
+    var params = 
+    {
+      "tool_id":"toolshed.g2.bx.psu.edu/repos/devteam/ncbi_blast_plus/ncbi_blastn_wrapper/0.1.07",
+      "tool_version":"0.1.07",
+      "history_id": "f597429621d6eb2b",   // must reference a history, todo: make this a variable
+      "inputs":{
+        "query":{
+          "batch":false,
+          "values":[
+            {
+              "hid": args.hid, 
+              "id": args.id, 
+              "name": args.name,
+              "src":"hda"
+            }
+          ]
+        },
+        "db_opts|db_opts_selector":"db",
+        "db_opts|database":"17apr2014-nt",
+        "db_opts|histdb":"",
+        "db_opts|subject":"",
+        "blast_type":"blastn",
+        "evalue_cutoff":"0.001",
+        "output|out_format":"5",
+        "adv_opts|adv_opts_selector":"basic"
+      }
+    };    
+    
+    var jsonstr = JSON.stringify(params);
+
+    request.post({
+        url: g.jbrowse.galaxyUrl+"/api/tools"+"?key="+g.jbrowse.galaxyAPIKey, 
+        method: 'POST',
+        //qs: params,
+        headers: {
+            //'Content-Type': 'application/json',
+            //'Accept':'application/json, text/javascript, */*; q=0.01',
+            'Accept-Encoding' : 'gzip, deflate',
+            'Accept-Language' : 'en-US,en;q=0.5',
+            'Content-Length' : jsonstr.length
+            //'Referrer':galaxyUrl,
+            //'X-Requested-With':'XMLHttpRequest'
+        },
+        json: params
+    }, function(error, response, body){
+        if(error) {
+            console.log(error);
+        } else {
+            var result = body;
+            //console.log(response.statusCode, body);
+            myPostFn(result);
+        }
+    });    
+    
+}
+// run Blast XML to Tabular
+function execTool_blastxml2tab(args,postFn){
+    console.log('execTool_blastPlus()');
+    console.dir(args);
+    var myPostFn = postFn;
+    var g = sails.config.globals;
+    
+    // todo: pass in the current history somehow
+
+    
+    
+    var params = 
+    {
+      "tool_id":"toolshed.g2.bx.psu.edu/repos/devteam/ncbi_blast_plus/blastxml_to_tabular/0.1.07",
+      "tool_version":"0.1.07",
+      "history_id": "f597429621d6eb2b",   // must reference a history, todo: make this a variable
+      "inputs":{
+        "blastxml_file":{
+          "batch":false,
+          "values":[
+            {
+              "hid": args.hid, 
+              "id": args.id, 
+              "name": args.name,
+              "src":"hda"
+            }
+          ]
+        },
+        "output|out_format":"ext"
+      }
+    };
+            
+    
     var jsonstr = JSON.stringify(params);
 
     request.post({
