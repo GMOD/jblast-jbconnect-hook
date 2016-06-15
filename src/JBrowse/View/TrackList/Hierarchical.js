@@ -184,7 +184,9 @@ return declare(
                     title: Util.escapeHTML( trackConf.shortDescription || track.shortDescription ||  (trackConf.description===1?undefined:trackConf.description) || track.description || trackConf.Description || track.Description || trackConf.metadata && ( trackConf.metadata.shortDescription || trackConf.metadata.description || trackConf.metadata.Description ) || track.key || trackConf.key || trackConf.label )
                 }, category.pane.containerNode );
 
-            var checkbox = dom.create('input', { type: 'checkbox', className: 'check' }, labelNode );
+            var checkBoxProps = { type: 'checkbox', className: 'check' };
+            var checkBoxProps = thisB.extendCheckbox(checkBoxProps,trackConf);
+            var checkbox = dom.create('input', checkBoxProps, labelNode );
             var trackLabel = trackConf.label;
             var checkListener;
             this.own( checkListener = on( checkbox, 'click', function() {
@@ -196,6 +198,16 @@ return declare(
 
             this._updateTitles( category );
         }, this );
+    },
+    // method to extend checkbox properties
+    extendCheckbox: function(props,trackConf) {
+        //console.log("extendCheckbox",trackConf);
+        if (typeof trackConf.blastData !== 'undefined') {
+            console.log("extendCheckbox prop",props)
+            props.blastRef = trackConf.label;
+            props.className += " blast-item";
+        }
+        return props;
     },
     // called when item checkbox is clicked.
     itemClick: function(checkbox,trackConf) {
