@@ -188,7 +188,8 @@ return declare(
             var trackLabel = trackConf.label;
             var checkListener;
             this.own( checkListener = on( checkbox, 'click', function() {
-                thisB.browser.publish( '/jbrowse/v1/v/tracks/'+(this.checked ? 'show' : 'hide'), [trackConf] );
+                thisB.itemClick(this,trackConf);
+                //thisB.browser.publish( '/jbrowse/v1/v/tracks/'+(this.checked ? 'show' : 'hide'), [trackConf] );
             }));
             dom.create('span', { className: 'key', innerHTML: trackConf.key || trackConf.label }, labelNode );
 
@@ -196,6 +197,10 @@ return declare(
 
             this._updateTitles( category );
         }, this );
+    },
+    itemClick: function(checkbox,trackConf) {
+        
+        this.browser.publish( '/jbrowse/v1/v/tracks/'+(checkbox.checked ? 'show' : 'hide'), [trackConf] );
     },
 
     _loadState: function() {
