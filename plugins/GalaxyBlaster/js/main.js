@@ -119,6 +119,32 @@ return declare( JBrowsePlugin,
                     console.log("blast go btn",obj[0]);
                     //JBrowse.publish( '/jbrowse/v1/v/tracks/hide', [obj[0]] );
                     //browser.publish( '/jbrowse/v1/v/tracks/show', [obj[0]] );
+                    
+                    browser.blastFilter = $('#blast-filter-input').val();
+                    
+                    var filter = browser.blastFilter.split("/");
+                    
+                    switch(filter[0]) {
+                        case "evalue":
+                        case "bit-score":
+                        case "gap":
+                        case "identity":
+                            break;
+                        default:
+                            filter[0] = "bit-score";
+                    }
+                    if (filter.length==1) filter[1] = 0;
+                    else {
+                        filter[1] = parseInt(filter[1]);
+                        if (filter[1]=="NaN") filter[1] = 0;
+                    }
+                    console.log("filter",filter);
+                    
+                    // can contain bit-score,evalue,gap,identity
+                    var filterText = "Hsp_" + filter[0];
+                    var filterNum = filter[1];
+                    createTestFilter(filterText,filterNum);
+                    
                     $('#blast-accordion').html("");     // clearout the blast accordion
                     $('.blast-item').trigger('click');
                     setTimeout(function(){
@@ -165,9 +191,9 @@ function createTestFilter(value,num) {
     
     // sort the list based on desired sort (value)
     function compare(a,b) {
-        if (a.Hsp[value] < b.Hsp[value])
-            return -1;
         if (a.Hsp[value] > b.Hsp[value])
+            return -1;
+        if (a.Hsp[value] < b.Hsp[value])
             return 1;
         return 0;
     }

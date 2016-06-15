@@ -758,8 +758,6 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
 
         this.scale = scale;
 
-        console.log("fill features verify", browser.blastDataFiltered);
-
         block.featureNodes = {};
 
         //determine the glyph height, arrowhead width, label text dimensions, etc.
