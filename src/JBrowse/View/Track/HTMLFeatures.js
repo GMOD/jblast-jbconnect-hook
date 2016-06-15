@@ -120,12 +120,9 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
             browser.blastTrack = this;
         }
         
-        // full hit set
         //var hits = obj.BlastOutput.BlastOutput_iterations.Iteration.Hit;
+        
         var hits = browser.blastData;
-
-        // filtered hit set
-        var hits = browser.blastDataFiltered;
 
         var txt = "";
         
@@ -210,8 +207,8 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
     },
     blastRenderHitBp: function(hit){
         
-        var coordHstr = repeatChar(hit.Hsp.Hsp_hseq.length,".");
-        var coordQstr = repeatChar(hit.Hsp.Hsp_hseq.length,".");
+        var coordHstr = repeatChar(hit.Hsp.Hsp_hseq.length," ");    //"┬"
+        var coordQstr = repeatChar(hit.Hsp.Hsp_hseq.length," ");    //"┴"
         var len = hit.Hsp['Hsp_align-len'];
         console.log("hitlen",len,hit);
         
@@ -222,8 +219,8 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
         
         var inc = 20;
         for(var i = 0; i < len;i += inc) {
-            coordHstr = overwriteStr(coordHstr,coordHbase+i,"|"+(coordH+i));
-            coordQstr = overwriteStr(coordQstr,coordQbase+i,"|"+(coordQ+i));
+            coordHstr = overwriteStr(coordHstr,coordHbase+i,"├"+(coordH+i));
+            coordQstr = overwriteStr(coordQstr,coordQbase+i,"├"+(coordQ+i));
         }
         
         var txt = '';

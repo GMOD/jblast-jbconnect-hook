@@ -131,7 +131,9 @@ return declare( JBrowsePlugin,
                 
                 // todo: handle more than one blast dataset
                 //console.log("blastData obj",obj[0]);
-                blastReadJSON(obj[0],createTestFilter);
+                blastReadJSON(obj[0],function() {
+                    createTestFilter("Hsp_bit-score",20);
+                });
             }
         });
         
@@ -150,15 +152,16 @@ function createTestFilter(value,num) {
         //var newItem = new Object();
         //newItem.key = x;
         //newItem.hit = blastData[x];
-        blastData[x].selected = 0;  // clear all selected
+        if (num > 0)
+            blastData[x].selected = 0;  // clear all selected
         sorted.push(blastData[x]);
     }
     
     // sort the list based on desired sort (value)
     function compare(a,b) {
-        if (a.Hsp['Hsp_bit-score'] < b.Hsp['Hsp_bit-score'])
+        if (a.Hsp[value] < b.Hsp[value])
             return -1;
-        if (a.Hsp['Hsp_bit-score'] > b.Hsp['Hsp_bit-score'])
+        if (a.Hsp[value] > b.Hsp[value])
             return 1;
         return 0;
     }
@@ -167,23 +170,24 @@ function createTestFilter(value,num) {
     
     
     // chop the list based on (num)
-    var filtered = [];
-    var count = 15;
-    
-    for(var i in sorted) {
-        if (count-- <= 0) continue; 
-        //filtered[sorted[i].key] = sorted[i].hit;
-        sorted[i].selected = 1; // mark selected
-        filtered.push(sorted[i]);
+    if (num > 0) {
+        var filtered = [];
+        var count = num;
+
+        for(var i in sorted) {
+            if (count-- <= 0) continue; 
+            //filtered[sorted[i].key] = sorted[i].hit;
+            sorted[i].selected = 1; // mark selected
+            filtered.push(sorted[i]);
+        }
+        // debug show results
+        for(var i in filtered) {
+            console.log(filtered[i].Hsp[value],filtered[i]);
+        }
+
+        console.log("filtered list",filtered);
+        JBrowse.blastData = filtered;
     }
-    // debug show results
-    for(var i in filtered) {
-        console.log(filtered[i].Hsp['Hsp_bit-score'],filtered[i]);
-    }
-    
-    console.log("filtered list",filtered);
-    JBrowse.blastDataFiltered = filtered;
-    //console.log("blast finished filtering",JBrowse.blastDataFiltered);
     return;
 }
 
