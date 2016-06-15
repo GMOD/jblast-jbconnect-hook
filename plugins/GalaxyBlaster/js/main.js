@@ -99,58 +99,156 @@ return declare( JBrowsePlugin,
             }
         });
         */
-        // create function intercept after view initialization (because the view object doesn't exist before that)
-        browser.afterMilestone( 'loadConfig', function() {
-            
-            require(["dojo/_base/lang", "JBrowse/View/FASTA"], function(lang, FASTA){
-                /*
-                lang.extend(FASTA, {
-                    renderHTML: function( region, seq, parent ) {
-                        console.log("intercept renderHTML()");
-                        console.dir(this);
-                        //return this.old_renderHTML( region, seq, parent );
-                    }
-                    
-                });
-                */
-            });
-        });
-        
-        // create function intercept after view initialization (because the view object doesn't exist before that)
-        browser.afterMilestone( 'loadConfig', function() {
-            
-            require(["dojo/_base/lang", "JBrowse/View/FASTA"], function(lang, FASTA){
-                /*
-                lang.extend(FASTA, {
-                    renderHTML: function( region, seq, parent ) {
-                        console.log("intercept renderHTML()");
-                        console.dir(this);
-                        //return this.old_renderHTML( region, seq, parent );
-                    }
-                    
-                });
-                */
-            });
-        });
-        // setup goto button for features
         browser.afterMilestone( 'initView', function() {
             
+            // setup goto button for features
             browser.blastGoto = function(obj) {
                 //alert($(obj).attr('blastkey'));
                 $('#blastPanel').openMbExtruder(true);$('#blastPanel').openPanel();
                 var i = '#'+$(obj).attr('blastkey');
-                console.log(i);
-                console.log($(i).html());
+                console.log("blast goto", i, $(i));
                 $('#j-blast').animate({
                     scrollTop: $(i).position().top
                 }, 500);
             };
+            
+            // process blast filter button "GO" in blast panel
+            $('#blast-filter-go').click(function() {
+                obj = findObjNested(browser.config,"blastData");
+                if (Array.isArray(obj)) {
+                    console.log("blast go btn",obj[0]);
+                    //JBrowse.publish( '/jbrowse/v1/v/tracks/hide', [obj[0]] );
+                    JBrowse.publish( '/jbrowse/v1/v/tracks/show', [obj[0]] );
+                }
+            });
+        });
+
+        browser.afterMilestone( 'loadConfig', function() {
+            
+            // load blast data from blast track config
+            obj = findObjNested(browser.config,"blastData");
+            if (Array.isArray(obj)) {
+                
+                // todo: handle more than one blast dataset
+                //console.log("blastData obj",obj[0]);
+                blastReadJSON(obj[0],createTestFilter);
+            }
         });
         
     }
 });
 });
 
+// a test filter to sorted
+function createTestFilter(value,num) {
+    //console.log("createTestFilter",JBrowse.blastData);
+    var blastData = JBrowse.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
+    
+    var sorted = [];
+    
+    for(var x in blastData) {
+        //var newItem = new Object();
+        //newItem.key = x;
+        //newItem.hit = blastData[x];
+        blastData[x].selected = 0;  // clear all selected
+        sorted.push(blastData[x]);
+    }
+    
+    // sort the list based on desired sort (value)
+    function compare(a,b) {
+        if (a.Hsp['Hsp_bit-score'] < b.Hsp['Hsp_bit-score'])
+            return -1;
+        if (a.Hsp['Hsp_bit-score'] > b.Hsp['Hsp_bit-score'])
+            return 1;
+        return 0;
+    }
+
+    sorted.sort(compare);
+    
+    
+    // chop the list based on (num)
+    var filtered = [];
+    var count = 15;
+    
+    for(var i in sorted) {
+        if (count-- <= 0) continue; 
+        //filtered[sorted[i].key] = sorted[i].hit;
+        sorted[i].selected = 1; // mark selected
+        filtered.push(sorted[i]);
+    }
+    // debug show results
+    for(var i in filtered) {
+        console.log(filtered[i].Hsp['Hsp_bit-score'],filtered[i]);
+    }
+    
+    console.log("filtered list",filtered);
+    JBrowse.blastDataFiltered = filtered;
+    //console.log("blast finished filtering",JBrowse.blastDataFiltered);
+    return;
+}
+
+// retrieve blast data json into this.blastData
+function blastReadJSON(config,postFn) {
+    console.log("BLAST READ XML in main");
+    //console.log(this,args);
+    //var thisB = JBrowse;
+
+    JBrowse.blastDataJSON = 0;
+    JBrowse.blastData = 0;
+
+    var blastDataFile = config.blastData;
+    if (typeof blastDataFile !== "undefined") {
+        dojo.xhrGet({
+            url: config.baseUrl+blastDataFile,
+            handleAs: "json",
+            load: function(obj) {
+                //blastRenderData();
+                
+                var hits = obj.BlastOutput.BlastOutput_iterations.Iteration.Hit;
+
+                var flist = [];
+                for(var i in hits) {
+                    hits[i].key = i;
+                    hits[i].selected = 1;
+                    flist.push(hits[i]);
+                }
+                console.log("blastDataJSON "+blastDataFile,obj);
+                JBrowse.blastDataJSON = obj;
+                
+                console.log("blastDataJSON "+blastDataFile,flist);
+                JBrowse.blastData = flist;
+                
+                postFn();
+            },
+            error: function(err) {
+                console.log(err);
+            }
+        });            
+    }
+}
+
+// recursively find id in a node tree
+// find key in a complex object, recursive.  Returns the object list containing such key
+function findObjNested(obj, key, memo) {
+  var i,
+      proto = Object.prototype,
+      ts = proto.toString,
+      hasOwn = proto.hasOwnProperty.bind(obj);
+
+  if ('[object Array]' !== ts.call(memo)) memo = [];
+
+  for (i in obj) {
+    if (hasOwn(i)) {
+      if (i === key) {
+        memo.push(obj);
+      } else if ('[object Array]' === ts.call(obj[i]) || '[object Object]' === ts.call(obj[i])) {
+        findObjNested(obj[i], key, memo);
+      }
+    }
+  }
+
+  return memo;
+}
 /**
  * Initialize notification subscriptions
  */

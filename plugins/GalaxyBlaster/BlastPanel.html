@@ -12,7 +12,7 @@
         #j-blast {
             position:absolute;
             background-color:#eee;
-            overflow-x:auto;
+            overflow-x:hidden;
             overflow-y:auto;
             width: 100%;
             padding:10px;
@@ -44,12 +44,12 @@
             var h = $("div.extruder-content").height();
             var w = $('.tg-yw4l').width();
             $("#j-hist-grid").height(h);
-            $("#j-blast").height(h-20);
-            $('#j-blast').width(w-15);
+            $("#j-blast").height(h-62);
+            $('#j-blast').width(w-19);
         },1000);
         
         setTimeout(function(){
-            $('.extruder-container').css('height','250px');     // for some reason, we must do this, why?
+            $('.extruder-container').css('height','350px');     // for some reason, we must do this, why?
             doGetJobs();
         },3000);
         
@@ -207,7 +207,19 @@
   <div style="width:100%;padding-left:5px;padding-right:5px;padding-top:2px">
     <table class="tg" style="width:100%">
       <tr>
-        <td class="tg-yw4l">
+        <td class="tg-yw4l" style="background-color: #eee">
+
+            <div class="row" style="padding-left: 10px;padding-top: 5px;">
+              <div class="col-lg-6">
+                <div class="input-group">
+                  <input type="text" class="form-control" placeholder="BLAST Filter...">
+                  <span class="input-group-btn">
+                    <button id="blast-filter-go" class="btn btn-secondary" type="button">Go</button>
+                  </span>
+                </div>
+              </div>
+            </div>            
+            
             <div id="j-blast">
                 <div class="panel-group" id="blast-accordion">
                 </div>

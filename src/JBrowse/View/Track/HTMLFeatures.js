@@ -78,7 +78,8 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
 
         this._setupEventHandlers();
         
-        this.blastReadXML(args);
+        //this.blastReadXML(args);
+        this.blastRenderData();
     },
     
     // retrieve blast data json into this.blastData
@@ -108,20 +109,36 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
     // render data into blast panel
     blastRenderData: function() {
         var thisB = this;
-        var obj = this.blastData;
+        var browser = this.browser;
+        var obj = browser.blastData;
         //console.log("blastRenderData");
-        var hits = obj.BlastOutput.BlastOutput_iterations.Iteration.Hit;
         
+        var blastDataFile = this.config.blastData;
+        
+        // save blast track - temporary solution
+        if (typeof blastDataFile !== "undefined") {
+            browser.blastTrack = this;
+        }
+        
+        // full hit set
+        //var hits = obj.BlastOutput.BlastOutput_iterations.Iteration.Hit;
+        var hits = browser.blastData;
+
+        // filtered hit set
+        var hits = browser.blastDataFiltered;
+
         var txt = "";
         
         for (var x in hits) {
-            var key = x;
+            //console.log("accordion item", hit)
+            var key = hits[x].key;
             blast_addPanel(key,hits[x].Hit_def);
         }
         $('#blast-accordion').on('show.bs.collapse', function(e) {
             var key = $(e.target).attr('id');
             //console.log(e.target);
-            var hit = thisB.blastData.BlastOutput.BlastOutput_iterations.Iteration.Hit[key];
+            var hit = browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit[key];
+            console.log("expand hit",hit);
             var txt = thisB.blastRenderHit(hit);
             txt += thisB.blastRenderHitBp(hit);
             $('.panel-body',e.target).html(txt);
@@ -132,10 +149,10 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
             // setup tooltip
             $('.blast-feature').each(function() {
                 var key = $(this).attr('blastkey');
-                var hit = thisB.blastData.BlastOutput.BlastOutput_iterations.Iteration.Hit[key];
+                var hit = browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit[key];
                 //console.log('key-hit ',key,hit);
                 
-                var text = '<div>'+thisB.blastRenderHit(hit)+'<button blastkey="'+key+'"onclick="JBrowse.blastGoto(this)">Goto</button></div>';
+                var text = '<div>'+thisB.blastRenderHit(hit)+'<button class="btn btn-primary" blastkey="'+key+'"onclick="JBrowse.blastGoto(this)">Goto</button></div>';
                 
                 $(this).qtip({
                     content: {
@@ -143,7 +160,7 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
                         title: hit.Hit_def
                     },
                     style: {
-                        classes: 'qtip-tipped', //'qtip-tipped' 'ui-tooltip-blue
+                        classes: 'blastQtip qtip-tipped', //'qtip-tipped' 'ui-tooltip-blue
                         width: "400px"
                     },
                     position: { // tooltip shows up near mouse
@@ -179,13 +196,13 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
         txt +=    '<td>Expect</td>';
         txt +=    '<td>Identities</td>';
         txt +=    '<td>Gaps</td>';
-        txt +=    '<td>Strand</td>';
+        //txt +=    '<td>Strand</td>';
         txt += '</tr><tr>';
         txt +=    '<td>'+hit.Hsp['Hsp_bit-score']+'('+hit.Hsp.Hsp_score+')</td>';
         txt +=    '<td>'+hit.Hsp.Hsp_evalue+'</td>';
         txt +=    '<td>'+hit.Hsp.Hsp_identity+'/'+hit.Hsp['Hsp_align-len']+'</td>';
         txt +=    '<td>'+hit.Hsp.Hsp_gaps+'/'+hit.Hsp['Hsp_align-len']+'</td>';
-        txt +=    '<td>'+hit.Hsp['Hsp_query-strand']+'/'+hit.Hsp['Hsp_hit-strand-len']+'</td>';
+        //txt +=    '<td>'+hit.Hsp['Hsp_query-strand']+'/'+hit.Hsp['Hsp_hit-strand-len']+'</td>';
         txt += '</tr></table>';
         //txt += '</div>'
         
@@ -739,8 +756,12 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
         var containerStart = args.containerStart;
         var containerEnd = args.containerEnd;
         var finishCallback = args.finishCallback;
+        var browser = this.browser;
+        
 
         this.scale = scale;
+
+        console.log("fill features verify", browser.blastDataFiltered);
 
         block.featureNodes = {};
 
@@ -761,8 +782,19 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
                 /* feature render, adding to block, centering refactored into addFeatureToBlock() */
                 // var filter = this.browser.view.featureFilter;
                 if( this.filterFeature( feature ) )  {
-                    this.addFeatureToBlock( feature, uniqueId, block, scale, labelScale, descriptionScale,
-                                            containerStart, containerEnd );
+                    
+                    // check blast data
+                    var blastData = browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
+                    
+                    var blasthit = feature.get('blasthit');
+                    //console.log("featurefilter",blasthit);
+                    var render = 0;
+                    if ((typeof blastData !== 'undefined') && (typeof blasthit !== 'undefined'))
+                        render = blastData[blasthit].selected;
+                    
+                    if ((render === 1) || (typeof blasthit === 'undefined')) {
+                        this.addFeatureToBlock( feature, uniqueId, block, scale, labelScale, descriptionScale, containerStart, containerEnd );
+                    }
                }
             }
         });
