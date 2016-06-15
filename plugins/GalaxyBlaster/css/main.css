@@ -4,3 +4,8 @@
 */
 
 .blast-feature: hover
+
+.blastQtip {
+    max-width: 1000px !important;
+    min-width: 7000px !important;
+}
