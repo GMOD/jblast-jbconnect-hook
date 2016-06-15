@@ -189,7 +189,6 @@ return declare(
             var checkListener;
             this.own( checkListener = on( checkbox, 'click', function() {
                 thisB.itemClick(this,trackConf);
-                //thisB.browser.publish( '/jbrowse/v1/v/tracks/'+(this.checked ? 'show' : 'hide'), [trackConf] );
             }));
             dom.create('span', { className: 'key', innerHTML: trackConf.key || trackConf.label }, labelNode );
 
@@ -198,6 +197,7 @@ return declare(
             this._updateTitles( category );
         }, this );
     },
+    // called when item checkbox is clicked.
     itemClick: function(checkbox,trackConf) {
         
         this.browser.publish( '/jbrowse/v1/v/tracks/'+(checkbox.checked ? 'show' : 'hide'), [trackConf] );
