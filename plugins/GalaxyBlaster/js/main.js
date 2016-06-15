@@ -118,7 +118,12 @@ return declare( JBrowsePlugin,
                 if (Array.isArray(obj)) {
                     console.log("blast go btn",obj[0]);
                     //JBrowse.publish( '/jbrowse/v1/v/tracks/hide', [obj[0]] );
-                    JBrowse.publish( '/jbrowse/v1/v/tracks/show', [obj[0]] );
+                    //browser.publish( '/jbrowse/v1/v/tracks/show', [obj[0]] );
+                    $('#blast-accordion').html("");     // clearout the blast accordion
+                    $('.blast-item').trigger('click');
+                    setTimeout(function(){
+                        $('.blast-item').trigger('click');
+                    },300);
                 }
             });
         });
@@ -133,6 +138,7 @@ return declare( JBrowsePlugin,
                 //console.log("blastData obj",obj[0]);
                 blastReadJSON(obj[0],function() {
                     createTestFilter("Hsp_bit-score",20);
+                    console.log("blastData",browser.blastData);
                 });
             }
         });
@@ -181,11 +187,12 @@ function createTestFilter(value,num) {
             filtered.push(sorted[i]);
         }
         // debug show results
+        /*
         for(var i in filtered) {
             console.log(filtered[i].Hsp[value],filtered[i]);
         }
-
-        console.log("filtered list",filtered);
+        */
+        //console.log("filtered list",filtered);
         JBrowse.blastData = filtered;
     }
     return;
@@ -216,10 +223,10 @@ function blastReadJSON(config,postFn) {
                     hits[i].selected = 1;
                     flist.push(hits[i]);
                 }
-                console.log("blastDataJSON "+blastDataFile,obj);
+                //console.log("blastDataJSON "+blastDataFile,obj);
                 JBrowse.blastDataJSON = obj;
                 
-                console.log("blastDataJSON "+blastDataFile,flist);
+                //console.log("blastDataJSON "+blastDataFile,flist);
                 JBrowse.blastData = flist;
                 
                 postFn();
@@ -254,8 +261,9 @@ function findObjNested(obj, key, memo) {
   return memo;
 }
 /**
- * Initialize notification subscriptions
+ * Initialize notification subscriptions (keep for reference, for now)
  */
+/*
 function ext_subscribeToChannel(channel,listener) {
     var thisB = this;
     var channelPrefix = thisB.config.notifications.channel || "";
@@ -304,3 +312,4 @@ function ext_initNotifications() {
         }
     });
 }
+*/
