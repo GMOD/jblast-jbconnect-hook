@@ -184,16 +184,18 @@ function createTestFilter(value,num) {
         //var newItem = new Object();
         //newItem.key = x;
         //newItem.hit = blastData[x];
-        if (num > 0)
+        if (num == 0)
+            blastData[x].selected = 1;  // clear all selected
+        else
             blastData[x].selected = 0;  // clear all selected
         sorted.push(blastData[x]);
     }
     
     // sort the list based on desired sort (value)
     function compare(a,b) {
-        if (a.Hsp[value] > b.Hsp[value])
-            return -1;
         if (a.Hsp[value] < b.Hsp[value])
+            return -1;
+        if (a.Hsp[value] > b.Hsp[value])
             return 1;
         return 0;
     }
