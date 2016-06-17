@@ -106,10 +106,14 @@ return declare( JBrowsePlugin,
                 //alert($(obj).attr('blastkey'));
                 $('#blastPanel').openMbExtruder(true);$('#blastPanel').openPanel();
                 var i = '#'+$(obj).attr('blastkey');
-                console.log("blast goto", i, $(i));
+                var item = $(i).parent();
+                console.log("blast goto", i, item.position().top);
                 $('#j-blast').animate({
-                    scrollTop: $(i).position().top
+                    scrollTop: item.position().top
                 }, 500);
+                setTimeout(function() {
+                    $(i).collapse('show');
+                },1000);
             };
             
             // process blast filter button "GO" in blast panel

@@ -156,6 +156,7 @@
         $newPanel.find(".accordion-toggle").attr("href",  "#" + id)
                  .text(text);
         $newPanel.find(".panel-collapse").attr("id", id).addClass("collapse").removeClass("in");
+        //$newPanel.attr("blastid", id);
         $("#blast-accordion").append($newPanel.fadeIn());
     };
     
@@ -188,7 +189,16 @@
       return result + result.substring(0, count - result.length);
     };
     
-        /*
+    // debugging display positions
+    /*
+    setInterval(function() {
+        $('.blast-debug-pos').each(function() {
+            //console.log("position",$(this).position().top);
+            $(this).html($(this).position().top);
+        });
+    },2000);
+    */
+    /*
         var toggleChevron = function (e) {
           $(e.target)
             .prev('.panel-heading')
@@ -252,6 +262,7 @@
 
     <div style="display:none">
       <div class="panel panel-default blast-panel-template">
+          <!--span class="blast-debug-pos" style="position:absolute;border:1px solid blue">.</span-->
         <div class="panel-heading">
           <h4 class="panel-title">
             <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseThree">

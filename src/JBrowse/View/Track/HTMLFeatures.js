@@ -133,12 +133,19 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
         }
         $('#blast-accordion').on('show.bs.collapse', function(e) {
             var key = $(e.target).attr('id');
+            item = e.target;
+            
+            if (typeof key === 'undefined') {
+                item = $('.panel-collapse',e.target);
+                key = item.attr('id');
+            }
             //console.log(e.target);
             var hit = browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit[key];
-            console.log("expand hit",hit);
+            console.log("expand hit",key,item);
             var txt = thisB.blastRenderHit(hit);
             txt += thisB.blastRenderHitBp(hit);
-            $('.panel-body',e.target).html(txt);
+            
+            $('.panel-body',item).html(txt);
         });
         
         // setup the feature tooltip
@@ -182,10 +189,9 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
         
     },
     blastRenderHit: function(hit){
-        //console.log("blastRenderHit");
+        //console.log("blastRenderHit",hit);
         var txt = '';
         
-        //txt += '<span>'+hit.Hit_def+'</span>';
         txt += '<span>Sequence ID: '+hit.Hit_id+' Length: '+hit.Hit_len+' Matches: '+hit.Hit_count+'</span>';
         //txt += '<div class="CSSTableGenerator">';
         txt += '<table class="CSSTableGenerator" style="width:100px"><tr id="head">';
@@ -210,7 +216,7 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
         var coordHstr = repeatChar(hit.Hsp.Hsp_hseq.length," ");    //"┬"
         var coordQstr = repeatChar(hit.Hsp.Hsp_hseq.length," ");    //"┴"
         var len = hit.Hsp['Hsp_align-len'];
-        console.log("hitlen",len,hit);
+        //console.log("hitlen",len,hit);
         
         var coordHbase = 0;
         var coordH = parseInt(hit.Hsp['Hsp_hit-from']);
