@@ -1,12 +1,12 @@
 <tool id="jb_blast2gff" name="BlastTab2GFF" version="1.0.0">
   <description>Convert BLAST to GFF for JBrowse Blaster</description>
-  <command interpreter="perl">Blast2Gff.pl -i $input1 -o $output -d "/var/www/html/galaxy/data/blastdb/wgs/20apr2014/wgs" -s $input2</command>
+  <command interpreter="perl">Blast2Gff.pl -i $blasttab -o $output -d "/var/www/html/galaxy/data/blastdb/wgs/20apr2014/wgs" -s $refseq</command>
   <inputs>
-    <param format="tabular" name="input1" type="data" label="BLAST Result file (tabular)"/>
-    <param format="fasta" name="input2" type="data" label="Original Sequence file (FASTA)"/>
+    <param format="tabular" name="blasttab" type="data" label="BLAST Result file (tabular)"/>
+    <param format="fasta" name="refseq" type="data" label="Original Sequence file (FASTA)"/>
   </inputs>
   <outputs>
-    <data format="gff3" name="output" label="BLAST to GFF3 output"/>
+    <data format="gff3" name="output" label="jb blasttab to GFF3"/>
   </outputs>
 
   <help>
