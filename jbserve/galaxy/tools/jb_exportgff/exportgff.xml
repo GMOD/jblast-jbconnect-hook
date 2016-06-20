@@ -1,11 +1,11 @@
 <tool id="jb_exportgff" name="Export Gff to JBrowse" version="1.0.0">
-  <description>Export GFF file to JBrowse and notify</description>
-  <command interpreter="node">add-track-json.js -t ./inMemTemplate.json -f $input1 -o $output</command>
+  <description>Export GFF/JSON file(s) to JBrowse and notify</description>
+  <command interpreter="node">jbexport.js -t ./inMemTemplate.json -f $input1 -o $output</command>
   <inputs>
     <param format="gff" name="input1" type="data" label="GFF file"/>
   </inputs>
   <outputs>
-      <data format="json" name="output" label="JSON output"/>
+      <data format="json" name="output" label="jb export results (JSON)"/>
 </outputs>
 
   <help>

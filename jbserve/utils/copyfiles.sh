@@ -4,7 +4,7 @@
 cp -v ../galaxy/config/tool_conf.xml /var/www/html/galaxy/config/ # 
 
 mkdir -p /var/www/html/galaxy/tools/jb_exportgff #
-cp -v add-track-json.js /var/www/html/galaxy/tools/jb_exportgff #
+cp -v jbexport.js /var/www/html/galaxy/tools/jb_exportgff #
 cp -v inMemTemplate.json /var/www/html/galaxy/tools/jb_exportgff #
 cp -rv node_modules/ /var/www/html/galaxy/tools/jb_exportgff #
 cp -rv ../galaxy/tools/jb_exportgff/ /var/www/html/galaxy/tools/ #
