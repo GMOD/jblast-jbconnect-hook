@@ -8,8 +8,12 @@ var request = require('request');
 var fs = require('fs');
 var path = require('path');
 
-var filePath = "/var/www/html/jb-galaxy-blaster/tmp/";
-var urlPath = "http://localhost/jb-galaxy-blaster/tmp/";
+//var filePath = "/var/www/html/jb-galaxy-blaster/tmp/";
+//var urlPath = "http://localhost/jb-galaxy-blaster/tmp/";
+
+var globalPath = "/etc/jbrowse";
+var globalFile = globalPath + "/globals.dat";
+
 
 module.exports = function (sails) {
 
@@ -18,12 +22,13 @@ module.exports = function (sails) {
         initialize: function(cb) {
            console.log("Sails Hook: jb-galaxy-blast initialize"); 
            // todo: check that galaxy is running
-
+           
            return cb();
         },
         routes: {
            after: {
               'post /jbapi/blastregion': rest_BlastRegion,
+              'post /jbapi/workflowsubmit': rest_WorkflowSubmit,
 
               'post /jbapi/posttest': function (req, res, next) {
                   console.log("jb-galaxy-blast /jbapi/posttest called");
@@ -36,11 +41,103 @@ module.exports = function (sails) {
                   res.send({result:"jb-galaxy-blast gettest success"});
                   //return next();
               }
+              
            }
         }
 
     }
 };
+
+function rest_WorkflowSubmit(req,res) {
+    var g = sails.config.globals;
+    var region = req.body.region;
+    var workflow = req.body.workflow;
+    
+    var params = {
+        //workflow_id: 'f2db41e1fa331b3e',
+        workflow_id: workflow,
+        history: 'hist_id=f597429621d6eb2b',
+        ds_map: {
+            "0": {
+                src: 'hda',
+                id: 'test.out'//result.outputs[0].id
+            }
+        }
+    };
+    
+    console.log("params",params);
+    var jsonstr = JSON.stringify(params);
+
+    var d = new Date();
+
+    // write the BLAST region file
+    
+    var theBlastFile = "blast_region"+d.getTime()+".fa";
+    
+    // write the received region into a file
+    // todo: handle errors
+    ws = fs.createWriteStream(g.jbrowse.filePath+theBlastFile);
+    ws.write(region);
+    ws.end();
+    
+
+    // write variable to global
+    var blastData = {
+            "name": "JBlast", 
+            //"blastSeq": "/var/www/html/jb-galaxy-blaster/tmp/44705works.fasta",
+            "blastSeq": g.jbrowse.filePath+theBlastFile,
+            "originalSeq": "/var/www/html/jb-galaxy-blaster/tmp/volvox.fa",
+            "offset": 44705
+    };
+    
+    storeInGlobals(blastData,"jblast");
+   
+    console.log("blastData",blastData);
+    
+    
+    request.post({
+        url: g.jbrowse.galaxyUrl+"/api/workflows"+"?key="+g.jbrowse.galaxyAPIKey, 
+        method: 'POST',
+        //qs: params,
+        headers: {
+            'Accept-Encoding' : 'gzip, deflate',
+            'Accept-Language' : 'en-US,en;q=0.5',
+            'Content-Length' : jsonstr.length
+        },
+        json: params
+    }, function(error, response, body){
+        if(error) {
+            console.log(error);
+        } else {
+            //console.log(response.statusCode, body);
+            //JSON.stringify(eval("(" + str + ")"));
+            //var result = JSON.parse(body);
+            var result = body;
+            console.log(result);
+        }
+    });    
+    
+}
+
+// store section in globals
+function storeInGlobals (sectionData,sectionName) {
+    
+    fs.readFile(globalFile, function read(err, data) {
+        if (err) {
+            throw err;
+        }
+        var g = JSON.parse(data);
+        g[sectionName] = sectionData;
+
+        var gStr = JSON.stringify(g,null,4);
+
+        fs.writeFile(globalFile,gStr, function (err) {
+            if (err) throw err;
+            console.log("Global file: "+ globalFile);
+        });
+    });    
+        
+}
 
 
 // REST function for /jbapi/blastregion
@@ -89,7 +186,7 @@ function rest_BlastRegion(req,res) {
             };
             
             execTool_blastxml2tab(args,function(data) {
-               console.log("completed blastxml2tabular submit ") 
+               console.log("completed blastxml2tabular submit "); 
             });
         });
 
@@ -152,7 +249,6 @@ function importFiles(theFile,postFn) {
     });    
     
 }
-
 
 // run blast
 function execTool_megablast(args,postFn){
