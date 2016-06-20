@@ -8,6 +8,8 @@ var prettyjson = require('prettyjson');
 
 var $ = 0;
 
+var galaxyWorkflows = [];
+
 require("jsdom").env("", function(err, window) {
 	if (err) {
 		console.error(err);
@@ -39,12 +41,18 @@ module.exports = function galaxyKueSyncHook(sails) {
                 //console.log("intervalCount "+intervalCount++);
                 //syncGalaxyJobs();
                 syncGalaxyHistories();
+                read_workflows();
             },2500);
             
             return cb();
         },
         routes: {
            before: {
+              'get /jbapi/getworkflows': function (req, res, next) {
+                    console.log("jb-galaxy-kue-sync /jbapi/getworkflows called");
+                    //console.dir(req.params);
+                    return res.send(galaxyWorkflows);
+              },
               'get /jbapi/cleankue': function (req, res, next) {
                   console.log("jb-galaxy-kue-sync /jbJob/cleankue called");
                   cleanupQueue (req, res);
@@ -67,6 +75,23 @@ module.exports = function galaxyKueSyncHook(sails) {
    };
 };
 console.log("Sails Hook: JBrowse-Galaxy Kue Sync");
+
+// read galaxy workflows into galaxyWorkflows[]
+function read_workflows() {
+    
+    var g = sails.config.globals;
+    
+    request(g.jbrowse.galaxyUrl +"/api/workflows?key="+g.jbrowse.galaxyAPIKey, function (error, response, body) {
+        if (!error && response.statusCode === 200) {
+            //console.log(body);
+            
+            galaxyWorkflows = JSON.parse(body);
+            
+        }
+    });
+    
+}
+
 
 
 function syncGalaxyHistories() {
