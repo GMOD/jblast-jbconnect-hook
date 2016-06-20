@@ -1,8 +1,9 @@
 <tool id="jb_exportgff" name="Export Gff to JBrowse" version="1.0.0">
   <description>Export GFF/JSON file(s) to JBrowse and notify</description>
-  <command interpreter="node">jbexport.js -t ./inMemTemplate.json -f $input1 -o $output</command>
+  <command interpreter="node">jbexport.js -t ./inMemTemplate.json -g $gffin -b $jsonin -o $output</command>
   <inputs>
-    <param format="gff" name="input1" type="data" label="GFF file"/>
+    <param format="gff" name="gffin" type="data" label="GFF in"/>
+    <param format="json" name="jsonin" type="data" label="blastJSON in"/>
   </inputs>
   <outputs>
       <data format="json" name="output" label="jb export results (JSON)"/>

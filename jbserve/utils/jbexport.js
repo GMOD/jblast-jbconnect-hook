@@ -19,7 +19,8 @@ var request = require('request'),
 var opt = getopt.create([
     ['d' , 'data=PATH'       , 'path to JBrowse data directory'],
     ['t' , 'track=PATH'      , 'path to new track file'],
-    ['f' , 'file=PATH'       , 'file; '],
+    ['g' , 'gff=PATH'       , 'GFF file input; '],
+    ['b' , 'blastjson=PATH'       , 'blastJSON file input; '],
     ['l' , 'label=STRING'       , 'track label (unique)'],
     
     
