@@ -5,7 +5,7 @@
     <param format="blastxml" name="input1" type="data" label="BlastXML input file"/>
   </inputs>
   <outputs>
-    <data format="json" name="output" label="BlastXML to JSON output"/>
+    <data format="json" name="output" label="jb BlastXML to JSON output"/>
   </outputs>
 
   <help>
