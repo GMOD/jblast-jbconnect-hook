@@ -63,7 +63,7 @@ var trackListPath = path.join (dataDir, 'trackList.json');
 var newTrackPath = opt.options['track'] || opt.argv[0] || '/dev/stdin';
 var logging = opt.options['messages'];
 
-var theFile = opt.options['file'];
+var theFile = opt.options['gff'];
 
 /*
  * export the gff file to jbrowse
