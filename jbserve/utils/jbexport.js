@@ -22,6 +22,7 @@ var opt = getopt.create([
     ['g' , 'gff=PATH'       , 'GFF file input; '],
     ['b' , 'blastjson=PATH'       , 'blastJSON file input; '],
     ['l' , 'label=STRING'       , 'track label (unique)'],
+    ['o' , 'out=PATH'       , 'output jbrowse config JSON'],
     
     
 //    ['j' , 'jbrowse=PATH'    , 'JBrowse application path'],
