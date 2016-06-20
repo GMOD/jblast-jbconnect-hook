@@ -1,11 +1,11 @@
 <tool id="jb_blaststart" name="JBlastStart" version="1.0.0">
-  <description>Prepare files from JBrowse for BLAST</description>
+  <description>Prepare files JBrowse for BLAST</description>
   <command interpreter="node">jblaststart.js --blastseq $outBlastSeq --refseq $outRefSeq</command>
   <inputs>
   </inputs>
   <outputs>
-    <data format="fasta" name="outBlastSeq" label="JBrowse BLAST sequence out file (fasta)"/>
-    <data format="fasta" name="outRefSeq" label="JBrowse original seq out file (fasta)"/>
+    <data format="fasta" name="outBlastSeq" label="jb BLAST sequence (fasta)"/>
+    <data format="fasta" name="outRefSeq" label="jb original seq (fasta)"/>
   </outputs>
 
   <help>
