@@ -81,6 +81,16 @@
                 onExtContentLoad:function(){},
                 onExtClose:function(){}
             });
+            $("#blastFilterPanel").buildMbExtruder({
+                position:"bottom",
+                width:600,
+                extruderOpacity:.8,
+                //hidePanelsOnClose:true,
+                //accordionPanels:false,
+                onExtOpen:function(){},
+                onExtContentLoad:function(){},
+                onExtClose:function(){}
+            });
             
         });
         
@@ -202,5 +212,6 @@
     <div style="display: none">JBrowseDefaultMainPage</div>
     <!--div id="extruderLeft" class="{title:'Galaxy ', url:'plugins/GalaxyBlaster/historytable.html'}"></div-->
     <div id="blastPanel" class="{title:'BLAST ', url:'plugins/GalaxyBlaster/BlastPanel.html'}"></div>
+    <!--div id="blastFilterPanel" class="{title:'BLAST ', url:'plugins/GalaxyBlaster/BlastFilterPanel.html'}"></div-->
   </body>
 </html>
