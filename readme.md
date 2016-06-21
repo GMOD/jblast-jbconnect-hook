@@ -1,4 +1,4 @@
-# JBrowse Galaxy Blaster Plugin
+# JBrowse-Galaxy BLAST Plugin
 
 ##Requires:
 
