@@ -18,7 +18,7 @@ var request = require('request'),
 
 var opt = getopt.create([
     ['d' , 'data=PATH'       , 'path to JBrowse data directory'],
-    ['t' , 'track=PATH'      , 'path to new track file'],
+    ['t' , 'track=PATH'      , 'path to new track template'],
     ['g' , 'gff=PATH'       , 'GFF file input; '],
     ['b' , 'blastjson=PATH'       , 'blastJSON file input; '],
     ['l' , 'label=STRING'       , 'track label (unique)'],
@@ -40,67 +40,72 @@ var opt = getopt.create([
 /*
 read the jbrowse global config file in /etc/jbrowse/globals.dat
 */
-var globalPath = "/etc/jbrowse";
-var globalFile = globalPath + "/globals.dat";
+var g = getGlobals();
+console.log("globals",g);
 
-try {
-    fs.accessSync(globalFile, fs.F_OK);
-    var str = fs.readFileSync(globalFile);
-    var jGbl = JSON.parse(str);
-    //console.log('globals.dat',jGbl);
-} 
-catch (e) {
-    // It isn't accessible
-    console.error(e);
-    process.exit(1);
-}
-
-
-var dataDir = opt.options['data'] || jGbl.dataSet[0].dataPath || '.';
-
-var trackListPath = path.join (dataDir, 'trackList.json');
-
-// this is the track template file
-var newTrackPath = opt.options['track'] || opt.argv[0] || '/dev/stdin';
-var logging = opt.options['messages'];
-
-var theFile = opt.options['gff'];
-
+// export will copy result files into <dataset dir>/data (i.e. "/sample_data/json/volvox/data"
+var blastResultDir = "data";
 /*
  * export the gff file to jbrowse
  * the default directory will be the <jbrowse data directory>/data
  * 
  */
-//console.log("export file");
-var srcFile = theFile;
-var targetPath = jGbl.jbrowsePath + jGbl.dataSet[0].dataPath + "/data";
+var theGffSrc = opt.options['gff'];
+var theGffTarget = getTargetFile(theGffSrc,'gff');
 
-// strip out the source path
-var targetFileOnly =  path.basename(theFile);
-var trackLabel = targetFileOnly;
+var theJsonSrc = opt.options['blastjson'];
+var theJsonTarget = getTargetFile(theJsonSrc,'json');
 
-// rename .dat to .gff
-targetFileOnly.replace(".dat", ".gff");
+console.log("gff",theGffSrc,theGffTarget);
+console.log("json",theJsonSrc,theJsonTarget);
 
-// todo:  generalize look at the galaxy history data to identify the file type as well as the filename
+exportFile(theGffSrc,theGffTarget);
+exportFile(theJsonSrc,theJsonTarget);
 
-// prepend the full path
-targetFile = targetPath +"/"+ targetFileOnly;
+var fileGffOnly = path.basename(theGffTarget);
+var fileJsonOnly = path.basename(theGffTarget);
 
-//console.log(targetPath,targetFileOnly);
-try {
+notifyListeners();
+
+// write a file, just because the galaxy tool wants one.
+// todo: later we can perhaps output some info in this file.
+var outFile = opt.options['out'];
+fs.writeFileSync(outFile, 'Success');
+
+//process.exit(0);
+
+// copies the specified file into the data directory data directory of the jbrowse dataset, whatever that is.
+function getTargetFile(srcFile,ext) {
+
+    // get the garget path the the data directory
+    // todo: there needs to be a way to get a working path from the jbrowse GUI.
+    var targetPath = g.jbrowsePath + g.dataSet[0].dataPath + blastResultDir;
+
     // create the directory if necessary
-    if (!fs.existsSync(targetPath)){
-        fs.mkdir(targetPath, function(err) {
-            if (err)    throw err;
-        });
+    try {
+        if (!fs.existsSync(targetPath)){
+            fs.mkdir(targetPath, function(err) {
+                if (err) throw err;
+            });
+        }
     }
+    catch (err) {
+        console.error("create dir", err);
+        process.exit(1);
+    }
+    
+    // rename .dat to .gff
+    var ts = (new Date).getTime();
+    var filename = "";
+    if (ext==='gff') filename = "jblast-track-"+ts+".gff";
+    if (ext==='json')filename = "jblast-data-"+ts+".json";
+
+    // prepend the full path
+    targetFile = targetPath +"/"+ filename;
+
+    return targetFile;
+
 }
-catch (err) {
-    console.error("create dir", err);
-    process.exit(1);
-}
-exportFile(srcFile,targetFile);
 
 // copy the file to the jbrowse directory
 function exportFile(srcFile,targetFile) {
@@ -120,71 +125,105 @@ function exportFile(srcFile,targetFile) {
 /*
  * open track template file
  */
-fs.readFile (newTrackPath, function (err, newTrackData) {
-    console.log("reading file..."+newTrackPath);
-    if (err) throw err;
-
-
-    var newTrackJson = JSON.parse(newTrackData);
-
-    //console.log("file content");
-    //console.info(newTrackJson);
-
-    //if it's a single definition, coerce to an array
-    if (Object.prototype.toString.call(newTrackJson) !== '[object Array]') {
-        newTrackJson = [ newTrackJson ];
-    }
-   
-    // validate the new track JSON structures
-    newTrackJson.forEach (function (track) {
-        if (!track.label) {
-            console.error("Invalid track JSON: missing a label element");
-            process.exit (1);
+function notifyListeners () {
+    // this is the track template file
+    //var newTrackPath = opt.options['track'];
+    var trackListPath = g.jbrowsePath+g.dataSet[0].dataPath + blastResultDir;
+    var newTrackPath = trackListPath+'/'+"inMemTemplate.json";
+    console.log("notifyListeners()",newTrackPath,newTrackPath.length);
+    
+    fs.readFile (newTrackPath, function (err, newTrackData) {
+        console.log("reading file..."+newTrackPath);
+        if (err) { 
+            throw err;
+            console.log(err);
+            process.exit(1);
         }
+
+        var newTrackJson = JSON.parse(newTrackData);
+
+        //console.log("file content");
+        //console.info(newTrackJson);
+
+        //if it's a single definition, coerce to an array
+        if (Object.prototype.toString.call(newTrackJson) !== '[object Array]') {
+            newTrackJson = [ newTrackJson ];
+        }
+
+        // validate the new track JSON structures
+        newTrackJson.forEach (function (track) {
+            if (!track.label) {
+                console.error("Invalid track JSON: missing a label element");
+                process.exit (1);
+            }
+        });
+
+        var trackLabel = g.jblast.name+(new Date());
+
+        // replace some track info
+        newTrackJson[0].urlTemplate = blastResultDir+"/"+fileGffOnly;
+        newTrackJson[0].label = trackLabel;
+        newTrackJson[0].category= "BLAST Results";
+        newTrackJson[0].key = trackLabel;
+
+
+
+        var payload = {
+            "trackListPath": trackListPath,
+            "addTracks": newTrackJson,
+            "blastGff":blastResultDir+"/"+fileGffOnly,
+            "blastJson":blastResultDir+"/"+fileJsonOnly
+        };
+
+        //console.log(payload);
+
+        var strPayload = JSON.stringify(payload);
+        //strPayload = 'hello there';
+        var url = g.jbrowseRest+"/jbtrack/addTrack";
+        console.log("posting strPayload="+strPayload, url);
+
+        request.post({
+            url: url, 
+            method: 'POST',
+            //qs: params,
+            headers: {
+                'Accept-Encoding' : 'gzip, deflate',
+                'Accept-Language' : 'en-US,en;q=0.5',
+                'Content-Length' : strPayload.length
+            },
+            body: strPayload
+        }, function(error, response, body){
+            if(error) {
+                console.error(error);
+                process.exit(1);
+            } else {
+                console.log(response.statusCode, body);
+                //JSON.stringify(eval("(" + str + ")"));
+                //var result = JSON.parse(body);
+                var result = body;
+                console.dir(result);
+            }
+        });    
+
+
     });
+}
+function getGlobals() {
+    var globalPath = "/etc/jbrowse";
+    var globalFile = globalPath + "/globals.dat";
+    var jGbl = {};
     
-    // replace some track info
-    newTrackJson[0].urlTemplate = "data/"+targetFileOnly;
-    newTrackJson[0].label = trackLabel;
-    newTrackJson[0].category= "BLAST Results";
-    newTrackJson[0].key = trackLabel;
-
-
-    
-    // todo: eventually we need to grab some info from galaxy history
-    
-    var payload = {
-        "trackListPath": trackListPath,
-        "addTracks": newTrackJson
-    };
-    
-    //console.log(payload);
-
-    var strPayload = JSON.stringify(payload);
-    //strPayload = 'hello there';
-    //console.log("*************strPayload="+strPayload);
-
-    request.post({
-        url: jGbl.jbrowseRest+"/jbtrack/addTrack", 
-        method: 'POST',
-        //qs: params,
-        headers: {
-            'Accept-Encoding' : 'gzip, deflate',
-            'Accept-Language' : 'en-US,en;q=0.5',
-            'Content-Length' : strPayload.length
-        },
-        body: strPayload
-    }, function(error, response, body){
-        if(error) {
-            console.error(error);
-        } else {
-            console.log(response.statusCode, body);
-            //JSON.stringify(eval("(" + str + ")"));
-            //var result = JSON.parse(body);
-            var result = body;
-            console.dir(result);
-        }
-    });    
-
-
-});
+    try {
+        fs.accessSync(globalFile, fs.F_OK);
+        var str = fs.readFileSync(globalFile,"utf-8");
+        //console.log("global data len",str.length,str);
+        jGbl = JSON.parse(str);
+        //console.log('globals.dat',jGbl);
+    } 
+    catch (e) {
+        // It isn't accessible
+        console.error(e);
+        process.exit(1);
+    }
+    return jGbl;
+}

@@ -73,24 +73,35 @@ function startTracking(tracklist) {
 
 function addTrackJson(req,res,next) {
 
-    var g = sails.config.globals;
+    var g = sails.config.globals.jbrowse;
     
     var newTrackJson = req.body.addTracks;
-    var trackListPath = req.body.trackListPath;
+    //var trackListPath = req.body.trackListPath;
+
+    console.log('globals',g);
+    
+    //todo: make this configurable later
+    var trackListPath = g.jbrowsePath + g.dataSet[0].dataPath + 'trackList.json';
+    
+    
     //console.log(req.body);
     console.log("trackListPath = "+trackListPath);
     console.log("newTrackJson = ",newTrackJson);
     //var trackListPath = req.body.trackListPath;
     
-    var filePath = g.jbrowse.jbrowsePath+trackListPath;
+    var filePath = trackListPath;
     
+    console.log("reading ...");
     fs.readFile (filePath, function (err, trackListData) {
         if (err) {
             console.log ("Warning: could not open '" + trackListPath + "': " + err);
             return;
         }
+        
         var trackListJson = err ? {} : JSON.parse(trackListData);
-        trackListJson.tracks = trackListJson.tracks || [];
+        //trackListJson.tracks = trackListJson.tracks || [];
+        
+        console.log("read "+trackListJson.tracks.length + " tracks");
 
         //var timeout = setTimeout (function() {
         //    if (args.newTrackPath == '/dev/stdin')
