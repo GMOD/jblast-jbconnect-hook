@@ -20,7 +20,7 @@ module.exports.globals = {
         jbrowseURL: "http://localhost/jb-galaxy-blaster/",
         dataSet: [
             {
-                dataPath: "sample_data/json/volvox"
+                dataPath: "sample_data/json/volvox/"
             }
         ],
 
