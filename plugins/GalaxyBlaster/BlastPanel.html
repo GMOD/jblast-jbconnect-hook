@@ -188,7 +188,11 @@
       }
       return result + result.substring(0, count - result.length);
     };
-    
+    // setup sliders
+    $(function() {
+    //    $("#slider-score").slider({min:0,max:100}).slider("float");
+        
+    });
     // debugging display positions
     /*
     setInterval(function() {
@@ -221,11 +225,21 @@
 
             <div class="row" style="padding-left: 10px;padding-top: 5px;">
               <div class="col-lg-6">
-                <div class="input-group">
+                <div class="input-group" style="height:50px;width:500px;padding-left:20px;padding-top:10px;">
+                    <table cellpadding="5" style="width: 600px"><tr>
+                       <td style="width:100px;padding:10px;border:0px;">
+                        <span style="padding-bottom: 6px;">Score:</span> 
+                       </td>
+                       <td style="padding:10px;border:0px">
+                        <div id="slider-score"></div> 
+                       </td>
+                    </table>
+                  
                   <input id="blast-filter-input" type="text" class="form-control" placeholder="BLAST Filter...">
                   <span class="input-group-btn">
                     <button id="blast-filter-go" class="btn btn-secondary" type="button">Go</button>
                   </span>
+                  
                 </div>
               </div>
             </div>            

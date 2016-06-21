@@ -156,6 +156,7 @@ return declare( JBrowsePlugin,
                     },300);
                 }
             });
+
         });
 
         browser.afterMilestone( 'loadConfig', function() {
@@ -167,8 +168,9 @@ return declare( JBrowsePlugin,
                 // todo: handle more than one blast dataset
                 //console.log("blastData obj",obj[0]);
                 blastReadJSON(obj[0],function() {
-                    createTestFilter("Hsp_bit-score",20);
                     console.log("blastData",browser.blastData);
+                    //createTestFilter("Hsp_bit-score",20);
+                    gotBlastData();
                 });
             }
         });
@@ -176,6 +178,68 @@ return declare( JBrowsePlugin,
     }
 });
 });
+
+var lastVal = 0;
+function scoreFilter(val){
+    
+    if (lastVal == val) return;
+    lastVal = val;
+    
+    var blastData = JBrowse.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
+
+    for(var x in blastData) {
+        blastData[x].selected = 0;
+        if (parseFloat(blastData[x].Hsp['Hsp_bit-score']) > val) blastData[x].selected = 1;
+    }
+    
+    $('.blast-item').trigger('click');
+    setTimeout(function(){
+        $('.blast-item').trigger('click');
+    },300);
+    
+}
+
+// blast data has been acquired
+function gotBlastData() {
+
+    var browser = this.browser;
+    createTestFilter("Hsp_bit-score",20);
+    
+    var hi = getHighest('Hsp_bit-score');
+    var lo = getLowest('Hsp_bit-score');
+    console.log("score hi/lo",lo,hi);
+    
+    // setup sliders
+    $("#slider-score").slider({min:lo,max:hi}).slider("float");
+
+    setInterval(function() {
+        var val = $('#slider-score').slider("option", "value");
+        console.log('textbox',val);
+        scoreFilter(val);
+    },3000);
+    
+}
+
+function getHighest(variable) {
+    var blastData = JBrowse.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
+    var val = 0;
+    for(var x in blastData) {
+        //console.log(variable,blastData[x].Hsp[variable]);
+        if (parseFloat(blastData[x].Hsp[variable]) > val)
+            val = parseFloat(blastData[x].Hsp[variable]);
+    }
+    return Math.ceil(val);
+}
+function getLowest(variable) {
+    var blastData = JBrowse.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
+    var val = -1;
+    for(var x in blastData) {
+        if (val = -1) val = parseFloat(blastData[x].Hsp[variable]);
+        if (parseFloat(blastData[x].Hsp[variable]) < val)
+            val = parseFloat(blastData[x].Hsp[variable]);
+    }
+    return Math.floor(val);
+}
 
 // a test filter to sorted
 function createTestFilter(value,num) {
