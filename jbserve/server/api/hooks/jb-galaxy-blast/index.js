@@ -82,6 +82,8 @@ function rest_WorkflowSubmit(req,res) {
     
 
     // write variable to global
+    // todo: later the name and perhaps additional info should come from the FASTA header (ie: JBlast ctgA ctgA:46990..48410 (- strand)
+    // which should appear as the track name when the operation is done.
     var blastData = {
             "name": "JBlast", 
             //"blastSeq": "/var/www/html/jb-galaxy-blaster/tmp/44705works.fasta",
@@ -89,7 +91,6 @@ function rest_WorkflowSubmit(req,res) {
             "originalSeq": "/var/www/html/jb-galaxy-blaster/tmp/volvox.fa",
             "offset": 44705
     };
-    
     storeInGlobals(blastData,"jblast");
    
     console.log("blastData",blastData);
