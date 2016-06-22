@@ -179,6 +179,7 @@ return declare( JBrowsePlugin,
 });
 });
 
+// filter hits based on scores
 var lastVal = 0;
 function scoreFilter(val){
     
@@ -203,20 +204,39 @@ function scoreFilter(val){
 function gotBlastData() {
 
     var browser = this.browser;
+    // initial score filter (top 20)
     createTestFilter("Hsp_bit-score",20);
     
     var hi = getHighest('Hsp_bit-score');
     var lo = getLowest('Hsp_bit-score');
     console.log("score hi/lo",lo,hi);
     
+    var startPos = Math.round((hi - lo) * .8) + lo; // 80%
+    
     // setup sliders
-    $("#slider-score").slider({min:lo,max:hi}).slider("float");
+    $("#slider-score").slider({
+        min: lo,
+        max: hi//,
+        //values:[  400  ]
+    }).slider("pips");//.slider("float");
+
+    $("#slider-evalue").slider({min: 0,max: 100}).slider("pips");
+    $("#slider-identity").slider({min: -50,max: 50}).slider("pips");
+    $("#slider-gap").slider({min: .01,max: .1,step:.02}).slider("pips");
+    
 
     setInterval(function() {
         var val = $('#slider-score').slider("option", "value");
         console.log('textbox',val);
         scoreFilter(val);
     },3000);
+    
+    
+    // process blast filter button (toggle)
+    $( "#blast-filter-btn" ).click(function() {
+        if ($('#blast-filter-group').is(":visible")) $('#blast-filter-group').hide(500); 
+        else $('#blast-filter-group').show(500);
+    });    
     
 }
 
