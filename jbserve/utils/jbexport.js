@@ -157,11 +157,14 @@ function notifyListeners () {
                 process.exit (1);
             }
         });
-
-        var trackLabel = g.jblast.name+(new Date());
+        
+        var dateFormat = require('dateformat');
+        var ts = new Date();  
+        var trackLabel = g.jblast.name+' '+dateFormat(ts,"isoDateTime");
 
         // replace some track info
         newTrackJson[0].urlTemplate = blastResultDir+"/"+fileGffOnly;
+        newTrackJson[0].blastData = blastResultDir+"/"+fileJsonOnly;
         newTrackJson[0].label = trackLabel;
         newTrackJson[0].category= "BLAST Results";
         newTrackJson[0].key = trackLabel;
