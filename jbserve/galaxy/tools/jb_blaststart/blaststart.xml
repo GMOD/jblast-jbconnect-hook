@@ -1,5 +1,5 @@
 <tool id="jb_blaststart" name="JBlastStart" version="1.0.0">
-  <description>Prepare files JBrowse-Galaxy BLAST Module</description>
+  <description>Import data to Galaxy from JBrowse-Galaxy BLAST Module</description>
   <command interpreter="node">jblaststart.js --blastseq $outBlastSeq --refseq $outRefSeq</command>
   <inputs>
   </inputs>
