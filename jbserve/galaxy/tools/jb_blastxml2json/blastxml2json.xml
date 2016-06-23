@@ -1,5 +1,5 @@
 <tool id="jb_blastxml2json" name="BlastXml2json" version="1.0.0">
-  <description>Convert BlastXML to JSON - for JBrowse Blaster</description>
+  <description>Convert BlastXML to JSON - for JBrowse-Galaxy BLAST Module</description>
   <command interpreter="node">blastxml2json.js -x $input1 -o $output -o $output</command>
   <inputs>
     <param format="blastxml" name="input1" type="data" label="BlastXML input file"/>

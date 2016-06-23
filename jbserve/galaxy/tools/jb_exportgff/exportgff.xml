@@ -1,5 +1,5 @@
 <tool id="jb_exportgff" name="Export Gff to JBrowse" version="1.0.0">
-  <description>Export GFF/JSON file(s) to JBrowse and notify</description>
+  <description>Export result file(s) to JBrowse-Galaxy BLAST Module</description>
   <command interpreter="node">jbexport.js -t ./inMemTemplate.json -g $gffin -b $jsonin -o $output</command>
   <inputs>
     <param format="gff" name="gffin" type="data" label="GFF in"/>
