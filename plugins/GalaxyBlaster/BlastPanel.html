@@ -225,41 +225,8 @@
 
             <div class="row" style="padding-left: 10px;padding-top: 5px;">
               <div class="col-lg-6" style="position:relative">
-                <div id="blast-filter-group" class="input-group" style="display:none;height:50px;width:500px;margin-left:120px;padding:10px;padding-top:10px;border:1px solid #bbb;border-radius: 5px;">
-                    <table style="width: 600px">
-                        <tr>
-                            <td style="width:100px;padding:0px;border:0px;height:50px">Score:</td>
-                            <td style="padding:10px;border:0px"><div style="overflow:visible" id="slider-score"></div></td>
-                        </tr>
-                        <tr>
-                            <td style="width:100px;padding:0px;border:0px;height:50px">E-value:</td>
-                            <td style="padding:10px;border:0px"><div id="slider-evalue"></div></td>
-                        </tr>
-                        <tr>
-                            <td style="width:100px;padding:0px;border:0px;height:50px">Identity:</td>
-                            <td style="padding:10px;border:0px"><div id="slider-identity"></div></td>
-                        </tr>
-                        <tr>
-                            <td style="width:100px;padding:0px;border:0px;height:50px">Gaps:</td>
-                            <td style="padding:10px;border:0px"><div id="slider-gap"></div></td>
-                        </tr>
-                    </table>
-                    <div>
-                        <input id="blast-textfilter-input" type="text" class="form-control" placeholder="Text Filter..." style="width:500px">
-                        <span class="input-group-btn">
-                          <button id="blast-textfilter-go" class="btn btn-secondary" type="button">Go</button>
-                        </span>
-                    </div>
-                  <!--
-                  <input id="blast-filter-input" type="text" class="form-control" placeholder="BLAST Filter...">
-                  <span class="input-group-btn">
-                    <button id="blast-filter-go" class="btn btn-secondary" type="button">Go</button>
-                  </span>
-                  -->
-                </div>
               </div>
             </div>            
-              <button id="blast-filter-btn" style="position:absolute;left:10px;top:30px;z-index:10" class="btn btn-primary">Blast filters</button>  
               
             <div id="j-blast" style="padding-top: 25px;">
                 <div class="panel-group" id="blast-accordion">
@@ -306,6 +273,36 @@
           </div>
         </div>
       </div>
+    </div>
+    <div style="display:none">
+                <div id="blast-filter-group" class="input-group blast-filter-group" style="display:none">
+                    <div class="blast-slider-title">
+                        <h2 class="title">BLAST Filter</h2>
+                        <button id="blast-filter-close-btn" style="float:right;" class="btn btn-primary">-</button>  
+                    </div>
+                    <div class="blast-filter-sliders">
+                        <span class="blast-slider-label">Score</span>
+                        <div class="blast-slider-item" ><div id="slider-score"></div></div>
+                        <span class="blast-slider-label">E-Value</span>
+                        <div class="blast-slider-item" ><div id="slider-evalue"></div></div>
+                        <span class="blast-slider-label">Identity</span>
+                        <div class="blast-slider-item" ><div id="slider-identity"></div></div>
+                        <span class="blast-slider-label">Gap</span>
+                        <div class="blast-slider-item" ><div id="slider-gap"></div></div>
+                        <div>
+                            <input id="blast-textfilter-input" type="text" class="form-control" placeholder="Text Filter..." style="width:200px">
+                            <span class="input-group-btn">
+                              <button id="blast-textfilter-go" class="btn btn-secondary" type="button">Go</button>
+                            </span>
+                        </div>
+                    </div>
+                  <!--
+                  <input id="blast-filter-input" type="text" class="form-control" placeholder="BLAST Filter...">
+                  <span class="input-group-btn">
+                    <button id="blast-filter-go" class="btn btn-secondary" type="button">Go</button>
+                  </span>
+                  -->
+                </div>
     </div>
 </body>
 </html>

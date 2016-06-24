@@ -9,3 +9,39 @@
     max-width: 1000px !important;
     min-width: 7000px !important;
 }
+.blast-filter-group {
+    width:100%;
+    border-bottom: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: #bbb;
+}
+.blast-filter-sliders {
+    width:100%;
+    padding:25px;
+}
+.blast-slider-title {
+    height: 50px;
+    padding: 5px;
+}
+.blast-slider-label {
+    font-weight: bolder;
+    font-size: larger;
+    position: relative;
+    top: -10px;
+    left: -8px;
+}
+.blast-slider-item {
+    height: 60px;width:100%;
+}
+#blast-filter-close-btn {
+    float:right;
+    position:relative;
+    top:-41px
+}
+#blast-filter-open-btn {
+    position:relative;
+    float:right;
+    top: 5px;
+    left: -5px;
+    display:none;
+}

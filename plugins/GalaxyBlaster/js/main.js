@@ -100,6 +100,7 @@ return declare( JBrowsePlugin,
         });
         */
         browser.afterMilestone( 'initView', function() {
+            console.log('initView milestone');
             
             // setup goto button for features
             browser.blastGoto = function(obj) {
@@ -151,11 +152,30 @@ return declare( JBrowsePlugin,
                     
                     $('#blast-accordion').html("");     // clearout the blast accordion
                     $('.blast-item').trigger('click');
-                    setTimeout(function(){
-                        $('.blast-item').trigger('click');
-                    },300);
+                    //setTimeout(function(){
+                    //    $('.blast-item').trigger('click');
+                    //},300);
+                    
                 }
             });
+            setTimeout(function() {
+                console.log('reloc blast-filter-group');
+                //relocate blast filter panel; put it in sidebar
+                $('#blast-filter-group').prependTo('.jbrowseHierarchicalTrackSelector');
+                setupFilterSliders();
+
+                // setup button open button in the Available Tracks title
+                $('.jbrowseHierarchicalTrackSelector > .header').prepend('<button id="blast-filter-open-btn" class="btn btn-primary">BLAST Filter</button>');
+
+                setTimeout(function() {
+                    $('#blast-filter-group').show(500);
+                    $('#blast-filter-open-btn').click(function(){
+                        $('#blast-filter-group').show(500);
+                        $('#blast-filter-open-btn').hide(200);
+                    });
+                },500);
+                
+            },1000);
 
         });
 
@@ -199,14 +219,8 @@ function scoreFilter(val){
     },300);
     
 }
-
-// blast data has been acquired
-function gotBlastData() {
-
-    var browser = this.browser;
-    // initial score filter (top 20)
-    createTestFilter("Hsp_bit-score",20);
-    
+//setup sliders
+function setupFilterSliders() {
     var hi = getHighest('Hsp_bit-score');
     var lo = getLowest('Hsp_bit-score');
     console.log("score hi/lo",lo,hi);
@@ -218,13 +232,13 @@ function gotBlastData() {
         min: lo,
         max: hi//,
         //values:[  400  ]
-    }).slider("pips");//.slider("float");
+    }).slider("pips").slider("float");
 
-    $("#slider-evalue").slider({min: 0,max: 100}).slider("pips");
-    $("#slider-identity").slider({min: -50,max: 50}).slider("pips");
-    $("#slider-gap").slider({min: .01,max: .1,step:.02}).slider("pips");
+    $("#slider-evalue").slider({min: 0,max: 100}).slider("pips").slider("float");
+    $("#slider-identity").slider({min: -50,max: 50}).slider("pips").slider("float");
+    $("#slider-gap").slider({min: .01,max: .1,step:.02}).slider("pips").slider("float");
     
-
+    // periodically scan slider value and rerender blast feature track
     setInterval(function() {
         var val = $('#slider-score').slider("option", "value");
         console.log('textbox',val);
@@ -232,11 +246,21 @@ function gotBlastData() {
     },3000);
     
     
-    // process blast filter button (toggle)
-    $( "#blast-filter-btn" ).click(function() {
-        if ($('#blast-filter-group').is(":visible")) $('#blast-filter-group').hide(500); 
-        else $('#blast-filter-group').show(500);
+    // process blast Filter button (toggle) (obsolete)
+    $( "#blast-filter-close-btn" ).click(function() {
+        $('#blast-filter-group').hide(500); 
+        $('#blast-filter-open-btn').show(200);
     });    
+    
+}
+
+// blast data has been acquired, init sliders
+function gotBlastData() {
+
+    var browser = this.browser;
+    // initial score filter (top 20)
+    createTestFilter("Hsp_bit-score",20);
+    
     
 }
 
