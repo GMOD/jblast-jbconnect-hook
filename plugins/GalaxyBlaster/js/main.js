@@ -221,8 +221,8 @@ function scoreFilter(val){
 }
 //setup sliders
 function setupFilterSliders() {
-    var hi = getHighest('Hsp_bit-score');
-    var lo = getLowest('Hsp_bit-score');
+    var hi = Math.ceil(getHighest('Hsp_bit-score'));
+    var lo = Math.floor(getLowest('Hsp_bit-score'));
     console.log("score hi/lo",lo,hi);
     
     var startPos = Math.round((hi - lo) * .8) + lo; // 80%
@@ -233,10 +233,22 @@ function setupFilterSliders() {
         max: hi//,
         //values:[  400  ]
     }).slider("pips").slider("float");
+    
+    var hi = getHighest('Hsp_evalue');
+    var lo = getLowest('Hsp_evalue');
+    var stp = (hi - lo) / 20;
 
-    $("#slider-evalue").slider({min: 0,max: 100}).slider("pips").slider("float");
-    $("#slider-identity").slider({min: -50,max: 50}).slider("pips").slider("float");
-    $("#slider-gap").slider({min: .01,max: .1,step:.02}).slider("pips").slider("float");
+    $("#slider-evalue").slider({min: lo,max: hi,step:stp}).slider("pips").slider("float");
+
+    var hi = Math.ceil(getHighest('Hsp_identity'));
+    var lo = Math.floor(getLowest('Hsp_identity'));
+
+    $("#slider-identity").slider({min: lo,max: hi}).slider("pips").slider("float");
+
+    var hi = Math.ceil(getHighest('Hsp_gaps'));
+    var lo = Math.floor(getLowest('Hsp_gaps'));
+
+    $("#slider-gap").slider({min: lo,max: hi}).slider("pips").slider("float");
     
     // periodically scan slider value and rerender blast feature track
     setInterval(function() {
@@ -272,7 +284,7 @@ function getHighest(variable) {
         if (parseFloat(blastData[x].Hsp[variable]) > val)
             val = parseFloat(blastData[x].Hsp[variable]);
     }
-    return Math.ceil(val);
+    return val;
 }
 function getLowest(variable) {
     var blastData = JBrowse.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
@@ -282,7 +294,7 @@ function getLowest(variable) {
         if (parseFloat(blastData[x].Hsp[variable]) < val)
             val = parseFloat(blastData[x].Hsp[variable]);
     }
-    return Math.floor(val);
+    return val;
 }
 
 // a test filter to sorted
