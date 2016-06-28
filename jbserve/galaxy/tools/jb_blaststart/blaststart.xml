@@ -1,4 +1,4 @@
-<tool id="jb_blaststart" name="JBlastStart" version="1.0.0">
+<tool id="jb_blaststart" name="JBlast Start" version="1.0.0">
   <description>Import data to Galaxy from JBrowse-Galaxy BLAST Module</description>
   <command interpreter="node">jblaststart.js --blastseq $outBlastSeq --refseq $outRefSeq</command>
   <inputs>
