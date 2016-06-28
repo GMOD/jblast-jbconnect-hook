@@ -63,7 +63,7 @@ exportFile(theGffSrc,theGffTarget);
 exportFile(theJsonSrc,theJsonTarget);
 
 var fileGffOnly = path.basename(theGffTarget);
-var fileJsonOnly = path.basename(theGffTarget);
+var fileJsonOnly = path.basename(theJsonTarget);
 
 notifyListeners();
 
