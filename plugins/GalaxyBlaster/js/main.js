@@ -188,6 +188,14 @@ return declare( JBrowsePlugin,
             }
             
         });
+        dojo.subscribe("/jbrowse/v1/v/tracks/hide", function(data){
+
+            // detect unselected track and remove blast panel stuff
+            if (typeof data[0].blastData !== 'undefined') {
+                //$('#blast-filter-group').remove();
+                //$('#blast-filter-open-btn').remove();
+            }
+        });        
         
     },
     // initial the blast track, called in HTMLFeatures constructor
