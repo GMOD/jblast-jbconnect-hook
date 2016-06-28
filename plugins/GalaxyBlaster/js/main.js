@@ -30,6 +30,9 @@ return declare( JBrowsePlugin,
         var thisB = this;
         var browser = this.browser;
         
+        // save the reference to the blast plugin in browser
+        browser.blastPlugin = this;
+        
         // setup additional functions (necessary?)
         //browser.subscribeToChannel = ext_subscribeToChannel;
         //browser.initNotifications = ext_initNotifications;
@@ -102,7 +105,7 @@ return declare( JBrowsePlugin,
         browser.afterMilestone( 'initView', function() {
             console.log('initView milestone');
             
-            // setup goto button for features
+            // setup goto button for features (depricated)
             browser.blastGoto = function(obj) {
                 //alert($(obj).attr('blastkey'));
                 $('#blastPanel').openMbExtruder(true);$('#blastPanel').openPanel();
@@ -117,9 +120,9 @@ return declare( JBrowsePlugin,
                 },1000);
             };
             
-            // process blast filter button "GO" in blast panel
+            // process blast filter button "GO" in blast panel (obsolete)
             $('#blast-filter-go').click(function() {
-                obj = findObjNested(browser.config,"blastData");
+                obj = thisB.findObjNested(browser.config,"blastData");
                 if (Array.isArray(obj)) {
                     console.log("blast go btn",obj[0]);
                     //JBrowse.publish( '/jbrowse/v1/v/tracks/hide', [obj[0]] );
@@ -158,310 +161,478 @@ return declare( JBrowsePlugin,
                     
                 }
             });
+            
             setTimeout(function() {
-                console.log('reloc blast-filter-group');
-                //relocate blast filter panel; put it in sidebar
-                $('#blast-filter-group').prependTo('.jbrowseHierarchicalTrackSelector');
-                setupFilterSliders();
-
-                // setup button open button in the Available Tracks title
-                $('.jbrowseHierarchicalTrackSelector > .header').prepend('<button id="blast-filter-open-btn" class="btn btn-primary">BLAST Filter</button>');
-
-                setTimeout(function() {
-                    $('#blast-filter-group').show(500);
-                    $('#blast-filter-open-btn').click(function(){
-                        $('#blast-filter-group').show(500);
-                        $('#blast-filter-open-btn').hide(200);
-                    });
-                },500);
-                
-            },1000);
-
+                //thisB.insertBlastPanel();
+                thisB.featureDetailMonitor();
+            },500);
+            
         });
 
         browser.afterMilestone( 'loadConfig', function() {
             
+            //  todo: need to fix. we should load data in HTMLFeatures constructor
             // load blast data from blast track config
-            obj = findObjNested(browser.config,"blastData");
+            obj = thisB.findObjNested(browser.config,"blastData");
+            
             if (Array.isArray(obj)) {
                 
                 // todo: handle more than one blast dataset
                 //console.log("blastData obj",obj[0]);
-                blastReadJSON(obj[0],function() {
+                thisB.blastReadJSON(obj[0],function() {
                     console.log("blastData",browser.blastData);
                     //createTestFilter("Hsp_bit-score",20);
-                    gotBlastData();
+                    thisB.gotBlastData();
                 });
+                
             }
+            
         });
         
-    }
-});
-});
-
-// filter hits based on scores
-var lastVal = 0;
-function scoreFilter(val){
-    
-    if (lastVal == val) return;
-    lastVal = val;
-    
-    var blastData = JBrowse.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
-
-    for(var x in blastData) {
-        blastData[x].selected = 0;
-        if (parseFloat(blastData[x].Hsp['Hsp_bit-score']) > val) blastData[x].selected = 1;
-    }
-    
-    $('.blast-item').trigger('click');
-    setTimeout(function(){
-        $('.blast-item').trigger('click');
-    },300);
-    
-}
-//setup sliders
-function setupFilterSliders() {
-    var hi = Math.ceil(getHighest('Hsp_bit-score'));
-    var lo = Math.floor(getLowest('Hsp_bit-score'));
-    console.log("score hi/lo",lo,hi);
-    
-    var startPos = Math.round((hi - lo) * .8) + lo; // 80%
-    
-    // setup sliders
-    $("#slider-score").slider({
-        min: lo,
-        max: hi//,
-        //values:[  400  ]
-    }).slider("pips").slider("float");
-    
-    var hi = getHighest('Hsp_evalue');
-    var lo = getLowest('Hsp_evalue');
-    var stp = (hi - lo) / 20;
-
-    $("#slider-evalue").slider({min: lo,max: hi,step:stp}).slider("pips").slider("float");
-
-    var hi = Math.ceil(getHighest('Hsp_identity'));
-    var lo = Math.floor(getLowest('Hsp_identity'));
-
-    $("#slider-identity").slider({min: lo,max: hi}).slider("pips").slider("float");
-
-    var hi = Math.ceil(getHighest('Hsp_gaps'));
-    var lo = Math.floor(getLowest('Hsp_gaps'));
-
-    $("#slider-gap").slider({min: lo,max: hi}).slider("pips").slider("float");
-    
-    // periodically scan slider value and rerender blast feature track
-    setInterval(function() {
-        var val = $('#slider-score').slider("option", "value");
-        console.log('textbox',val);
-        scoreFilter(val);
-    },3000);
-    
-    
-    // process blast Filter button (toggle) (obsolete)
-    $( "#blast-filter-close-btn" ).click(function() {
-        $('#blast-filter-group').hide(500); 
-        $('#blast-filter-open-btn').show(200);
-    });    
-    
-}
-
-// blast data has been acquired, init sliders
-function gotBlastData() {
-
-    var browser = this.browser;
-    // initial score filter (top 20)
-    createTestFilter("Hsp_bit-score",20);
-    
-    
-}
-
-function getHighest(variable) {
-    var blastData = JBrowse.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
-    var val = 0;
-    for(var x in blastData) {
-        //console.log(variable,blastData[x].Hsp[variable]);
-        if (parseFloat(blastData[x].Hsp[variable]) > val)
-            val = parseFloat(blastData[x].Hsp[variable]);
-    }
-    return val;
-}
-function getLowest(variable) {
-    var blastData = JBrowse.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
-    var val = -1;
-    for(var x in blastData) {
-        if (val = -1) val = parseFloat(blastData[x].Hsp[variable]);
-        if (parseFloat(blastData[x].Hsp[variable]) < val)
-            val = parseFloat(blastData[x].Hsp[variable]);
-    }
-    return val;
-}
-
-// a test filter to sorted
-function createTestFilter(value,num) {
-    //console.log("createTestFilter",JBrowse.blastData);
-    var blastData = JBrowse.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
-    
-    var sorted = [];
-    
-    for(var x in blastData) {
-        //var newItem = new Object();
-        //newItem.key = x;
-        //newItem.hit = blastData[x];
-        if (num == 0)
-            blastData[x].selected = 1;  // clear all selected
-        else
-            blastData[x].selected = 0;  // clear all selected
-        sorted.push(blastData[x]);
-    }
-    
-    // sort the list based on desired sort (value)
-    function compare(a,b) {
-        if (a.Hsp[value] < b.Hsp[value])
-            return -1;
-        if (a.Hsp[value] > b.Hsp[value])
-            return 1;
-        return 0;
-    }
-
-    sorted.sort(compare);
-    
-    
-    // chop the list based on (num)
-    if (num > 0) {
-        var filtered = [];
-        var count = num;
-
-        for(var i in sorted) {
-            if (count-- <= 0) continue; 
-            //filtered[sorted[i].key] = sorted[i].hit;
-            sorted[i].selected = 1; // mark selected
-            filtered.push(sorted[i]);
-        }
-        // debug show results
-        /*
-        for(var i in filtered) {
-            console.log(filtered[i].Hsp[value],filtered[i]);
-        }
-        */
-        //console.log("filtered list",filtered);
-        JBrowse.blastData = filtered;
-    }
-    return;
-}
-
-// retrieve blast data json into this.blastData
-function blastReadJSON(config,postFn) {
-    console.log("BLAST READ XML in main");
-    //console.log(this,args);
-    //var thisB = JBrowse;
-
-    JBrowse.blastDataJSON = 0;
-    JBrowse.blastData = 0;
-
-    var blastDataFile = config.blastData;
-    if (typeof blastDataFile !== "undefined") {
-        dojo.xhrGet({
-            url: config.baseUrl+blastDataFile,
-            handleAs: "json",
-            load: function(obj) {
-                //blastRenderData();
-                
-                var hits = obj.BlastOutput.BlastOutput_iterations.Iteration.Hit;
-
-                var flist = [];
-                for(var i in hits) {
-                    hits[i].key = i;
-                    hits[i].selected = 1;
-                    flist.push(hits[i]);
+    },
+    // initial the blast track, called in HTMLFeatures constructor
+    initBlastTrack: function(blastData) {
+        //this.blastReadJSON(blastData,function() {
+            //this.gotBlastData();
+            this.insertBlastPanel();
+            this.blastRenderData();
+        //});
+    },
+        // retrieve blast data json into this.blastData  (this is obsolete)
+    blastReadXML: function(args) {
+        console.log("BLAST READ XML");
+        //console.log(this,args);
+        var thisB = this;
+        
+        this.blastData = 0;
+        
+        var blastDataFile = this.config.blastData;
+        if (typeof blastDataFile !== "undefined") {
+            dojo.xhrGet({
+                url: this.config.baseUrl+blastDataFile,
+                handleAs: "json",
+                load: function(obj) {
+                    thisB.blastData = obj;
+                    console.log(blastDataFile,thisB.blastData);
+                    thisB.blastRenderData();
+                },
+                error: function(err) {
+                    console.log(err);
                 }
-                //console.log("blastDataJSON "+blastDataFile,obj);
-                JBrowse.blastDataJSON = obj;
-                
-                //console.log("blastDataJSON "+blastDataFile,flist);
-                JBrowse.blastData = flist;
-                
-                postFn();
-            },
-            error: function(err) {
-                console.log(err);
+            });            
+        }
+    },
+    // render data into blast panel
+    blastRenderData: function() {
+        var thisB = this;
+        var browser = this.browser;
+        var obj = browser.blastData;
+        //console.log("blastRenderData");
+        
+        var blastDataFile = this.config.blastData;
+        
+        // save blast track - temporary solution
+        if (typeof blastDataFile !== "undefined") {
+            browser.blastTrack = this;
+        }
+        
+        //var hits = obj.BlastOutput.BlastOutput_iterations.Iteration.Hit;
+        
+        var hits = browser.blastData;
+
+        var txt = "";
+        
+        for (var x in hits) {
+            //console.log("accordion item", hit)
+            var key = hits[x].key;
+            blast_addPanel(key,hits[x].Hit_def);
+        }
+        $('#blast-accordion').on('show.bs.collapse', function(e) {
+            var key = $(e.target).attr('id');
+            item = e.target;
+            
+            if (typeof key === 'undefined') {
+                item = $('.panel-collapse',e.target);
+                key = item.attr('id');
             }
-        });            
-    }
-}
-
-// recursively find id in a node tree
-// find key in a complex object, recursive.  Returns the object list containing such key
-function findObjNested(obj, key, memo) {
-  var i,
-      proto = Object.prototype,
-      ts = proto.toString,
-      hasOwn = proto.hasOwnProperty.bind(obj);
-
-  if ('[object Array]' !== ts.call(memo)) memo = [];
-
-  for (i in obj) {
-    if (hasOwn(i)) {
-      if (i === key) {
-        memo.push(obj);
-      } else if ('[object Array]' === ts.call(obj[i]) || '[object Object]' === ts.call(obj[i])) {
-        findObjNested(obj[i], key, memo);
-      }
-    }
-  }
-
-  return memo;
-}
-/**
- * Initialize notification subscriptions (keep for reference, for now)
- */
-/*
-function ext_subscribeToChannel(channel,listener) {
-    var thisB = this;
-    var channelPrefix = thisB.config.notifications.channel || "";
-    return thisB.fayeClient.subscribe (channelPrefix + channel, listener)
-        .then (function() {
-            console.log ("Subscribed to " + channelPrefix + channel + " at " + thisB.config.notifications.url);
-        })
-}
-
-function ext_initNotifications() {
-    var thisB = this;
-    return thisB._milestoneFunction('initNotifications', function( deferred ) {
-        if ("notifications" in thisB.config) {
-            thisB.fayeClient = new Faye.Client (thisB.config.notifications.url,
-                            thisB.config.notifications.params || {});
-            deferred.resolve ({success:true});
-            // try subscribing to /log first; wait until this succeeds before subscribing to all the others
-            thisB.subscribeToChannel ('/log', function(message) {
-                console.log (message);
-            }).then (function() {
-                var newTrackHandler = function (eventType) {
-                    return function (message) {
-                        var notifyStoreConf = dojo.clone (message);
-                        var notifyTrackConf = dojo.clone (message);
-                        notifyStoreConf.browser = thisB;
-                        notifyStoreConf.type = notifyStoreConf.storeClass;
-                        notifyTrackConf.store = thisB.addStoreConfig(undefined, notifyStoreConf);
-                        thisB.publish ('/jbrowse/v1/v/tracks/' + eventType, [notifyTrackConf]);
+            //console.log(e.target);
+            var hit = browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit[key];
+            console.log("expand hit",key,item);
+            var txt = browser.blastPlugin.blastRenderHit(hit);
+            txt += browser.blastPlugin.blastRenderHitBp(hit);
+            
+            $('.panel-body',item).html(txt);
+        });
+        
+        // setup the feature tooltip
+        setTimeout(function() {
+            // setup tooltip
+            $('.blast-feature').each(function() {
+                var key = $(this).attr('blastkey');
+                var hit = browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit[key];
+                //console.log('key-hit ',key,hit);
+                
+                var text = '<div>'+browser.blastPlugin.blastRenderHit(hit); //+'<button class="btn btn-primary" blastkey="'+key+'"onclick="JBrowse.blastGoto(this)">Goto</button></div>';
+                
+                $(this).qtip({
+                    content: {
+                        text: text,
+                        title: hit.Hit_def
+                    },
+                    style: {
+                        classes: 'blastQtip qtip-tipped', //'qtip-tipped' 'ui-tooltip-blue
+                        width: "400px"
+                    },
+                    position: { // tooltip shows up near mouse
+                        //target: 'mouse'
+                        // language: 'my' tooltip positioned 'at' position of target 
+                        my: 'top left',
+                        at: 'bottom left'
+                    },
+                    hide: {     // allow mouse to move into tip
+                        //event:'unfocus'
+                        delay: 500,
+                        fixed: true
+                    }
+                });
+                
+                //$(this).mouseover(function() {
+                //    var key = $(this).attr('blastkey');
+                    //$('#test-test').html(key);
+                //});
+            });            
+        },1000);
+        
+    },
+// monitor feature detail popup and insert blast data when necessary
+    featureDetailMonitor: function() {
+        var thisB = this;
+        var blastPlugin = this.browser.blastPlugin;
+        var lastBlastKey = "";
+        setInterval(function(){
+            var blastShow = 0;
+            var blastField = $('div.popup-dialog div.feature-detail h2.blasthit')[0];
+            
+            if (typeof blastField !== 'undefined') blastShow = $(blastField).attr('blastshown');
+            
+            //console.log("monitor",blastField,blastShow,typeof blastShow);
+            
+            if (typeof blastField !== 'undefined') {// && blastShow !== '1') {
+                //$(blastField).attr('blastshown',1);
+                var blastKey = $('div.popup-dialog div.feature-detail div.value_container div.blasthit').html();
+                if (blastKey !== lastBlastKey) {
+                    console.log("new blast dialog key = "+blastKey);
+                    var regionObj = $('div.popup-dialog div.feature-detail div.field_container h2.feature_sequence');
+                    var rObjP = $(regionObj).parent();
+                    //console.log(regionObj,rObjP);
+                    var hasBlastDetail = $('#blastDialogDetail');
+                    //console.log('blastDialogDetail',$('#blastDialogDetail').length);
+                    if ($('#blastDialogDetail').length==0) {
+                        console.log('blastDialogDetail created');
+                        $('<div id="blastDialogDetail">BLAST</div>').insertBefore(rObjP);
+                        
+                        var blastContent = "";
+                        var blastData = thisB.browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
+                        var hit = blastData[blastKey];
+                        console.log('hit',hit);
+                        setTimeout(function() {
+                            blastContent += '<h2 class="blastDetailTitle sectiontitle">BLAST Results</h2>';
+                            blastContent += '<div class="blastDialogContent">';
+                            blastContent += '<span class="blast-desc-view">'+hit.Hit_def+'</span><br/>';
+                            blastContent += blastPlugin.blastRenderHit(hit);
+                            blastContent += blastPlugin.blastRenderHitBp(hit);
+                            blastContent += '</div>';
+                            $('#blastDialogDetail').html(blastContent);
+                        },100);
                     }
                 }
-
-                thisB.subscribeToChannel ('/tracks/new', newTrackHandler ('new'))
-                thisB.subscribeToChannel ('/tracks/replace', newTrackHandler ('replace'))
-
-                thisB.subscribeToChannel ('/tracks/delete', function (trackConfigs) {
-                    thisB.publish ('/jbrowse/v1/v/tracks/delete', trackConfigs);
-                })
-
-                thisB.subscribeToChannel ('/alert', alert)
-
-                thisB.passMilestone( 'notificationsConnected', { success: true } );
-            });
-
-        } else {
-            deferred.resolve ({success:false});
+            }
+            
+        },1000);
+    },
+    blastRenderHit: function(hit){
+        //console.log("blastRenderHit",hit);
+        var txt = '';
+        
+        txt += '<span class="blast-data-view">Sequence ID: '+hit.Hit_id+' Length: '+hit.Hit_len+' Matches: '+hit.Hit_count+'</span>';
+        //txt += '<div class="CSSTableGenerator">';
+        txt += '<div class="blast-table-view">'
+        txt += '<table class="CSSTableGenerator " style="width:100px"><tr id="head">';
+        txt +=    '<td>Score</td>';
+        txt +=    '<td>Expect</td>';
+        txt +=    '<td>Identities</td>';
+        txt +=    '<td>Gaps</td>';
+        //txt +=    '<td>Strand</td>';
+        txt += '</tr><tr>';
+        txt +=    '<td>'+hit.Hsp['Hsp_bit-score']+'('+hit.Hsp.Hsp_score+')</td>';
+        txt +=    '<td>'+hit.Hsp.Hsp_evalue+'</td>';
+        txt +=    '<td>'+hit.Hsp.Hsp_identity+'/'+hit.Hsp['Hsp_align-len']+'</td>';
+        txt +=    '<td>'+hit.Hsp.Hsp_gaps+'/'+hit.Hsp['Hsp_align-len']+'</td>';
+        //txt +=    '<td>'+hit.Hsp['Hsp_query-strand']+'/'+hit.Hsp['Hsp_hit-strand-len']+'</td>';
+        txt += '</tr></table>';
+        txt += '</div>'
+        //txt += '</div>'
+        
+        return txt;
+    },
+    blastRenderHitBp: function(hit){
+        
+        var coordHstr = repeatChar(hit.Hsp.Hsp_hseq.length," ");    //"┬"
+        var coordQstr = repeatChar(hit.Hsp.Hsp_hseq.length," ");    //"┴"
+        var len = hit.Hsp['Hsp_align-len'];
+        //console.log("hitlen",len,hit);
+        
+        var coordHbase = 0;
+        var coordH = parseInt(hit.Hsp['Hsp_hit-from']);
+        var coordQbase = 0;
+        var coordQ = parseInt(hit.Hsp['Hsp_query-from']);
+        
+        var inc = 20;
+        for(var i = 0; i < len;i += inc) {
+            coordHstr = overwriteStr(coordHstr,coordHbase+i,"├"+(coordH+i));
+            coordQstr = overwriteStr(coordQstr,coordQbase+i,"├"+(coordQ+i));
         }
-    });
-}
-*/
+        
+        var txt = '';
+        txt += '<div class="blast-bp-view" style="font-family: monospace;white-space:pre; width:100%;overflow:auto">';
+        txt += '<span style="background-color:#eee">'+coordHstr+'</span><br/>';
+        txt += hit.Hsp.Hsp_hseq + '<br/>';
+        txt += hit.Hsp.Hsp_midline + '<br/>';
+        txt += hit.Hsp.Hsp_qseq + '<br/>';
+        txt += '<span style="background-color:#eee">'+coordQstr+'</span>';
+        txt += '</div>';
+        return txt;
+    },
+    insertBlastPanel: function(postFn) {
+        var thisB = this;
+        console.log('reloc blast-filter-group');
+        //relocate blast filter panel; put it in sidebar (this is from a template in BlastPanel.html)
+        $('#blast-filter-group').prependTo('.jbrowseHierarchicalTrackSelector');
+        thisB.setupFilterSliders();
+
+        // setup button open button in the Available Tracks title
+        $('.jbrowseHierarchicalTrackSelector > .header').prepend('<button id="blast-filter-open-btn" class="btn btn-primary">BLAST Filter</button>');
+
+        setTimeout(function() {
+            $('#blast-filter-group').show(500);
+            $('#blast-filter-open-btn').click(function(){
+                $('#blast-filter-group').show(500);
+                $('#blast-filter-open-btn').hide(200);
+            });
+        },500);
+    },
+    // filter hits based on scores
+    lastVal: 0,
+    scoreFilter: function(val){
+
+        if (this.lastVal == val) return;
+        this.lastVal = val;
+
+        var blastData = this.browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
+
+        for(var x in blastData) {
+            blastData[x].selected = 0;
+            if (parseFloat(blastData[x].Hsp['Hsp_bit-score']) > val) blastData[x].selected = 1;
+        }
+
+        $('.blast-item').trigger('click');
+        setTimeout(function(){
+            $('.blast-item').trigger('click');
+        },300);
+
+    },
+    //setup blast sliders
+    setupFilterSliders: function() {
+        var thisB = this;
+        
+        var hi = Math.ceil(this.getHighest('Hsp_bit-score'));
+        var lo = Math.floor(this.getLowest('Hsp_bit-score'));
+        console.log("score hi/lo",lo,hi);
+
+        var startPos = Math.round((hi - lo) * .8) + lo; // 80%
+
+        // setup sliders
+        $("#slider-score").slider({
+            min: lo,
+            max: hi//,
+            //values:[  400  ]
+        }).slider("pips").slider("float");
+
+        var hi = this.getHighest('Hsp_evalue');
+        var lo = this.getLowest('Hsp_evalue');
+        var stp = (hi - lo) / 20;
+
+        $("#slider-evalue").slider({min: lo,max: hi,step:stp}).slider("pips").slider("float");
+
+        var hi = Math.ceil(this.getHighest('Hsp_identity'));
+        var lo = Math.floor(this.getLowest('Hsp_identity'));
+
+        $("#slider-identity").slider({min: lo,max: hi}).slider("pips").slider("float");
+
+        var hi = Math.ceil(this.getHighest('Hsp_gaps'));
+        var lo = Math.floor(this.getLowest('Hsp_gaps'));
+
+        $("#slider-gap").slider({min: lo,max: hi}).slider("pips").slider("float");
+
+        // periodically scan slider value and rerender blast feature track
+        setInterval(function() {
+            var val = $('#slider-score').slider("option", "value");
+            //console.log('textbox',val);
+            thisB.scoreFilter(val);
+        },3000);
+
+
+        // process blast Filter button (toggle) (obsolete)
+        $( "#blast-filter-close-btn" ).click(function() {
+            $('#blast-filter-group').hide(500); 
+            $('#blast-filter-open-btn').show(200);
+        });    
+
+    },
+    getHighest: function(variable) {
+        var blastData = this.browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
+        var val = 0;
+        for(var x in blastData) {
+            //console.log(variable,blastData[x].Hsp[variable]);
+            if (parseFloat(blastData[x].Hsp[variable]) > val)
+                val = parseFloat(blastData[x].Hsp[variable]);
+        }
+        return val;
+    },
+    getLowest: function(variable) {
+        var blastData = this.browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
+        var val = -1;
+        for(var x in blastData) {
+            if (val = -1) val = parseFloat(blastData[x].Hsp[variable]);
+            if (parseFloat(blastData[x].Hsp[variable]) < val)
+                val = parseFloat(blastData[x].Hsp[variable]);
+        }
+        return val;
+    },
+    // blast data has been acquired, setup default filter.  (depricated)
+    gotBlastData: function() {
+
+        var browser = this.browser;
+        // initial score filter (top 20)
+        this.createTestFilter("Hsp_bit-score",20);
+
+
+    },
+    // a test filter to sorted (should be obsoleted)
+    createTestFilter:function(value,num) {
+        //console.log("createTestFilter",JBrowse.blastData);
+        var blastData = JBrowse.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
+
+        var sorted = [];
+
+        for(var x in blastData) {
+            //var newItem = new Object();
+            //newItem.key = x;
+            //newItem.hit = blastData[x];
+            if (num == 0)
+                blastData[x].selected = 1;  // clear all selected
+            else
+                blastData[x].selected = 0;  // clear all selected
+            sorted.push(blastData[x]);
+        }
+
+        // sort the list based on desired sort (value)
+        function compare(a,b) {
+            if (a.Hsp[value] < b.Hsp[value])
+                return -1;
+            if (a.Hsp[value] > b.Hsp[value])
+                return 1;
+            return 0;
+        }
+
+        sorted.sort(compare);
+
+
+        // chop the list based on (num)
+        if (num > 0) {
+            var filtered = [];
+            var count = num;
+
+            for(var i in sorted) {
+                if (count-- <= 0) continue; 
+                //filtered[sorted[i].key] = sorted[i].hit;
+                sorted[i].selected = 1; // mark selected
+                filtered.push(sorted[i]);
+            }
+            // debug show results
+            /*
+            for(var i in filtered) {
+                console.log(filtered[i].Hsp[value],filtered[i]);
+            }
+            */
+            //console.log("filtered list",filtered);
+            JBrowse.blastData = filtered;
+        }
+        return;
+    },
+    // retrieve blast data json into this.blastData
+    blastReadJSON: function(config,postFn) {
+        var thisB = this;
+        var browser = this.browser;
+        console.log("BLAST READ XML in main");
+        //console.log(this,args);
+        //var thisB = JBrowse;
+
+        browser.blastDataJSON = 0;
+        browser.blastData = 0;
+
+        var blastDataFile = config.blastData;
+        if (typeof blastDataFile !== "undefined") {
+            dojo.xhrGet({
+                url: config.baseUrl+blastDataFile,
+                handleAs: "json",
+                load: function(obj) {
+                    //blastRenderData();
+
+                    var hits = obj.BlastOutput.BlastOutput_iterations.Iteration.Hit;
+
+                    var flist = [];
+                    for(var i in hits) {
+                        hits[i].key = i;
+                        hits[i].selected = 1;
+                        flist.push(hits[i]);
+                    }
+                    //console.log("blastDataJSON "+blastDataFile,obj);
+                    browser.blastDataJSON = obj;
+
+                    //console.log("blastDataJSON "+blastDataFile,flist);
+                    browser.blastData = flist;
+
+                    postFn();
+                },
+                error: function(err) {
+                    console.log(err);
+                }
+            });            
+        }
+    },
+    // recursively find id in a node tree
+    // find key in a complex object, recursive.  Returns the object list containing such key
+    findObjNested: function(obj, key, memo) {
+      var thisB = this;
+      var i,
+          proto = Object.prototype,
+          ts = proto.toString,
+          hasOwn = proto.hasOwnProperty.bind(obj);
+
+      if ('[object Array]' !== ts.call(memo)) memo = [];
+
+      for (i in obj) {
+        if (hasOwn(i)) {
+          if (i === key) {
+            memo.push(obj);
+          } else if ('[object Array]' === ts.call(obj[i]) || '[object Object]' === ts.call(obj[i])) {
+            thisB.findObjNested(obj[i], key, memo);
+          }
+        }
+      }
+
+      return memo;
+    }
+});
+});

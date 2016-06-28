@@ -45,3 +45,40 @@
     left: -5px;
     display:none;
 }
+#blastDialogDetail {
+
+}
+.blastDialogTitle {
+    
+}
+.blastDialogContent {
+    padding-left: 13px;
+    padding-bottom: 25px;
+}
+
+// blast detail view
+#blastDialogDetail {
+
+}
+.blastDialogTitle {
+    
+}
+.blastDialogContent {
+    padding-left: 13px;
+    padding-bottom: 25px;
+}
+.blast-table-view {
+}
+.blast-bp-view {
+    margin-top: 20px;
+}
+.blast-desc-view {
+    font-size: large;
+    font-weight: bold;
+}
+.blast-data-view {
+    line-height: 3;
+}
+
+
+
