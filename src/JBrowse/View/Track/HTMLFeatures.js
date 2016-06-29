@@ -84,7 +84,7 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
             console.log('blastData',this.config.blastData);
             // only if it a blastData track
             if (typeof this.config.blastData !== 'undefined') {
-                this.browser.blastPlugin.initBlastTrack(this.config.blastData);
+                this.browser.blastPlugin.initBlastTrack(this.config.blastData,this);
             }
         }
         //this.blastReadXML(args);
