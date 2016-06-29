@@ -147,7 +147,7 @@
     var blast_hash = 0;
     var $blast_template = $(".blast-panel-template");
     
-    var blast_addPanel = function(id,text) {
+    var blast_addPanel = function(id,text,summary) {
         var $newPanel = $blast_template.clone();
         //console.log($newPanel);
 
@@ -156,6 +156,7 @@
         $newPanel.find(".accordion-toggle").attr("href",  "#" + id)
                  .text(text);
         $newPanel.find(".panel-collapse").attr("id", id).addClass("collapse").removeClass("in");
+        $newPanel.find(".blastSummary").html(summary);
         //$newPanel.attr("blastid", id);
         $("#blast-accordion").append($newPanel.fadeIn());
     };
@@ -272,6 +273,7 @@
           <div class="panel-body">
           </div>
         </div>
+          <div class="blastSummary"></div>
       </div>
     </div>
     <div style="display:none">

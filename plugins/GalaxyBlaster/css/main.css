@@ -98,8 +98,19 @@ img.cogwheel {
 
 #xxblastPanel .flapLabel {
     position: relative;
-    top: -25px;    
+    top: -25px;
 }
 
 
-
+.blastSummary {
+    float:right;
+    width:320px;
+    position:relative;
+    top:-30px;
+    border-width:0px;
+}
+div.blastSummary td.blastSummaryItem {
+    width:80px;
+    background-color: #ccc;
+    border-width:0px;
+}

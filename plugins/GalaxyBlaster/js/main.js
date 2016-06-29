@@ -267,7 +267,8 @@ return declare( JBrowsePlugin,
                 // display only filtered results.
                 if (hits[x].selected==1) {
                     //console.log("add to panel",hits[x]);
-                    blast_addPanel(key,hits[x].Hit_def);
+                    var summary = thisB.blastRenderSummary(hits[x]);
+                    blast_addPanel(key,hits[x].Hit_def,summary);
                 }
             }
         },200);
@@ -425,6 +426,16 @@ return declare( JBrowsePlugin,
         txt += hit.Hsp.Hsp_qseq + '<br/>';
         txt += '<span style="background-color:#eee">'+coordQstr+'</span>';
         txt += '</div>';
+        return txt;
+    },
+    blastRenderSummary: function(hit) {
+        var txt = '';
+        txt +=  '<table  cellspacing="1" style="width:100%"><tr>';
+        txt +=    '<td class="blastSummaryItem" align="center">'+hit.Hsp['Hsp_bit-score']+'</td>';
+        txt +=    '<td class="blastSummaryItem" align="center">'+hit.Hsp.Hsp_evalue+'</td>';
+        txt +=    '<td class="blastSummaryItem" align="center">'+hit.Hsp.Hsp_identity+'</td>';
+        txt +=    '<td class="blastSummaryItem" align="center">'+hit.Hsp.Hsp_gaps+'</td>';
+        txt += '</tr></table>';  
         return txt;
     },
     insertBlastPanel: function(postFn) {
