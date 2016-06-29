@@ -41,10 +41,10 @@
         //adjust grid height
         
         setInterval(function() {
-            var h = $("div.extruder-content").height();
+            var h = $("#blastPanel div.extruder-content").height();
             var w = $('.tg-yw4l').width();
-            $("#j-hist-grid").height(h);
-            $("#j-blast").height(h-62);
+            //$("#j-hist-grid").height(h);
+            $("#j-blast").height(h-12);
             $('#j-blast').width(w-19);
         },1000);
         
@@ -234,8 +234,8 @@
                 
             </div>
         </td>
-        <td class="tg-yw4l" style="width: 300px">
-            <div id="j-hist-grid">
+        <!--td class="tg-yw4l" style="width: 300px">
+            <!--div id="j-hist-grid">
                 <div class="CSSTableGenerator"  >
                         <table >
                             <tr id="head">
@@ -253,7 +253,7 @@
                 </div>
             </div>
             
-        </td>
+        </td-->
       </tr>
     </table>
   </div> 

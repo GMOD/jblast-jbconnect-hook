@@ -443,6 +443,8 @@ return declare( JBrowsePlugin,
             if (parseFloat(blastData[x].Hsp['Hsp_bit-score']) > val) blastData[x].selected = 1;
         }
 
+        // toggle blast item
+        // todo: toggle specific button based on currently selected
         $('.blast-item').trigger('click');
         setTimeout(function(){
             $('.blast-item').trigger('click');

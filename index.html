@@ -36,21 +36,6 @@
     <script type="text/javascript" src="src/mb.extruder/inc/mbExtruder.js"></script>
 
     <script type="text/javascript" src="src/test/gridDataSource.js"></script>
-    <style>
-        div.flapEx {
-            padding-top:35px !important;
-        }
-        div.hidden {
-            display:none;
-        }
-        img.cogwheel {
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            width: 22px;
-            height: 22px;
-        }
-    </style>
     <script>
         var jbServer = 'http://192.168.56.102:1337';
         
@@ -77,7 +62,7 @@
             
             $("#blastPanel").buildMbExtruder({
                 position:"bottom",
-                width:2000,
+                width:1000,
                 extruderOpacity:.8,
                 //hidePanelsOnClose:true,
                 //accordionPanels:false,
@@ -214,8 +199,8 @@
   <body class="fuelux">
     <div id="GenomeBrowser" style="height: 100%; width: 100%; padding: 0; border: 0;"></div>
     <div style="display: none">JBrowseDefaultMainPage</div>
-    <!--div id="extruderLeft" class="{title:'Galaxy ', url:'plugins/GalaxyBlaster/historytable.html'}"></div-->
-    <div id="blastPanel" class="{title:'Galaxy BLAST', url:'plugins/GalaxyBlaster/BlastPanel.html'}"></div>
+    <div id="extruderLeft" class="{title:'History ', url:'plugins/GalaxyBlaster/HistoryPanel.html'}"></div>
+    <div id="blastPanel" class="{title:'BLAST Results', url:'plugins/GalaxyBlaster/BlastPanel.html'}"></div>
     <!--div id="blastFilterPanel" class="{title:'BLAST ', url:'plugins/GalaxyBlaster/BlastFilterPanel.html'}"></div-->
   </body>
 </html>

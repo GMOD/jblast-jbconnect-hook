@@ -3,6 +3,22 @@
     Author     : ey
 */
 
+
+div.flapEx {
+    padding-top:35px !important;
+}
+div.hidden {
+    display:none;
+}
+img.cogwheel {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 22px;
+    height: 22px;
+}
+
+
 .blast-feature: hover
 
 .blastQtip {
@@ -78,6 +94,11 @@
 }
 .blast-data-view {
     line-height: 3;
+}
+
+#xxblastPanel .flapLabel {
+    position: relative;
+    top: -25px;    
 }
 
 
