@@ -199,10 +199,12 @@ return declare( JBrowsePlugin,
         
     },
     // initial the blast track, called in HTMLFeatures constructor
-    initBlastTrack: function(blastData,blastTrack) {
+    initBlastTrack: function(blastData,blastTrackConfig) {
         //this.blastReadJSON(blastData,function() {
             //this.gotBlastData();
-            this.blastTrack = blastTrack;
+            //console.log('blastData', blastData,'blastTrackConfig',blastTrackConfig);
+            this.browser.blastTrackConfig = blastTrackConfig;
+            this.browser.blastKey = blastTrackConfig.label;
             this.insertBlastPanel();
             this.blastRenderData();
         //});
@@ -255,7 +257,7 @@ return declare( JBrowsePlugin,
         $('#blast-accordion').html('');
 
         //var txt = "";
-        console.log("hits",hits);
+        //console.log("hits",hits);
         setTimeout(function() {
             console.log("rendering blast accordion");
             for (var x in hits) {
@@ -264,7 +266,7 @@ return declare( JBrowsePlugin,
 
                 // display only filtered results.
                 if (hits[x].selected==1) {
-                    console.log("add to panel",hits[x]);
+                    //console.log("add to panel",hits[x]);
                     blast_addPanel(key,hits[x].Hit_def);
                 }
             }
@@ -459,11 +461,15 @@ return declare( JBrowsePlugin,
 
         // toggle blast item
         // todo: toggle specific button based on currently selected
-        $('.blast-item').trigger('click');
-        setTimeout(function(){
-            $('.blast-item').trigger('click');
-        },300);
-
+        var key = this.browser.blastKey;
+        //var blastRef = $('.blast-item').attr('blastref');
+        //console.log('compare',key,blastRef)
+        //if (key == blastRef) {
+            $(".blast-item[blastref*='"+key+"']").trigger('click');  "input[name*='man']"
+            setTimeout(function(){
+                $(".blast-item[blastref*='"+key+"']").trigger('click');
+            },300);
+        //}
     },
     //setup blast sliders
     setupFilterSliders: function() {
