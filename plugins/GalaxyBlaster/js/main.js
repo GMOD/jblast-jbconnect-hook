@@ -452,7 +452,7 @@ return declare( JBrowsePlugin,
             $('#blast-filter-group').show(500);
             $('#blast-filter-open-btn').click(function(){
                 $('#blast-filter-group').slideDown(500);
-                $('#blast-filter-open-btn').hide(200);
+                $('#blast-filter-open-btn').hide();
             });
         },500);
     },
@@ -526,7 +526,7 @@ return declare( JBrowsePlugin,
         // process blast Filter button (toggle)
         $( "#blast-filter-close-btn" ).click(function() {
             $('#blast-filter-group').slideUp(500); 
-            $('#blast-filter-open-btn').show(200);
+            $('#blast-filter-open-btn').show();
         });    
 
     },
