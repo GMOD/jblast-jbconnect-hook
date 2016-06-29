@@ -74,11 +74,13 @@
 	border-width:0px 0px 0px 0px;
 }
 .CSSTableGenerator tr:first-child td{
-		background:-o-linear-gradient(bottom, #005fbf 5%, #003f7f 100%);	background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #005fbf), color-stop(1, #003f7f) );
-	background:-moz-linear-gradient( center top, #005fbf 5%, #003f7f 100% );
-	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr="#005fbf", endColorstr="#003f7f");	background: -o-linear-gradient(top,#005fbf,003f7f);
+	background:-o-linear-gradient(bottom, #bfbfbf 5%, #7f7f7f 100%);	
+        background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #bfbfbf), color-stop(1, #7f7f7f) );
+	background:-moz-linear-gradient( center top, #bfbfbf 5%, #7f7f7f 100% );
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr="#bfbfbf", endColorstr="#7f7f7f");	
+        background: -o-linear-gradient(top,#bfbfbf,7f7f7f);
 
-	background-color:#005fbf;
+	background-color:#bfbfbf;
 	border:0px solid #000000;
 	text-align:center;
 	border-width:0px 0px 1px 1px;
