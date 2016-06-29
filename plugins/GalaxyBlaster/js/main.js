@@ -199,9 +199,10 @@ return declare( JBrowsePlugin,
         
     },
     // initial the blast track, called in HTMLFeatures constructor
-    initBlastTrack: function(blastData) {
+    initBlastTrack: function(blastData,blastTrack) {
         //this.blastReadJSON(blastData,function() {
             //this.gotBlastData();
+            this.blastTrack = blastTrack;
             this.insertBlastPanel();
             this.blastRenderData();
         //});
@@ -237,24 +238,37 @@ return declare( JBrowsePlugin,
         var obj = browser.blastData;
         //console.log("blastRenderData");
         
-        var blastDataFile = this.config.blastData;
+        //var blastDataFile = this.config.blastData;
         
         // save blast track - temporary solution
-        if (typeof blastDataFile !== "undefined") {
-            browser.blastTrack = this;
-        }
+        //if (typeof blastDataFile !== "undefined") {
+        //    browser.blastTrack = this;
+        //}
         
         //var hits = obj.BlastOutput.BlastOutput_iterations.Iteration.Hit;
         
-        var hits = browser.blastData;
+        //var hits = browser.blastData;
+        var hits = browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
 
-        var txt = "";
+        // clearout the blast panel accordion
         
-        for (var x in hits) {
-            //console.log("accordion item", hit)
-            var key = hits[x].key;
-            blast_addPanel(key,hits[x].Hit_def);
-        }
+        $('#blast-accordion').html('');
+
+        //var txt = "";
+        console.log("hits",hits);
+        setTimeout(function() {
+            console.log("rendering blast accordion");
+            for (var x in hits) {
+                //console.log("accordion item", hit)
+                var key = hits[x].key;
+
+                // display only filtered results.
+                if (hits[x].selected==1) {
+                    console.log("add to panel",hits[x]);
+                    blast_addPanel(key,hits[x].Hit_def);
+                }
+            }
+        },200);
         $('#blast-accordion').on('show.bs.collapse', function(e) {
             var key = $(e.target).attr('id');
             item = e.target;
@@ -424,7 +438,7 @@ return declare( JBrowsePlugin,
         setTimeout(function() {
             $('#blast-filter-group').show(500);
             $('#blast-filter-open-btn').click(function(){
-                $('#blast-filter-group').show(500);
+                $('#blast-filter-group').slideDown(500);
                 $('#blast-filter-open-btn').hide(200);
             });
         },500);
@@ -492,9 +506,9 @@ return declare( JBrowsePlugin,
         },3000);
 
 
-        // process blast Filter button (toggle) (obsolete)
+        // process blast Filter button (toggle)
         $( "#blast-filter-close-btn" ).click(function() {
-            $('#blast-filter-group').hide(500); 
+            $('#blast-filter-group').slideUp(500); 
             $('#blast-filter-open-btn').show(200);
         });    
 
