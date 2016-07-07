@@ -233,7 +233,7 @@ return declare( JBrowsePlugin,
             });            
         }
     },
-    // render data into blast panel
+    // render data into blast panel (bottom panel)
     blastRenderData: function() {
         var thisB = this;
         var browser = this.browser;
@@ -290,6 +290,7 @@ return declare( JBrowsePlugin,
         });
         
         // setup the feature tooltip
+        // todo: this action should be triggered by the approrpiate event
         setTimeout(function() {
             // setup tooltip
             $('.blast-feature').each(function() {
@@ -329,7 +330,8 @@ return declare( JBrowsePlugin,
         },1000);
         
     },
-// monitor feature detail popup and insert blast data when necessary
+    // monitor feature detail popup and insert blast data when necessary
+    // todo: should trigger on the appropriate event
     featureDetailMonitor: function() {
         var thisB = this;
         var blastPlugin = this.browser.blastPlugin;
@@ -375,6 +377,7 @@ return declare( JBrowsePlugin,
             
         },1000);
     },
+    // this renders the summary information for the hit
     blastRenderHit: function(hit){
         //console.log("blastRenderHit",hit);
         var txt = '';
@@ -400,6 +403,8 @@ return declare( JBrowsePlugin,
         
         return txt;
     },
+    // this renders the query/subject table of the details
+    // it also draws the coordinate 
     blastRenderHitBp: function(hit){
         
         var coordHstr = repeatChar(hit.Hsp.Hsp_hseq.length," ");    //"┬"
@@ -412,12 +417,14 @@ return declare( JBrowsePlugin,
         var coordQbase = 0;
         var coordQ = parseInt(hit.Hsp['Hsp_query-from']);
         
-        var inc = 20;
+        var inc = 20;       // draw coord every (inc) base pairs.
         for(var i = 0; i < len;i += inc) {
             coordHstr = overwriteStr(coordHstr,coordHbase+i,"├"+(coordH+i));
             coordQstr = overwriteStr(coordQstr,coordQbase+i,"├"+(coordQ+i));
         }
-        
+    
+        // use a monospace font
+        // todo: move styles out to the CSS file
         var txt = '';
         txt += '<div class="blast-bp-view" style="font-family: monospace;white-space:pre; width:100%;overflow:auto">';
         txt += '<span style="background-color:#eee">'+coordHstr+'</span><br/>';
@@ -428,6 +435,7 @@ return declare( JBrowsePlugin,
         txt += '</div>';
         return txt;
     },
+    // render blast summary (used in bottom blast panel)
     blastRenderSummary: function(hit) {
         var txt = '';
         txt +=  '<table  cellspacing="1" style="width:100%"><tr>';
@@ -438,6 +446,7 @@ return declare( JBrowsePlugin,
         txt += '</tr></table>';  
         return txt;
     },
+    // this creates the side blast filter panel
     insertBlastPanel: function(postFn) {
         var thisB = this;
         console.log('reloc blast-filter-group');
@@ -482,7 +491,7 @@ return declare( JBrowsePlugin,
             },300);
         //}
     },
-    //setup blast sliders
+    //setup blast filter sliders
     setupFilterSliders: function() {
         var thisB = this;
         
@@ -530,6 +539,7 @@ return declare( JBrowsePlugin,
         });    
 
     },
+    // get the hightest value of the blast data variable
     getHighest: function(variable) {
         var blastData = this.browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
         var val = 0;
@@ -540,6 +550,7 @@ return declare( JBrowsePlugin,
         }
         return val;
     },
+    // get the lowest value of the blast data variable.
     getLowest: function(variable) {
         var blastData = this.browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
         var val = -1;
