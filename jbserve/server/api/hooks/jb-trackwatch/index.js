@@ -1,7 +1,4 @@
 /* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
  */
 
 var fs = require('fs'),
@@ -9,7 +6,7 @@ var fs = require('fs'),
     deferred = require('deferred')
 
 
-module.exports = function galaxyKueSyncHook(sails) {
+module.exports = function trackWatchHook(sails) {
     return {
 
         initialize: function(cb) {
