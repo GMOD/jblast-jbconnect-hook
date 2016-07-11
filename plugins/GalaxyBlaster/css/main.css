@@ -22,7 +22,7 @@ img.cogwheel {
 
 .blastQtip {
     max-width: 1000px !important;
-    min-width: 7000px !important;
+    min-width: 400px !important;
 }
 .blast-filter-group {
     width:100%;
