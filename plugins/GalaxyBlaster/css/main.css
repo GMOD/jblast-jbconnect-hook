@@ -3,6 +3,8 @@
     Author     : ey
 */
 
+@import url("CSSTableGenerator.css");
+
 
 div.flapEx {
     padding-top:35px !important;
@@ -17,9 +19,6 @@ img.cogwheel {
     width: 22px;
     height: 22px;
 }
-
-
-.blast-feature: hover
 
 .blastQtip {
     max-width: 1000px !important;
