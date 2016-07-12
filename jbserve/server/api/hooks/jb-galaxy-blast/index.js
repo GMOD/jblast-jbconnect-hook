@@ -53,6 +53,8 @@ function rest_WorkflowSubmit(req,res) {
     var region = req.body.region;
     var workflow = req.body.workflow;
     
+    
+    // todo: need to change history reference.
     var params = {
         //workflow_id: 'f2db41e1fa331b3e',
         workflow_id: workflow,
@@ -68,6 +70,10 @@ function rest_WorkflowSubmit(req,res) {
     console.log("params",params);
     var jsonstr = JSON.stringify(params);
 
+    // get starting coord of region
+    var startCoord = getRegionStart(region);
+
+
     var d = new Date();
 
     // write the BLAST region file
@@ -81,6 +87,7 @@ function rest_WorkflowSubmit(req,res) {
     ws.end();
     
 
+
     // write variable to global
     // todo: later the name and perhaps additional info should come from the FASTA header (ie: JBlast ctgA ctgA:46990..48410 (- strand)
     // which should appear as the track name when the operation is done.
@@ -89,13 +96,14 @@ function rest_WorkflowSubmit(req,res) {
             //"blastSeq": "/var/www/html/jb-galaxy-blaster/tmp/44705works.fasta",
             "blastSeq": g.jbrowse.filePath+theBlastFile,
             "originalSeq": "/var/www/html/jb-galaxy-blaster/tmp/volvox.fa",
-            "offset": 44705
+            "offset": startCoord
     };
     storeInGlobals(blastData,"jblast");
    
     console.log("blastData",blastData);
     
-    
+    //console.log("not submitted");
+    //return;
     request.post({
         url: g.jbrowse.galaxyUrl+"/api/workflows"+"?key="+g.jbrowse.galaxyAPIKey, 
         method: 'POST',
@@ -119,6 +127,14 @@ function rest_WorkflowSubmit(req,res) {
     });    
     
 }
+// return the starting coordinate
+//  >ctgA ctgA:3014..6130 (+ strand) class=remark length=3117
+function getRegionStart(str) {
+    var line = str.split("\n")[0];
+    var re = line.split(":")[1].split("..")[0];
+    return re;
+}
+
 
 // store section in globals
 function storeInGlobals (sectionData,sectionName) {
