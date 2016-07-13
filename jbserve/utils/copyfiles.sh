@@ -19,5 +19,10 @@ cp -v jblaststart.js /var/www/html/galaxy/tools/jb_blaststart #
 cp -r node_modules/ /var/www/html/galaxy/tools/jb_blaststart #
 cp -rv ../galaxy/tools/jb_blaststart/ /var/www/html/galaxy/tools/ #
 
+mkdir -p /var/www/html/galaxy/tools/jb_offset #
+cp -v jboffset.js /var/www/html/galaxy/tools/jb_offset #
+cp -r node_modules/ /var/www/html/galaxy/tools/jb_offset #
+cp -rv ../galaxy/tools/jb_offset/ /var/www/html/galaxy/tools/ #
+
 mkdir -p /var/www/html/galaxy/tools/jb_blast2gff #
 cp -rv ../galaxy/tools/jb_blast2gff/ /var/www/html/galaxy/tools/ #
