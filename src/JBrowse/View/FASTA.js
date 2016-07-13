@@ -107,6 +107,8 @@ return declare([InHook],
     blastDialog: function (region) {
         var regionB = region;
         var thisB = this;
+        var comboData = [];
+        
         if (!this.dialog) {
 
             this.dialog = new Dialog({ title: 'Process BLAST' });
@@ -120,7 +122,6 @@ return declare([InHook],
                 id: 'blast-workflow-select'
             }, this.dialog.containerNode);
 
-                var comboData = [];
                 var workflows = thisB.workflows;
 
                 for(var i in this.workflows) {
@@ -156,13 +157,25 @@ return declare([InHook],
             var submitBtn = new Button({
                 label: "Submit",
                 onClick: function(){
+                    
+                    // get selected workflow
+                    var selStr = dijit.byId('workflow-combo').get('value');
+                    for(var x in comboData) {
+                        if (comboData[x].name == selStr) {
+                            var selWorkflow = comboData[x].id;
+                            console.log('Selected workflow',selWorkflow,comboData[x].name);
+                        }
+                    }
+                    console.log('Selected workflow',selWorkflow);
+                    
                     // do http post
                     var xhrArgs = {
                       //url: jbServer + '/jbapi/blastregion',
                       url: jbServer + '/jbapi/workflowsubmit',
                       postData: {
                           region: regionB,
-                          workflow: 'f2db41e1fa331b3e'
+                          //workflow: 'f2db41e1fa331b3e'
+                          workflow: selWorkflow
                       },
                       handleAs: "json",
                       load: function(data){
@@ -172,7 +185,7 @@ return declare([InHook],
                       error: function(error){
                           alert(error);
                       }
-                    }
+                    };
                     var deferred = dojo.xhrPost(xhrArgs);
 
 
