@@ -42,11 +42,21 @@ img.cogwheel {
     font-weight: bolder;
     font-size: larger;
     position: relative;
-    top: -10px;
-    left: -8px;
+    top: 0px;
+    left: 10px;
 }
-.blast-slider-item {
-    height: 60px;width:100%;
+td.blast-slider-item {
+    height: 60px;
+    padding: 20px;
+}
+td.blast-slider-item-c2 {
+    width:70px;
+    padding:10px;
+}
+div.blast-slider-item-data {
+    margin:10px;
+    white-space: nowrap;
+    padding:10px;
 }
 #blast-filter-close-btn {
     float:right;

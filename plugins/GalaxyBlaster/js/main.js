@@ -24,7 +24,7 @@ define([
 return declare( JBrowsePlugin,
 {
     constructor: function( args ) {
-        console.log("plugin: GalaxyBlaster");
+        console.log("plugin: JBlast");
         //console.dir(args);
 
         var thisB = this;
@@ -504,25 +504,109 @@ return declare( JBrowsePlugin,
         // setup sliders
         $("#slider-score").slider({
             min: lo,
-            max: hi//,
-            //values:[  400  ]
+            max: hi,
+            change: function(event,ui) {
+                var v = ui.value;
+                $('#slider-score-data').html(v);
+            }
         }).slider("pips").slider("float");
-
+        /*
+        setTimeout(function(){
+            $('#slider-score .ui-slider-handle').on('mousemove',function(){
+                var v = $('#slider-score').value;
+                $('#slider-score-data').html(v);
+            });
+        },100);
+        */
         var hi = this.getHighest('Hsp_evalue');
         var lo = this.getLowest('Hsp_evalue');
         var stp = (hi - lo) / 20;
 
-        $("#slider-evalue").slider({min: lo,max: hi,step:stp}).slider("pips").slider("float");
+        var labels1 = [];
+        for(var i=lo;i <= hi; i += stp) {
+            var v = i;
+            v = v.toExponential(2);
+            //var v1 = v.split('e');
+            //v = v1[0]+' e'+v1[1];
+            labels1.push(v);
+        }
+
+        var step = (hi - lo) / 5;
+        var labels = [];
+        for(var i=lo;i <= hi; i += step) {
+            var v = i;
+            v = v.toExponential(2);
+            var v1 = v.split('e');
+            v = v1[0]+' e'+v1[1];
+            labels.push(v);
+        }
+        console.log(labels);
+
+        $("#slider-evalue").slider({
+            min: lo,
+            max: hi,
+            step:stp,
+            change: function(event,ui) {
+                var v = ui.value.toExponential(2);
+                $('#slider-evalue-data').html(v);
+            }
+        }).slider("pips",{
+            rest:'label',
+            first:'label',
+            last:'label',
+            step: 4,
+            labels: labels
+        }).slider("float",{
+            labels: labels1
+        });
 
         var hi = Math.ceil(this.getHighest('Hsp_identity'));
         var lo = Math.floor(this.getLowest('Hsp_identity'));
 
-        $("#slider-identity").slider({min: lo,max: hi}).slider("pips").slider("float");
+        var step = (hi - lo) / 5;
+        var labels = [];
+        for(var i=lo;i <= hi; i += step) {
+            labels.push(""+Math.round(i));
+        }
+        
+        $("#slider-identity").slider({
+            min: lo,
+            max: hi,
+            change: function(event,ui) {
+                var v = ui.value;
+                $('#slider-identity-data').html(v);
+            }
+        }).slider("pips",{
+            rest:'label',
+            first:'label',
+            last:'label',
+            step: step,
+            labels: labels
+        }).slider("float");
 
         var hi = Math.ceil(this.getHighest('Hsp_gaps'));
         var lo = Math.floor(this.getLowest('Hsp_gaps'));
 
-        $("#slider-gap").slider({min: lo,max: hi}).slider("pips").slider("float");
+        var step = (hi - lo) / 5;
+        var labels = [];
+        for(var i=lo;i <= hi; i += step) {
+            labels.push(""+i);
+        }
+
+        $("#slider-gap").slider({
+            min: lo,
+            max: hi,
+            change: function(event,ui) {
+                var v = ui.value;
+                $('#slider-gap-data').html(v);
+            }
+        }).slider("pips",{
+            rest: 'label',
+            first: 'label',
+            last: 'label',
+            step: step,
+            labels: labels
+        }).slider("float");
 
         // periodically scan slider value and rerender blast feature track
         setInterval(function() {

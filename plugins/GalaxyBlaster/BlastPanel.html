@@ -29,7 +29,7 @@
         .tg td{font-family:Arial, sans-serif;font-size:14px;padding:0px 0px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
         .tg .tg-yw4l{vertical-align:top}
     </style>
-    <link rel="stylesheet" type="text/css" href="css/JobTable.css">
+    <link rel="stylesheet" type="text/css" href="css/CSSTableGenerator.css">
     
     <script type="text/javascript">
         // fix position of flap
@@ -282,7 +282,37 @@
                         <h2 class="title">Blast Filter</h2>
                         <button id="blast-filter-close-btn" style="float:right;" class="btn btn-primary">-</button>  
                     </div>
-                    <div class="blast-filter-sliders">
+                    <table class="blast-filter-sliders" style="width:100%;cellpadding:10px">
+                        <tr>
+                            <td colspan="2" class="blast-slider-label">Score</td>
+                        </tr>
+                        <tr>
+                            <td class="blast-slider-item"><div id="slider-score"></td>
+                            <td class="blast-slider-item-c2"><div id="slider-score-data" class="blast-slider-item-data panel panel-default panel-body">Blah</div></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="blast-slider-label">E-Value</td>
+                        </tr>
+                        <tr>
+                            <td class="blast-slider-item"><div id="slider-evalue"></td>
+                            <td class="blast-slider-item-c2"><div id="slider-evalue-data" class="blast-slider-item-data panel panel-default panel-body">Blah</div></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="blast-slider-label">Identity</td>
+                        </tr>
+                        <tr>
+                            <td class="blast-slider-item"><div id="slider-identity"></td>
+                            <td class="blast-slider-item-c2"><div id="slider-identity-data" class="blast-slider-item-data panel panel-default panel-body">Blah</div></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="blast-slider-label">Gaps</td>
+                        </tr>
+                        <tr>
+                            <td class="blast-slider-item"><div id="slider-gap"></td>
+                            <td class="blast-slider-item-c2"><div id="slider-gap-data" class="blast-slider-item-data panel panel-default panel-body">Blah</div></td>
+                        </tr>
+                    </table>
+                    <!--div class="blast-filter-sliders">
                         <span class="blast-slider-label">Score</span>
                         <div class="blast-slider-item" ><div id="slider-score"></div></div>
                         <span class="blast-slider-label">E-Value</span>
@@ -297,7 +327,7 @@
                               <button id="blast-textfilter-go" class="btn btn-secondary" type="button">Go</button>
                             </span>
                         </div>
-                    </div>
+                    </div-->
                   <!--
                   <input id="blast-filter-input" type="text" class="form-control" placeholder="BLAST Filter...">
                   <span class="input-group-btn">
