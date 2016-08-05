@@ -24,6 +24,20 @@ img.cogwheel {
     max-width: 1000px !important;
     min-width: 400px !important;
 }
+
+
+/*
+    blast filter sliders
+*/
+
+/*
+ keep the evalue slider float from wrapping
+*/
+#slider-evalue span.ui-slider-tip {
+    white-space: nowrap;
+}
+
+
 .blast-filter-group {
     width:100%;
     border-bottom: 1px;
@@ -70,12 +84,8 @@ div.blast-slider-item-data {
     left: -5px;
     display:none;
 }
-#blastDialogDetail {
 
-}
-.blastDialogTitle {
-    
-}
+
 .blastDialogContent {
     padding-left: 13px;
     padding-bottom: 25px;

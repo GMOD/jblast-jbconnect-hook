@@ -491,9 +491,12 @@ return declare( JBrowsePlugin,
             },300);
         //}
     },
-    //setup blast filter sliders
+    // setup blast filter sliders
+    // ref: http://simeydotme.github.io/jQuery-ui-Slider-Pips/#options-pips
     setupFilterSliders: function() {
         var thisB = this;
+        
+        // score slider
         
         var hi = Math.ceil(this.getHighest('Hsp_bit-score'));
         var lo = Math.floor(this.getLowest('Hsp_bit-score'));
@@ -510,20 +513,15 @@ return declare( JBrowsePlugin,
                 $('#slider-score-data').html(v);
             }
         }).slider("pips").slider("float");
-        /*
-        setTimeout(function(){
-            $('#slider-score .ui-slider-handle').on('mousemove',function(){
-                var v = $('#slider-score').value;
-                $('#slider-score-data').html(v);
-            });
-        },100);
-        */
+
+        // evalue slider
+
         var hi = this.getHighest('Hsp_evalue');
         var lo = this.getLowest('Hsp_evalue');
-        var stp = (hi - lo) / 20;
+        var step = (hi - lo) / 20;
 
         var labels1 = [];
-        for(var i=lo;i <= hi; i += stp) {
+        for(var i=lo;i <= hi; i += step) {
             var v = i;
             v = v.toExponential(2);
             //var v1 = v.split('e');
@@ -531,9 +529,9 @@ return declare( JBrowsePlugin,
             labels1.push(v);
         }
 
-        var step = (hi - lo) / 5;
+        var pstep = 5;
         var labels = [];
-        for(var i=lo;i <= hi; i += step) {
+        for(var i=lo;i <= hi; i += pstep*step) {
             var v = i;
             v = v.toExponential(2);
             var v1 = v.split('e');
@@ -545,7 +543,7 @@ return declare( JBrowsePlugin,
         $("#slider-evalue").slider({
             min: lo,
             max: hi,
-            step:stp,
+            step:step,
             change: function(event,ui) {
                 var v = ui.value.toExponential(2);
                 $('#slider-evalue-data').html(v);
@@ -554,16 +552,20 @@ return declare( JBrowsePlugin,
             rest:'label',
             first:'label',
             last:'label',
-            step: 4,
+            step: pstep,
             labels: labels
         }).slider("float",{
             labels: labels1
         });
 
-        var hi = Math.ceil(this.getHighest('Hsp_identity'));
-        var lo = Math.floor(this.getLowest('Hsp_identity'));
+        // identity slider
 
-        var step = (hi - lo) / 5;
+        var hi = Math.ceil(this.getHighestPct('Hsp_identity'));
+        var lo = Math.floor(this.getLowestPct('Hsp_identity'));
+        var step = (hi - lo) / 20;
+
+        // pip setup
+        var pstep = 5;
         var labels = [];
         for(var i=lo;i <= hi; i += step) {
             labels.push(""+Math.round(i));
@@ -572,40 +574,51 @@ return declare( JBrowsePlugin,
         $("#slider-identity").slider({
             min: lo,
             max: hi,
+            step: step,
             change: function(event,ui) {
-                var v = ui.value;
+                var v = ui.value + '%';
                 $('#slider-identity-data').html(v);
             }
         }).slider("pips",{
             rest:'label',
             first:'label',
             last:'label',
-            step: step,
-            labels: labels
+            step: pstep,
+            //labels: labels,
+            suffix: '%'
         }).slider("float");
 
-        var hi = Math.ceil(this.getHighest('Hsp_gaps'));
-        var lo = Math.floor(this.getLowest('Hsp_gaps'));
+        // gap slider
 
-        var step = (hi - lo) / 5;
+        var hi = Math.ceil(this.getHighestPct('Hsp_gaps'));
+        var lo = Math.floor(this.getLowestPct('Hsp_gaps'));
+        var step = (hi - lo) / 20;
+        console.log("gap step",step);
+        step = parseFloat(step.toFixed(2));
+        console.log("gap step",step);
+
+        var pstep = 5;
+        pstep = parseFloat(pstep.toFixed(2));
         var labels = [];
-        for(var i=lo;i <= hi; i += step) {
-            labels.push(""+i);
+        for(var i=lo;i <= hi; i += pstep*step) {
+            labels.push(parseFloat(i.toFixed(2)));
         }
-
+        console.log("gap labels",labels);
         $("#slider-gap").slider({
             min: lo,
             max: hi,
+            step: step,
             change: function(event,ui) {
-                var v = ui.value;
+                var v = ui.value + '%';
                 $('#slider-gap-data').html(v);
             }
         }).slider("pips",{
             rest: 'label',
             first: 'label',
             last: 'label',
-            step: step,
-            labels: labels
+            step: pstep,
+            labels: labels,
+            suffix: '%'
         }).slider("float");
 
         // periodically scan slider value and rerender blast feature track
@@ -642,6 +655,30 @@ return declare( JBrowsePlugin,
             if (val = -1) val = parseFloat(blastData[x].Hsp[variable]);
             if (parseFloat(blastData[x].Hsp[variable]) < val)
                 val = parseFloat(blastData[x].Hsp[variable]);
+        }
+        return val;
+    },
+    // get the hightest value of the blast data variable as a percent of align-len
+    getHighestPct: function(variable) {
+        var blastData = this.browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
+        var val = 0;
+        for(var x in blastData) {
+            //console.log(variable,blastData[x].Hsp[variable]);
+            var cval = parseFloat(blastData[x].Hsp[variable]) / parseFloat(blastData[x].Hsp['Hsp_align-len']) * 100;
+            if (cval > val)
+                val = cval
+        }
+        return val;
+    },
+    // get the lowest value of the blast data variable as a percent of align-len
+    getLowestPct: function(variable) {
+        var blastData = this.browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
+        var val = -1;
+        for(var x in blastData) {
+            var cval = parseFloat(blastData[x].Hsp[variable]) / parseFloat(blastData[x].Hsp['Hsp_align-len']) * 100;
+            if (val = -1) val = cval;
+            if (cval < val)
+                val = cval;
         }
         return val;
     },
