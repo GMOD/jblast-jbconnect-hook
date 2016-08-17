@@ -1,5 +1,5 @@
 /* 
-    JBrowse Galaxy Blaster - Client Side Plugin X
+    JBlast - Client Side Plugin X
 
     Created on : Mar 20, 2016, 6:38:33 PM
     Author     : ey
@@ -11,7 +11,8 @@ define([
         'dojo/Deferred',
         'dojo/dom-construct',
         'dojo/query',
-        'JBrowse/Plugin'
+        'JBrowse/Plugin',
+        './slidersMixin'
        ],
        function(
         declare,
@@ -19,16 +20,32 @@ define([
         Deferred,
         domConstruct,
         query,
-        JBrowsePlugin
+        JBrowsePlugin,
+        slidersMixin
        ) {
 return declare( JBrowsePlugin,
 {
     constructor: function( args ) {
         console.log("plugin: JBlast");
         //console.dir(args);
-
+        
         var thisB = this;
         var browser = this.browser;
+
+        var sliders = new slidersMixin(this,browser);
+        
+        
+        browser.jblast = {
+            filterSliders: {
+                score: 0,
+                evalue: 0,
+                identity: 0,
+                gaps: 0
+            }
+        };
+
+        //this.initSliders(this,browser);
+
         
         // save the reference to the blast plugin in browser
         browser.blastPlugin = this;
@@ -104,8 +121,14 @@ return declare( JBrowsePlugin,
         */
         browser.afterMilestone( 'initView', function() {
             console.log('initView milestone');
+
+            setTimeout(function() {
+                //thisB.insertBlastPanel();
+                thisB.featureDetailMonitor();
+            },500);
             
             // setup goto button for features (depricated)
+            /*
             browser.blastGoto = function(obj) {
                 //alert($(obj).attr('blastkey'));
                 $('#blastPanel').openMbExtruder(true);$('#blastPanel').openPanel();
@@ -119,8 +142,10 @@ return declare( JBrowsePlugin,
                     $(i).collapse('show');
                 },1000);
             };
+            */
             
             // process blast filter button "GO" in blast panel (obsolete)
+            /*
             $('#blast-filter-go').click(function() {
                 obj = thisB.findObjNested(browser.config,"blastData");
                 if (Array.isArray(obj)) {
@@ -154,21 +179,17 @@ return declare( JBrowsePlugin,
                     createTestFilter(filterText,filterNum);
                     
                     $('#blast-accordion').html("");     // clearout the blast accordion
-                    $('.blast-item').trigger('click');
+                    $('.jblast-item').trigger('click');
                     //setTimeout(function(){
-                    //    $('.blast-item').trigger('click');
+                    //    $('.jblast-item').trigger('click');
                     //},300);
                     
                 }
             });
-            
-            setTimeout(function() {
-                //thisB.insertBlastPanel();
-                thisB.featureDetailMonitor();
-            },500);
+            */
             
         });
-
+        /*
         browser.afterMilestone( 'loadConfig', function() {
             
             //  todo: need to fix. we should load data in HTMLFeatures constructor
@@ -188,6 +209,8 @@ return declare( JBrowsePlugin,
             }
             
         });
+        */
+        /*
         dojo.subscribe("/jbrowse/v1/v/tracks/hide", function(data){
 
             // detect unselected track and remove blast panel stuff
@@ -196,48 +219,34 @@ return declare( JBrowsePlugin,
                 //$('#blast-filter-open-btn').remove();
             }
         });        
-        
+        */
     },
     // initial the blast track, called in HTMLFeatures constructor
-    initBlastTrack: function(blastData,blastTrackConfig) {
-        //this.blastReadJSON(blastData,function() {
-            //this.gotBlastData();
-            //console.log('blastData', blastData,'blastTrackConfig',blastTrackConfig);
-            this.browser.blastTrackConfig = blastTrackConfig;
-            this.browser.blastKey = blastTrackConfig.label;
-            this.insertBlastPanel();
-            this.blastRenderData();
-        //});
-    },
-        // retrieve blast data json into this.blastData  (this is obsolete)
-    blastReadXML: function(args) {
-        console.log("BLAST READ XML");
-        //console.log(this,args);
+    initBlastTrack: function(blastTrackConfig) {
+        console.log('initBlastTrack()');
         var thisB = this;
+        var config = blastTrackConfig;
         
-        this.blastData = 0;
+        if (this.browser.jblast.BlastKey === config.label) return;
         
-        var blastDataFile = this.config.blastData;
-        if (typeof blastDataFile !== "undefined") {
-            dojo.xhrGet({
-                url: this.config.baseUrl+blastDataFile,
-                handleAs: "json",
-                load: function(obj) {
-                    thisB.blastData = obj;
-                    console.log(blastDataFile,thisB.blastData);
-                    thisB.blastRenderData();
-                },
-                error: function(err) {
-                    console.log(err);
-                }
-            });            
-        }
+        console.log("blastKey",config.label);
+        
+        this.browser.jblast.BlastKey = config.label;
+        
+        this.blastReadJSON(config,function() {
+            //this.gotBlastData();
+            console.log("blastReadJSON callback");
+            thisB.browser.blastTrackConfig = config;
+            thisB.browser.blastKey = config.label;
+            thisB.insertBlastPanel();
+            thisB.blastRenderData();
+        });
     },
     // render data into blast panel (bottom panel)
     blastRenderData: function() {
         var thisB = this;
         var browser = this.browser;
-        var obj = browser.blastData;
+        //var obj = browser.blastData;
         //console.log("blastRenderData");
         
         //var blastDataFile = this.config.blastData;
@@ -297,35 +306,39 @@ return declare( JBrowsePlugin,
                 var key = $(this).attr('blastkey');
                 var hit = browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit[key];
                 //console.log('key-hit ',key,hit);
-                
-                var text = '<div>'+browser.blastPlugin.blastRenderHit(hit); //+'<button class="btn btn-primary" blastkey="'+key+'"onclick="JBrowse.blastGoto(this)">Goto</button></div>';
-                
-                $(this).qtip({
-                    content: {
-                        text: text,
-                        title: hit.Hit_def
-                    },
-                    style: {
-                        classes: 'blastQtip qtip-tipped', //'qtip-tipped' 'ui-tooltip-blue
-                        width: "400px"
-                    },
-                    position: { // tooltip shows up near mouse
-                        //target: 'mouse'
-                        // language: 'my' tooltip positioned 'at' position of target 
-                        my: 'top left',
-                        at: 'bottom left'
-                    },
-                    hide: {     // allow mouse to move into tip
-                        //event:'unfocus'
-                        delay: 500,
-                        fixed: true
-                    }
-                });
-                
-                //$(this).mouseover(function() {
-                //    var key = $(this).attr('blastkey');
-                    //$('#test-test').html(key);
-                //});
+                if (typeof hit !== 'undefined') {
+                    var text = '<div>'+browser.blastPlugin.blastRenderHit(hit); //+'<button class="btn btn-primary" blastkey="'+key+'"onclick="JBrowse.blastGoto(this)">Goto</button></div>';
+
+                    $(this).qtip({
+                        content: {
+                            text: text,
+                            title: hit.Hit_def
+                        },
+                        style: {
+                            classes: 'blastQtip qtip-tipped', //'qtip-tipped' 'ui-tooltip-blue
+                            width: "400px"
+                        },
+                        position: { // tooltip shows up near mouse
+                            //target: 'mouse'
+                            // language: 'my' tooltip positioned 'at' position of target 
+                            my: 'top left',
+                            at: 'bottom left'
+                        },
+                        hide: {     // allow mouse to move into tip
+                            //event:'unfocus'
+                            delay: 500,
+                            fixed: true
+                        }
+                    });
+
+                    //$(this).mouseover(function() {
+                    //    var key = $(this).attr('blastkey');
+                        //$('#test-test').html(key);
+                    //});
+                }
+                else {
+                    console.log('undefined blastkey', key, '(this happens for test json file');
+                }
             });            
         },1000);
         
@@ -392,10 +405,10 @@ return declare( JBrowsePlugin,
         txt +=    '<td>Gaps</td>';
         //txt +=    '<td>Strand</td>';
         txt += '</tr><tr>';
-        txt +=    '<td>'+hit.Hsp['Hsp_bit-score']+'('+hit.Hsp.Hsp_score+')</td>';
+        txt +=    '<td>'+ parseInt(hit.Hsp['Hsp_bit-score'])+' ('+hit.Hsp.Hsp_score+')</td>';
         txt +=    '<td>'+hit.Hsp.Hsp_evalue+'</td>';
-        txt +=    '<td>'+hit.Hsp.Hsp_identity+'/'+hit.Hsp['Hsp_align-len']+'</td>';
-        txt +=    '<td>'+hit.Hsp.Hsp_gaps+'/'+hit.Hsp['Hsp_align-len']+'</td>';
+        txt +=    '<td>'+hit.Hsp.Hsp_identity/hit.Hsp['Hsp_align-len']*100+'</td>';
+        txt +=    '<td>'+hit.Hsp.Hsp_gaps/hit.Hsp['Hsp_align-len']*100+'</td>';
         //txt +=    '<td>'+hit.Hsp['Hsp_query-strand']+'/'+hit.Hsp['Hsp_hit-strand-len']+'</td>';
         txt += '</tr></table>';
         txt += '</div>'
@@ -441,15 +454,15 @@ return declare( JBrowsePlugin,
         txt +=  '<table  cellspacing="1" style="width:100%"><tr>';
         txt +=    '<td class="blastSummaryItem" align="center">'+hit.Hsp['Hsp_bit-score']+'</td>';
         txt +=    '<td class="blastSummaryItem" align="center">'+hit.Hsp.Hsp_evalue+'</td>';
-        txt +=    '<td class="blastSummaryItem" align="center">'+hit.Hsp.Hsp_identity+'</td>';
-        txt +=    '<td class="blastSummaryItem" align="center">'+hit.Hsp.Hsp_gaps+'</td>';
+        txt +=    '<td class="blastSummaryItem" align="center">'+hit.Hsp.Hsp_identity/hit.Hsp['Hsp_align-len']*100+'</td>';
+        txt +=    '<td class="blastSummaryItem" align="center">'+hit.Hsp.Hsp_gaps/hit.Hsp['Hsp_align-len']*100+'</td>';
         txt += '</tr></table>';  
         return txt;
     },
     // this creates the side blast filter panel
     insertBlastPanel: function(postFn) {
         var thisB = this;
-        console.log('reloc blast-filter-group');
+        console.log('insertBlastPanel()');
         //relocate blast filter panel; put it in sidebar (this is from a template in BlastPanel.html)
         $('#blast-filter-group').prependTo('.jbrowseHierarchicalTrackSelector');
         thisB.setupFilterSliders();
@@ -468,33 +481,46 @@ return declare( JBrowsePlugin,
     // filter hits based on scores
     lastVal: 0,
     scoreFilter: function(val){
+        
+        if (JSON.stringify(this.lastVal) == JSON.stringify(val)) return;    // deep compare
+        this.lastVal = JSON.parse(JSON.stringify(val));     // deep copy
 
-        if (this.lastVal == val) return;
-        this.lastVal = val;
+        console.log("val",val);
 
         var blastData = this.browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
 
         for(var x in blastData) {
             blastData[x].selected = 0;
-            if (parseFloat(blastData[x].Hsp['Hsp_bit-score']) > val) blastData[x].selected = 1;
+            if (parseFloat(blastData[x].Hsp['Hsp_bit-score']) > val.score &&
+               //parseFloat(blastData[x].Hsp['Hsp_evalue']) < val.evalue &&     
+               ((parseFloat(blastData[x].Hsp['Hsp_identity']) / parseFloat(blastData[x].Hsp['Hsp_align-len'])) * 100) > val.identity &&    
+               ((parseFloat(blastData[x].Hsp['Hsp_gaps']) / parseFloat(blastData[x].Hsp['Hsp_align-len'])) * 100) < val.gaps   &&  
+               
+               1 ) blastData[x].selected = 1;
         }
 
         // toggle blast item
         // todo: toggle specific button based on currently selected
         var key = this.browser.blastKey;
-        //var blastRef = $('.blast-item').attr('blastref');
+        //var blastRef = $('.jblast-item').attr('blastref');
         //console.log('compare',key,blastRef)
         //if (key == blastRef) {
-            $(".blast-item[blastref*='"+key+"']").trigger('click');  "input[name*='man']"
+            $(".jblast-item[blastref*='"+key+"']").trigger('click');  "input[name*='man']"
             setTimeout(function(){
-                $(".blast-item[blastref*='"+key+"']").trigger('click');
+                $(".jblast-item[blastref*='"+key+"']").trigger('click');
             },300);
         //}
     },
+    
     // setup blast filter sliders
     // ref: http://simeydotme.github.io/jQuery-ui-Slider-Pips/#options-pips
     setupFilterSliders: function() {
+        console.log("setupFilterSliders()");
         var thisB = this;
+
+        var filterSlider = this.browser.jblast.filterSliders;
+        
+        //this.sliders.initSliders();
         
         // score slider
         
@@ -508,19 +534,29 @@ return declare( JBrowsePlugin,
         $("#slider-score").slider({
             min: lo,
             max: hi,
-            change: function(event,ui) {
+            values: [lo],
+            slide: function(event,ui) {
                 var v = ui.value;
                 $('#slider-score-data').html(v);
+                filterSlider.score = parseInt(v);
             }
-        }).slider("pips").slider("float");
+        }).slider("pips");
+        //.slider("float");
+
+        //$('#slider-score-data').html(lo);
+        filterSlider.score = lo;
 
         // evalue slider
 
-        var hi = this.getHighest('Hsp_evalue');
-        var lo = this.getLowest('Hsp_evalue');
+        var hi = this.getHighest10('Hsp_evalue');
+        var lo = this.getLowest10('Hsp_evalue');
         var step = (hi - lo) / 20;
+        step = Number.parseFloat(step.toExponential(2));
+
+        console.log("evalue hi/lo/step",hi,lo,step);
 
         var labels1 = [];
+        /*
         for(var i=lo;i <= hi; i += step) {
             var v = i;
             v = v.toExponential(2);
@@ -528,35 +564,42 @@ return declare( JBrowsePlugin,
             //v = v1[0]+' e'+v1[1];
             labels1.push(v);
         }
-
+        */
         var pstep = 5;
         var labels = [];
+        
         for(var i=lo;i <= hi; i += pstep*step) {
-            var v = i;
-            v = v.toExponential(2);
-            var v1 = v.split('e');
-            v = v1[0]+' e'+v1[1];
-            labels.push(v);
+            var v = Math.pow(10,i);
+            labels.push(v.toExponential(1));
         }
+
         console.log(labels);
 
         $("#slider-evalue").slider({
             min: lo,
             max: hi,
             step:step,
-            change: function(event,ui) {
-                var v = ui.value.toExponential(2);
+            values: [hi],
+            slide: function(event,ui) {
+                var v = Math.pow(10,+ui.value);
+                var v = +v.toExponential(1);
                 $('#slider-evalue-data').html(v);
+                filterSlider.evalue = v;
             }
         }).slider("pips",{
             rest:'label',
             first:'label',
             last:'label',
-            step: pstep,
-            labels: labels
-        }).slider("float",{
-            labels: labels1
+            labels: labels,
+            step: pstep
         });
+        //.slider("float",{
+        //    labels: labels1
+        //});
+        
+        //var v = hi.toExponential(2);
+        //$('#slider-evalue-data').html(v);
+        filterSlider.evalue = hi;
 
         // identity slider
 
@@ -567,7 +610,7 @@ return declare( JBrowsePlugin,
         // pip setup
         var pstep = 5;
         var labels = [];
-        for(var i=lo;i <= hi; i += step) {
+        for(var i=lo;i <= hi; i += pstep*step) {
             labels.push(""+Math.round(i));
         }
         
@@ -575,9 +618,11 @@ return declare( JBrowsePlugin,
             min: lo,
             max: hi,
             step: step,
-            change: function(event,ui) {
+            values: [lo],
+            slide: function(event,ui) {
                 var v = ui.value + '%';
                 $('#slider-identity-data').html(v);
+                filterSlider.identity = parseInt(v);
             }
         }).slider("pips",{
             rest:'label',
@@ -586,46 +631,74 @@ return declare( JBrowsePlugin,
             step: pstep,
             //labels: labels,
             suffix: '%'
-        }).slider("float");
+        });
+        //.slider("float");
+
+        //var v = lo + '%';
+        //$('#slider-identity-data').html(v);
+        filterSlider.identity = lo;
 
         // gap slider
 
         var hi = Math.ceil(this.getHighestPct('Hsp_gaps'));
         var lo = Math.floor(this.getLowestPct('Hsp_gaps'));
         var step = (hi - lo) / 20;
-        console.log("gap step",step);
-        step = parseFloat(step.toFixed(2));
-        console.log("gap step",step);
+        //step = parseFloat(step.toFixed(2));
 
         var pstep = 5;
-        pstep = parseFloat(pstep.toFixed(2));
+        //pstep = parseFloat(pstep.toFixed(2));
         var labels = [];
         for(var i=lo;i <= hi; i += pstep*step) {
-            labels.push(parseFloat(i.toFixed(2)));
+            //labels.push(parseFloat(i.toFixed(2)));
+            labels.push(i);
         }
-        console.log("gap labels",labels);
         $("#slider-gap").slider({
             min: lo,
             max: hi,
             step: step,
-            change: function(event,ui) {
+            values: [hi],
+            slide: function(event,ui) {
                 var v = ui.value + '%';
                 $('#slider-gap-data').html(v);
+                filterSlider.gaps = parseFloat(ui.value);
             }
         }).slider("pips",{
             rest: 'label',
             first: 'label',
             last: 'label',
             step: pstep,
-            labels: labels,
+            //labels: labels,
             suffix: '%'
-        }).slider("float");
+        });
+        //.slider("float");
+
+        //var v = hi + '%';
+        //$('#slider-gap-data').html(v);
+        filterSlider.gaps = hi;
+
+        // do stuff once after sliders are initialized
+        setTimeout(function() {
+            var val = filterSlider.score;
+            $('#slider-score-data').html(val);
+            
+            var val = filterSlider.evalue;
+            $('#slider-evalue-data').html(val.toExponential(1));
+
+            var v = filterSlider.identity + '%';
+            $('#slider-identity-data').html(v);
+
+            var v = filterSlider.gaps + '%';
+            $('#slider-gap-data').html(v);
+            
+        },100);
 
         // periodically scan slider value and rerender blast feature track
         setInterval(function() {
-            var val = $('#slider-score').slider("option", "value");
-            //console.log('textbox',val);
-            thisB.scoreFilter(val);
+            //var val = $('#slider-score').slider("option", "value");
+            //var val = $('#slider-score').value;
+            //console.log('val',val);
+            
+            thisB.scoreFilter(filterSlider);
         },3000);
 
 
@@ -642,8 +715,8 @@ return declare( JBrowsePlugin,
         var val = 0;
         for(var x in blastData) {
             //console.log(variable,blastData[x].Hsp[variable]);
-            if (parseFloat(blastData[x].Hsp[variable]) > val)
-                val = parseFloat(blastData[x].Hsp[variable]);
+            if (+blastData[x].Hsp[variable] > val)
+                val = +blastData[x].Hsp[variable];
         }
         return val;
     },
@@ -652,9 +725,31 @@ return declare( JBrowsePlugin,
         var blastData = this.browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
         var val = -1;
         for(var x in blastData) {
-            if (val = -1) val = parseFloat(blastData[x].Hsp[variable]);
-            if (parseFloat(blastData[x].Hsp[variable]) < val)
-                val = parseFloat(blastData[x].Hsp[variable]);
+            if (val === -1) val = +blastData[x].Hsp[variable];
+            if (+blastData[x].Hsp[variable] < val)
+                val = +blastData[x].Hsp[variable];
+        }
+        return val;
+    },
+    // get the hightest value of the blast data variable
+    getHighest10: function(variable) {
+        var blastData = this.browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
+        var val = 0;
+        for(var x in blastData) {
+            //console.log(variable,+blastData[x].Hsp[variable]);
+            var v = Math.log10(+blastData[x].Hsp[variable]);
+            if (v > val) val = v;
+        }
+        return val;
+    },
+    // get the lowest value of the blast data variable.
+    getLowest10: function(variable) {
+        var blastData = this.browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
+        var val = -1;
+        for(var x in blastData) {
+            var v = Math.log10(+blastData[x].Hsp[variable]);
+            if (val === -1) val = v;
+            if (v < val)  val = v;
         }
         return val;
     },
@@ -665,8 +760,7 @@ return declare( JBrowsePlugin,
         for(var x in blastData) {
             //console.log(variable,blastData[x].Hsp[variable]);
             var cval = parseFloat(blastData[x].Hsp[variable]) / parseFloat(blastData[x].Hsp['Hsp_align-len']) * 100;
-            if (cval > val)
-                val = cval
+            if (cval > val) val = cval
         }
         return val;
     },
@@ -676,9 +770,8 @@ return declare( JBrowsePlugin,
         var val = -1;
         for(var x in blastData) {
             var cval = parseFloat(blastData[x].Hsp[variable]) / parseFloat(blastData[x].Hsp['Hsp_align-len']) * 100;
-            if (val = -1) val = cval;
-            if (cval < val)
-                val = cval;
+            if (val === -1) val = cval;
+            if (cval < val) val = cval;
         }
         return val;
     },
@@ -745,43 +838,41 @@ return declare( JBrowsePlugin,
     },
     // retrieve blast data json into this.blastData
     blastReadJSON: function(config,postFn) {
+        console.log("blastReadJSON()",config,config.baseUrl+config.blastData);
         var thisB = this;
         var browser = this.browser;
-        console.log("BLAST READ XML in main");
-        //console.log(this,args);
-        //var thisB = JBrowse;
 
         browser.blastDataJSON = 0;
-        browser.blastData = 0;
 
-        var blastDataFile = config.blastData;
-        if (typeof blastDataFile !== "undefined") {
-            dojo.xhrGet({
-                url: config.baseUrl+blastDataFile,
+        //var blastDataFile = config.blastData;
+        if (typeof config.blastData !== "undefined") {
+            var success = 0;
+            var deferred = dojo.xhrGet({
+                url: config.baseUrl+config.blastData,
                 handleAs: "json",
+                preventCache: true,
                 load: function(obj) {
-                    //blastRenderData();
-
-                    var hits = obj.BlastOutput.BlastOutput_iterations.Iteration.Hit;
-
-                    var flist = [];
-                    for(var i in hits) {
-                        hits[i].key = i;
-                        hits[i].selected = 1;
-                        flist.push(hits[i]);
-                    }
-                    //console.log("blastDataJSON "+blastDataFile,obj);
                     browser.blastDataJSON = obj;
-
-                    //console.log("blastDataJSON "+blastDataFile,flist);
-                    browser.blastData = flist;
-
-                    postFn();
+                    success = 1;
+                    console.log("read success",obj,success);
                 },
                 error: function(err) {
                     console.log(err);
                 }
-            });            
+            });
+            // need to decouple the postFn() callback because errors in postFn cause xhrGet error trap to trigger.
+            var timeout = 0;
+            var timy = setInterval(function() {
+                if (success){
+                    console.log("blastReadJSON done", browser.blastDataJSON);
+                    clearInterval(timy);
+                    postFn();
+                }
+                if (timeout++ > 300) {
+                    clearInterval(timy);
+                    console.log("blastReadJSON did not call postFn()");
+                }
+            },10);
         }
     },
     // recursively find id in a node tree
