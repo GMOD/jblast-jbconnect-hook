@@ -55,6 +55,8 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
      * @param args.trackPadding {Number} distance in px between tracks
      */
     constructor: function( args ) {
+        
+        console.log("HTMLFeatures constructor");
         //number of histogram bins per block
         this.numBins = lang.getObject( 'histogram.binsPerBlock', false, this.config ) || 25;
 
@@ -78,19 +80,19 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
 
         this._setupEventHandlers();
         
-        // if blast plugin available
+        this.extendedInit();
+    },
+    extendedInit: function() {
+        // if jblast plugin available
         if (typeof this.browser.blastPlugin !== 'undefined') {
-            //console.log('trackconfig',this.config);
-            //console.log('blastData',this.config.blastData);
+           
             // only if it a blastData track
             if (typeof this.config.blastData !== 'undefined') {
-                this.browser.blastPlugin.initBlastTrack(this.config.blastData,this.config);
+                this.browser.blastPlugin.initBlastTrack(this.config);
             }
         }
-        //this.blastReadXML(args);
         
     },
-    
     /**
      * Returns object holding the default configuration for HTML-based feature tracks.
      * @private
@@ -636,16 +638,8 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
                 // var filter = this.browser.view.featureFilter;
                 if( this.filterFeature( feature ) )  {
                     
-                    // check blast data
-                    var blastData = browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
-                    
-                    var blasthit = feature.get('blasthit');
-                    //console.log("featurefilter",blasthit);
-                    var render = 0;
-                    if ((typeof blastData !== 'undefined') && (typeof blasthit !== 'undefined'))
-                        render = blastData[blasthit].selected;
-                    
-                    if ((render === 1) || (typeof blasthit === 'undefined')) {
+                    var render = this.renderFilter(feature);
+                    if (render === 1) {
                         this.addFeatureToBlock( feature, uniqueId, block, scale, labelScale, descriptionScale, containerStart, containerEnd );
                     }
                }
@@ -689,7 +683,32 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
                                 }
                               );
     },
+    /**
+     * This hook allows filtering of features to render.
+     * @param {type} feature
+     * @returns true if render feature, false if not
+     */
+    renderFilter: function(feature) {
+        var browser = this.browser;
+        var render = 0;
+        //return 1;
+        //console.log('********************* blastDataJSON',browser.blastDataJSON);
+        if ( browser.blastDataJSON === 0) {
+            return 0;   /// not initialized yet
+        }
+        
+        // jblast filter
+        var blastData = browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
 
+        var blasthit = feature.get('blasthit');
+        //console.log("featurefilter",blasthit);
+        if ((typeof blastData !== 'undefined') && (typeof blasthit !== 'undefined'))
+            if (typeof blastData[blasthit] !== 'undefined')
+                render = blastData[blasthit].selected;
+        
+        return render;
+    },
+    
     /**
      *  Creates feature div, adds to block, and centers subfeatures.
      *  Overridable by subclasses that need more control over the substructure.
