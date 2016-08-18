@@ -543,8 +543,8 @@ return declare( JBrowsePlugin,
             }
         })
         .slider('pips', {
-            rest:'pip',
-            step:step
+            rest:'label',
+            step: step
         });
 
         filterSlider.score = lo;
