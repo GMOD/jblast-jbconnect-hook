@@ -205,7 +205,7 @@ return declare(
         if (typeof trackConf.blastData !== 'undefined') {
             console.log("extendCheckbox prop",props)
             props.blastRef = trackConf.label;
-            props.className += " blast-item";
+            props.className += " jblast-item";
         }
         return props;
     },
