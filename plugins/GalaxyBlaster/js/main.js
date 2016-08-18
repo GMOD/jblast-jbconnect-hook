@@ -526,7 +526,7 @@ return declare( JBrowsePlugin,
         
         var hi = Math.ceil(this.getHighest('Hsp_bit-score'));
         var lo = Math.floor(this.getLowest('Hsp_bit-score'));
-        var pstep = Math.round((hi-lo) / 4);
+        var step = Math.round((hi-lo) / 4);
         console.log("score hi/lo",lo,hi);
 
         var startPos = Math.round((hi - lo) * .8) + lo; // 80%
@@ -543,11 +543,10 @@ return declare( JBrowsePlugin,
             }
         })
         .slider('pips', {
-            rest:'pips',
-            step:pstep
+            rest:'pip',
+            step:step
         });
 
-        //$('#slider-score-data').html(lo);
         filterSlider.score = lo;
 
         // evalue slider
@@ -555,14 +554,13 @@ return declare( JBrowsePlugin,
         var hi = this.getHighest10('Hsp_evalue');
         var lo = this.getLowest10('Hsp_evalue');
         var step = (hi - lo) / 20;
-        //step = Number.parseFloat(step.toExponential(2));
 
-        console.log("evalue hi/lo/step",hi,lo,step);
+        console.log("evalue hi/lo/step,hival",lo,hi,step,this.getHighest('Hsp_evalue').toExponential(1));
 
         var pstep = 5;
         var labels = [];
         
-        for(var i=lo;i <= hi; i += step) {
+        for(var i=lo;i <= hi; i += pstep*step) {
             var v = Math.pow(10,i);
             labels.push(v.toExponential(1));
         }
@@ -592,13 +590,7 @@ return declare( JBrowsePlugin,
             labels: labels,
             step: pstep
         });
-        //.slider("float",{
-        //    labels: labels1
-        //});
-        
-        //var v = hi.toExponential(2);
-        //$('#slider-evalue-data').html(v);
-        filterSlider.evalue = hi;
+        filterSlider.evalue = Math.pow(10,hi - offset);
 
         // identity slider
 
@@ -631,10 +623,6 @@ return declare( JBrowsePlugin,
             //labels: labels,
             suffix: '%'
         });
-        //.slider("float");
-
-        //var v = lo + '%';
-        //$('#slider-identity-data').html(v);
         filterSlider.identity = lo;
 
         // gap slider
@@ -648,7 +636,6 @@ return declare( JBrowsePlugin,
         //pstep = parseFloat(pstep.toFixed(2));
         var labels = [];
         for(var i=lo;i <= hi; i += pstep*step) {
-            //labels.push(parseFloat(i.toFixed(2)));
             labels.push(i);
         }
         $("#slider-gap").slider({
@@ -669,10 +656,6 @@ return declare( JBrowsePlugin,
             //labels: labels,
             suffix: '%'
         });
-        //.slider("float");
-
-        //var v = hi + '%';
-        //$('#slider-gap-data').html(v);
         filterSlider.gaps = hi;
 
         // do stuff once after sliders are initialized
@@ -681,7 +664,7 @@ return declare( JBrowsePlugin,
             $('#slider-score-data').html(val);
             
             var val = filterSlider.evalue;
-            val = Math.pow(10,val);
+            //val = Math.pow(10,val);
             $('#slider-evalue-data').html(val.toExponential(1));
 
             var v = filterSlider.identity + '%';
@@ -734,10 +717,11 @@ return declare( JBrowsePlugin,
     // get the hightest value of the blast data variable
     getHighest10: function(variable) {
         var blastData = this.browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
-        var val = 0;
+        var val = Math.log10(Number.MIN_VALUE);
+        //console.log("smallest",val);
         for(var x in blastData) {
-            //console.log(variable,+blastData[x].Hsp[variable]);
             var v = Math.log10(+blastData[x].Hsp[variable]);
+            //console.log('v',v,blastData[x].Hsp[variable]);
             if (v > val) val = v;
         }
         return val;
