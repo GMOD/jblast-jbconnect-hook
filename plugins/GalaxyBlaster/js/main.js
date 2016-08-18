@@ -492,7 +492,7 @@ return declare( JBrowsePlugin,
         for(var x in blastData) {
             blastData[x].selected = 0;
             if (parseFloat(blastData[x].Hsp['Hsp_bit-score']) > val.score &&
-               //parseFloat(blastData[x].Hsp['Hsp_evalue']) < val.evalue &&     
+               +blastData[x].Hsp['Hsp_evalue'] < val.evalue &&     
                ((parseFloat(blastData[x].Hsp['Hsp_identity']) / parseFloat(blastData[x].Hsp['Hsp_align-len'])) * 100) > val.identity &&    
                ((parseFloat(blastData[x].Hsp['Hsp_gaps']) / parseFloat(blastData[x].Hsp['Hsp_align-len'])) * 100) < val.gaps   &&  
                
@@ -526,6 +526,7 @@ return declare( JBrowsePlugin,
         
         var hi = Math.ceil(this.getHighest('Hsp_bit-score'));
         var lo = Math.floor(this.getLowest('Hsp_bit-score'));
+        var pstep = Math.round((hi-lo) / 4);
         console.log("score hi/lo",lo,hi);
 
         var startPos = Math.round((hi - lo) * .8) + lo; // 80%
@@ -538,10 +539,13 @@ return declare( JBrowsePlugin,
             slide: function(event,ui) {
                 var v = ui.value;
                 $('#slider-score-data').html(v);
-                filterSlider.score = parseInt(v);
+                filterSlider.score = parseInt(v);            
             }
-        }).slider("pips");
-        //.slider("float");
+        })
+        .slider('pips', {
+            rest:'pips',
+            step:pstep
+        });
 
         //$('#slider-score-data').html(lo);
         filterSlider.score = lo;
@@ -551,27 +555,23 @@ return declare( JBrowsePlugin,
         var hi = this.getHighest10('Hsp_evalue');
         var lo = this.getLowest10('Hsp_evalue');
         var step = (hi - lo) / 20;
-        step = Number.parseFloat(step.toExponential(2));
+        //step = Number.parseFloat(step.toExponential(2));
 
         console.log("evalue hi/lo/step",hi,lo,step);
 
-        var labels1 = [];
-        /*
-        for(var i=lo;i <= hi; i += step) {
-            var v = i;
-            v = v.toExponential(2);
-            //var v1 = v.split('e');
-            //v = v1[0]+' e'+v1[1];
-            labels1.push(v);
-        }
-        */
         var pstep = 5;
         var labels = [];
         
-        for(var i=lo;i <= hi; i += pstep*step) {
+        for(var i=lo;i <= hi; i += step) {
             var v = Math.pow(10,i);
             labels.push(v.toExponential(1));
         }
+        labels.push(Math.pow(10,hi).toExponential(1));
+
+        // push values to positive zone because slider pips cannot seem to handle negative numbers with custom labels
+        offset = Math.abs(lo);
+	lo = lo + offset;
+        hi = hi + offset;
 
         console.log(labels);
 
@@ -581,9 +581,8 @@ return declare( JBrowsePlugin,
             step:step,
             values: [hi],
             slide: function(event,ui) {
-                var v = Math.pow(10,+ui.value);
-                var v = +v.toExponential(1);
-                $('#slider-evalue-data').html(v);
+                var v = Math.pow(10,+ui.value - offset);
+                $('#slider-evalue-data').html(v.toExponential(1));
                 filterSlider.evalue = v;
             }
         }).slider("pips",{
@@ -682,6 +681,7 @@ return declare( JBrowsePlugin,
             $('#slider-score-data').html(val);
             
             var val = filterSlider.evalue;
+            val = Math.pow(10,val);
             $('#slider-evalue-data').html(val.toExponential(1));
 
             var v = filterSlider.identity + '%';
