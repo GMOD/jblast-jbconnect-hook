@@ -3,9 +3,20 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "sails": {
+    "isHook": true
+  },  
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC"
+  "devDependencies": {
+   "sails": "~0.11.0"
+  },
+  "keywords": [
+    "JBrowse",
+    "Galaxy",
+    "Blast"
+  ],
+  "author": "eyao",
+  "license": "GNU LESSER GENERAL PUBLIC LICENSE"
 }

@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "JBrowse Galaxy Blaster",
   "main": "index.js",
+  "sails": {
+    "isHook": true
+  },  
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,6 +14,9 @@
     "Galaxy",
     "Blast"
   ],
-  "author": "ey",
-  "license": "ISC"
+  "devDependencies": {
+   "sails": "~0.11.0"
+  },
+  "author": "eyao",
+  "license": "GNU LESSER GENERAL PUBLIC LICENSE"
 }
