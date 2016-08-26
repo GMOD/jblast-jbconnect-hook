@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /* 
  * get global data and output files to specified location.
  * from global file /etc/jbrowse/globals.dat
