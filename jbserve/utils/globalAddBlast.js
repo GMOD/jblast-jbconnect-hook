@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /*
  * add blast globals to global file 
  */
