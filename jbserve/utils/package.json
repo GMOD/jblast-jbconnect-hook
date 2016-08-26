@@ -5,6 +5,14 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "bin" : {
+      "jblast-start":"./jblaststart.js",
+      "jblast-offset" : "./jboffset.js",
+      "jblast-export" : "./jbexport.js",
+      "jblast-xml2json" : "./blastxml2json.js",
+      "jblast-addglobal": "./globalAddBlast.js",
+      "jblast-xml2csv":"./blastxml2csv.js"
+  },
   "author": "eyao",
   "license": "GNU LESSER GENERAL PUBLIC LICENSE",
   "dependencies": {
