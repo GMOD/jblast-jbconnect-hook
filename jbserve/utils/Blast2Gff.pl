@@ -47,7 +47,7 @@ my $Usage = "USAGE:\n".
     "    Default is the intput file path with gff extension.\n".
     " -d Blast database that was blasted against [STRING]\n".
     "    This is required\n".
-    " -s ".
+    " -s sequence name\n".
     " -m Format of the algnment outout from blast [INTEGER]\n".
     "    Default value is 8. Valid values are 0,8,9".
     " -p Blast program used [STRING]\n".
