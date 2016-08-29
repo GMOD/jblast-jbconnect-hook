@@ -71,15 +71,14 @@ if ($PrintHelp)
     exit;
 }
 
-$SeqName = $Options{s} ||
-    die "\aERROR: A sequence file name must be specified\n$Usage\n";
+$SeqName = $Options{s} || "x blastseq"; 
 $GffAppend = $Options{a};
 $InFile = $Options{i} ||
     die "\aERROR: An input file must be specified.\n\n$Usage\n";
 # Default output is the full path of the input file with the gff extension
 $BlastProg = $Options{p} ||
     "blastn";
-$BlastDb = $Options{d} || 
+$BlastDb = $Options{d} || "xblastdb";
     die "\aERROR: A blast database should be indicated.\n\n$Usage\n";
 $OutFile = $Options{o} ||
     $InFile.".gff";
