@@ -10,9 +10,9 @@
       "jblast-offset" : "./jboffset.js",
       "jblast-export" : "./jbexport.js",
       "jblast-xml2json" : "./blastxml2json.js",
-      "jblast-addglobal": "./globalAddBlast.js",
+      "jblast-global": "./jbglobal.js",
       "jblast-xml2csv":"./blastxml2csv.js",
-      "jblast-xml2gff": "./Blast2Gff.pl"
+      "jblast-tab2gff": "./Blast2Gff.pl"
   },
   "author": "eyao",
   "license": "GNU LESSER GENERAL PUBLIC LICENSE",
