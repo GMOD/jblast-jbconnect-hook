@@ -1,7 +1,7 @@
 <tool id="jb_offset" name="JBlast - apply offsets to coord" version="1.0.0">
     <description>Apply offset to coordinate space</description>
-    <command interpreter="node">
-       jboffset.js -i $input1 -o $output -t $type_select
+    <command>
+       jblast-offset -i $input1 -o $output -t $type_select
     </command>
     <inputs>
         <param format="gff,json" name="input1" type="data" label="GFF or JSON in"/>

@@ -1,6 +1,6 @@
 <tool id="jb_blastxml2json" name="BlastXml 2 json" version="1.0.0">
   <description>Convert BlastXML to JSON - for JBlast Module</description>
-  <command interpreter="node">blastxml2json.js -x $input1 -o $output -o $output</command>
+  <command>jblast-xml2json -x $input1 -o $output -o $output</command>
   <inputs>
     <param format="blastxml" name="input1" type="data" label="BlastXML input file"/>
   </inputs>
