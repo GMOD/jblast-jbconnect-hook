@@ -4,7 +4,7 @@
  */
 
 var request = require('request');
-var prettyjson = require('prettyjson');
+//var prettyjson = require('prettyjson');
 
 var $ = 0;
 
