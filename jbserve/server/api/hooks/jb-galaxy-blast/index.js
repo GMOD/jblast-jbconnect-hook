@@ -95,7 +95,7 @@ function rest_WorkflowSubmit(req,res) {
             "name": "JBlast", 
             //"blastSeq": "/var/www/html/jb-galaxy-blaster/tmp/44705works.fasta",
             "blastSeq": g.jbrowse.filePath+theBlastFile,
-            "originalSeq": "/var/www/html/jb-galaxy-blaster/tmp/volvox.fa",
+//            "originalSeq": "/var/www/html/jb-galaxy-blaster/tmp/volvox.fa",
             "offset": startCoord
     };
     storeInGlobals(blastData,"jblast");
