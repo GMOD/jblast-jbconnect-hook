@@ -1,6 +1,6 @@
 <tool id="jb_blast2gff" name="BlastTab 2 GFF" version="1.0.0">
   <description>Convert BLAST Tab to GFF for JBlast Module</description>
-  <command >jblast-tab2gff -i $blasttab -o $output</command>
+  <command >jblast-tab2gff -i $blasttab -o $output  -d "/var/www/html/galaxy/data/blastdb/wgs/20apr2014/wgs"</command>
   <inputs>
     <param format="tabular" name="blasttab" type="data" label="BLAST Result file (tabular)"/>
   </inputs>
