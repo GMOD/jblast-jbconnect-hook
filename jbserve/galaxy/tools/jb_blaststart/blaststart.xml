@@ -1,11 +1,10 @@
 <tool id="jb_blaststart" name="JBlast Start" version="1.0.0">
   <description>Import data to Galaxy from JBrowse-Galaxy BLAST Module</description>
-  <command>jblast-start --blastseq $outBlastSeq --refseq $outRefSeq</command>
+  <command>jblast-start --blastseq $outBlastSeq</command>
   <inputs>
   </inputs>
   <outputs>
     <data format="fasta" name="outBlastSeq" label="jb BLAST sequence (fasta)"/>
-    <data format="fasta" name="outRefSeq" label="jb original seq (fasta)"/>
   </outputs>
 
   <help>

@@ -3,7 +3,6 @@
   <command >jblast-tab2gff -i $blasttab -o $output</command>
   <inputs>
     <param format="tabular" name="blasttab" type="data" label="BLAST Result file (tabular)"/>
-    <param format="fasta" name="refseq" type="data" label="Original Sequence file (FASTA)"/>
   </inputs>
   <outputs>
     <data format="gff3" name="output" label="jb blasttab to GFF3"/>
