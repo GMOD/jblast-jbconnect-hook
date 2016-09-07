@@ -34,20 +34,22 @@ var opt = getopt.create([
 .parseSystem(); // parse command line
 
 var blastSeqOut = opt.options['blastseq'] || '.';
-var refSeqOut = opt.options['refseq'] || '.';
+//var refSeqOut = opt.options['refseq'] || '.';
 
 readInGlobals(function(gbl) {
 
     console.log(gbl.jblast);
     blastSeqIn = gbl.jblast.blastSeq;
-    refSeqIn = gbl.jblast.originalSeq;
+    //refSeqIn = gbl.jblast.originalSeq;
     
     console.log(blastSeqIn,blastSeqOut);
-    console.log(refSeqIn,refSeqOut);
+    //console.log(refSeqIn,refSeqOut);
 
     try {
-        fs.createReadStream(blastSeqIn).pipe(fs.createWriteStream(blastSeqOut));    
-        fs.createReadStream(refSeqIn).pipe(fs.createWriteStream(refSeqOut));
+        fs.createReadStream(blastSeqIn).pipe(fs.createWriteStream(blastSeqOut));
+        
+        // 
+        //fs.createReadStream(refSeqIn).pipe(fs.createWriteStream(refSeqOut));
     }
     catch (e) {
         logMyErrors(e.message, e.name);
