@@ -79,7 +79,7 @@ $InFile = $Options{i} ||
 $BlastProg = $Options{p} ||
     "blastn";
 $BlastDb = $Options{d} || "xblastdb";
-    die "\aERROR: A blast database should be indicated.\n\n$Usage\n";
+#    die "\aERROR: A blast database should be indicated.\n\n$Usage\n";
 $OutFile = $Options{o} ||
     $InFile.".gff";
 $AlignFormat = $Options{m} || 
