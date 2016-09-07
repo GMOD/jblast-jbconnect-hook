@@ -44,7 +44,7 @@ var g = getGlobals();
 console.log("globals",g);
 
 // export will copy result files into <dataset dir>/data (i.e. "/sample_data/json/volvox/data"
-var blastResultDir = "data";
+var blastResultDir = g.jbrowse.blastResultPath;
 /*
  * export the gff file to jbrowse
  * the default directory will be the <jbrowse data directory>/data

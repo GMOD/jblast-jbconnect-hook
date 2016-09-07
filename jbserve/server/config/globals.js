@@ -15,6 +15,7 @@ module.exports.globals = {
     jbrowse: {
         galaxyUrl: "http://localhost:8080",
         galaxyAPIKey: "2bb67717b99a37e92e59003f93625c9b",
+        blastResultPath: "jblast",
 
         jbrowsePath: "/var/www/html/jb-galaxy-blaster/",
         jbrowseURL: "http://localhost/jb-galaxy-blaster/",
