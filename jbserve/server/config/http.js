@@ -16,6 +16,16 @@ module.exports.http = {
     
     customMiddleware: function (app) {
         console.log("config of Middleware config/http.js for jbrowse");
+        
+        var express = require('express');
+	
+        // setup jbrowse route
+        // todo: make this configurable in globals.js 
+	app.use(express.logger());
+	app.use(express.compress());
+	app.use('/jbrowse', express.static('/var/www/html/jb-galaxy-blaster/'));
+
+        
         // setup kue and kue-ui
         var g = sails.config.globals;
 
