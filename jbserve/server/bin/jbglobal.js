@@ -5,9 +5,12 @@
  */
 var fs = require("fs");
 var getopt = require('node-getopt');
+var globals = require('../config/globals');
 
-var globalPath = "/etc/jbrowse";
-var globalFile = globalPath + "/globals.dat";
+console.log('globals',globals.globals.jbrowse);
+
+//var globalPath = "/etc/jbrowse";
+//var globalFile = globalPath + "/globals.dat";
 
 var blastData = {
         "name": "JBlast Test", 
@@ -27,8 +30,8 @@ opt.parseSystem(); // parse command line
 
 var addGlobal = opt.options['add'];
 
-if (typeof addGlobal !== 'undefined')
-    storeInGlobals(blastData,"jblast");
+//if (typeof addGlobal !== 'undefined')
+//    storeInGlobals(blastData,"jblast");
 
 // add a new section to global data
 function storeInGlobals (sectionData,sectionName) {
