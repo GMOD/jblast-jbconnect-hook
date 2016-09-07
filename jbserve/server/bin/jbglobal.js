@@ -10,10 +10,10 @@ var globalPath = "/etc/jbrowse";
 var globalFile = globalPath + "/globals.dat";
 
 var blastData = {
-            "name": "JBlast Test", 
-            "blastSeq": "/var/www/html/jb-galaxy-blaster/tmp/44705works.fasta",
+        "name": "JBlast Test", 
+        "blastSeq": "/var/www/html/jb-galaxy-blaster/tmp/44705works.fasta",
 //            "originalSeq": "/var/www/html/jb-galaxy-blaster/tmp/volvox.fa",
-            "offset": 44705
+        "offset": 44705
     };
 
 
@@ -27,13 +27,15 @@ opt.parseSystem(); // parse command line
 
 var addGlobal = opt.options['add'];
 
-storeInGlobals(blastData,"jblast");
+if (typeof addGlobal !== 'undefined')
+    storeInGlobals(blastData,"jblast");
 
 // add a new section to global data
 function storeInGlobals (sectionData,sectionName) {
     
     console.log("global file: "+ globalFile);
     
+    jGlobals = 
     fs.readFile(globalFile, function read(err, data) {
         if (err) {
             throw err;
