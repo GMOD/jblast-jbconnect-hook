@@ -12,7 +12,7 @@ var globalFile = globalPath + "/globals.dat";
 var blastData = {
             "name": "JBlast Test", 
             "blastSeq": "/var/www/html/jb-galaxy-blaster/tmp/44705works.fasta",
-            "originalSeq": "/var/www/html/jb-galaxy-blaster/tmp/volvox.fa",
+//            "originalSeq": "/var/www/html/jb-galaxy-blaster/tmp/volvox.fa",
             "offset": 44705
     };
 
