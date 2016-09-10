@@ -1,7 +1,6 @@
 {
   "name": "jblast-galaxy-tools",
   "version": "0.1.0",
-  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,7 +10,8 @@
     "jblast-export": "./bin/jbexport.js",
     "jblast-xml2json": "./bin/blastxml2json.js",
     "jblast-xml2csv": "./bin/blastxml2csv.js",
-    "jblast-tab2gff": "./bin/Blast2Gff.pl"
+    "jblast-tab2gff": "./bin/Blast2Gff.pl",
+    "jblast-setup-galaxy": "./bin/copyfiles.js"
   },
   "author": "eyao",
   "license": "GNU LESSER GENERAL PUBLIC LICENSE",
