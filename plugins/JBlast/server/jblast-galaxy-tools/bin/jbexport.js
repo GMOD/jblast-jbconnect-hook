@@ -7,7 +7,6 @@ var request = require('request'),
 
 //require('request-debug')(request);
 
-
 // sails globals    
 //var jGbl = require('../server/config/globals');
 

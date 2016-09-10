@@ -13,7 +13,6 @@
     };
 */
 
-
 var request = require('request');
 //var prettyjson = require('prettyjson');
 //var prompt = require('prompt');
