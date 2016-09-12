@@ -82,9 +82,25 @@ function rest_WorkflowSubmit(req,res) {
     
     // write the received region into a file
     // todo: handle errors
-    ws = fs.createWriteStream(g.jbrowse.filePath+theBlastFile);
-    ws.write(region);
-    ws.end();
+    
+    var blastPath = g.jbrowse.jbrowsePath + g.jbrowse.dataSet.dataPath + g.jbrowse.jblast.blastResultPath;
+    theBlastFile = blastPath+'/'+theBlastFile; 
+            
+    // if direcgtory doesn't exist, create it
+    if (!fs.existsSync(blastPath)){
+        fs.mkdirSync(blastPath);
+    }  
+    
+    try {
+        ws = fs.createWriteStream(theBlastFile);
+        ws.write(region);
+        ws.end();
+        
+    }
+    catch (e) {
+        console.log(e,theBlastFile);
+        process.exit(1);
+    }
     
 
 
@@ -94,7 +110,7 @@ function rest_WorkflowSubmit(req,res) {
     var blastData = {
             "name": "JBlast", 
             //"blastSeq": "/var/www/html/jb-galaxy-blaster/tmp/44705works.fasta",
-            "blastSeq": g.jbrowse.filePath+theBlastFile,
+            "blastSeq": theBlastFile,
 //            "originalSeq": "/var/www/html/jb-galaxy-blaster/tmp/volvox.fa",
             "offset": startCoord
     };
@@ -139,21 +155,29 @@ function getRegionStart(str) {
 // store section in globals
 function storeInGlobals (sectionData,sectionName) {
     
-    fs.readFile(globalFile, function read(err, data) {
-        if (err) {
-            throw err;
-        }
-        var g = JSON.parse(data);
-        g[sectionName] = sectionData;
+    try {
+        var data = fs.readFileSync(globalFile,'utf8');
+    }
+    catch (e) {
+        console.log("read",e, globalFile);
+        process.exit(1);
+    }
+    var g = JSON.parse(data);
 
-        var gStr = JSON.stringify(g,null,4);
+    // merge existing jblast section with new section data
+    if (typeof g.sectionName === 'undefined') g.sectionName = {};
+    for (var i in sectionData) g.sectionName[i] = sectionData[i];
 
-        fs.writeFile(globalFile,gStr, function (err) {
-            if (err) throw err;
-            console.log("Global file: "+ globalFile);
-        });
-    });    
-        
+    var gStr = JSON.stringify(g,null,4);
+    
+    try {
+        fs.writeFileSync(globalFile,gStr);
+    }
+    catch(e) {
+        console.log("write",e, globalFile);
+        process.exit(1);
+    }
+    console.log("Global file: "+ globalFile);
 }
 
 
