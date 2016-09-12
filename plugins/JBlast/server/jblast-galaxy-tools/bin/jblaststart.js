@@ -51,7 +51,8 @@ readInGlobals(function(gbl) {
         //fs.createReadStream(refSeqIn).pipe(fs.createWriteStream(refSeqOut));
     }
     catch (e) {
-        logMyErrors(e.message, e.name);
+        console.log(e.message, e.name);
+        process.exit(1);
     }
 });
 
