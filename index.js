@@ -83,8 +83,9 @@ function rest_WorkflowSubmit(req,res) {
     // write the received region into a file
     // todo: handle errors
     
-    var blastPath = g.jbrowse.jbrowsePath + g.jbrowse.dataSet.dataPath + g.jbrowse.jblast.blastResultPath;
+    var blastPath = g.jbrowse.jbrowsePath + g.jbrowse.dataSet[0].dataPath + g.jbrowse.jblast.blastResultPath;
     theBlastFile = blastPath+'/'+theBlastFile; 
+    console.log("theBlastFile",theBlastFile);
             
     // if direcgtory doesn't exist, create it
     if (!fs.existsSync(blastPath)){
@@ -165,8 +166,8 @@ function storeInGlobals (sectionData,sectionName) {
     var g = JSON.parse(data);
 
     // merge existing jblast section with new section data
-    if (typeof g.sectionName === 'undefined') g.sectionName = {};
-    for (var i in sectionData) g.sectionName[i] = sectionData[i];
+    if (typeof g[sectionName] === 'undefined') g[sectionName] = {};
+    for (var i in sectionData) g[sectionName][i] = sectionData[i];
 
     var gStr = JSON.stringify(g,null,4);
     
