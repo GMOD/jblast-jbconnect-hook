@@ -5,7 +5,7 @@
   "author": "eyao",
   "license": "MIT",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "postinstall": "bin/postinstall.js"
   },
   "bin": {
     "jblast-start": "./bin/jblaststart.js",
@@ -16,9 +16,6 @@
     "jblast-tab2gff": "./bin/Blast2Gff.pl",
     "jblast-setup-galaxy": "./bin/copyfiles.js"
   },
-  "scripts": {
-    "postinstall": "bin/postinstall.js"
-  },
   "dependencies": {
     "dateformat": "^1.0.12",
     "fs": "^0.0.2",
@@ -26,6 +23,7 @@
     "node-getopt": "^0.2.3",
     "path": "^0.12.7",
     "request": "^2.72.0",
+    "request-promise": "^4.1.1",
     "util": "^0.10.3",
     "xml2js": "^0.4.16",
     "xml2json-stream": "^0.2.0",
