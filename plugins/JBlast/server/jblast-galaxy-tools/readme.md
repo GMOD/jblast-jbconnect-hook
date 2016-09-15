@@ -6,6 +6,7 @@ Install globally:
 ```
 npm install -g .
 ```
+Note: must have proper permission to the global node_modules (/usr/local/lib/node_modules) directoryand the /bin directory.
 
 ## Troubleshooting
 
@@ -19,4 +20,5 @@ This will convert line endings to unix format.
 ```
 tr -d '\15\32' < jblaststart.js > jblaststart.js
 ```
- 
+
+
