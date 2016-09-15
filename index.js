@@ -11,8 +11,8 @@ var path = require('path');
 //var filePath = "/var/www/html/jb-galaxy-blaster/tmp/";
 //var urlPath = "http://localhost/jb-galaxy-blaster/tmp/";
 
-var globalPath = "/etc/jbrowse";
-var globalFile = globalPath + "/globals.dat";
+//var globalPath = "/etc/jbrowse";
+//var globalFile = globalPath + "/globals.dat";
 
 
 module.exports = function (sails) {
@@ -20,10 +20,16 @@ module.exports = function (sails) {
    return {
 
         initialize: function(cb) {
-           console.log("Sails Hook: jb-galaxy-blast initialize"); 
-           // todo: check that galaxy is running
-           
-           return cb();
+            console.log("Sails Hook: jb-galaxy-blast initialize"); 
+            // todo: check that galaxy is running
+
+            sails.on('hook:orm:loaded', function() {
+                // do something after hooks are loaded
+                //console.log(sails.hooks);
+                return cb();
+            });
+            
+            //return cb();
         },
         routes: {
            after: {
@@ -103,8 +109,6 @@ function rest_WorkflowSubmit(req,res) {
         process.exit(1);
     }
     
-
-
     // write variable to global
     // todo: later the name and perhaps additional info should come from the FASTA header (ie: JBlast ctgA ctgA:46990..48410 (- strand)
     // which should appear as the track name when the operation is done.
@@ -115,32 +119,35 @@ function rest_WorkflowSubmit(req,res) {
 //            "originalSeq": "/var/www/html/jb-galaxy-blaster/tmp/volvox.fa",
             "offset": startCoord
     };
-    storeInGlobals(blastData,"jblast");
-   
-    console.log("blastData",blastData);
     
-    //console.log("not submitted");
-    //return;
-    request.post({
-        url: g.jbrowse.galaxyUrl+"/api/workflows"+"?key="+g.jbrowse.galaxyAPIKey, 
-        method: 'POST',
-        //qs: params,
-        headers: {
-            'Accept-Encoding' : 'gzip, deflate',
-            'Accept-Language' : 'en-US,en;q=0.5',
-            'Content-Length' : jsonstr.length
-        },
-        json: params
-    }, function(error, response, body){
-        if(error) {
-            console.log(error);
-        } else {
-            //console.log(response.statusCode, body);
-            //JSON.stringify(eval("(" + str + ")"));
-            //var result = JSON.parse(body);
-            var result = body;
-            console.log(result);
+    sails.hooks['jbcore'].setGlobalSection(blastData,"jblast", function(err) {
+        
+        if (err) {
+            console.log("jbcore: failed to save globals");
+            return;
         }
+        // submit galaxy workflow
+        request.post({
+            url: g.jbrowse.galaxyUrl+"/api/workflows"+"?key="+g.jbrowse.galaxyAPIKey, 
+            method: 'POST',
+            //qs: params,
+            headers: {
+                'Accept-Encoding' : 'gzip, deflate',
+                'Accept-Language' : 'en-US,en;q=0.5',
+                'Content-Length' : jsonstr.length
+            },
+            json: params
+        }, function(error, response, body){
+            if(error) {
+                console.log(error);
+            } else {
+                //console.log(response.statusCode, body);
+                //JSON.stringify(eval("(" + str + ")"));
+                //var result = JSON.parse(body);
+                var result = body;
+                console.log(result);
+            }
+        });
     });    
     
 }
@@ -152,37 +159,12 @@ function getRegionStart(str) {
     return re;
 }
 
-
-// store section in globals
-function storeInGlobals (sectionData,sectionName) {
-    
-    try {
-        var data = fs.readFileSync(globalFile,'utf8');
-    }
-    catch (e) {
-        console.log("read",e, globalFile);
-        process.exit(1);
-    }
-    var g = JSON.parse(data);
-
-    // merge existing jblast section with new section data
-    if (typeof g[sectionName] === 'undefined') g[sectionName] = {};
-    for (var i in sectionData) g[sectionName][i] = sectionData[i];
-
-    var gStr = JSON.stringify(g,null,4);
-    
-    try {
-        fs.writeFileSync(globalFile,gStr);
-    }
-    catch(e) {
-        console.log("write",e, globalFile);
-        process.exit(1);
-    }
-    console.log("Global file: "+ globalFile);
-}
-
-
-// REST function for /jbapi/blastregion
+/**
+ * REST function for /jbapi/blastregion
+ * @param {type} req
+ * @param {type} res
+ * @returns {undefined}
+ */ 
 function rest_BlastRegion(req,res) {
 
     var g = sails.config.globals;
@@ -239,7 +221,12 @@ function rest_BlastRegion(req,res) {
     res.send({result:"success"});
 }
 
-// fetch file(s) from url (import file into galaxy)
+/**
+ * fetch file(s) from url (import file into galaxy)
+ * @param {type} theFile
+ * @param {type} postFn
+ * @returns {undefined}
+ */
 function importFiles(theFile,postFn) {
     console.log('uploadFiles()');
     
