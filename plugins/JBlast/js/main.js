@@ -43,6 +43,39 @@ return declare( JBrowsePlugin,
                 gaps: 0
             }
         };
+        
+        // create function intercepts
+        browser.afterMilestone( 'loadConfig', function() {
+            if (typeof browser.config.classInterceptList === 'undefined') {
+                browser.config.classInterceptList = {};
+            }
+            
+            // override HTMLFeatures
+            require(["dojo/_base/lang", "JBrowse/View/Track/HTMLFeatures"], function(lang, HTMLFeatures){
+                lang.extend(HTMLFeatures, {
+                    renderFilter: thisB.HTMLFeatures_renderFilter,
+                    extendedInit: thisB.HTMLFeatures_extendedInit
+                });
+            });
+/*
+            // override Hierarchical
+            require(["dojo/_base/lang", "JBrowse/View/TrackList/Hierarchical"], function(lang, Hierarchical){
+                lang.extend(Hierarchical, {
+                    renderFeature: thisB.segments_renderFeature,                    
+                    renderIntrons: thisB.segments_renderIntrons
+                });
+            });
+            // override FASTA
+            require(["dojo/_base/lang", "JBrowse/View/FASTA"], function(lang, FASTA){
+                lang.extend(FASTA, {
+                    renderBox: thisB.box_renderBox,
+                    colorShift: thisB.box_colorShift,
+                    zeroPad: thisB.box_zeroPad
+                });
+            });
+*/
+        });      
+        
 
         //this.initSliders(this,browser);
 
@@ -881,6 +914,43 @@ return declare( JBrowsePlugin,
       }
 
       return memo;
+    },
+    HTMLFeatures_extendedInit: function() {
+        // if jblast plugin available
+        if (typeof this.browser.blastPlugin !== 'undefined') {
+           
+            // only if it a blastData track
+            if (typeof this.config.blastData !== 'undefined') {
+                this.browser.blastPlugin.initBlastTrack(this.config);
+            }
+        }
+        
+    },
+    HTMLFeatures_renderFilter: function(feature) {
+            var browser = this.browser;
+            var render = 0;
+            //return 1;
+            //console.log('********************* blastDataJSON',browser.blastDataJSON);
+            //console.log(this);
+
+            // if this is not a jblast track, then pass then render all features.
+            if (typeof this.config.blastData === 'undefined') return 1;
+
+            if ( (typeof browser.blastDataJSON==='undefined') || browser.blastDataJSON === 0) {
+                return 0;   /// not initialized yet
+            }
+
+            // jblast filter
+            var blastData = browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
+
+            var blasthit = feature.get('blasthit');
+            //console.log("featurefilter",blasthit);
+            if ((typeof blastData !== 'undefined') && (typeof blasthit !== 'undefined'))
+                if (typeof blastData[blasthit] !== 'undefined')
+                    render = blastData[blasthit].selected;
+
+            return render;
     }
 });
 });
+

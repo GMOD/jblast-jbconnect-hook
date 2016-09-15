@@ -80,8 +80,11 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
 
         this._setupEventHandlers();
         
-        this.extendedInit();
+        // plugin hook
+        if (typeof this.extendedInit === 'function')
+            this.extendedInit();
     },
+/*    
     extendedInit: function() {
         // if jblast plugin available
         if (typeof this.browser.blastPlugin !== 'undefined') {
@@ -91,8 +94,8 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
                 this.browser.blastPlugin.initBlastTrack(this.config);
             }
         }
-        
     },
+*/
     /**
      * Returns object holding the default configuration for HTML-based feature tracks.
      * @private
@@ -638,7 +641,11 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
                 // var filter = this.browser.view.featureFilter;
                 if( this.filterFeature( feature ) )  {
                     
-                    var render = this.renderFilter(feature);
+                    // plugin hook
+                    var render = 1;
+                    if (typeof this.renderFilter === 'function')
+                        render = this.renderFilter(feature);
+                    
                     if (render === 1) {
                         this.addFeatureToBlock( feature, uniqueId, block, scale, labelScale, descriptionScale, containerStart, containerEnd );
                     }
@@ -688,6 +695,11 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
      * @param {type} feature
      * @returns true if render feature, false if not
      */
+/*
+    renderFilter: function(feature) {
+        return 1;
+    },  
+
     renderFilter: function(feature) {
         var browser = this.browser;
         var render = 0;
@@ -713,7 +725,7 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
         
         return render;
     },
-    
+*/    
     /**
      *  Creates feature div, adds to block, and centers subfeatures.
      *  Overridable by subclasses that need more control over the substructure.
