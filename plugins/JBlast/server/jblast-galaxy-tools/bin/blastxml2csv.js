@@ -18,11 +18,6 @@ var fs = require('fs'),
 
 var to_json = require('xmljson').to_json;
 
-
-var globalPath = "/etc/jbrowse";
-var globalFile = globalPath + "/globals.dat";
-
-
 var opt = getopt.create([
     ['x' , 'blastxml=PATH'       , 'path BlastXML input file'],
     ['o' , 'csv=PATH'      , 'path CSV output file'],
@@ -42,7 +37,7 @@ var offset = "0";
 //var parser = new xml2js.Parser();
 
 // start by reading globals
-readInGlobals(function(gbl) {
+global.getGlobals (function(gbl) {
     
     if (typeof gbl.jblast != 'undefined')
         offset = gbl.jblast.offset || "0";
@@ -189,16 +184,5 @@ function doMain () {
     });
 }
     
-// read the global file
-function readInGlobals (postFn) {
-    
-    fs.readFile(globalFile, function read(err, data) {
-        if (err) {
-            throw err;
-        }
-        var g = JSON.parse(data);
-        postFn(g);
-    });
-}
 
 
