@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-/* 
+/** 
  * get global data and output files to specified location.
  * from global file /etc/jbrowse/globals.dat
  * format in global:
@@ -13,11 +13,9 @@
     };
 */
 
-var request = require('request');
-//var prettyjson = require('prettyjson');
-//var prompt = require('prompt');
 var fs = require('fs');
 var getopt = require('node-getopt');
+var global = require('./global-rest.js');
 
 
 var globalPath = "/etc/jbrowse";
@@ -35,7 +33,8 @@ var opt = getopt.create([
 var blastSeqOut = opt.options['blastseq'] || '.';
 //var refSeqOut = opt.options['refseq'] || '.';
 
-readInGlobals(function(gbl) {
+
+global.getGlobals (function(gbl) {
 
     console.log(gbl.jblast);
     blastSeqIn = gbl.jblast.blastSeq;
@@ -55,14 +54,3 @@ readInGlobals(function(gbl) {
         process.exit(1);
     }
 });
-
-function readInGlobals (postFn) {
-    
-    fs.readFile(globalFile, function read(err, data) {
-        if (err) {
-            throw err;
-        }
-        var g = JSON.parse(data);
-        postFn(g);
-    });
-}
