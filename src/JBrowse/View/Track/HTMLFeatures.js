@@ -693,10 +693,10 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
         var render = 0;
         //return 1;
         //console.log('********************* blastDataJSON',browser.blastDataJSON);
-        //console.log(this.config);
+        //console.log(this);
         
         // if this is not a jblast track, then pass then render all features.
-        if (typeof this.blastData === 'undefined') return 1;
+        if (typeof this.config.blastData === 'undefined') return 1;
         
         if ( (typeof browser.blastDataJSON==='undefined') || browser.blastDataJSON === 0) {
             return 0;   /// not initialized yet
