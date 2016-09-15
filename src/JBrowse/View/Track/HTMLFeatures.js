@@ -84,18 +84,7 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
         if (typeof this.extendedInit === 'function')
             this.extendedInit();
     },
-/*    
-    extendedInit: function() {
-        // if jblast plugin available
-        if (typeof this.browser.blastPlugin !== 'undefined') {
-           
-            // only if it a blastData track
-            if (typeof this.config.blastData !== 'undefined') {
-                this.browser.blastPlugin.initBlastTrack(this.config);
-            }
-        }
-    },
-*/
+    
     /**
      * Returns object holding the default configuration for HTML-based feature tracks.
      * @private
@@ -641,6 +630,8 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
                 // var filter = this.browser.view.featureFilter;
                 if( this.filterFeature( feature ) )  {
                     
+                    //todo: adapt filterFeature instead of renderFeature
+                    
                     // plugin hook
                     var render = 1;
                     if (typeof this.renderFilter === 'function')
@@ -691,6 +682,7 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
                               );
     },
     /**
+     * template for renderFilter
      * This hook allows filtering of features to render.
      * @param {type} feature
      * @returns true if render feature, false if not
@@ -698,34 +690,8 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
 /*
     renderFilter: function(feature) {
         return 1;
-    },  
-
-    renderFilter: function(feature) {
-        var browser = this.browser;
-        var render = 0;
-        //return 1;
-        //console.log('********************* blastDataJSON',browser.blastDataJSON);
-        //console.log(this);
-        
-        // if this is not a jblast track, then pass then render all features.
-        if (typeof this.config.blastData === 'undefined') return 1;
-        
-        if ( (typeof browser.blastDataJSON==='undefined') || browser.blastDataJSON === 0) {
-            return 0;   /// not initialized yet
-        }
-        
-        // jblast filter
-        var blastData = browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
-
-        var blasthit = feature.get('blasthit');
-        //console.log("featurefilter",blasthit);
-        if ((typeof blastData !== 'undefined') && (typeof blasthit !== 'undefined'))
-            if (typeof blastData[blasthit] !== 'undefined')
-                render = blastData[blasthit].selected;
-        
-        return render;
     },
-*/    
+*/
     /**
      *  Creates feature div, adds to block, and centers subfeatures.
      *  Overridable by subclasses that need more control over the substructure.
