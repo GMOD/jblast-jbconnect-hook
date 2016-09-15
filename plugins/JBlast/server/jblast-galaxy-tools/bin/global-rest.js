@@ -1,5 +1,10 @@
 var requestp = require('request-promise');
 
+/**
+ * Functions for retrieving global data through rest API
+ * Depends on active JBrowse server.
+ * @type type
+ */
 
 module.exports = {
     url: 'http://localhost',
@@ -19,7 +24,7 @@ module.exports = {
         requestp(reqOptions)
             .then(function (repos) {
                 if (IsJbrowseValue(repos))
-                    cb(repos);
+                    cb(repos.jbrowse);
                 else
                     cb({result:'error',error:'global.js: invalid JSON'})
             })
@@ -44,6 +49,13 @@ function IsJsonString(val) {
     return true;
 }
 function IsJbrowseValue(val) {
-    if (val.length===1 && (typeof val[0].jbrowse !== 'undefined')) return true;
+    //if (!IsJsonString(val)) {
+    //    throw "Invalid JSON";
+    //    return false;
+    //}
+    if ((val.id !== 'undefined') && (val.jbrowse !== 'undefined')) {
+        if (val.id===1) return true;
+    }
+    throw "Invalid global data";
     return false;
 }
