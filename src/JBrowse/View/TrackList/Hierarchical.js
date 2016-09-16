@@ -185,12 +185,16 @@ return declare(
                 }, category.pane.containerNode );
 
             var checkBoxProps = { type: 'checkbox', className: 'check' };
-            var checkBoxProps = thisB.extendCheckbox(checkBoxProps,trackConf);
+            
+            // plugin hook
+            if (typeof thisB.extendCheckbox === 'function')
+                var checkBoxProps = thisB.extendCheckbox(checkBoxProps,trackConf);
+            
             var checkbox = dom.create('input', checkBoxProps, labelNode );
             var trackLabel = trackConf.label;
             var checkListener;
             this.own( checkListener = on( checkbox, 'click', function() {
-                thisB.itemClick(this,trackConf);
+                    thisB.itemClick(this,trackConf);
             }));
             dom.create('span', { className: 'key', innerHTML: trackConf.key || trackConf.label }, labelNode );
 
@@ -200,6 +204,7 @@ return declare(
         }, this );
     },
     // method to extend checkbox properties
+    /*
     extendCheckbox: function(props,trackConf) {
         //console.log("extendCheckbox",trackConf);
         if (typeof trackConf.blastData !== 'undefined') {
@@ -209,6 +214,7 @@ return declare(
         }
         return props;
     },
+    */
     // called when item checkbox is clicked.
     itemClick: function(checkbox,trackConf) {
         
@@ -265,7 +271,9 @@ return declare(
         }
         return false;
     },
-
+    replaceTracks: function( trackConfigs ) {   // notification
+    },
+    /*
     replaceTracks: function( trackConfigs ) {   // notification
         var isChecked = {}
         array.forEach( trackConfigs, function(conf) {
@@ -283,6 +291,7 @@ return declare(
             });
         },this);
     },
+    */
 
     /**
      * Given an array of track configs, update the track list to show

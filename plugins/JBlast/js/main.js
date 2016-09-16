@@ -57,14 +57,15 @@ return declare( JBrowsePlugin,
                     extendedInit: thisB.HTMLFeatures_extendedInit
                 });
             });
-/*
+
             // override Hierarchical
             require(["dojo/_base/lang", "JBrowse/View/TrackList/Hierarchical"], function(lang, Hierarchical){
                 lang.extend(Hierarchical, {
-                    renderFeature: thisB.segments_renderFeature,                    
-                    renderIntrons: thisB.segments_renderIntrons
+                    extendCheckbox: thisB.Hierarchical_extendCheckbox,                    
+                    replaceTracks: thisB.Hierarchical_replaceTracks
                 });
             });
+/*
             // override FASTA
             require(["dojo/_base/lang", "JBrowse/View/FASTA"], function(lang, FASTA){
                 lang.extend(FASTA, {
@@ -950,7 +951,34 @@ return declare( JBrowsePlugin,
                     render = blastData[blasthit].selected;
 
             return render;
+    },
+    Hierarchical_extendCheckbox: function(props,trackConf) {
+        //console.log("extendCheckbox",trackConf);
+        if (typeof trackConf.blastData !== 'undefined') {
+            console.log("extendCheckbox prop",props)
+            props.blastRef = trackConf.label;
+            props.className += " jblast-item";
+        }
+        return props;
+    },
+    Hierarchical_replaceTracks: function( trackConfigs ) {   // notification
+        var isChecked = {}
+        array.forEach( trackConfigs, function(conf) {
+            this._findTrack( conf.label, function( trackRecord, category ) {
+                isChecked[conf.label] = trackRecord.checkbox.checked;
+            });
+        },this);
+
+        this.deleteTracks (trackConfigs);
+        this.addTracks (trackConfigs);
+
+        array.forEach( trackConfigs, function(conf) {
+            this._findTrack( conf.label, function( trackRecord, category ) {
+                trackRecord.checkbox.checked = isChecked[conf.label];
+            });
+        },this);
     }
+    
 });
 });
 
