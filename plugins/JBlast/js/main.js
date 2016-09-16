@@ -12,6 +12,11 @@ define([
         'dojo/dom-construct',
         'dojo/query',
         'JBrowse/Plugin',
+           'dijit/form/Button',
+           'dijit/Dialog',
+           "dojo/store/Memory",
+           "dijit/form/ComboBox",
+           'JBrowse/has',
         './slidersMixin'
        ],
        function(
@@ -21,6 +26,7 @@ define([
         domConstruct,
         query,
         JBrowsePlugin,
+        Button, Dialog, Memory, ComboBox,has,
         slidersMixin
        ) {
 return declare( JBrowsePlugin,
@@ -54,7 +60,8 @@ return declare( JBrowsePlugin,
             require(["dojo/_base/lang", "JBrowse/View/Track/HTMLFeatures"], function(lang, HTMLFeatures){
                 lang.extend(HTMLFeatures, {
                     renderFilter: thisB.HTMLFeatures_renderFilter,
-                    extendedInit: thisB.HTMLFeatures_extendedInit
+                    extendedInit: thisB.HTMLFeatures_extendedInit,
+                    featureHook1: thisB.HTMLFeatures_featureHook1
                 });
             });
 
@@ -70,7 +77,7 @@ return declare( JBrowsePlugin,
             require(["dojo/_base/lang", "JBrowse/View/FASTA"], function(lang, FASTA){
                 lang.extend(FASTA, {
                     initData: thisB.FASTA_initData,
-                    FASTA_addButtons: thisB.FASTA_addButtons,
+                    addButtons: thisB.FASTA_addButtons,
                     blastDialog: thisB.FASTA_blastDialog,
                     destroyBlastDialog:thisB.FASTA_destroyBlastDialog
                 });
@@ -953,6 +960,17 @@ return declare( JBrowsePlugin,
 
             return render;
     },
+    HTMLFeatures_featureHook1: function(feature,featDiv) {
+        /*
+        blast attributes
+        */
+        var blastHit = feature.get('blasthit');
+        if (typeof blastHit !== 'undefined') {
+            var blastKey = blastHit;
+            dojo.attr(featDiv,'blastkey',blastKey);
+            dojo.addClass(featDiv,'blast-feature');
+        }
+    },
     Hierarchical_extendCheckbox: function(props,trackConf) {
         //console.log("extendCheckbox",trackConf);
         if (typeof trackConf.blastData !== 'undefined') {
@@ -982,6 +1000,7 @@ return declare( JBrowsePlugin,
     FASTA_initData: function(args) {
         var thisB = this;
         this.workflows = [];
+        this.dialog = null;
         
         var xhrArgs = {
           url: jbServer + "/jbapi/getworkflows",

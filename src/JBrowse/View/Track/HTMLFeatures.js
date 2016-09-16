@@ -55,8 +55,6 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
      * @param args.trackPadding {Number} distance in px between tracks
      */
     constructor: function( args ) {
-        
-        console.log("HTMLFeatures constructor");
         //number of histogram bins per block
         this.numBins = lang.getObject( 'histogram.binsPerBlock', false, this.config ) || 25;
 
@@ -80,7 +78,7 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
 
         this._setupEventHandlers();
         
-        // plugin hook
+        // hook point
         if (typeof this.extendedInit === 'function')
             this.extendedInit();
     },
@@ -632,7 +630,7 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
                     
                     //todo: adapt filterFeature instead of renderFeature
                     
-                    // plugin hook
+                    // hook point
                     var render = 1;
                     if (typeof this.renderFilter === 'function')
                         render = this.renderFilter(feature);
@@ -1028,21 +1026,9 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
 
         block.featureNodes[uniqueId] = featDiv;
 
-        /*
-        // blast attributes
-        */
-        var blastHit = feature.get('blasthit');
-        //var blastHsp = feature.get('blasthsp');
-        if (typeof blastHit !== 'undefined') {
-            //console.log(blastHit,blastHsp);
-            var blastKey = blastHit;
-            //var blastKey = blastKey.replace(/[|]/g,"-");
-            //var blastKey = blastKey.replace(/[.]/g,"+");
-            //console.log('blastHit',blastHit)
-            dojo.attr(featDiv,'blastkey',blastKey);
-            dojo.addClass(featDiv,'blast-feature');
-        }
-
+	// hook point
+	if (typeof this.featureHook1 === 'function')
+		this.featureHook1(feature,featDiv);
 
         // record whether this feature protrudes beyond the left and/or right side of the block
         if( layoutStart < block.startBase ) {
@@ -1072,8 +1058,6 @@ var HTMLFeatures = declare( [ BlockBased, YScaleMixin, ExportMixin, FeatureDetai
         if ((phase !== null) && (phase !== undefined))
 //            featDiv.className = featDiv.className + " " + featDiv.className + "_phase" + phase;
             dojo.addClass(featDiv, className + "_phase" + phase);
-
-
 
         // check if this feature is highlighted
         var highlighted = this.isFeatureHighlighted( feature, name );

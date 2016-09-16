@@ -186,7 +186,7 @@ return declare(
 
             var checkBoxProps = { type: 'checkbox', className: 'check' };
             
-            // plugin hook
+            // hook point
             if (typeof thisB.extendCheckbox === 'function')
                 var checkBoxProps = thisB.extendCheckbox(checkBoxProps,trackConf);
             
@@ -203,18 +203,6 @@ return declare(
             this._updateTitles( category );
         }, this );
     },
-    // method to extend checkbox properties
-    /*
-    extendCheckbox: function(props,trackConf) {
-        //console.log("extendCheckbox",trackConf);
-        if (typeof trackConf.blastData !== 'undefined') {
-            console.log("extendCheckbox prop",props)
-            props.blastRef = trackConf.label;
-            props.className += " jblast-item";
-        }
-        return props;
-    },
-    */
     // called when item checkbox is clicked.
     itemClick: function(checkbox,trackConf) {
         
@@ -271,27 +259,9 @@ return declare(
         }
         return false;
     },
+    //  hook point
     replaceTracks: function( trackConfigs ) {   // notification
     },
-    /*
-    replaceTracks: function( trackConfigs ) {   // notification
-        var isChecked = {}
-        array.forEach( trackConfigs, function(conf) {
-            this._findTrack( conf.label, function( trackRecord, category ) {
-                isChecked[conf.label] = trackRecord.checkbox.checked;
-            });
-        },this);
-
-        this.deleteTracks (trackConfigs);
-        this.addTracks (trackConfigs);
-
-        array.forEach( trackConfigs, function(conf) {
-            this._findTrack( conf.label, function( trackRecord, category ) {
-                trackRecord.checkbox.checked = isChecked[conf.label];
-            });
-        },this);
-    },
-    */
 
     /**
      * Given an array of track configs, update the track list to show
