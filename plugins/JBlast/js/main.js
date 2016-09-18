@@ -96,7 +96,38 @@ return declare( JBrowsePlugin,
         //browser.subscribeToChannel = ext_subscribeToChannel;
         //browser.initNotifications = ext_initNotifications;
 
+        var newTrackHandler = function (eventType,data) {
+            //return function (message) {
 
+                console.log("trackhandler "+eventType);
+                var notifyStoreConf = dojo.clone (data);
+                var notifyTrackConf = dojo.clone (data);
+                notifyStoreConf.browser = browser;
+                notifyStoreConf.type = notifyStoreConf.storeClass;
+                notifyTrackConf.store = browser.addStoreConfig(undefined, notifyStoreConf);
+                browser.publish ('/jbrowse/v1/v/tracks/' + eventType, [notifyTrackConf]);
+            //}
+        }
+
+
+        io.socket.on('track-new', function (data){
+            console.log('event','track-new',data);
+            newTrackHandler ('new',data);
+        });		
+        io.socket.on('track-replace', function (data){
+            console.log('event','track-replace',data);
+            newTrackHandler ('replace',data);
+        });		
+        io.socket.on('job-remove', function (data){
+            console.log('event','job-remove',data);
+            browser.publish ('/jbrowse/v1/v/tracks/delete', browser.trackConfigs);
+        });		
+        io.socket.on('track-test', function (data){
+            console.log('event','track-test',data);
+            console.log("event track-test "+data.value);
+            alert("event track-test value = "+data.value)
+        });		
+/* obsolete
         // subscribe to server track events
         io.socket.on('jbtrack', function (event){
             console.log("msg "+event.data.msg);
@@ -143,7 +174,7 @@ return declare( JBrowsePlugin,
         io.socket.get('/jbtrack', function gotResponse(body, response) {
           console.log('Current test: ', body);
         });            
-
+*/
 
         /*
         dojo.subscribe("/jbrowse/v1/v/tracks/show", function(data){
