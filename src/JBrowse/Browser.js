@@ -3277,6 +3277,7 @@ teardown: function() {
 /**
  * Initialize notification subscriptions
  */
+/*
 subscribeToChannel: function(channel,listener) {
     var thisB = this;
     var channelPrefix = thisB.config.notifications.channel || "";
@@ -3325,6 +3326,7 @@ initNotifications: function() {
         }
     });
 }
+*/
 
       });
 });
