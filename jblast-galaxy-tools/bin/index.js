@@ -42,7 +42,7 @@ if (dir.length==0) {
     process.exit(1);
 }
 var tooldir = dir[0];
-console.log('tool-data dir',tooldir);
+console.log('tool-data directory:',tooldir);
 
 var files = Finder.from(tooldir).exclude('*.sample').findFiles('blastdb.loc');
 console.log('files',files);
