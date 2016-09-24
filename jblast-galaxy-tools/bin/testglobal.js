@@ -4,10 +4,10 @@ var global = require('./global-rest.js');
 var getopt = require('node-getopt');
 
 var getopt = new getopt([
-    ['g' , 'getcfg'       , 'get config'],
-    ['s' , 'setcfg'       , 'set config'],
-    ['n' , 'name=NAME'       , 'set config'],
-    ['v' , 'value=VALUE'       , 'set config'],
+    ['g' , 'get'        , 'get config'],
+    ['s' , 'set'        , 'set config'],
+    ['n' , 'name=NAME'  , 'name'],
+    ['v' , 'value=VALUE', 'value'],
     
     ['h' , 'help'            , 'display this help']
 ]);              // create Getopt instance
