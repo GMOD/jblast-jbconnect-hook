@@ -2,6 +2,9 @@
 This is the set of tools and sample workflow specific to jblast.
 The scripts in /bin are used by jblast workflow.
 
+Instructions for getting the Galaxy API key.
+https://wiki.galaxyproject.org/Learn/API
+
 Install globally:
 ```
 npm install -g .
