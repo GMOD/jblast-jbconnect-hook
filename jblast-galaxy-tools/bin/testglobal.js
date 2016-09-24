@@ -19,18 +19,20 @@ if (!process.argv.slice(2).length) {
     process.exit(1);
 }
 
-var getcfg = opt.options['getcfg'];
-var setcfg = opt.options['setcfg'];
+var getcfg = opt.options['get'];
+var setcfg = opt.options['set'];
 var name = opt.options['name'];
 var val = opt.options['value'];
 
+// set name/value
 if (setcfg) {
     global.setConfig(name,val);
 }
 
+// get value given name
 if (getcfg) {
     if (typeof name === 'undefined')
-        console.log('returned',global.getConfig(''));
+        console.log(global.getConfig(''));
     else
-        console.log('returned',global.getConfig(name));
+        console.log(global.getConfig(name));
 }

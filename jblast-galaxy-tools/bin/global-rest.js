@@ -54,7 +54,7 @@ module.exports = {
     setConfig: function(name,value) {
         this.checkDir();
         
-        console.log('setConfig',name,value);
+        //console.log('setConfig',name,value);
         var contents = "{}";
         try {
             contents = fs.readFileSync(this.cfgFile);
@@ -81,7 +81,7 @@ module.exports = {
      * @returns value or 0 if does not exist
      */
     getConfig: function(name) {
-        console.log('getConfig',name);
+        //console.log('getConfig',name);
         var contents = "{}";
         try {
             contents = fs.readFileSync(this.cfgFile);
@@ -93,7 +93,7 @@ module.exports = {
         
         var json = JSON.parse(contents);
         if (name=='') {
-            return json;
+            return JSON.stringify(json,null,2);
         }
         if (typeof json[name] != 'undefined')
             return json[name];
