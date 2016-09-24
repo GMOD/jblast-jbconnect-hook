@@ -6,9 +6,10 @@ var request = require('request'),
     getopt = require('node-getopt');
 var global = require('./global-rest.js');
 var Finder = require('fs-finder');
- 
+
 var getopt = new getopt([
-    ['g' , 'gpath=PATH'       , 'Galaxy install path'],
+    ['g' , 'gpath=PATH'       , 'set and save Galaxy install path'],
+    ['a' , 'apikey=STRING'    , 'set and save Galaxy API key'],
     ['b' , 'blastdb=STRING'   , 'Blast db to download and install [all|htgs|nt|wgs|phiX] (this will take a while)'],
     ['p' , 'blastdb-path=PATH', 'existing database path'],
     ['u' , 'blastdb-uri=URI'  , 'Download from Blastdb URI (rsync://...; this will take a while)'],
@@ -34,7 +35,16 @@ if (!process.argv.slice(2).length) {
 }
 
 var gpath = opt.options['gpath'];
-console.log('options',opt.options);
+var apikey = opt.options['apikey'];
+
+// save gpath or get it if it exists
+if (typeof gpath !== 'undefined') global.setConfig('gpath',gpath);
+else gpath = global.getConfig('gpath');
+
+// save apikey or get it if it exists
+if (typeof apikey !== 'undefined') global.setConfig('apikey',apikey);
+else gpath = global.getConfig('apikey');
+
 
 var dir = Finder.from(gpath).findDirectories('tool-data');
 if (dir.length==0) {
