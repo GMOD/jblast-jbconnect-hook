@@ -19,13 +19,41 @@ var getopt = new getopt([
     
     ['h' , 'help'            , 'display this help']
 ]);              // create Getopt instance
-getopt.bindHelp()     // bind option 'help' to default action
+getopt.bindHelp();     // bind option 'help' to default action
 opt = getopt.parseSystem(); // parse command line
 
 getopt.setHelp(
-  "Usage: jblast-config [OPTION]\n" +
-  "\n" +
-  "[[OPTIONS]]\n"
+    "Usage: jblast-config [OPTION]\n" +
+    "[[OPTIONS]]\n" +
+    "\n" +
+    "Examples:\n" +
+    "\n" +
+    "Set gpath and apikey for later commands\n" +
+    "Jblast-config --gpath <path> --apikey <apikey\n" +
+    "\n" +
+    "Download and install UCSC blast databases (include htgs, nt, wgs, phiX)\n" +
+    "Jblast-config --gpath <path> --blastdb all\n" +
+    "\n" +
+    "Download and install one of the standard blast databases.\n" +
+    "Jblast-config --gpath <path>--blastdb [htgs | nt | wgs | phiX]\n" +
+    "\n" +
+    "Download database (with rsync) and install.\n" +
+    "Jblast-config --gpath <path> --blastdb-uri [uri of data]\n" +
+    "\n" +
+    "Install an existing blast database\n" +
+    "Jblast-config --gpath <path> --blastdb-path [local path]\n" +
+    "\n" +
+    "Import jblast package workflows\n" +
+    "Jblast-config --gpath <path> --workflow import\n" +
+    "\n" +
+    "Import workflow file.\n" +
+    "Jblast-config --gpath <path> --workflow <path to .ga file>\n" +
+    "\n" +
+    "Install package jblast tools to galaxy\n" +
+    "Jblast-config --gpath <path> --tool\n" +
+    "\n" +
+    "Install jblast server plugins (not sure if this is the best way)\n" +
+    "jblast-config --spath <jbrowse server path>\n" 
 );
 
 /* Display help if no arguments are passed */
