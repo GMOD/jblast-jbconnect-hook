@@ -1,33 +1,10 @@
-<?xml version='1.0' encoding='utf-8'?>
-<toolbox>
-  <section id="getext" name="Get Data">
-    <tool file="data_source/upload.xml" />
-    <tool file="data_source/ucsc_tablebrowser.xml" />
-    <tool file="data_source/ucsc_tablebrowser_archaea.xml" />
-    <tool file="data_source/ebi_sra.xml" />
-    <tool file="data_source/biomart.xml" />
-    <tool file="data_source/gramene_mart.xml" />
-    <tool file="data_source/flymine.xml" />
-    <tool file="data_source/fly_modencode.xml" />
-    <tool file="data_source/modmine.xml" />
-    <tool file="data_source/mousemine.xml" />
-    <tool file="data_source/ratmine.xml" />
-    <tool file="data_source/yeastmine.xml" />
-    <tool file="data_source/worm_modencode.xml" />
-    <tool file="data_source/wormbase.xml" />
-    <tool file="data_source/zebrafishmine.xml" />
-    <tool file="data_source/eupathdb.xml" />
-    <tool file="genomespace/genomespace_file_browser_prod.xml" />
-    <tool file="genomespace/genomespace_importer.xml" />
-  </section>
-  <section id="send" name="Send Data">
-    <tool file="genomespace/genomespace_exporter.xml" />
-  </section>
-  <section id="jbrowseTools" name="JBrowse Tools">
-	<tool file="jb_blaststart/blaststart.xml" />
-	<tool file="jb_blast2gff/blast2gff.xml" />
-	<tool file="jb_exportgff/exportgff.xml" />
-	<tool file="jb_blastxml2json/blastxml2json.xml" />
-	<tool file="jb_offset/jboffset.xml" />
-  </section>
+<?xml version="1.0"?>
+<toolbox tool_path="/export/jblasttools">
+    <section id="jblasttools" name="JBlast Tools">
+        <tool file="blaststart.xml" />
+        <tool file="blast2gff.xml" />
+        <tool file="blastxml2json.xml" />
+        <tool file="exportgff.xml" />
+        <tool file="jboffset.xml" />
+    </section>
 </toolbox>
