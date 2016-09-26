@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='utf-8'?>
+<toolbox tool_path="/export/jblasttools">
+  <section id="jbrowseTools" name="JBblast Tools">
+    <tool file="blaststart.xml" />
+    <tool file="blast2gff.xml" />
+    <tool file="exportgff.xml" />
+    <tool file="blastxml2json.xml" />
+    <tool file="jboffset.xml" />
+  </section>
+</toolbox>
