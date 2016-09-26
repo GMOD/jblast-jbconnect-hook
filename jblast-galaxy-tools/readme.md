@@ -11,6 +11,14 @@ npm install -g .
 ```
 Note: must have proper permission to the global node_modules (/usr/local/lib/node_modules) directoryand the /bin directory.
 
+Initial launch of galaxy docker:
+docker run -i -t -p 8080:80 -v /var/www/html/galaxy_jblast/:/export/ bgruening/galaxy-blast
+The first time this is run, it takes a few minutes to get started.  This is because it's the galaxy data and databases into the ../galaxy_jblast image
+
+
+docker run -i -t -p 8080:80 -v /var/www/html/galaxy_jblast/:/export/ -e GALAXY_CONFIG_TOOL_CONFIG_FILE=config/tool_conf.xml.sample,config/shed_tool_conf.xml.jtest,config/jblast_tool_conf.xml bgruening/galaxy-blast
+
+
 ## Troubleshooting
 
 The scripts in the bin directory need unix line terminators b/c the line one 
