@@ -10,7 +10,7 @@
 
   <help>
 Blast2Gff.pl  
-Modified to export special blast key for Jbrowse Blaster module.                                               
+Modified to export special blast key for JBlast module.                                               
 ORIGINAL AUTHOR: James C. Estill                                  
 CONTACT: JamesEstill_at_gmail.com                         
 Galaxy Script by: ey 5/11/2016 
