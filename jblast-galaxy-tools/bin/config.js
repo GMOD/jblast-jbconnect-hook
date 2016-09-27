@@ -1,18 +1,18 @@
 #!/usr/bin/env node
 
-var request = require('request'),
-    fs = require('fs'),
-    path = require('path'),
-    getopt = require('node-getopt');
-var global = require('./global-rest.js');
+var fs = require('fs');
+var path = require('path');
+var getopt = require('node-getopt');
+var util = require('./global-rest.js');
 var Finder = require('fs-finder');
-var execSync = require('child_process').execSync;
 
 var getopt = new getopt([
+    ['a' , 'all'              , 'setup all'],
     ['g' , 'gpath=PATH'       , 'set and save Galaxy install path'],
-    ['a' , 'apikey=STRING'    , 'set and save Galaxy API key'],
+    ['u' , 'gurl=PATH'        , 'set and save Galaxy URL'],
+    ['k' , 'apikey=STRING'    , 'set and save Galaxy API key'],
     ['p' , 'blastdbpath=PATH' , 'existing database path'],
-    ['w' , 'setupworkflow=ARG', '[install|<path>] "install" project wf, or specify .ga file '],
+    ['w' , 'setupworkflows', '[install|<path>] "install" project wf, or specify .ga file '],
     ['t' , 'setuptools'       , 'setup jblast tools for galaxy'],
     ['v' , 'view'             , 'view status of config'],
     
@@ -34,10 +34,10 @@ getopt.setHelp(
     "Jblast-config --gpath <path> --blastdbpath [local path]\n" +
     "\n" +
     "Install jblast package workflows to galaxy\n" +
-    "Jblast-config --gpath <path> --setupworkflows import\n" +
+    "Jblast-config --gpath <path> --gurl <galaxy url> --setupworkflows\n" +
     "\n" +
     "Install jblast package tools to galaxy\n" +
-    "Jblast-config --gpath <path> --setuptools\n" +
+    "Jblast-config --gpath <path> --setuptools\n"
 );
 
 /* Display help if no arguments are passed */
@@ -46,20 +46,45 @@ if (!process.argv.slice(2).length) {
 	process.exit(1);
 }
 
+
+/*
+ * get values for --gpath, apikey and gurl; grab from saved globals if necessary
+ */
 var gpath = opt.options['gpath'];
 var apikey = opt.options['apikey'];
-
+var gurl = opt.options['gurl'];
 
 // save gpath or get it if it exists
-if (typeof gpath !== 'undefined') global.setConfig('gpath',gpath);
-else gpath = global.getConfig('gpath');
+if (typeof gpath !== 'undefined') util.setConfig('gpath',gpath);
+else gpath = util.getConfig('gpath');
+
+// save gurl (galaxy url) or get it if it exists
+if (typeof gurl !== 'undefined') util.setConfig('gurl',gurl);
+else gurl = util.getConfig('gurl');
 
 // save apikey or get it if it exists
-if (typeof apikey !== 'undefined') global.setConfig('apikey',apikey);
-else apikey = global.getConfig('apikey');
+if (typeof apikey !== 'undefined') util.setConfig('apikey',apikey);
+else apikey = util.getConfig('apikey');
 
-var gdataroot = gpath;
-var gdatapath = gpath+"/galaxy-central";
+/*
+ * defaults fo gpath and gurl
+ */ 
+if (gurl === 'undefined') {
+    gurl = "http://localhost:8080";
+    util.setConfig('gurl',gurl);
+    console.log("undefined --gurl; defaulting to", gurl);
+}
+if (gpath === 'undefined') {
+    gpath = "/var/www/galaxy_jblast";
+    util.setConfig('gpath',gpath)
+    console.log("undefined --gpath; defaulting to", gpath);
+}
+
+/*
+ * figure target paths
+ */
+var gdataroot = gpath;                      // root of local path of galaxy
+var gdatapath = gpath+"/galaxy-central";    // galaxy data files, if docker
 try {
     // check if gdatapath directory exists
     fs.accessSync(gdataroot, fs.F_OK);
@@ -77,23 +102,13 @@ catch (err) {
     gdatapath = gpath;
 }
 
-console.log('gdataroot / gdatapath',gdataroot,'/',gdatapath);
+//console.log('gdataroot / gdatapath',gdataroot,'/',gdatapath);
 
 /*
-var dir = Finder.from(gpath).findDirectories('tool-data');
-if (dir.length==0) {
-    console.log("tool-data dir not found\n");
-    process.exit(1);
-}
-var tooldir = dir[0];
-console.log('tool-data directory:',tooldir);
-
-var files = Finder.from(tooldir).exclude('*.sample').findFiles('blastdb.loc');
-console.log('files',files);
-*/
-
+ * figure source path of jblast-galaxy-tools (installed globally)
+ */
 var srcpath = __dirname+"/..";
-console.log("srcpath",srcpath);
+//console.log("srcpath",srcpath);
 try {
     fs.accessSync(srcpath, fs.F_OK);
 }
@@ -102,7 +117,7 @@ catch(err) {
 }
 
 /*
- * --setuptools - install galaxy tools
+ * process commands arguments
  */
 var setuptools = opt.options['setuptools'];
 if (typeof setuptools !== 'undefined') {
@@ -118,17 +133,40 @@ var setupworkflows = opt.options['setupworkflows'];
 if (typeof setupworkflows !== 'undefined') {
     exec_setupworkflows();
 }
+
 /*
  * import the package workflows
  */
 function exec_setupworkflows() {
     
+    var srcdir = srcpath+'/workflows';
+
+    console.log("gurl, gpath", gurl,gpath);
+    
+    // find workflow files
+    var files = Finder.from(srcdir).exclude('*.sample').findFiles('*.ga');
+    //console.log('files',files);
+    for(var i in files) {
+        var content = fs.readFileSync(files[i]).toString();
+        var jsonparam = {'workflow':JSON.parse(content)};
+        //console.log('jsonparam',jsonparam);
+        util.galaxyPostJSON('/api/workflows/upload',jsonparam,function(err,response,body){
+            if (err || response.statusCode != 200) {
+                console.log("response.statusCode",response.statusCode);
+                console.log("Error:",err);
+                return;
+            }
+            console.log('returned',body);
+        });
+    }
 }
 /*
  * register blast nucleotide databases
  */
 function exec_blastdbpath() {
 
+
+    // target directory
     var tooldir = gdatapath+'/tool-data';
     
     var files = Finder.from(tooldir).exclude('*.sample').findFiles('blastdb.loc');
@@ -169,16 +207,16 @@ function exec_blastdbpath() {
 }
 
 /*
- * setup tools
+ * setup tools - 
  */
 function exec_setuptools() {
     
-    // copy tools to /export root
-    cmd('cp -R "'+srcpath+'/jblasttools" "'+gdataroot+'"');
+    // copy tools to export root.
+    util.cmd('cp -R "'+srcpath+'/jblasttools" "'+gdataroot+'"');
     
     var shed_conf = gdatapath+'/config/shed_tool_conf.xml.jblast';
     // copy shed_tool_conf.xml file to shed_tool_conf.xml.jblast
-    cmd('cp "'+gdatapath+'/config/shed_tool_conf.xml" "'+shed_conf+'"');
+    util.cmd('cp "'+gdatapath+'/config/shed_tool_conf.xml" "'+shed_conf+'"');
     
     // in shed_tool_conf.xml.jblast replace ../shed_tools with /export/shed_tools 
     try {
@@ -191,16 +229,4 @@ function exec_setuptools() {
     var content2 = content.replace("../shed_tools", "/export/shed_tools");
     console.log("modifying",shed_conf);
     fs.writeFileSync(shed_conf,content2);
-}
-/**
- * execute command synchronously
- * @param {type} cmdstr
- * @returns {undefined}
- */
-function cmd(cmdstr) {
-    console.log(cmdstr);
-    var result = execSync(cmdstr).toString();
-    if (result.length)
-        console.log(result);    
-    
 }

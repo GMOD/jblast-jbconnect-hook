@@ -1,6 +1,8 @@
 var fs = require('fs');
+var request = require('request');
 var jsonfile = require('jsonfile');
 var requestp = require('request-promise');
+var execSync = require('child_process').execSync;
 
 var cfgDir = '/etc/jbrowse';
 
@@ -92,13 +94,58 @@ module.exports = {
         }
         
         var json = JSON.parse(contents);
-        if (name=='') {
+        if (name==='') {
             return JSON.stringify(json,null,2);
         }
-        if (typeof json[name] != 'undefined')
+        if (typeof json[name] !== 'undefined')
             return json[name];
         else
             return 'undefined';   // not found
+    },
+    /* send JSON POST request
+     * 
+     * @param {type} api - e.g. "/api/workflows"
+     * @param {type} params - json parameter i.e. {a:1,b:2}
+     * @param {type} cb - callback function cb(error,response,body)
+     */
+    galaxyPostJSON: function(api,params,cb) {
+        
+        var jsonstr = JSON.stringify(params);
+        var apikey = this.getConfig("apikey");
+        var gurl = this.getConfig("gurl");
+        
+        if(apikey=='undefined') {
+            console.log("missing apikey");
+            return;
+        }
+        
+        var req = {
+            url: gurl+api+"?key="+apikey, 
+            method: 'POST',
+            encoding: null,
+            gzip:true,
+            //qs: params,
+            headers: {
+                'Connection': 'keep-alive',
+                'Accept-Encoding' : 'gzip, deflate',
+                'Accept': '*/*',
+                'Accept-Language' : 'en-US,en;q=0.5',
+                'Content-Length' : jsonstr.length
+            },
+            json: params
+        };
+        
+        console.log(req);
+        
+        request.post(req, function(err, response, body){
+            if (err || response.statusCode != 200) {
+                console.log("response.statusCode",response.statusCode);
+                if (response.statusCode==403) console.log("possible invalid apikey", apikey);
+                if (err) console.log("Error:",err);
+            }
+            cb(err,response,body);
+        });
+        
     },
     /**
      * check directory 
@@ -108,6 +155,18 @@ module.exports = {
         if (!fs.existsSync(cfgDir)){
             fs.mkdirSync(cfgDir);
         }        
+    },
+    /**
+     * execute command synchronously
+     * @param {type} cmdstr
+     * @returns {undefined}
+     */
+    cmd: function(cmdstr) {
+        console.log(cmdstr);
+        var result = execSync(cmdstr).toString();
+        if (result.length)
+            console.log(result);    
+
     }
 }
 
