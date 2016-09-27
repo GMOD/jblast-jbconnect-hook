@@ -218,6 +218,9 @@ function exec_setuptools() {
     // copy shed_tool_conf.xml file to shed_tool_conf.xml.jblast
     util.cmd('cp "'+gdatapath+'/config/shed_tool_conf.xml" "'+shed_conf+'"');
     
+    // copy jblast_tool_conf.xml to /config
+    util.cmd('cp "'+srcpath+'/config/jblast_tool_conf.xml" "'+gdatapath+'/config"');
+    
     // in shed_tool_conf.xml.jblast replace ../shed_tools with /export/shed_tools 
     try {
         var content = fs.readFileSync(shed_conf).toString();
