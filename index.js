@@ -128,7 +128,7 @@ function rest_WorkflowSubmit(req,res) {
         }
         // submit galaxy workflow
         request.post({
-            url: g.jbrowse.galaxyUrl+"/api/workflows"+"?key="+g.jbrowse.galaxyAPIKey, 
+            url: g.jbrowse.galaxy.galaxyUrl+"/api/workflows"+"?key="+g.jbrowse.galaxy.galaxyAPIKey, 
             method: 'POST',
             //qs: params,
             headers: {
@@ -251,7 +251,7 @@ function importFiles(theFile,postFn) {
     var jsonstr = JSON.stringify(params);
 
     request.post({
-        url: g.jbrowse.galaxyUrl+"/api/tools"+"?key="+g.jbrowse.galaxyAPIKey, 
+        url: g.jbrowse.galaxy.galaxyUrl+"/api/tools"+"?key="+g.jbrowse.galaxy.galaxyAPIKey, 
         method: 'POST',
         //qs: params,
         headers: {
@@ -348,7 +348,7 @@ function execTool_megablast(args,postFn){
     var jsonstr = JSON.stringify(params);
 
     request.post({
-        url: g.jbrowse.galaxyUrl+"/api/tools"+"?key="+g.jbrowse.galaxyAPIKey, 
+        url: g.jbrowse.galaxy.galaxyUrl+"/api/tools"+"?key="+g.jbrowse.galaxy.galaxyAPIKey, 
         method: 'POST',
         //qs: params,
         headers: {
@@ -408,7 +408,7 @@ function execTool_blastxml2tab(args,postFn){
     var jsonstr = JSON.stringify(params);
 
     request.post({
-        url: g.jbrowse.galaxyUrl+"/api/tools"+"?key="+g.jbrowse.galaxyAPIKey, 
+        url: g.jbrowse.galaxy.galaxyUrl+"/api/tools"+"?key="+g.jbrowse.galaxy.galaxyAPIKey, 
         method: 'POST',
         //qs: params,
         headers: {
