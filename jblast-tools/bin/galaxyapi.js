@@ -1,3 +1,7 @@
+/*
+ *  this is just for testing 
+*/
+/*
 console.log("Galaxy API Test...");
 
 var request = require('request');
