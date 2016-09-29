@@ -4,7 +4,7 @@ var request = require('request'),
     fs = require('fs'),
     path = require('path'),
     getopt = require('node-getopt');
-var global = require('./global-rest.js');
+var util = require('./global-rest.js');
 
 //require('request-debug')(request);
 
@@ -25,13 +25,11 @@ var opt = getopt.create([
 .bindHelp()     // bind option 'help' to default action
 .parseSystem(); // parse command line
 
-//console.dir(opt.options);
-
 /**
-read the jbrowse global config file in /etc/jbrowse/globals.dat
+read the jbrowse globals
 */
-//var g = getGlobals();
-global.getGlobals (function(g) {
+
+util.getGlobals (function(g) {
 
     console.log("globals",g);
 
@@ -66,7 +64,7 @@ global.getGlobals (function(g) {
     var outFile = opt.options['out'];
     fs.writeFileSync(outFile, 'Success');
 });
-//process.exit(0);
+
 
 // copies the specified file into the data directory data directory of the jbrowse dataset, whatever that is.
 function getTargetFile(srcFile,ext) {
@@ -113,8 +111,6 @@ function exportFile(srcFile,targetFile) {
         process.exit(1);
     }
 }
-
-//console.log("track template");
 
 /*
  * open track template file
