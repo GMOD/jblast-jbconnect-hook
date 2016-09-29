@@ -46,7 +46,7 @@ http://getfuelux.com/2.6/#datagrid
 
             console.log("getjobs");
             $.ajax({
-                url: "http://192.168.56.102:1337/api/jobs/galaxy-job/complete/1..10000",
+                url: "/api/jobs/galaxy-job/complete/1..10000",
                 dataType: "text",
                 success: function (data) {
                   callback(data);

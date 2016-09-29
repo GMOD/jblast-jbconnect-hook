@@ -5,7 +5,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1/jquery.js"></script>
-        <script type="text/javascript" src="//192.168.56.102:1337/js/dependencies/sails.io.js"></script>
+        <script type="text/javascript" src="/js/dependencies/sails.io.js"></script>
         <script>
             
             io.socket.on('test', function (event){
@@ -18,7 +18,7 @@
             function callkue() {
                 console.log("getjobs");
                 $.ajax({
-                    url: "http://192.168.56.102:1337/api/jobs/galaxy-job/complete/1..10000",
+                    url: "/api/jobs/galaxy-job/complete/1..10000",
                     dataType: "text",
                     success: function (data) {
                       console.log(data);
