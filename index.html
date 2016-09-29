@@ -25,8 +25,15 @@
 
     <script type="text/javascript" src="src/qTip/jquery.qtip.js"></script>    
     <script type="text/javascript" src="src/slider-pips/dist/jquery-ui-slider-pips.min.js"></script>    
+    <script type="text/javascript">
+        // for cross origin sails server access
+        //var jbServer = 'http://192.168.56.x:1337';
+        
+        // for sails hosted jbrowse
+        var jbServer = "";
+    </script>
     
-    <script type="text/javascript" src="//192.168.56.102:1337/js/dependencies/sails.io.js"></script>
+    <script type="text/javascript" src="/js/dependencies/sails.io.js"></script>
    
     <!--link href="//code.jquery.com/ui/1.11.4/themes/cupertino/jquery-ui.css" rel="stylesheet"-->
 
@@ -38,10 +45,7 @@
 
     <script type="text/javascript" src="src/test/gridDataSource.js"></script>
     <script>
-        var jbServer = 'http://192.168.56.102:1337';
-        
         $(document).ready(function() {
-            
 
             // setup extruder sidebar
             if (self.location.href == top.location.href){
