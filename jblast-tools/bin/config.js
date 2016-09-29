@@ -5,12 +5,13 @@ var path = require('path');
 var getopt = require('node-getopt');
 var util = require('./global-rest.js');
 var Finder = require('fs-finder');
+var globals = require('../globals.js');
 
 var getopt = new getopt([
     ['a' , 'all'              , 'setup all'],
-    ['g' , 'gpath=PATH'       , 'set and save Galaxy install path'],
-    ['u' , 'gurl=PATH'        , 'set and save Galaxy URL'],
-    ['k' , 'apikey=STRING'    , 'set and save Galaxy API key'],
+//    ['g' , 'gpath=PATH'       , 'set and save Galaxy install path'],
+//    ['u' , 'gurl=PATH'        , 'set and save Galaxy URL'],
+//    ['k' , 'apikey=STRING'    , 'set and save Galaxy API key'],
     ['p' , 'blastdbpath=PATH' , 'existing database path'],
     ['w' , 'setupworkflows', '[install|<path>] "install" project wf, or specify .ga file '],
     ['t' , 'setuptools'       , 'setup jblast tools for galaxy'],
@@ -46,10 +47,15 @@ if (!process.argv.slice(2).length) {
 	process.exit(1);
 }
 
-
 /*
  * get values for --gpath, apikey and gurl; grab from saved globals if necessary
  */
+
+var gurl = globals.galaxy.galaxyUrl;
+var gpath = globals.galaxy.galaxyPath;
+var apikey = globals.galaxy.galaxyAPIKey;
+
+/*
 var gpath = opt.options['gpath'];
 var apikey = opt.options['apikey'];
 var gurl = opt.options['gurl'];
@@ -65,10 +71,11 @@ else gurl = util.getConfig('gurl');
 // save apikey or get it if it exists
 if (typeof apikey !== 'undefined') util.setConfig('apikey',apikey);
 else apikey = util.getConfig('apikey');
-
+*/
 /*
  * defaults fo gpath and gurl
- */ 
+ */
+/*
 if (gurl === 'undefined') {
     gurl = "http://localhost:8080";
     util.setConfig('gurl',gurl);
@@ -79,6 +86,7 @@ if (gpath === 'undefined') {
     util.setConfig('gpath',gpath)
     console.log("undefined --gpath; defaulting to", gpath);
 }
+*/
 
 /*
  * figure target paths

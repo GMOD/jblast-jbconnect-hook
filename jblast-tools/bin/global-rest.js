@@ -3,8 +3,11 @@ var request = require('request');
 var jsonfile = require('jsonfile');
 var requestp = require('request-promise');
 var execSync = require('child_process').execSync;
+var globals = require('../globals.js');
 
 var cfgDir = '/etc/jbrowse';
+
+
 
 /**
  * Functions for retrieving global data through rest API
@@ -53,7 +56,7 @@ module.exports = {
      * @param {type} value
      * @returns return 1 if failed, 0 success
      */
-    setConfig: function(name,value) {
+    x_setConfig: function(name,value) {
         this.checkDir();
         
         //console.log('setConfig',name,value);
@@ -82,7 +85,7 @@ module.exports = {
      * @param {type} name
      * @returns value or 0 if does not exist
      */
-    getConfig: function(name) {
+    x_getConfig: function(name) {
         //console.log('getConfig',name);
         var contents = "{}";
         try {
@@ -111,10 +114,14 @@ module.exports = {
     galaxyPostJSON: function(api,params,cb) {
         
         var jsonstr = JSON.stringify(params);
-        var apikey = this.getConfig("apikey");
-        var gurl = this.getConfig("gurl");
+        //var apikey = this.getConfig("apikey");
+        //var gurl = this.getConfig("gurl");
+
+        var gurl = globals.galaxy.galaxyUrl;
+        var apikey = globals.galaxy.galaxyAPIKey;
         
-        if(apikey=='undefined') {
+        
+        if(typeof apikey=='undefined') {
             console.log("missing apikey");
             return;
         }
