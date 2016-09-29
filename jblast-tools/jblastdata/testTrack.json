@@ -13,6 +13,6 @@
         "category" : "Miscellaneous",
         "type" : "JBrowse/View/Track/HTMLFeatures",
         "label" : "AddTest",
-        "baseUrl": "http://192.168.56.102/jb-galaxy-blaster/sample_data/json/volvox/"
+        "baseUrl": "http://192.168.56.x/jb-galaxy-blaster/sample_data/json/volvox/"
     }
 ]

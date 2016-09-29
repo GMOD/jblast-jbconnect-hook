@@ -1,0 +1,48 @@
+{
+  "maxFeatureSizeForUnderlyingRefSeq": 250000,
+  "maxFeatureScreenDensity": 0.5,
+  "maxFeatureGlyphExpansion": 500,
+  "maxHeight": 600,
+  "histograms": {
+    "description": "feature density",
+    "min": 0,
+    "height": 100,
+    "color": "goldenrod",
+    "clip_marker_color": "red"
+  },
+  "style": {
+    "_defaultHistScale": 4,
+    "_defaultLabelScale": 30,
+    "_defaultDescriptionScale": 120,
+    "xshowLabels": true,
+    "xxshowTooltips": true,
+    "xxlabel": "name,id",
+    "xxdescription": "note, description"
+  },
+  "displayMode": "normal",
+  "events": {},
+  "menuTemplate": [
+    {
+      "label": "View details",
+      "title": "{type} {name}",
+      "action": "contentDialog",
+      "iconClass": "dijitIconTask"
+    },
+    {
+      "iconClass": "dijitIconConnector"
+    },
+    {
+      "iconClass": "dijitIconFilter"
+    }
+  ],
+  "storeClass": "JBrowse/Store/SeqFeature/GFF3",
+  "urlTemplate": "/jb-galaxy-blaster/jbserve/utils/blast2.gff",
+  "type": "JBrowse/View/Track/HTMLFeatures",
+  "metadata": {
+    "description": "Blast GFF Test"
+  },
+  "category": "Miscellaneous",
+  "key": "Blast Results",
+  "label": "blasttest1",
+  "baseUrl": "http://192.168.56.x/jb-galaxy-blaster/sample_data/json/volvox/"
+}
