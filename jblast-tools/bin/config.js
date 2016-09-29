@@ -5,7 +5,7 @@ var path = require('path');
 var getopt = require('node-getopt');
 var util = require('./global-rest.js');
 var Finder = require('fs-finder');
-var globals = require('../globals.js');
+var config = require('../config.js');
 
 var getopt = new getopt([
     ['a' , 'all'              , 'setup all'],
@@ -28,17 +28,14 @@ getopt.setHelp(
     "\n" +
     "Examples:\n" +
     "\n" +
-    "Set gpath and apikey for later commands\n" +
-    "Jblast-config --gpath <path> --apikey <apikey\n" +
-    "\n" +
     "Install an existing blast database\n" +
-    "Jblast-config --gpath <path> --blastdbpath [local path]\n" +
+    "Jblast-config --blastdbpath [local path]\n" +
     "\n" +
     "Install jblast package workflows to galaxy\n" +
-    "Jblast-config --gpath <path> --gurl <galaxy url> --setupworkflows\n" +
+    "Jblast-config --gurl <galaxy url> --setupworkflows\n" +
     "\n" +
     "Install jblast package tools to galaxy\n" +
-    "Jblast-config --gpath <path> --setuptools\n"
+    "Jblast-config --setuptools\n"
 );
 
 /* Display help if no arguments are passed */
@@ -51,9 +48,9 @@ if (!process.argv.slice(2).length) {
  * get values for --gpath, apikey and gurl; grab from saved globals if necessary
  */
 
-var gurl = globals.galaxy.galaxyUrl;
-var gpath = globals.galaxy.galaxyPath;
-var apikey = globals.galaxy.galaxyAPIKey;
+var gurl = config.galaxy.galaxyUrl;
+var gpath = config.galaxy.galaxyPath;
+var apikey = config.galaxy.galaxyAPIKey;
 
 /*
 var gpath = opt.options['gpath'];
@@ -149,7 +146,7 @@ function exec_setupworkflows() {
     
     var srcdir = srcpath+'/workflows';
 
-    console.log("gurl, gpath", gurl,gpath);
+    //console.log("gurl, gpath", gurl,gpath);
     
     // find workflow files
     var files = Finder.from(srcdir).exclude('*.sample').findFiles('*.ga');
@@ -164,7 +161,8 @@ function exec_setupworkflows() {
                 console.log("Error:",err);
                 return;
             }
-            console.log('returned',body);
+            console.log('Workflow imported:',body.name);
+            console.log(body.url);
         });
     }
 }

@@ -3,7 +3,7 @@ var request = require('request');
 var jsonfile = require('jsonfile');
 var requestp = require('request-promise');
 var execSync = require('child_process').execSync;
-var globals = require('../globals.js');
+var config = require('../config.js');
 
 var cfgDir = '/etc/jbrowse';
 
@@ -22,7 +22,7 @@ module.exports = {
 
 
     /**
-     * 
+     * regrieve globals by performing a REST call to the jbrowse server
      * @param {type} cb
      * @returns {undefined}
      */
@@ -56,6 +56,7 @@ module.exports = {
      * @param {type} value
      * @returns return 1 if failed, 0 success
      */
+    /*
     x_setConfig: function(name,value) {
         this.checkDir();
         
@@ -80,11 +81,13 @@ module.exports = {
         console.log(this.cfgFile,"written",str);
         return 0;   // success
     },
+    */
     /**
      * Get config value given name
      * @param {type} name
      * @returns value or 0 if does not exist
      */
+    /*
     x_getConfig: function(name) {
         //console.log('getConfig',name);
         var contents = "{}";
@@ -105,6 +108,7 @@ module.exports = {
         else
             return 'undefined';   // not found
     },
+    */
     /* send JSON POST request
      * 
      * @param {type} api - e.g. "/api/workflows"
@@ -117,8 +121,8 @@ module.exports = {
         //var apikey = this.getConfig("apikey");
         //var gurl = this.getConfig("gurl");
 
-        var gurl = globals.galaxy.galaxyUrl;
-        var apikey = globals.galaxy.galaxyAPIKey;
+        var gurl = config.galaxy.galaxyUrl;
+        var apikey = config.galaxy.galaxyAPIKey;
         
         
         if(typeof apikey=='undefined') {
@@ -142,7 +146,7 @@ module.exports = {
             json: params
         };
         
-        console.log(req);
+        //console.log(req);
         
         request.post(req, function(err, response, body){
             if (err || response.statusCode != 200) {
