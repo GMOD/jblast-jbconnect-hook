@@ -14,7 +14,7 @@
     "jblast-xml2json": "./bin/blastxml2json.js",
     "jblast-xml2csv": "./bin/blastxml2csv.js",
     "jblast-tab2gff": "./bin/Blast2Gff.pl",
-    "jblast-config": "./bin/configutil.js"
+    "jblast": "./bin/configutil.js"
   },
   "dependencies": {
     "child_process": "^1.0.2",
