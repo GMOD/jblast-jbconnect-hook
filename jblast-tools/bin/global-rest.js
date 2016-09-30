@@ -45,70 +45,8 @@ module.exports = {
             });
     },
     setGlobals: function (data) {
-        
+        console.log("not implemented");
     },
-    test: function(){
-        console.log("test output");
-    },
-    /**
-     * Set config value
-     * @param {type} name
-     * @param {type} value
-     * @returns return 1 if failed, 0 success
-     */
-    /*
-    x_setConfig: function(name,value) {
-        this.checkDir();
-        
-        //console.log('setConfig',name,value);
-        var contents = "{}";
-        try {
-            contents = fs.readFileSync(this.cfgFile);
-        }        
-        catch(err) {
-            console.log(this.cfgFile, 'does not exist');
-        }
-        var json = JSON.parse(contents);
-        json[name] = value;
-        var str = JSON.stringify(json);
-        try {
-            fs.writeFileSync(this.cfgFile, str);
-        }
-        catch(err) {
-            console.log("ERROR:",err);
-            return 1;   // failed
-        }
-        console.log(this.cfgFile,"written",str);
-        return 0;   // success
-    },
-    */
-    /**
-     * Get config value given name
-     * @param {type} name
-     * @returns value or 0 if does not exist
-     */
-    /*
-    x_getConfig: function(name) {
-        //console.log('getConfig',name);
-        var contents = "{}";
-        try {
-            contents = fs.readFileSync(this.cfgFile);
-        }
-        catch(err) {
-            console.log(this.cfgFile,'does not exist');
-            return 'undefined';
-        }
-        
-        var json = JSON.parse(contents);
-        if (name==='') {
-            return JSON.stringify(json,null,2);
-        }
-        if (typeof json[name] !== 'undefined')
-            return json[name];
-        else
-            return 'undefined';   // not found
-    },
-    */
     /* send JSON POST request
      * 
      * @param {type} api - e.g. "/api/workflows"
@@ -159,7 +97,7 @@ module.exports = {
         
     },
     /**
-     * check directory 
+     * create directory if it doesn't exist 
      * @returns {undefined}
      */
     checkDir: function() {
