@@ -1,5 +1,5 @@
 /*
- * jblast globals
+ * jblast tools configuration
  */
 module.exports = {
     jbrowsePath: "/var/www/html/jbrowse/",
@@ -11,7 +11,10 @@ module.exports = {
     galaxy: {
         galaxyUrl: "http://localhost:8080",
         galaxyPath: "/var/www/html/galaxy_jblast",
-        galaxyAPIKey: "3ac9578a0158a218b5f129c912795239"
+        galaxyAPIKey: "3ac9578a0158a218b5f129c912795239",
+        
+        // jblast will use this Galaxy history
+        historyName: "JBlast History"
     },
     jblast: {
         blastResultPath: "jblastdata"
