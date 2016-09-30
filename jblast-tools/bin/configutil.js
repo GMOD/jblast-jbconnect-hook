@@ -8,7 +8,8 @@ var Finder = require('fs-finder');
 var config = require('../config.js');
 
 var getopt = new getopt([
-    ['a' , 'all'              , 'setup all'],
+    ['a' , 'setupall'         , 'equivelant to -w -t -d combined'],
+    [''  , 'globals[=ARG]'    , 'show globals'],
     ['p' , 'blastdbpath=PATH' , 'existing database path'],
     ['w' , 'setupworkflows', '[install|<path>] "install" project wf, or specify .ga file '],
     ['t' , 'setuptools'       , 'setup jblast tools for galaxy'],
@@ -46,12 +47,29 @@ if (!process.argv.slice(2).length) {
 }
 
 /*
+ * process --globals
+ * 
+ */
+var globals = opt.options['globals'];
+if (typeof globals !== 'undefined') {
+    util.getGlobals(function(g) {
+        if (g===null)
+            process.exit(1);
+        
+        console.log('jbserver globals:');
+        console.log(g);
+        process.exit(0);
+    })
+}
+
+/*
  * get values for --gpath, apikey and gurl; grab from saved globals if necessary
  */
 
 var gurl = config.galaxy.galaxyUrl;
 var gpath = config.galaxy.galaxyPath;
 var apikey = config.galaxy.galaxyAPIKey;
+
 
 
 /*
@@ -93,6 +111,16 @@ catch(err) {
     console.log(srcpath,'does not exist');
 }
 
+/*
+ * process --setupall
+ */
+var setupall = opt.options['setupall'];
+if (typeof setupall !== 'undefined') {
+    exec_setuptools();
+    exec_setupworkflows();
+    exec_setupdata();
+    process.exit(0);
+}
 /*
  * process commands arguments
  */
@@ -152,6 +180,12 @@ function exec_setupworkflows() {
             console.log(body.url);
         });
     }
+}
+/*
+ * setup galaxy history given historyName in config.js
+ */
+function exec_setuphistory() {
+    
 }
 /*
  * register blast nucleotide databases
