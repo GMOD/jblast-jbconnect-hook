@@ -30,7 +30,9 @@ read the jbrowse globals
 */
 
 util.getGlobals (function(g) {
-
+    if (g===null)
+        process.exit(1);
+    
     console.log("globals",g);
 
     // export will copy result files into <dataset dir>/jblast (i.e. "/sample_data/json/volvox/jblast"

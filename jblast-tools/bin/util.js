@@ -41,7 +41,8 @@ module.exports = {
                     cb({result:'error',error:'global.js: invalid JSON'})
             })
             .catch(function (err) {
-                cb({result:'error',error:err});
+                console.log(err.RequestError);
+                cb(null);
             });
     },
     setGlobals: function (data) {
@@ -90,7 +91,7 @@ module.exports = {
             if (err || response.statusCode != 200) {
                 console.log("response.statusCode",response.statusCode);
                 if (response.statusCode==403) console.log("possible invalid apikey", apikey);
-                if (err) console.log("Error:",err);
+                if (err) console.log(err.error.RequestError);
             }
             cb(err,response,body);
         });

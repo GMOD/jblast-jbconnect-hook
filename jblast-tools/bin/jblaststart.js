@@ -36,6 +36,9 @@ var blastSeqOut = opt.options['blastseq'] || '.';
 
 util.getGlobals (function(gbl) {
 
+    if (gbl==null)
+        return;
+
     console.log(gbl.jblast);
     blastSeqIn = gbl.jblast.blastSeq;
     //refSeqIn = gbl.jblast.originalSeq;

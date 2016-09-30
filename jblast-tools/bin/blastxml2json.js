@@ -35,9 +35,12 @@ var offset = "0";
 //var parser = new xml2js.Parser();
 
 // start by reading globals
-global.getGlobals (function(gbl) {
+util.getGlobals (function(gbl) {
     
-    if (typeof gbl.jblast != 'undefined')
+    if (gbl===null)
+        return;
+    
+    if (typeof gbl.jblast !== 'undefined')
         offset = gbl.jblast.offset || "0";
     offset = parseInt(offset);
     
