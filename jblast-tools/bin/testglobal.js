@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var global = require('./global-rest.js');
+var util = require('./util.js');
 var getopt = require('node-getopt');
 
 var getopt = new getopt([
@@ -26,13 +26,13 @@ var val = opt.options['value'];
 
 // set name/value
 if (setcfg) {
-    global.setConfig(name,val);
+    util.setConfig(name,val);
 }
 
 // get value given name
 if (getcfg) {
     if (typeof name === 'undefined')
-        console.log(global.getConfig(''));
+        console.log(util.getConfig(''));
     else
-        console.log(global.getConfig(name));
+        console.log(util.getConfig(name));
 }

@@ -4,7 +4,7 @@ var request = require('request'),
     fs = require('fs'),
     path = require('path'),
     getopt = require('node-getopt');
-var util = require('./global-rest.js');
+var util = require('./util.js');
 
 //require('request-debug')(request);
 

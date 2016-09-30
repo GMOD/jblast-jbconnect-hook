@@ -15,7 +15,7 @@
 
 var fs = require('fs');
 var getopt = require('node-getopt');
-var global = require('./global-rest.js');
+var util = require('./util.js');
 
 
 var globalPath = "/etc/jbrowse";
@@ -34,7 +34,7 @@ var blastSeqOut = opt.options['blastseq'] || '.';
 //var refSeqOut = opt.options['refseq'] || '.';
 
 
-global.getGlobals (function(gbl) {
+util.getGlobals (function(gbl) {
 
     console.log(gbl.jblast);
     blastSeqIn = gbl.jblast.blastSeq;
