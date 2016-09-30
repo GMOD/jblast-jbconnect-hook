@@ -15,7 +15,7 @@
     "jblast-xml2csv": "./bin/blastxml2csv.js",
     "jblast-tab2gff": "./bin/Blast2Gff.pl",
     "jblast-setup-galaxy": "./bin/copyfiles.js",
-    "jblast-config": "./bin/config.js",
+    "jblast-config": "./bin/configutil.js",
     "jblast-test": "./bin/testglobal.js"
   },
   "dependencies": {
