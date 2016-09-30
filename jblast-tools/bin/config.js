@@ -15,6 +15,7 @@ var getopt = new getopt([
     ['p' , 'blastdbpath=PATH' , 'existing database path'],
     ['w' , 'setupworkflows', '[install|<path>] "install" project wf, or specify .ga file '],
     ['t' , 'setuptools'       , 'setup jblast tools for galaxy'],
+    ['d' , 'setupdata'        , 'setup data and samples'],
     ['v' , 'view'             , 'view status of config'],
     
     ['h' , 'help'            , 'display this help']
@@ -87,6 +88,10 @@ if (gpath === 'undefined') {
 
 /*
  * figure target paths
+ * gdataroot is the root of the where galaxy is installed (default: /var/www/galaxy)
+ *     if docker this is the docker export directory.
+ * gdatapath is galaxy data dir.  For regular installations, this is the same as gdataroot.
+ *     if docker, this is /galaxy-central under gdataroot
  */
 var gdataroot = gpath;                      // root of local path of galaxy
 var gdatapath = gpath+"/galaxy-central";    // galaxy data files, if docker
@@ -107,10 +112,9 @@ catch (err) {
     gdatapath = gpath;
 }
 
-//console.log('gdataroot / gdatapath',gdataroot,'/',gdatapath);
-
 /*
- * figure source path of jblast-galaxy-tools (installed globally)
+ * figure source path of jblast-galaxy-tools 
+ *   (installed with -g option on RHEL: /usr/lib/node_modules/jblast-tools)
  */
 var srcpath = __dirname+"/..";
 //console.log("srcpath",srcpath);
@@ -138,7 +142,22 @@ var setupworkflows = opt.options['setupworkflows'];
 if (typeof setupworkflows !== 'undefined') {
     exec_setupworkflows();
 }
+var setupdata = opt.options['setupdata'];
+if (typeof setupdata !== 'undefined') {
+    exec_setupdata();
+}
 
+/*
+ * setup data directory and sample
+ */
+function exec_setupdata() {
+    var targetdir = config.jbrowsePath+config.dataSet[0].dataPath;
+    
+    util.checkDir(targetdir+config.jblast.blastResultPath);
+    
+    util.cmd('cp -R -v "'+srcpath+'/jblastdata" "'+targetdir+'"');
+
+}
 /*
  * import the package workflows
  */
@@ -218,14 +237,14 @@ function exec_blastdbpath() {
 function exec_setuptools() {
     
     // copy tools to export root.
-    util.cmd('cp -R "'+srcpath+'/jblasttools" "'+gdataroot+'"');
+    util.cmd('cp -R -v "'+srcpath+'/jblasttools" "'+gdataroot+'"');
     
     var shed_conf = gdatapath+'/config/shed_tool_conf.xml.jblast';
     // copy shed_tool_conf.xml file to shed_tool_conf.xml.jblast
-    util.cmd('cp "'+gdatapath+'/config/shed_tool_conf.xml" "'+shed_conf+'"');
+    util.cmd('cp -v "'+gdatapath+'/config/shed_tool_conf.xml" "'+shed_conf+'"');
     
     // copy jblast_tool_conf.xml to /config
-    util.cmd('cp "'+srcpath+'/config/jblast_tool_conf.xml" "'+gdatapath+'/config"');
+    util.cmd('cp -v "'+srcpath+'/config/jblast_tool_conf.xml" "'+gdatapath+'/config"');
     
     // in shed_tool_conf.xml.jblast replace ../shed_tools with /export/shed_tools 
     try {
