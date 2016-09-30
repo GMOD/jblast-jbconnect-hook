@@ -2,6 +2,7 @@
  * jblast globals
  */
 module.exports = {
+    jbrowsePath: "/var/www/html/jbrowse/",
     dataSet: [
         {
             dataPath: "sample_data/json/volvox/"
