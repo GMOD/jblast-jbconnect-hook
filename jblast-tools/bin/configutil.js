@@ -14,6 +14,7 @@ var getopt = new getopt([
     ['w' , 'setupworkflows', '[install|<path>] "install" project wf, or specify .ga file '],
     ['t' , 'setuptools'       , 'setup jblast tools for galaxy'],
     ['d' , 'setupdata'        , 'setup data and samples'],
+    ['h' , 'setuphistory'     , 'setup history'],
     ['v' , 'view'             , 'view status of config'],
     
     ['h' , 'help'            , 'display this help']
@@ -142,6 +143,10 @@ var setupdata = opt.options['setupdata'];
 if (typeof setupdata !== 'undefined') {
     exec_setupdata();
 }
+var setuphistory = opt.options['setuphistory'];
+if (typeof setuphistory !== 'undefined') {
+    exec_setuphistory();
+}
 
 /*
  * setup data directory and sample
@@ -170,14 +175,15 @@ function exec_setupworkflows() {
         var content = fs.readFileSync(files[i]).toString();
         var jsonparam = {'workflow':JSON.parse(content)};
         //console.log('jsonparam',jsonparam);
-        util.galaxyPostJSON('/api/workflows/upload',jsonparam,function(err,response,body){
-            if (err || response.statusCode != 200) {
-                console.log("response.statusCode",response.statusCode);
-                console.log("Error:",err);
+        util.galaxyPostJSON('/api/workflows/upload',jsonparam,function(ret){
+            if (ret.status==='fail') {
+                //console.log("response.statusCode",response.statusCode);
+                console.log("Error:",ret);
                 return;
             }
-            console.log('Workflow imported:',body.name);
-            console.log(body.url);
+            var data = ret.data;
+            console.log('Workflow imported:',data.name);
+            console.log(data.url);
         });
     }
 }
@@ -185,7 +191,30 @@ function exec_setupworkflows() {
  * setup galaxy history given historyName in config.js
  */
 function exec_setuphistory() {
-    
+    util.galaxyGetJSON('/api/histories',function(data) {
+       if (data.status==='error') {
+           return;
+       } 
+       
+       console.log(data.data); 
+       var data = data.data;
+       var found = 0;
+       var histName = config.galaxy.historyName;
+       for(var i in data) {
+           if (data[i]==histName) found=1;
+       }
+       if (found===1) {
+           console.log('History already exists: ', histName);
+           return;
+       }
+       util.galaxyPostJSON('/api/histories',{name: histName}, function(data) {
+           if (data.status==='error') {
+               return;
+           }
+           console.log("result",data);
+       });
+       
+    });
 }
 /*
  * register blast nucleotide databases
