@@ -9,9 +9,6 @@ var config = require('../config.js');
 
 var getopt = new getopt([
     ['a' , 'all'              , 'setup all'],
-//    ['g' , 'gpath=PATH'       , 'set and save Galaxy install path'],
-//    ['u' , 'gurl=PATH'        , 'set and save Galaxy URL'],
-//    ['k' , 'apikey=STRING'    , 'set and save Galaxy API key'],
     ['p' , 'blastdbpath=PATH' , 'existing database path'],
     ['w' , 'setupworkflows', '[install|<path>] "install" project wf, or specify .ga file '],
     ['t' , 'setuptools'       , 'setup jblast tools for galaxy'],
@@ -36,7 +33,10 @@ getopt.setHelp(
     "Jblast-config --gurl <galaxy url> --setupworkflows\n" +
     "\n" +
     "Install jblast package tools to galaxy\n" +
-    "Jblast-config --setuptools\n"
+    "Jblast-config --setuptools\n"+
+    "\n" +
+    "Setup data and samples\n" +
+    "Jblast-config --setudata\n"
 );
 
 /* Display help if no arguments are passed */
@@ -53,38 +53,6 @@ var gurl = config.galaxy.galaxyUrl;
 var gpath = config.galaxy.galaxyPath;
 var apikey = config.galaxy.galaxyAPIKey;
 
-/*
-var gpath = opt.options['gpath'];
-var apikey = opt.options['apikey'];
-var gurl = opt.options['gurl'];
-
-// save gpath or get it if it exists
-if (typeof gpath !== 'undefined') util.setConfig('gpath',gpath);
-else gpath = util.getConfig('gpath');
-
-// save gurl (galaxy url) or get it if it exists
-if (typeof gurl !== 'undefined') util.setConfig('gurl',gurl);
-else gurl = util.getConfig('gurl');
-
-// save apikey or get it if it exists
-if (typeof apikey !== 'undefined') util.setConfig('apikey',apikey);
-else apikey = util.getConfig('apikey');
-*/
-/*
- * defaults fo gpath and gurl
- */
-/*
-if (gurl === 'undefined') {
-    gurl = "http://localhost:8080";
-    util.setConfig('gurl',gurl);
-    console.log("undefined --gurl; defaulting to", gurl);
-}
-if (gpath === 'undefined') {
-    gpath = "/var/www/galaxy_jblast";
-    util.setConfig('gpath',gpath)
-    console.log("undefined --gpath; defaulting to", gpath);
-}
-*/
 
 /*
  * figure target paths
