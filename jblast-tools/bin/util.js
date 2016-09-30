@@ -48,23 +48,21 @@ module.exports = {
     setGlobals: function (data) {
         console.log("not implemented");
     },
-    /* send JSON POST request
+    /* send JSON POST request to galaxy server
      * 
      * @param {type} api - e.g. "/api/workflows"
      * @param {type} params - json parameter i.e. {a:1,b:2}
-     * @param {type} cb - callback function cb(error,response,body)
+     * @param {type} cb - callback function cb(retval)
+     * 
+     * retval return {status: x, data:y}
      */
     galaxyPostJSON: function(api,params,cb) {
         
         var jsonstr = JSON.stringify(params);
-        //var apikey = this.getConfig("apikey");
-        //var gurl = this.getConfig("gurl");
-
         var gurl = config.galaxy.galaxyUrl;
         var apikey = config.galaxy.galaxyAPIKey;
         
-        
-        if(typeof apikey=='undefined') {
+        if(typeof apikey==='undefined') {
             console.log("missing apikey");
             return;
         }
@@ -92,10 +90,41 @@ module.exports = {
                 console.log("response.statusCode",response.statusCode);
                 if (response.statusCode==403) console.log("possible invalid apikey", apikey);
                 if (err) console.log(err.error.RequestError);
+                cb({status:'error',data:err});
             }
-            cb(err,response,body);
+            cb({status:'success',data:body});
         });
         
+    },
+    /**
+     * send JSON GET request to galaxy server
+     * @param {type} api - i.e. '/api/histories'
+     * @param {type} cb  callback i.e. function(retval)
+     * @returns {undefined}
+     * 
+     * retval = {status: x, data:y}
+     *      x can be 'success' or 'error'
+     */
+    galaxyGetJSON: function(api,cb) {
+        var gurl = config.galaxy.galaxyUrl;
+        var apikey = config.galaxy.galaxyAPIKey;
+        
+        var options = {
+            uri: gurl+api+"?key="+apikey,
+            headers: { 'User-Agent': 'Request-Promise' },
+            json: true  // parse json response
+        };
+
+        requestp(options)
+            .then(function (data) {
+                cb({status: 'success',data: data});
+            })
+            .catch(function (err) {
+                if (err) {
+                    console.log('GET /api/histories',err);
+                }
+                cb({status:'error',data:err});
+            });
     },
     /**
      * create directory if it doesn't exist 
