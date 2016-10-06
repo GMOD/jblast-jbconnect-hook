@@ -4,5 +4,4 @@
 JBrowse Server
 
 ##Installation:
-(TBD)
-
+[Instructions](https://github.com/GMOD/jblast/tree/master/jblast-tools).
