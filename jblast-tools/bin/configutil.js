@@ -16,6 +16,7 @@ var getopt = new getopt([
     ['d' , 'setupdata'        , 'setup data and samples'],
     ['h' , 'setuphistory'     , 'setup history'],
     ['v' , 'view'             , 'view status of config'],
+    ['t' , 'setuptrack'       , 'setup track sample and jblast plugin'],
     
     ['h' , 'help'            , 'display this help']
 ]);              // create Getopt instance
@@ -129,12 +130,10 @@ var setuptools = opt.options['setuptools'];
 if (typeof setuptools !== 'undefined') {
     exec_setuptools();
 }
-
 var blastdbpath = opt.options['blastdbpath'];
 if (typeof blastdbpath !== 'undefined') {
     exec_blastdbpath();
 }
-
 var setupworkflows = opt.options['setupworkflows'];
 if (typeof setupworkflows !== 'undefined') {
     exec_setupworkflows();
@@ -142,12 +141,73 @@ if (typeof setupworkflows !== 'undefined') {
 var setupdata = opt.options['setupdata'];
 if (typeof setupdata !== 'undefined') {
     exec_setupdata();
+    exec_setuptrack();
 }
 var setuphistory = opt.options['setuphistory'];
 if (typeof setuphistory !== 'undefined') {
     exec_setuphistory();
 }
 
+/*
+ * setup sample track
+ */
+function exec_setuptrack() {
+
+    var g = config;
+    var trackListPath = g.jbrowsePath + g.dataSet[0].dataPath + 'trackList.json';
+    var sampleTrackFile = config.jbrowsePath+config.dataSet[0].dataPath;
+    sampleTrackFile += config.jblast.blastResultPath+'/sampleTrack.json';
+    var dataSet = g.dataSet[0].dataPath;
+    
+    // read sampleTrack.json file
+    var error = 0;
+    try {
+      var sampleTrackData = fs.readFileSync (sampleTrackFile);
+    }
+    catch(err){
+        console.log("failed read",trackListPath,err);
+        error = 1;
+    }
+    if (error) return;
+    
+    var sampleTrack = JSON.parse(sampleTrackData);
+    
+    // read trackList.json
+    try {
+      var trackListData = fs.readFileSync (trackListPath);
+    }
+    catch(err) {
+        console.log("failed read",trackListPath,err);
+        error = 1;
+    }
+    if (error) return;
+    
+    var config = JSON.parse(trackListData);
+
+    // add the JBlast plugin  
+    config.plugins.push("JBlast");
+
+    // check if sample track exists in trackList.json (by checking for the label)
+    var hasLabel = 0;
+    for(var i in config.tracks) {
+        if (config.tracks[i].label===sampleTrack.label) hasLabel=1;
+    }
+
+    if (hasLabel) {
+        console.log('Sample track already exists');
+        return;
+    }
+    // add the sample track
+    config.tracks.push(sampleTrack);
+    
+    // write trackList.json
+    try {
+      fs.writeFileSync(trackListPath,JSON.stringify(config,null,4));
+    }
+    catch(err) {
+      console.log("failed write",trackListPath,err);
+    }
+}
 /*
  * setup data directory and sample
  */
@@ -195,13 +255,16 @@ function exec_setuphistory() {
        if (data.status==='error') {
            return;
        } 
-       
-       console.log(data.data); 
+       //console.log(data.data); 
        var data = data.data;
        var found = 0;
        var histName = config.galaxy.historyName;
        for(var i in data) {
-           if (data[i]==histName) found=1;
+           if (data[i].name==histName) {
+               console.log('History already exists: ', data[i].name);
+               console.log(data[i].url);
+               found=1;
+           }
        }
        if (found===1) {
            console.log('History already exists: ', histName);
@@ -211,7 +274,9 @@ function exec_setuphistory() {
            if (data.status==='error') {
                return;
            }
-           console.log("result",data);
+           var result = data.data;
+           console.log("Created History:",result.name);
+           console.log(result.url);
        });
        
     });
