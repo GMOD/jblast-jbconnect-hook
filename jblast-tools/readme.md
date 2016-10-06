@@ -5,19 +5,74 @@ The scripts in /bin are used by jblast workflow.
 Instructions for getting the Galaxy API key.
 https://wiki.galaxyproject.org/Learn/API
 
-Install globally:
+###Download the Blast Database:
+```
+cd /var/www
+rsync -avzP rsync://datacache.g2.bx.psu.edu/indexes/blastdb .
+```
+Take a long coffee break.  You're downloading 300+ gig.
+The result will be 4 databased in the /var/www/blastdb directory.
+
+###install and launch galaxy docker
+Initial launch of galaxy docker.  Start docker first.
+(note, in this demo, do not change the /export directory name. Certain setup scripts expect the export directory)
+```
+service docker start
+docker run -i -t -p 8080:80 -v /var/www/galaxy_jblast/:/export/ bgruening/galaxy-blast
+```
+The first time this is run, it takes a few minutes to get started, as it pulls in docker dependencies for the first time.
+This will install galaxy docker in the /var/www/galaxy_jblast directory
+
+###Install pull the jblast:
+(this part needs more work)
+```
+git clone https://github.com/GMOD/jblast
+cd jblast/jblast-tools
+```
+Edit config.js
+```
+nano config.js
+```
+Edit the references
+```
+module.exports = {
+    jbrowsePath: "/var/www/jbrowse/",
+    dataSet: [
+        {
+            dataPath: "sample_data/json/volvox/"
+        }
+    ],
+    galaxy: {
+        galaxyUrl: "http://localhost:8080",
+        galaxyPath: "/var/www/galaxy_jblast",
+        galaxyAPIKey: "3ac9578a0158a218b5f129c912795239",
+        
+        // jblast will use this Galaxy history
+        historyName: "JBlast History"
+    },
+    jblast: {
+        blastResultPath: "jblastdata"
+    }
+};
+```
+Then install globally:
 ```
 npm install -g .
 ```
-Note: must have proper permission to the global node_modules (/usr/local/lib/node_modules) directoryand the /bin directory.
 
-Initial launch of galaxy docker:
+###setup jblast
+Make sure the docker galaxy instance is running.
+```
+jblast --setupall
+```
 
-docker run -i -t -p 8080:80 -v /var/www/html/galaxy_jblast/:/export/ bgruening/galaxy-blast
-The first time this is run, it takes a few minutes to get started.  This is because it's the galaxy data and databases into the ../galaxy_jblast image
 
-docker run -i -t -p 8080:80 -v /var/www/html/galaxy_jblast/:/export/ -e GALAXY_CONFIG_TOOL_CONFIG_FILE=config/tool_conf.xml.sample,config/shed_tool_conf.xml.jblast,config/jblast_tool_conf.xml bgruening/galaxy-blast
+###launch modified docker galaxy
+Ctrl-C out of galaxy and now run this:
+```
+docker run -i -t -p 8080:80 -v /var/www/galaxy_jblast/:/export/ -e GALAXY_CONFIG_TOOL_CONFIG_FILE=config/tool_conf.xml.sample,config/shed_tool_conf.xml.jblast,config/jblast_tool_conf.xml bgruening/galaxy-blast
 (replace -i -t with -d to run in daemon mode).
+```
 
 ## Troubleshooting
 
