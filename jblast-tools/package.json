@@ -17,6 +17,7 @@
     "jblast": "./bin/configutil.js"
   },
   "dependencies": {
+    "bluebird": "^3.4.6",
     "child_process": "^1.0.2",
     "dateformat": "^1.0.12",
     "fs": "^0.0.2",
