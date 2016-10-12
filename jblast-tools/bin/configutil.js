@@ -16,7 +16,6 @@ var getopt = new getopt([
     ['d' , 'setupdata'        , 'setup data and samples'],
     ['h' , 'setuphistory'     , 'setup history'],
     ['v' , 'view'             , 'view status of config'],
-    ['t' , 'setuptrack'       , 'setup track sample and jblast plugin'],
     
     ['h' , 'help'            , 'display this help']
 ]);              // create Getopt instance
@@ -24,7 +23,7 @@ getopt.bindHelp();     // bind option 'help' to default action
 opt = getopt.parseSystem(); // parse command line
 
 getopt.setHelp(
-    "Usage: jblast-config [OPTION]\n" +
+    "Usage: jblast [OPTION]\n" +
     "[[OPTIONS]]\n" +
     "\n" +
     "Examples:\n" +
@@ -120,6 +119,7 @@ var setupall = opt.options['setupall'];
 if (typeof setupall !== 'undefined') {
     exec_setuptools();
     exec_setupworkflows();
+    exec_setuphistory();
     exec_setupdata();
     process.exit(0);
 }
@@ -152,6 +152,8 @@ if (typeof setuphistory !== 'undefined') {
  * setup sample track
  */
 function exec_setuptrack() {
+
+    console.log("Setting up sample track...");
 
     var g = config;
     var trackListPath = g.jbrowsePath + g.dataSet[0].dataPath + 'trackList.json';
@@ -212,6 +214,9 @@ function exec_setuptrack() {
  * setup data directory and sample
  */
 function exec_setupdata() {
+    
+    console.log("Setting up data directory...");
+    
     var targetdir = config.jbrowsePath+config.dataSet[0].dataPath;
     
     util.checkDir(targetdir+config.jblast.blastResultPath);
@@ -224,33 +229,58 @@ function exec_setupdata() {
  */
 function exec_setupworkflows() {
     
+    console.log("Setting up sample workflow(s)...");
+    
     var srcdir = srcpath+'/workflows';
 
-    //console.log("gurl, gpath", gurl,gpath);
+    // get existing workflow list
+    util.galaxyGetJSON('/api/workflows',function(data) {
+        if (data.status==='error') {
+            return;
+        } 
+        //console.log(data.data); 
+        var workflows = data.data;
     
-    // find workflow files
-    var files = Finder.from(srcdir).exclude('*.sample').findFiles('*.ga');
-    //console.log('files',files);
-    for(var i in files) {
-        var content = fs.readFileSync(files[i]).toString();
-        var jsonparam = {'workflow':JSON.parse(content)};
-        //console.log('jsonparam',jsonparam);
-        util.galaxyPostJSON('/api/workflows/upload',jsonparam,function(ret){
-            if (ret.status==='fail') {
-                //console.log("response.statusCode",response.statusCode);
-                console.log("Error:",ret);
-                return;
+        // find workflow files
+        var files = Finder.from(srcdir).exclude('*.sample').findFiles('*.ga');
+        //console.log('files',files);
+        for(var i in files) {
+            var content = fs.readFileSync(files[i]).toString();
+            
+            var thisWF = JSON.parse(content);
+            var wfName = thisWF.name;
+            var found = 0;
+            for(var i in workflows) {
+                if (workflows[i].name.indexOf(wfName) !== -1) {
+                    console.log('History already exists: ', workflows[i].name);
+                    console.log(workflows[i].url);
+                    found=1;
+                }
             }
-            var data = ret.data;
-            console.log('Workflow imported:',data.name);
-            console.log(data.url);
-        });
-    }
+            if (!found) {
+                var jsonparam = {'workflow':wfName};
+                //console.log('jsonparam',jsonparam);
+                util.galaxyPostJSON('/api/workflows/upload',jsonparam,function(ret){
+                    if (ret.status==='fail') {
+                        //console.log("response.statusCode",response.statusCode);
+                        console.log("Error:",ret);
+                        return;
+                    }
+                    var data = ret.data;
+                    console.log('Workflow imported:',data.name);
+                    console.log(data.url);
+                });
+            }
+        }
+    });
 }
 /*
  * setup galaxy history given historyName in config.js
  */
 function exec_setuphistory() {
+    
+    console.log("Setting up history...");
+    
     util.galaxyGetJSON('/api/histories',function(data) {
        if (data.status==='error') {
            return;
@@ -260,16 +290,14 @@ function exec_setuphistory() {
        var found = 0;
        var histName = config.galaxy.historyName;
        for(var i in data) {
-           if (data[i].name==histName) {
+           if (data[i].name.indexOf(histName) !== -1) {
                console.log('History already exists: ', data[i].name);
                console.log(data[i].url);
                found=1;
            }
        }
-       if (found===1) {
-           console.log('History already exists: ', histName);
-           return;
-       }
+       if (found===1) return;
+
        util.galaxyPostJSON('/api/histories',{name: histName}, function(data) {
            if (data.status==='error') {
                return;
@@ -286,6 +314,7 @@ function exec_setuphistory() {
  */
 function exec_blastdbpath() {
 
+    console.log("Setting BLAST DB path");
 
     // target directory
     var tooldir = gdatapath+'/tool-data';
@@ -339,8 +368,11 @@ function exec_setuptools() {
     // copy shed_tool_conf.xml file to shed_tool_conf.xml.jblast
     util.cmd('cp -v "'+gdatapath+'/config/shed_tool_conf.xml" "'+shed_conf+'"');
     
-    // copy jblast_tool_conf.xml to /config
-    util.cmd('cp -v "'+srcpath+'/config/jblast_tool_conf.xml" "'+gdatapath+'/config"');
+    // backup galaxy.ini if any
+    util.cmd('cp -v "'+gdatapath+'/config/galaxy.ini" "'+gdatapath+'/config/galaxy.ini.bak"');
+    
+    // copy /config stuff  to /config
+    util.cmd('cp -R -v "'+srcpath+'/config" "'+gdatapath+'"');
     
     // in shed_tool_conf.xml.jblast replace ../shed_tools with /export/shed_tools 
     try {
