@@ -4,23 +4,21 @@
  * and open the template in the editor.
  */
 var request = require('request');
-//var prettyjson = require('prettyjson');   // for debugging
+var requestp = require('request-promise');
 var fs = require('fs');
 var path = require('path');
 
-//var filePath = "/var/www/html/jb-galaxy-blaster/tmp/";
-//var urlPath = "http://localhost/jb-galaxy-blaster/tmp/";
+//var prettyjson = require('prettyjson');   // for debugging
 
-//var globalPath = "/etc/jbrowse";
-//var globalFile = globalPath + "/globals.dat";
-
+var historyName = '';
+var historyId = '';
 
 module.exports = function (sails) {
 
    return {
 
         initialize: function(cb) {
-            console.log("Sails Hook: jb-galaxy-blast initialize"); 
+            sails.log.info("Sails Hook: "+path.basename(__filename)+" initialize"); 
             // todo: check that galaxy is running
 
             sails.on('hook:orm:loaded', function() {
@@ -28,43 +26,116 @@ module.exports = function (sails) {
                 //console.log(sails.hooks);
                 return cb();
             });
+            // initialize history
+            init_history(this);
             
             //return cb();
         },
         routes: {
            after: {
               'post /jbapi/blastregion': rest_BlastRegion,
-              'post /jbapi/workflowsubmit': rest_WorkflowSubmit,
+              'post /jbapi/workflowsubmit': function (req, res, next) {
+                  sails.log.info(path.basename(__filename),"/jbapi/workflowsubmit");
+                  rest_WorkflowSubmit(req,res);
+              },
 
               'post /jbapi/posttest': function (req, res, next) {
-                  console.log("jb-galaxy-blast /jbapi/posttest called");
+                  sails.log.info(path.basename(__filename),"/jbapi/posttest");
                   res.header("Access-Control-Allow-Origin", "*");
                   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
                   res.send(req.body);
               },
               'get /jbapi/test': function (req, res, next) {
-                  console.log("jb-galaxy-blast /jbapi/gettest called");
+                  sails.log.info(path.basename(__filename),"/jbapi/gettest");
                   res.send({result:"jb-galaxy-blast gettest success"});
                   //return next();
               }
               
            }
+        },
+        /**
+         * send JSON GET request to galaxy server
+         * @param {type} api - i.e. '/api/histories'
+         * @param {type} cb  callback i.e. function(retval)
+         * @returns {undefined}
+         * 
+         * retval = {status: x, data:y}
+         *      x can be 'success' or 'error'
+         */
+        galaxyGetJSON: function(api,cb) {
+            var g = sails.config.globals.jbrowse;
+            var gurl = g.galaxy.galaxyUrl;
+            var apikey = g.galaxy.galaxyAPIKey;
+
+            var options = {
+                uri: gurl+api+"?key="+apikey,
+                headers: { 'User-Agent': 'Request-Promise' },
+                json: true  // parse json response
+            };
+
+            requestp(options)
+                .then(function (data) {
+                    cb({status: 'success',data: data});
+                })
+                .catch(function (err) {
+                    if (err) {
+                        console.log('GET /api/histories',err);
+                    }
+                    cb({status:'error',data:err});
+                });
+        },
+        getHistoryId: function() {
+            return historyId;
+        },
+        getHistoryName: function() {
+            return historyName;
         }
-
-    }
+    };
 };
+/**
+ * acquire history id from galaxy
+ * @returns {undefined}
+ */
+function init_history(th) {
+    sails.log("init_history");
+    var g = sails.config.globals.jbrowse;
+    historyName = g.galaxy.historyName;
+    
+    th.galaxyGetJSON('/api/histories',function(ret) {
+       if (ret.status==='success'){
+           var histlist = ret.data;
+           
+           //sails.log('histlist',histlist);
+           
+           var foundHist = 0;
+           for(var i in histlist) {
+               if (histlist[i].name===historyName) {
+                   historyId = histlist[i].id;
+                   foundHist = 1;
+               }
+           }
+           sails.log.info('Galaxy History: "'+historyName+'"',historyId);
+           
+       } 
+    });
+}
 
+/**
+ * submit workflow
+ * @param {type} req
+ * @param {type} res
+ * @returns {undefined}
+ */
 function rest_WorkflowSubmit(req,res) {
     var g = sails.config.globals;
     var region = req.body.region;
     var workflow = req.body.workflow;
     
-    
-    // todo: need to change history reference.
     var params = {
         //workflow_id: 'f2db41e1fa331b3e',
         workflow_id: workflow,
-        history: 'hist_id=f597429621d6eb2b',
+        history: 'hist_id='+historyId,
+        //history: 'hist_id=f597429621d6eb2b',
         ds_map: {
             "0": {
                 src: 'hda',
@@ -236,7 +307,7 @@ function importFiles(theFile,postFn) {
     var params = 
     {
             "tool_id": "upload1",
-            "history_id": "f597429621d6eb2b",   // must reference a history
+            "history_id": historyId,   // must reference a history
             "inputs": {
   
                 "dbkey":"?",
@@ -286,8 +357,6 @@ function execTool_megablast(args,postFn){
     var myPostFn = postFn;
     var g = sails.config.globals;
     
-    // todo: pass in the current history somehow
-    
     // megablast
     /*
     var params = 
@@ -321,7 +390,7 @@ function execTool_megablast(args,postFn){
     {
       "tool_id":"toolshed.g2.bx.psu.edu/repos/devteam/ncbi_blast_plus/ncbi_blastn_wrapper/0.1.07",
       "tool_version":"0.1.07",
-      "history_id": "f597429621d6eb2b",   // must reference a history, todo: make this a variable
+      "history_id": historyId,   // must reference a history, todo: make this a variable
       "inputs":{
         "query":{
           "batch":false,
@@ -379,15 +448,11 @@ function execTool_blastxml2tab(args,postFn){
     var myPostFn = postFn;
     var g = sails.config.globals;
     
-    // todo: pass in the current history somehow
-
-    
-    
     var params = 
     {
       "tool_id":"toolshed.g2.bx.psu.edu/repos/devteam/ncbi_blast_plus/blastxml_to_tabular/0.1.07",
       "tool_version":"0.1.07",
-      "history_id": "f597429621d6eb2b",   // must reference a history, todo: make this a variable
+      "history_id": historyId,   // must reference a history, todo: make this a variable
       "inputs":{
         "blastxml_file":{
           "batch":false,
