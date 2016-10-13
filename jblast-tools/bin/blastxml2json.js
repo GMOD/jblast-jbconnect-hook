@@ -14,7 +14,7 @@
 var fs = require('fs'),
     path = require('path'),
     getopt = require('node-getopt'),
-    util = require('util');
+    util = require('./util');
 
 var to_json = require('xmljson').to_json;
 
@@ -29,6 +29,10 @@ var opt = getopt.create([
 
 var blastxml = opt.options['blastxml'] || '.';
 var jsonfile = opt.options['json'] || '.';
+
+console.log("--blastxml",blastxml,"--json",jsonfile);
+
+console.log("util",util);
 
 var offset = "0";
 

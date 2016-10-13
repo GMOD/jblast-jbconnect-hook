@@ -121,7 +121,8 @@ module.exports = {
             })
             .catch(function (err) {
                 if (err) {
-                    console.log('GET /api/histories',err);
+                    //console.log('GET /api/histories',err);
+                    console.log(err.options,'statusCode:',err.statusCode,err.message);
                 }
                 cb({status:'error',data:err});
             });
