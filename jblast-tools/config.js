@@ -10,8 +10,11 @@ module.exports = {
     ],
     galaxy: {
         galaxyUrl: "http://localhost:8080",
-        galaxyPath: "/var/www/html/galaxy_jblast",
-        galaxyAPIKey: "3ac9578a0158a218b5f129c912795239",
+        
+        galaxyPath: "/var/www/html/galaxy",
+        //galaxyPath: "/var/www/html/galaxy_jblast",    // if docker
+
+        galaxyAPIKey: "c7be32db9329841598b1a5705655f633",
         
         // jblast will use this Galaxy history
         historyName: "JBlast History"
