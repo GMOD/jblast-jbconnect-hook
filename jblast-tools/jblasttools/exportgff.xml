@@ -1,12 +1,12 @@
 <tool id="jb_exportgff" name="Export to JBlast" version="1.0.0">
-  <description>Export results to JBlast Module</description>
-  <command>jblast-export -t ./inMemTemplate.json -g $gffin -b $jsonin -o $output</command>
+  <description>JBlast Complete</description>
+  <command>jblast-export -t ./inMemTemplate.json -g $gffin -b $jsonin -o $jblast_done_json</command>
   <inputs>
     <param format="gff" name="gffin" type="data" label="GFF in"/>
     <param format="json" name="jsonin" type="data" label="blastJSON in"/>
   </inputs>
   <outputs>
-      <data format="json" name="output" label="jb export results (JSON)"/>
+      <data format="json" name="jblast_done_json" label="jb export results (JSON)"/>
 </outputs>
 
   <help>
