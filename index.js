@@ -17,7 +17,6 @@ var historyId = '';
 module.exports = function (sails) {
 
    return {
-
         initialize: function(cb) {
             sails.log.info("Sails Hook: "+path.basename(__filename)+" initialize"); 
             // todo: check that galaxy is running
@@ -29,28 +28,11 @@ module.exports = function (sails) {
             });
             // initialize history
             init_history(this);
-            /*
-            this.galaxyGetJSON("/api/histories",
-                function(data) {
-                    console.log(data);
-                },
-                function(err) {
-                    console.log(err);
-                }
-            );
-            */
-            this.galaxyGetAsync("/api/histories")
-                .then(function(data){
-                    console.log(data);    
-                })
-                .catch(function(err){
-                    console.log(err);
-                });
             //return cb();
         },
         routes: {
            after: {
-              'post /jbapi/blastregion': rest_BlastRegion,
+              //'post /jbapi/blastregion': rest_BlastRegion,
               'post /jbapi/workflowsubmit': function (req, res, next) {
                   sails.log.info(path.basename(__filename),"/jbapi/workflowsubmit");
                   rest_WorkflowSubmit(req,res);
@@ -69,6 +51,28 @@ module.exports = function (sails) {
               }
               
            }
+        },
+        /* promise-ized galaxyGetJSON function
+         * 
+         * @param {type} api
+         * @returns {Promise}
+         */
+        galaxyGetAsync: function(api) {
+            var thisB = this;
+            return new Promise(function(resolve, reject) {
+                thisB.galaxyGetJSON(api, resolve, reject);
+            });
+        },
+        /* promise-ized galaxyPostJSON function
+         * 
+         * @param {type} api
+         * @returns {Promise}
+         */
+        galaxyPostAsync: function(api,params) {
+            var thisB = this;
+            return new Promise(function(resolve, reject) {
+                thisB.galaxyPostJSON(api,params, resolve, reject);
+            });
         },
         /**
          * send JSON GET request to galaxy server
@@ -107,9 +111,11 @@ module.exports = function (sails) {
          */
         galaxyPostJSON: function(api,params,cb,cberr) {
 
-            var jsonstr = JSON.stringify(params);
-            var gurl = config.galaxy.galaxyUrl;
-            var apikey = config.galaxy.galaxyAPIKey;
+            var g = sails.config.globals.jbrowse;
+            var gurl = g.galaxy.galaxyUrl;
+            var apikey = g.galaxy.galaxyAPIKey;
+
+            var pstr = JSON.stringify(params);
 
             if(typeof apikey==='undefined') {
                 console.log("missing apikey");
@@ -127,7 +133,7 @@ module.exports = function (sails) {
                     'Accept-Encoding' : 'gzip, deflate',
                     'Accept': '*/*',
                     'Accept-Language' : 'en-US,en;q=0.5',
-                    'Content-Length' : jsonstr.length
+                    'Content-Length' : pstr.length
                 },
                 json: params
             };
@@ -142,33 +148,23 @@ module.exports = function (sails) {
                 });
 
         },
-        /* promise-ized galaxyGetJSON function
-         * 
-         * @param {type} api
-         * @returns {Promise}
-         */
-        galaxyGetAsync: function(api) {
-            var thisB = this;
-            return new Promise(function(resolve, reject) {
-                thisB.galaxyGetJSON(api, resolve, reject);
-            });
-        },
-        /* promise-ized galaxyPostJSON function
-         * 
-         * @param {type} api
-         * @returns {Promise}
-         */
-        galaxyPostAsync: function(api) {
-            var thisB = this;
-            return new Promise(function(resolve, reject) {
-                thisB.galaxyPostJSON(api, resolve, reject);
-            });
-        },
         getHistoryId: function() {
             return historyId;
         },
         getHistoryName: function() {
             return historyName;
+        },
+        /**
+         * send file POST (promise)
+         * @param {type} theFile
+         * @param {type} hId
+         * @param {type} cb
+         * @returns {undefined}
+         */
+        sendFileAsync: function(theFile,hId) {
+            return new Promise(function (resolve, reject) {
+                sendFile(theFile,hId,resolve,reject);
+            }); 
         }
     };
 };
@@ -237,7 +233,7 @@ function rest_WorkflowSubmit(req,res) {
     // todo: handle errors
     
     var blastPath = g.jbrowse.jbrowsePath + g.jbrowse.dataSet[0].dataPath + g.jbrowse.jblast.blastResultPath;
-    theBlastFile = blastPath+'/'+theBlastFile; 
+    var theFullBlastFilePath = blastPath+'/'+theBlastFile; 
     console.log("theBlastFile",theBlastFile);
             
     // if direcgtory doesn't exist, create it
@@ -246,13 +242,13 @@ function rest_WorkflowSubmit(req,res) {
     }  
     
     try {
-        ws = fs.createWriteStream(theBlastFile);
+        ws = fs.createWriteStream(theFullBlastFilePath);
         ws.write(region);
         ws.end();
         
     }
     catch (e) {
-        console.log(e,theBlastFile);
+        console.log(e,theFullBlastFilePath);
         process.exit(1);
     }
     
@@ -262,7 +258,7 @@ function rest_WorkflowSubmit(req,res) {
     var blastData = {
             "name": "JBlast", 
             //"blastSeq": "/var/www/html/jb-galaxy-blaster/tmp/44705works.fasta",
-            "blastSeq": theBlastFile,
+            "blastSeq": theFullBlastFilePath,
 //            "originalSeq": "/var/www/html/jb-galaxy-blaster/tmp/volvox.fa",
             "offset": startCoord
     };
@@ -273,7 +269,16 @@ function rest_WorkflowSubmit(req,res) {
             console.log("jbcore: failed to save globals");
             return;
         }
+        
+        var jg = g.jbrowse;
+        var theFile = jg.jbrowseURL + jg.dataSet[0].dataPath + jg.jblast.blastResultPath+'/'+theBlastFile;
+        sails.hooks['jb-galaxy-blast'].sendFileAsync(theFile,historyId)
+            .then(function(data) {
+                console.log("send file result",data);
+            });
+        
         // submit galaxy workflow
+/*        
         request.post({
             url: g.jbrowse.galaxy.galaxyUrl+"/api/workflows"+"?key="+g.jbrowse.galaxy.galaxyAPIKey, 
             method: 'POST',
@@ -295,79 +300,32 @@ function rest_WorkflowSubmit(req,res) {
                 console.log(result);
             }
         });
+*/
     });    
-    
 }
-// return the starting coordinate
-//  >ctgA ctgA:3014..6130 (+ strand) class=remark length=3117
-function getRegionStart(str) {
-    var line = str.split("\n")[0];
-    var re = line.split(":")[1].split("..")[0];
-    return re;
+function sendFile(theFile,hId,cb,cberr) {
+    var params = 
+    {
+        "tool_id": "upload1",
+        "history_id": hId,   // must reference a history
+        "inputs": {
+
+            "dbkey":"?",
+            "file_type":"auto",
+            "files_0|type":"upload_dataset",
+            "files_0|space_to_tab":null,
+            "files_0|to_posix_lines":"Yes",
+            "files_0|url_paste":theFile
+        }
+    };
+    sails.hooks['jb-galaxy-blast'].galaxyPostAsync('/api/tools',params)
+       .then(function(data) {
+            cb(data);
+       })
+       .catch(function(err) {
+           cb(err);
+       });
 }
-
-/**
- * REST function for /jbapi/blastregion
- * @param {type} req
- * @param {type} res
- * @returns {undefined}
- */ 
-function rest_BlastRegion(req,res) {
-
-    var g = sails.config.globals;
-    var region = req.body.region;
-    
-    //console.dir(req.body);
-    
-    console.log("/jbapi/blastregion");
-    console.log(region);
-
-    
-    //todo: verify the operation can be run
-    // for example, if it is already running, don't run again.
-    
-    
-    var d = new Date();
-    
-    var theFile = "jbrowse_"+d.getTime()+".fa";
-    
-    // write the received region into a file
-    // todo: handle errors
-    ws = fs.createWriteStream(g.jbrowse.filePath+theFile);
-    ws.write(region);
-    ws.end();
-    
-    // import into galaxy
-    importFiles(g.jbrowse.urlPath+theFile,function(data) {
-        console.log("completed import");
-        
-        var args = {
-            hid: data.outputs[0].hid,
-            id: data.outputs[0].id,
-            name: "blast "+path.basename(data.outputs[0].name)
-        };
-        
-        execTool_megablast(args,function(data) {
-            console.log("completed blast submit");
-            
-            var args = {
-                hid: data.outputs[0].hid,
-                id: data.outputs[0].id,
-                name: data.outputs[0].name
-            };
-            
-            execTool_blastxml2tab(args,function(data) {
-               console.log("completed blastxml2tabular submit "); 
-            });
-        });
-
-    });
-    
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    res.send({result:"success"});
-}
-
 /**
  * fetch file(s) from url (import file into galaxy)
  * @param {type} theFile
@@ -425,8 +383,80 @@ function importFiles(theFile,postFn) {
     });    
     
 }
+// return the starting coordinate
+//  >ctgA ctgA:3014..6130 (+ strand) class=remark length=3117
+function getRegionStart(str) {
+    var line = str.split("\n")[0];
+    var re = line.split(":")[1].split("..")[0];
+    return re;
+}
+
+/**
+ * REST function for /jbapi/blastregion
+ * @param {type} req
+ * @param {type} res
+ * @returns {undefined}
+ */ 
+/* obsolete
+function rest_BlastRegion(req,res) {
+
+    var g = sails.config.globals;
+    var region = req.body.region;
+    
+    //console.dir(req.body);
+    
+    console.log("/jbapi/blastregion");
+    console.log(region);
+
+    
+    //todo: verify the operation can be run
+    // for example, if it is already running, don't run again.
+    
+    
+    var d = new Date();
+    
+    var theFile = "jbrowse_"+d.getTime()+".fa";
+    
+    // write the received region into a file
+    // todo: handle errors
+    ws = fs.createWriteStream(g.jbrowse.filePath+theFile);
+    ws.write(region);
+    ws.end();
+    
+    // import into galaxy
+    importFiles(g.jbrowse.urlPath+theFile,function(data) {
+        console.log("completed import");
+        
+        var args = {
+            hid: data.outputs[0].hid,
+            id: data.outputs[0].id,
+            name: "blast "+path.basename(data.outputs[0].name)
+        };
+        
+        execTool_megablast(args,function(data) {
+            console.log("completed blast submit");
+            
+            var args = {
+                hid: data.outputs[0].hid,
+                id: data.outputs[0].id,
+                name: data.outputs[0].name
+            };
+            
+            execTool_blastxml2tab(args,function(data) {
+               console.log("completed blastxml2tabular submit "); 
+            });
+        });
+
+    });
+    
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.send({result:"success"});
+}
+*/
 
 // run blast
+/* obsolete
 function execTool_megablast(args,postFn){
     console.log('execTool_blastPlus()');
     console.dir(args);
@@ -434,33 +464,6 @@ function execTool_megablast(args,postFn){
     var g = sails.config.globals;
     
     // megablast
-    /*
-    var params = 
-    {
-      "tool_id":"toolshed.g2.bx.psu.edu/repos/devteam/megablast_wrapper/megablast_wrapper/1.2.0",
-      "tool_version":"1.2.0",
-      "history_id": "f597429621d6eb2b",   // must reference a history, todo: make this a variable
-      "inputs":{
-        "input_query":{
-          "batch":false,
-          "values":[
-            {
-              "hid": args.hid, 
-              "id": args.id, 
-              "name": args.name,
-              "src":"hda"
-            }
-          ]
-                
-        },
-        "source_select":"13apr2014-htgs",   // todo: make this all the following configurable
-        "word_size":"28",
-        "iden_cutoff":"90",
-        "evalue_cutoff":"0.001",
-        "filter_query":"yes"
-      }
-    };
-    */
    // NCBI Blast
     var params = 
     {
@@ -498,7 +501,7 @@ function execTool_megablast(args,postFn){
         //qs: params,
         headers: {
             //'Content-Type': 'application/json',
-            //'Accept':'application/json, text/javascript, */*; q=0.01',
+            //'Accept':'application/json, text/javascript, ; q=0.01',
             'Accept-Encoding' : 'gzip, deflate',
             'Accept-Language' : 'en-US,en;q=0.5',
             'Content-Length' : jsonstr.length
@@ -517,7 +520,9 @@ function execTool_megablast(args,postFn){
     });    
     
 }
+*/
 // run Blast XML to Tabular
+/* obsolete
 function execTool_blastxml2tab(args,postFn){
     console.log('execTool_blastPlus()');
     console.dir(args);
@@ -554,7 +559,7 @@ function execTool_blastxml2tab(args,postFn){
         //qs: params,
         headers: {
             //'Content-Type': 'application/json',
-            //'Accept':'application/json, text/javascript, */*; q=0.01',
+            //'Accept':'application/json, text/javascript, ; q=0.01',
             'Accept-Encoding' : 'gzip, deflate',
             'Accept-Language' : 'en-US,en;q=0.5',
             'Content-Length' : jsonstr.length
@@ -573,3 +578,4 @@ function execTool_blastxml2tab(args,postFn){
     });    
     
 }
+*/
