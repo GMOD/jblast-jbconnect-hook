@@ -7,6 +7,7 @@ var request = require('request');
 var requestp = require('request-promise');
 var fs = require('fs');
 var path = require('path');
+var Promise = require('bluebird');
 
 //var prettyjson = require('prettyjson');   // for debugging
 
@@ -28,7 +29,23 @@ module.exports = function (sails) {
             });
             // initialize history
             init_history(this);
-            
+            /*
+            this.galaxyGetJSON("/api/histories",
+                function(data) {
+                    console.log(data);
+                },
+                function(err) {
+                    console.log(err);
+                }
+            );
+            */
+            this.galaxyGetAsync("/api/histories")
+                .then(function(data){
+                    console.log(data);    
+                })
+                .catch(function(err){
+                    console.log(err);
+                });
             //return cb();
         },
         routes: {
@@ -59,10 +76,8 @@ module.exports = function (sails) {
          * @param {type} cb  callback i.e. function(retval)
          * @returns {undefined}
          * 
-         * retval = {status: x, data:y}
-         *      x can be 'success' or 'error'
          */
-        galaxyGetJSON: function(api,cb) {
+        galaxyGetJSON: function(api,cb,cberr) {
             var g = sails.config.globals.jbrowse;
             var gurl = g.galaxy.galaxyUrl;
             var apikey = g.galaxy.galaxyAPIKey;
@@ -75,14 +90,79 @@ module.exports = function (sails) {
 
             requestp(options)
                 .then(function (data) {
-                    cb({status: 'success',data: data});
+                    cb(data);
                 })
                 .catch(function (err) {
-                    if (err) {
-                        console.log('GET /api/histories',err);
-                    }
-                    cb({status:'error',data:err});
+                    console.log('erro GET /api/histories');
+                    cberr(err);
                 });
+        },
+        /* send JSON POST request to galaxy server
+         * 
+         * @param {type} api - e.g. "/api/workflows"
+         * @param {type} params - json parameter i.e. {a:1,b:2}
+         * @param {type} cb - callback function cb(retval)
+         * 
+         * retval return {status: x, data:y}
+         */
+        galaxyPostJSON: function(api,params,cb,cberr) {
+
+            var jsonstr = JSON.stringify(params);
+            var gurl = config.galaxy.galaxyUrl;
+            var apikey = config.galaxy.galaxyAPIKey;
+
+            if(typeof apikey==='undefined') {
+                console.log("missing apikey");
+                return;
+            }
+
+            var req = {
+                url: gurl+api+"?key="+apikey, 
+                method: 'POST',
+                encoding: null,
+                gzip:true,
+                //qs: params,
+                headers: {
+                    'Connection': 'keep-alive',
+                    'Accept-Encoding' : 'gzip, deflate',
+                    'Accept': '*/*',
+                    'Accept-Language' : 'en-US,en;q=0.5',
+                    'Content-Length' : jsonstr.length
+                },
+                json: params
+            };
+
+            //console.log(req);
+            requestp.post(req)
+                .then(function(data){
+                    cb(data);
+                })
+                .catch(function(err){
+                    cberr(err);
+                });
+
+        },
+        /* promise-ized galaxyGetJSON function
+         * 
+         * @param {type} api
+         * @returns {Promise}
+         */
+        galaxyGetAsync: function(api) {
+            var thisB = this;
+            return new Promise(function(resolve, reject) {
+                thisB.galaxyGetJSON(api, resolve, reject);
+            });
+        },
+        /* promise-ized galaxyPostJSON function
+         * 
+         * @param {type} api
+         * @returns {Promise}
+         */
+        galaxyPostAsync: function(api) {
+            var thisB = this;
+            return new Promise(function(resolve, reject) {
+                thisB.galaxyPostJSON(api, resolve, reject);
+            });
         },
         getHistoryId: function() {
             return historyId;
@@ -101,23 +181,19 @@ function init_history(th) {
     var g = sails.config.globals.jbrowse;
     historyName = g.galaxy.historyName;
     
-    th.galaxyGetJSON('/api/histories',function(ret) {
-       if (ret.status==='success'){
-           var histlist = ret.data;
-           
-           //sails.log('histlist',histlist);
-           
-           var foundHist = 0;
-           for(var i in histlist) {
-               if (histlist[i].name===historyName) {
-                   historyId = histlist[i].id;
-                   foundHist = 1;
-               }
-           }
-           sails.log.info('Galaxy History: "'+historyName+'"',historyId);
-           
-       } 
-    });
+    th.galaxyGetAsync('/api/histories')
+        .then(function(histlist) {
+            for(var i in histlist) {
+                if (histlist[i].name===historyName) {
+                    historyId = histlist[i].id;
+                    sails.log.info('Galaxy History: "'+historyName+'"',historyId);
+                    return;
+                }
+            }
+        })
+        .catch(function(err) {
+            console.log('init_history failed');
+        });
 }
 
 /**
