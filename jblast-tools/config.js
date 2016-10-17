@@ -2,7 +2,8 @@
  * jblast tools configuration
  */
 module.exports = {
-    jbrowsePath: "/var/www/html/jbrowse/",
+    jbrowsePath:    "/var/www/html/jbrowse/",
+    jbrowseURL:     "http://localhost:1337/jbrowse/",
     dataSet: [
         {
             dataPath: "sample_data/json/volvox/"
@@ -20,6 +21,7 @@ module.exports = {
         historyName: "JBlast History"
     },
     jblast: {
-        blastResultPath: "jblastdata"
+        blastResultPath: "jblastdata",
+        insertTrackTemplate: "inMemTemplate.json"
     }
 };
