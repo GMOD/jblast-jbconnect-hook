@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-var request = require('request');
+//var request = require('request');
 var requestp = require('request-promise');
 var fs = require('fs');
 var path = require('path');
@@ -203,25 +203,8 @@ function rest_WorkflowSubmit(req,res) {
     var region = req.body.region;
     var workflow = req.body.workflow;
     
-    var params = {
-        //workflow_id: 'f2db41e1fa331b3e',
-        workflow_id: workflow,
-        history: 'hist_id='+historyId,
-        //history: 'hist_id=f597429621d6eb2b',
-        ds_map: {
-            "0": {
-                src: 'hda',
-                id: 'test.out'//result.outputs[0].id
-            }
-        }
-    };
-    
-    console.log("params",params);
-    var jsonstr = JSON.stringify(params);
-
     // get starting coord of region
     var startCoord = getRegionStart(region);
-
 
     var d = new Date();
 
@@ -269,13 +252,58 @@ function rest_WorkflowSubmit(req,res) {
             console.log("jbcore: failed to save globals");
             return;
         }
-        
+
         var jg = g.jbrowse;
         var theFile = jg.jbrowseURL + jg.dataSet[0].dataPath + jg.jblast.blastResultPath+'/'+theBlastFile;
+        
+        // create the kue job entry
+        var kJob = g.kue_queue.create('galaxy-workflow-watch', {
+            dataset: {
+                workflow: workflow,
+                file: theFile
+            }
+        })
+        .state('active')
+        .save(function(err){
+            if (!err) {
+                console.log("workflow watch adding job id = "+kJob.id);
+                return;
+            }
+            console.log('error creating workflow watch job');
+        });
+        
+        
         sails.hooks['jb-galaxy-blast'].sendFileAsync(theFile,historyId)
             .then(function(data) {
-                console.log("send file result",data);
-            });
+                //console.log("send file result",data);
+
+                kJob.data.dataset = data;
+                kJob.save();
+
+                var fileId = data.outputs[0].id;
+
+                var params = {
+                    workflow_id: workflow,
+                    history: 'hist_id='+historyId,
+                    ds_map: {
+                        "0": {
+                            src: 'hda',
+                            id: fileId
+                        }
+                    }
+                };
+                // promise chain
+                return sails.hooks['jb-galaxy-blast'].galaxyPostAsync('/api/workflows',params);
+            })
+            .then(function(data) {
+                kJob.data.workflow = data;
+                kJob.save();
+            })
+            .catch(function(err){
+                sails.log.error(err);
+                kJob.data.error = err;
+                kJob.save();
+            })
         
         // submit galaxy workflow
 /*        
