@@ -1,3 +1,4 @@
+var request = require('request');
 var requestp = require('request-promise');
 var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require("fs"));
@@ -9,8 +10,6 @@ var execSync = require('child_process').execSync;
 var config = require('../config.js');
 
 var cfgDir = '/etc/jbrowse';
-
-
 
 /**
  * Functions for retrieving global data through rest API
@@ -88,15 +87,19 @@ module.exports = {
             var options = {
                 uri: gurl+api+"?key="+apikey,
                 headers: { 'User-Agent': 'Request-Promise' },
+                //resolveWithFullResponse: true,
+                simple: true,
                 json: true  // parse json response
             };
 
+            //console.log("GET",options);
+
             requestp(options)
-                .then(function (data) {
-                    cb(data);
+                .then(function (resp) {
+                    //console.log("Response statusCode",resp.statusCode);
+                    cb(resp);
                 })
                 .catch(function (err) {
-                    console.log('erro GET /api/histories');
                     cberr(err);
                 });
         },
@@ -117,7 +120,7 @@ module.exports = {
             var pstr = JSON.stringify(params);
 
             if(typeof apikey==='undefined') {
-                console.log("missing apikey");
+                cberr("missing apikey");
                 return;
             }
 
@@ -134,12 +137,15 @@ module.exports = {
                     'Accept-Language' : 'en-US,en;q=0.5',
                     'Content-Length' : pstr.length
                 },
+                //resolveWithFullResponse: true,
+                simple:true,
                 json: params
             };
 
             //console.log(req);
-            requestp.post(req)
+            requestp(req)
                 .then(function(data){
+                    //console.log('galaxyPost result',data);
                     cb(data);
                 })
                 .catch(function(err){
