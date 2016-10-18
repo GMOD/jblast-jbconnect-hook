@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+//var requestp = require('request-promise');
 var fs = require('fs');
 var path = require('path');
 var getopt = require('node-getopt');
@@ -234,13 +235,8 @@ function exec_setupworkflows() {
     var srcdir = srcpath+'/workflows';
 
     // get existing workflow list
-    util.galaxyGetJSON('/api/workflows',function(data) {
-        if (data.status==='error') {
-            return;
-        } 
-        //console.log(data.data); 
-        var workflows = data.data;
-    
+    var p = util.galaxyGetAsync('/api/workflows')
+    .then(function(workflows) {
         // find workflow files
         var files = Finder.from(srcdir).exclude('*.sample').findFiles('*.ga');
         //console.log('files',files);
@@ -249,27 +245,26 @@ function exec_setupworkflows() {
             
             var thisWF = JSON.parse(content);
             var wfName = thisWF.name;
-            var found = 0;
             for(var i in workflows) {
+                var found = 0;
                 if (workflows[i].name.indexOf(wfName) !== -1) {
-                    console.log('History already exists: ', workflows[i].name);
+                    console.log('workflow already exists: ', workflows[i].name);
                     console.log(workflows[i].url);
-                    found=1;
+                    found = 1;
                 }
-            }
-            if (!found) {
-                var jsonparam = {'workflow':wfName};
-                //console.log('jsonparam',jsonparam);
-                util.galaxyPostJSON('/api/workflows/upload',jsonparam,function(ret){
-                    if (ret.status==='fail') {
-                        //console.log("response.statusCode",response.statusCode);
-                        console.log("Error:",ret);
-                        return;
-                    }
-                    var data = ret.data;
-                    console.log('Workflow imported:',data.name);
-                    console.log(data.url);
-                });
+                if (!found) {
+                    var jsonparam = {'workflow':wfName};
+                    //console.log('jsonparam',jsonparam);
+                    util.galaxyPostAsync('/api/workflows/upload',jsonparam)
+                    .then(function(data){
+                        console.log('Workflow imported:',data.name);
+                        console.log(data.url);
+                    })
+                    .catch(function(err) {
+                        console.log('Workflow Upload Error',err.message);
+                        console.log(err.options.uri);
+                    });
+                }
             }
         }
     });
@@ -281,32 +276,30 @@ function exec_setuphistory() {
     
     console.log("Setting up history...");
     
-    util.galaxyGetJSON('/api/histories',function(data) {
-       if (data.status==='error') {
-           return;
-       } 
-       //console.log(data.data); 
-       var data = data.data;
-       var found = 0;
-       var histName = config.galaxy.historyName;
-       for(var i in data) {
-           if (data[i].name.indexOf(histName) !== -1) {
-               console.log('History already exists: ', data[i].name);
-               console.log(data[i].url);
-               found=1;
-           }
-       }
-       if (found===1) return;
-
-       util.galaxyPostJSON('/api/histories',{name: histName}, function(data) {
-           if (data.status==='error') {
-               return;
-           }
-           var result = data.data;
-           console.log("Created History:",result.name);
-           console.log(result.url);
-       });
-       
+    var p = util.galaxyGetAsync('/api/histories')
+    .then(function(data) {
+        p.meexit = 0;
+        console.log("GET /api histories",data);
+        var histName = config.galaxy.historyName;
+        for(var i in data) {
+            if (data[i].name.indexOf(histName) !== -1) {
+                console.log('History already exists: ', data[i].name);
+                console.log(data[i].url);
+                p.meexit = 1;
+                return;
+            }
+        }
+        return util.galaxyPostAsync('/api/histories',{name: histName});
+    })
+    .then(function(result) {
+        if (p.meexit) return;
+        console.log("POST /api/histories",result)
+        console.log("Created History:",result.name);
+        console.log(result.url);
+    })
+    .catch(function(err) {
+        console.log('Create History Error',err.message);
+        console.log(err.options.uri);
     });
 }
 /*
@@ -369,7 +362,7 @@ function exec_setuptools() {
     util.cmd('cp -v "'+gdatapath+'/config/shed_tool_conf.xml" "'+shed_conf+'"');
     
     // backup galaxy.ini if any
-    util.cmd('cp -v "'+gdatapath+'/config/galaxy.ini" "'+gdatapath+'/config/galaxy.ini.bak"');
+    //util.cmd('cp -v "'+gdatapath+'/config/galaxy.ini" "'+gdatapath+'/config/galaxy.ini.bak"');
     
     // copy /config stuff  to /config
     util.cmd('cp -R -v "'+srcpath+'/config" "'+gdatapath+'"');
