@@ -237,6 +237,7 @@ function exec_setupworkflows() {
     // get existing workflow list
     var p = util.galaxyGetAsync('/api/workflows')
     .then(function(workflows) {
+        //console.log('workflows',workflows);
         // find workflow files
         var files = Finder.from(srcdir).exclude('*.sample').findFiles('*.ga');
         //console.log('files',files);
@@ -245,28 +246,31 @@ function exec_setupworkflows() {
             
             var thisWF = JSON.parse(content);
             var wfName = thisWF.name;
+            var found = 0;
             for(var i in workflows) {
-                var found = 0;
                 if (workflows[i].name.indexOf(wfName) !== -1) {
                     console.log('workflow already exists: ', workflows[i].name);
                     console.log(workflows[i].url);
                     found = 1;
                 }
-                if (!found) {
-                    var jsonparam = {'workflow':wfName};
-                    //console.log('jsonparam',jsonparam);
-                    util.galaxyPostAsync('/api/workflows/upload',jsonparam)
-                    .then(function(data){
-                        console.log('Workflow imported:',data.name);
-                        console.log(data.url);
-                    })
-                    .catch(function(err) {
-                        console.log('Workflow Upload Error',err.message);
-                        console.log(err.options.uri);
-                    });
-                }
+            }
+            if (!found) {
+                var params = {'workflow':thisWF};
+                //console.log('params',params);
+                var p1 = util.galaxyPostAsync('/api/workflows/upload',params)
+                .then(function(data){
+                    console.log('Workflow imported:',data.name);
+                    console.log(data.url);
+                })
+                .catch(function(err) {      // todo: not sure why failure not hitting this
+                    console.log('Workflow Upload Error',err.message);
+                    console.log(err.options.uri);
+                });
             }
         }
+    }).catch(function(err) {
+        console.log('Get Histories',err.message);
+        console.log(err.options.uri);
     });
 }
 /*
