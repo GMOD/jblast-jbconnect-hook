@@ -26,7 +26,7 @@
     "jsonfile": "^2.4.0",
     "node-getopt": "^0.2.3",
     "path": "^0.12.7",
-    "request": "^2.74.0",
+    "request": "^2.75.0",
     "request-promise": "^4.1.1",
     "util": "^0.10.3",
     "xml2js": "^0.4.16",
