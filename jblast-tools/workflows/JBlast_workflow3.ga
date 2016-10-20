@@ -132,7 +132,7 @@
                     "name": "input1"
                 }
             ], 
-            "label": null, 
+            "label": "export json", 
             "name": "BlastXml 2 json", 
             "outputs": [
                 {
@@ -169,7 +169,7 @@
                     "name": "blasttab"
                 }
             ], 
-            "label": null, 
+            "label": "export gff", 
             "name": "BlastTab 2 GFF", 
             "outputs": [
                 {
