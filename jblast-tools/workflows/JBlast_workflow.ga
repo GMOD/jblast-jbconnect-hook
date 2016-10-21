@@ -2,7 +2,7 @@
     "a_galaxy_workflow": "true", 
     "annotation": "", 
     "format-version": "0.1", 
-    "name": "JBlast WF3", 
+    "name": "JBlast Workflow", 
     "steps": {
         "0": {
             "annotation": "", 
@@ -189,52 +189,7 @@
             "type": "tool", 
             "uuid": "36779c86-95bf-4d4c-ae92-f7c810683192", 
             "workflow_outputs": []
-        }, 
-        "5": {
-            "annotation": "", 
-            "content_id": "jb_exportgff", 
-            "id": 5, 
-            "input_connections": {
-                "gffin": {
-                    "id": 4, 
-                    "output_name": "jblast_output_gff"
-                }, 
-                "jsonin": {
-                    "id": 3, 
-                    "output_name": "jblast_output_json"
-                }
-            }, 
-            "inputs": [
-                {
-                    "description": "runtime parameter for tool Export to JBlast", 
-                    "name": "jsonin"
-                }, 
-                {
-                    "description": "runtime parameter for tool Export to JBlast", 
-                    "name": "gffin"
-                }
-            ], 
-            "label": null, 
-            "name": "Export to JBlast", 
-            "outputs": [
-                {
-                    "name": "jblast_done_json", 
-                    "type": "json"
-                }
-            ], 
-            "position": {
-                "left": 892.5, 
-                "top": 377.5
-            }, 
-            "post_job_actions": {}, 
-            "tool_errors": null, 
-            "tool_id": "jb_exportgff", 
-            "tool_state": "{\"__page__\": 0, \"jsonin\": \"{\\\"__class__\\\": \\\"RuntimeValue\\\"}\", \"__rerun_remap_job_id__\": null, \"gffin\": \"{\\\"__class__\\\": \\\"RuntimeValue\\\"}\"}", 
-            "tool_version": "1.0.0", 
-            "type": "tool", 
-            "uuid": "0ade564c-c7f5-406a-9f92-22f194990f18", 
-            "workflow_outputs": []
         }
     }, 
-    "uuid": "ab244512-e459-4939-9b63-56949013e1a3"
+    "uuid": "662cba4a-0697-4c0e-809d-04d4b81deb0a"
 }
