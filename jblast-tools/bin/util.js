@@ -50,109 +50,59 @@ module.exports = {
     setGlobals: function (data) {
         console.log("not implemented");
     },
-        /* promise-ized galaxyGetJSON function
-         * 
-         * @param {type} api
-         * @returns {Promise}
-         */
-        galaxyGetAsync: function(api) {
-            var thisB = this;
-            return new Promise(function(resolve, reject) {
-                thisB.galaxyGetJSON(api, resolve, reject);
+    /* promise-ized galaxyGetJSON function
+     * 
+     * @param {type} api
+     * @returns {Promise}
+     */
+    galaxyGetAsync: function(api) {
+        var thisB = this;
+        return new Promise(function(resolve, reject) {
+            thisB.galaxyGetJSON(api, resolve, reject);
+        });
+    },
+    /* promise-ized galaxyPostJSON function
+     * 
+     * @param {type} api
+     * @returns {Promise}
+     */
+    galaxyPostAsync: function(api,params) {
+        var thisB = this;
+        return new Promise(function(resolve, reject) {
+            thisB.galaxyPostJSON(api,params, resolve, reject);
+        });
+    },
+    /**
+     * send JSON GET request to galaxy server
+     * @param {type} api - i.e. '/api/histories'
+     * @param {type} cb  callback i.e. function(retval)
+     * @returns {undefined}
+     * 
+     */
+    galaxyGetJSON: function(api,cb,cberr) {
+        var g = config;
+        var gurl = g.galaxy.galaxyUrl;
+        var apikey = g.galaxy.galaxyAPIKey;
+
+        var options = {
+            uri: gurl+api+"?key="+apikey,
+            headers: { 'User-Agent': 'Request-Promise' },
+            //resolveWithFullResponse: true,
+            simple: true,
+            json: true  // parse json response
+        };
+
+        //console.log("GET",options);
+
+        requestp(options)
+            .then(function (resp) {
+                //console.log("Response statusCode",resp.statusCode);
+                cb(resp);
+            })
+            .catch(function (err) {
+                cberr(err);
             });
-        },
-        /* promise-ized galaxyPostJSON function
-         * 
-         * @param {type} api
-         * @returns {Promise}
-         */
-        galaxyPostAsync: function(api,params) {
-            var thisB = this;
-            return new Promise(function(resolve, reject) {
-                thisB.galaxyPostJSON(api,params, resolve, reject);
-            });
-        },
-        /**
-         * send JSON GET request to galaxy server
-         * @param {type} api - i.e. '/api/histories'
-         * @param {type} cb  callback i.e. function(retval)
-         * @returns {undefined}
-         * 
-         */
-        galaxyGetJSON: function(api,cb,cberr) {
-            var g = config;
-            var gurl = g.galaxy.galaxyUrl;
-            var apikey = g.galaxy.galaxyAPIKey;
-
-            var options = {
-                uri: gurl+api+"?key="+apikey,
-                headers: { 'User-Agent': 'Request-Promise' },
-                //resolveWithFullResponse: true,
-                simple: true,
-                json: true  // parse json response
-            };
-
-            //console.log("GET",options);
-
-            requestp(options)
-                .then(function (resp) {
-                    //console.log("Response statusCode",resp.statusCode);
-                    cb(resp);
-                })
-                .catch(function (err) {
-                    cberr(err);
-                });
-        },
-        /* send JSON POST request to galaxy server
-         * 
-         * @param {type} api - e.g. "/api/workflows"
-         * @param {type} params - json parameter i.e. {a:1,b:2}
-         * @param {type} cb - callback function cb(retval)
-         * 
-         * retval return {status: x, data:y}
-         */
-        galaxyPostJSON: function(api,params,cb,cberr) {
-
-            var g = config;
-            var gurl = g.galaxy.galaxyUrl;
-            var apikey = g.galaxy.galaxyAPIKey;
-
-            var pstr = JSON.stringify(params);
-
-            if(typeof apikey==='undefined') {
-                cberr("missing apikey");
-                return;
-            }
-
-            var req = {
-                url: gurl+api+"?key="+apikey, 
-                method: 'POST',
-                encoding: null,
-                gzip:true,
-                //qs: params,
-                headers: {
-                    'Connection': 'keep-alive',
-                    'Accept-Encoding' : 'gzip, deflate',
-                    'Accept': '*/*',
-                    'Accept-Language' : 'en-US,en;q=0.5',
-                    'Content-Length' : pstr.length
-                },
-                //resolveWithFullResponse: true,
-                simple:true,
-                json: params
-            };
-
-            //console.log(req);
-            requestp(req)
-                .then(function(data){
-                    //console.log('galaxyPost result',data);
-                    cb(data);
-                })
-                .catch(function(err){
-                    cberr(err);
-                });
-
-        },
+    },
     /* send JSON POST request to galaxy server
      * 
      * @param {type} api - e.g. "/api/workflows"
@@ -161,18 +111,19 @@ module.exports = {
      * 
      * retval return {status: x, data:y}
      */
-    /*
-    galaxyPostJSON: function(api,params,cb) {
-        
-        var jsonstr = JSON.stringify(params);
-        var gurl = config.galaxy.galaxyUrl;
-        var apikey = config.galaxy.galaxyAPIKey;
-        
+    galaxyPostJSON: function(api,params,cb,cberr) {
+
+        var g = config;
+        var gurl = g.galaxy.galaxyUrl;
+        var apikey = g.galaxy.galaxyAPIKey;
+
+        var pstr = JSON.stringify(params);
+
         if(typeof apikey==='undefined') {
-            console.log("missing apikey");
+            cberr("missing apikey");
             return;
         }
-        
+
         var req = {
             url: gurl+api+"?key="+apikey, 
             method: 'POST',
@@ -182,60 +133,26 @@ module.exports = {
             headers: {
                 'Connection': 'keep-alive',
                 'Accept-Encoding' : 'gzip, deflate',
-                'Accept': '*//*',
+                'Accept': '*/*',
                 'Accept-Language' : 'en-US,en;q=0.5',
-                'Content-Length' : jsonstr.length
+                'Content-Length' : pstr.length
             },
+            //resolveWithFullResponse: true,
+            simple:true,
             json: params
         };
-        
-        //console.log(req);
-        
-        request.post(req, function(err, response, body){
-            if (err || response.statusCode != 200) {
-                console.log("response.statusCode",response.statusCode);
-                if (response.statusCode==403) console.log("possible invalid apikey", apikey);
-                if (err) console.log(err.error.RequestError);
-                cb({status:'error',data:err});
-            }
-            cb({status:'success',data:body});
-        });
-        
-    },
-    */
-    /**
-     * send JSON GET request to galaxy server
-     * @param {type} api - i.e. '/api/histories'
-     * @param {type} cb  callback i.e. function(retval)
-     * @returns {undefined}
-     * 
-     * retval = {status: x, data:y}
-     *      x can be 'success' or 'error'
-     */
-    /*
-    galaxyGetJSON: function(api,cb) {
-        var gurl = config.galaxy.galaxyUrl;
-        var apikey = config.galaxy.galaxyAPIKey;
-        
-        var options = {
-            uri: gurl+api+"?key="+apikey,
-            headers: { 'User-Agent': 'Request-Promise' },
-            json: true  // parse json response
-        };
 
-        requestp(options)
-            .then(function (data) {
-                cb({status: 'success',data: data});
+        //console.log(req);
+        requestp(req)
+            .then(function(data){
+                //console.log('galaxyPost result',data);
+                cb(data);
             })
-            .catch(function (err) {
-                if (err) {
-                    //console.log('GET /api/histories',err);
-                    console.log(err.options,'statusCode:',err.statusCode,err.message);
-                }
-                cb({status:'error',data:err});
+            .catch(function(err){
+                cberr(err);
             });
+
     },
-    */
     
     /**
      * create directory if it doesn't exist 
