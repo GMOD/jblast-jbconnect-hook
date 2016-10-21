@@ -6,5 +6,6 @@
     <tool file="exportgff.xml" />
     <tool file="blastxml2json.xml" />
     <tool file="jboffset.xml" />
+    <tool file="simblast.xml" />
   </section>
 </toolbox>
