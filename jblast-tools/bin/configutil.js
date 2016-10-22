@@ -30,16 +30,16 @@ getopt.setHelp(
     "Examples:\n" +
     "\n" +
     "Install an existing blast database\n" +
-    "Jblast-config --blastdbpath [local path]\n" +
+    "Jblast --blastdbpath [local path]\n" +
     "\n" +
     "Install jblast package workflows to galaxy\n" +
-    "Jblast-config --gurl <galaxy url> --setupworkflows\n" +
+    "Jblast --gurl <galaxy url> --setupworkflows\n" +
     "\n" +
     "Install jblast package tools to galaxy\n" +
-    "Jblast-config --setuptools\n"+
+    "Jblast --setuptools\n"+
     "\n" +
     "Setup data and samples\n" +
-    "Jblast-config --setudata\n"
+    "Jblast --setudata\n"
 );
 
 /* Display help if no arguments are passed */
@@ -139,27 +139,27 @@ var setupworkflows = opt.options['setupworkflows'];
 if (typeof setupworkflows !== 'undefined') {
     exec_setupworkflows();
 }
+var setuphistory = opt.options['setuphistory'];
+if (typeof setuphistory !== 'undefined') {
+    exec_setuphistory();
+}
 var setupdata = opt.options['setupdata'];
 if (typeof setupdata !== 'undefined') {
     exec_setupdata();
     exec_setuptrack();
-}
-var setuphistory = opt.options['setuphistory'];
-if (typeof setuphistory !== 'undefined') {
-    exec_setuphistory();
 }
 
 /*
  * setup sample track
  */
 function exec_setuptrack() {
-
     console.log("Setting up sample track...");
+    var g = require('../config.js');
+    // todo: why can't I access config from here?
 
-    var g = config;
     var trackListPath = g.jbrowsePath + g.dataSet[0].dataPath + 'trackList.json';
-    var sampleTrackFile = config.jbrowsePath+config.dataSet[0].dataPath;
-    sampleTrackFile += config.jblast.blastResultPath+'/sampleTrack.json';
+    var sampleTrackFile = g.jbrowsePath + g.dataSet[0].dataPath;
+    sampleTrackFile += g.jblast.blastResultPath+'/sampleTrack.json';
     var dataSet = g.dataSet[0].dataPath;
     
     // read sampleTrack.json file
@@ -215,7 +215,7 @@ function exec_setuptrack() {
  * setup data directory and sample
  */
 function exec_setupdata() {
-    
+
     console.log("Setting up data directory...");
     
     var targetdir = config.jbrowsePath+config.dataSet[0].dataPath;
@@ -282,7 +282,7 @@ function exec_setuphistory() {
     
     var p = util.galaxyGetAsync('/api/histories')
     .then(function(data) {
-        p.meexit = 0;
+        p.meexit = 0;       // this is wrong, but it works for now
         console.log("GET /api histories",data);
         var histName = config.galaxy.historyName;
         for(var i in data) {
@@ -302,7 +302,7 @@ function exec_setuphistory() {
         console.log(result.url);
     })
     .catch(function(err) {
-        console.log('Create History Error',err.message);
+        console.log('Read histories error',err.message);
         console.log(err.options.uri);
     });
 }
