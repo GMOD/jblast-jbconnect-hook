@@ -7,7 +7,7 @@
 
 //var requestp = require('request-promise');
 var fs = require('fs');
-var path = require('path');
+//var path = require('path');
 var getopt = require('node-getopt');
 var util = require('./util.js');
 var config = require('../config.js');
@@ -15,8 +15,8 @@ var config = require('../config.js');
 var getopt = new getopt([
     ['b' , 'blastxml=FILE'          , 'sim blastxml result file (found in /jblastdata)'],
     ['f' , 'fail'                   , 'simulate failure (process.exit(1))'],
-    ['i' , 'input'                  , 'dummy input (does nothing with input)'],
-    ['o' , 'output'                 , 'output will be the file passed in -b'],
+    ['i' , 'infile=PATH'            , 'dummy input (does nothing with input)'],
+    ['o' , 'outfile=PATH'           , 'output will be the file passed in -b'],
     
     ['h' , 'help'            , 'display this help']
 ]);              // create Getopt instance
@@ -44,13 +44,21 @@ if (typeof fail !== 'undefined') {
 }
 
 var blastxml = opt.options['blastxml'];
-var output = opt.options['output'];
+var outfile = opt.options['outfile'];
+var infile = opt.options['infile'];
+
+
 if (typeof blastxml !== 'undefined') {
     var src = config.jbrowsePath+config.dataSet[0].dataPath+config.jblast.blastResultPath+'/'+blastxml;
+
+    console.log("blastxml src",src);
+    console.log("infile",infile);
+    console.log("output",outfile);
+
     
-    fs.access(path, fs.F_OK, function(err) {
+    fs.access(src, fs.F_OK, function(err) {
         if (!err) {
-            fs.createReadStream(src).pipe(fs.createWriteStream(output));            
+            fs.createReadStream(src).pipe(fs.createWriteStream(outfile));            
         } else {
             console.log('failed to access',src);
             process.exit(1);
