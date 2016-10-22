@@ -22,6 +22,7 @@ module.exports = {
     },
     jblast: {
         blastResultPath: "jblastdata",
+        blastResultCategory: "JBlast Results",
         insertTrackTemplate: "inMemTemplate.json"
     }
 };
