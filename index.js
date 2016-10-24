@@ -38,6 +38,18 @@ module.exports = function (sails) {
                   sails.log.info(path.basename(__filename),"/jbapi/workflowsubmit");
                   rest_WorkflowSubmit(req,res);
               },
+              'get /jbapi/getworkflows': function (req, res, next) {
+                    console.log("jb-galaxy-kue-sync /jbapi/getworkflows called");
+                    //console.dir(req.params);
+                    sails.hooks['jb-galaxy-blast'].galaxyGetAsync("/api/workflows").then(function(workflows) {
+                        res.send(workflows);
+                    }).catch(function(err){
+                        sails.log.error(err.message);
+                        sails.log.error(err.options.uri);
+                        res.send([]);
+                    });
+                    //return res.send(galaxyWorkflows);
+              },
 
               'post /jbapi/posttest': function (req, res, next) {
                   sails.log.info(path.basename(__filename),"/jbapi/posttest");
@@ -415,13 +427,15 @@ function doCompleteAction(kWorkflowJob,hista) {
     kWorkflowJob.save();
     
     // insert track into trackList.json
-    insertTrack(kWorkflowJob);
+    moveResultFiles(kWorkflowJob,function(newTrackJson){
+        addToTrackList(newTrackJson);
+    });
 }
 /**
  * 
  * @returns {undefined}
  */
-function insertTrack(kWorkflowJob) {
+function moveResultFiles(kWorkflowJob,cb) {
     var wId = kWorkflowJob.data.workflow.workflow_id;
     sails.log.debug(wId,'insertTrack()');
 
@@ -462,20 +476,13 @@ function insertTrack(kWorkflowJob) {
         var fileJsonOnly = kWorkflowJob.data.blastData.outputs.json;
 
         // replace some track info
-        newTrackJson[0].urlTemplate = blastResultPath+"/"+fileGffOnly;
-        newTrackJson[0].blastData = blastResultPath+"/"+fileJsonOnly;
-        newTrackJson[0].label = trackLabel;
-        newTrackJson[0].category= "BLAST Results";
+        newTrackJson[0].baseUrl = g.dataSet[0].dataPath;
+        newTrackJson[0].urlTemplate = g.jblast.blastResultPath+"/"+fileGffOnly;
+        newTrackJson[0].blastData = g.jblast.blastResultPath+"/"+fileJsonOnly;
+        newTrackJson[0].label = "jblast-"+ (new Date().getTime());
         newTrackJson[0].key = trackLabel;
+        newTrackJson[0].category= g.jblast.blastResultCategory;
 
-        /*
-        var payload = {
-            "trackListPath": trackListPath,
-            "addTracks": newTrackJson,
-            "blastGff":blastResultPath+"/"+fileGffOnly,
-            "blastJson":blastResultPath+"/"+fileJsonOnly
-        };
-        */
         addToTrackList(newTrackJson);
     });
 }
@@ -554,11 +561,11 @@ function addToTrackList(newTrackJson) {
         // publish notifications
         deferred.map (addedTracks, function (track) {
             sails.hooks['jbcore'].sendEvent("track-new",{"value":track});
-            sails.log ("Announced new track ",track.label,track);
+            sails.log ("Announced new track ",track.label);
         });
         deferred.map (replacedTracks, function (track) {
             sails.hooks['jbcore'].sendEvent("track-replace",{value:track});
-            sails.log ("Announced replacement track ",track.label,track);
+            sails.log ("Announced replacement track ",track.label);
         });
     });
 }
