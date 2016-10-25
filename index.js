@@ -10,6 +10,7 @@ var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require("fs"));
 var deferred = require('deferred');
 var postAction = require('./postAction');
+var kueSyncJobs = require ('./kueSyncJobs');
 
 //var prettyjson = require('prettyjson');   // for debugging
 
@@ -31,6 +32,7 @@ module.exports = function (sails) {
             // initialize history
             init_history(this);
             //return cb();
+            kueSyncJobs.start();
         },
         routes: {
            after: {
