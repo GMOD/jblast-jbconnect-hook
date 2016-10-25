@@ -1,0 +1,13 @@
+{
+  "maxHeight": 1200,
+  "storeClass": "JBrowse/Store/SeqFeature/GFF3",
+  "type": "JBrowse/View/Track/HTMLFeatures",
+  "metadata": {
+    "description": "test insert"
+  },
+  "category": "JBlast Results",
+  "key": "test",
+  "label": "0",
+  "urlTemplate": "jblastdata/sampleResult.gff3",
+  "baseUrl": "sample_data/json/volvox/"
+}
