@@ -50,16 +50,34 @@ module.exports = function (sails) {
                     });
                     //return res.send(galaxyWorkflows);
               },
-
-              'post /jbapi/posttest': function (req, res, next) {
-                  sails.log.info(path.basename(__filename),"/jbapi/posttest");
+              /*
+               * test rest operations
+               */
+              /**
+               * /test/newtrack - sim creation of new track
+               * a new track is added to trackList.json and an add-track event is sent to listeners.
+               */
+              'get /test/newtrack': function (req, res, next) {
+                  sails.log.info(path.basename(__filename),"/test/newtrack");
+                  rest_testNewTrack(function(data) {
+                      res.send(data);
+                  });
+              },
+              /**
+               * /test/post test post operation
+               */
+              'post /test/post': function (req, res, next) {
+                  sails.log.info(path.basename(__filename),"/test/post");
                   res.header("Access-Control-Allow-Origin", "*");
                   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
                   res.send(req.body);
               },
-              'get /jbapi/test': function (req, res, next) {
-                  sails.log.info(path.basename(__filename),"/jbapi/gettest");
-                  res.send({result:"jb-galaxy-blast gettest success"});
+              /*
+               * test get operation
+               */
+              'get /test/get': function (req, res, next) {
+                  sails.log.info(path.basename(__filename),"/test/get");
+                  res.send({result:"jb-galaxy-blast /get/test success"});
                   //return next();
               }
               
@@ -560,11 +578,11 @@ function addToTrackList(newTrackJson) {
 
         // publish notifications
         deferred.map (addedTracks, function (track) {
-            sails.hooks['jbcore'].sendEvent("track-new",{"value":track});
+            sails.hooks['jbcore'].sendEvent("track-new",track);
             sails.log ("Announced new track ",track.label);
         });
         deferred.map (replacedTracks, function (track) {
-            sails.hooks['jbcore'].sendEvent("track-replace",{value:track});
+            sails.hooks['jbcore'].sendEvent("track-replace",track);
             sails.log ("Announced replacement track ",track.label);
         });
     });
@@ -615,3 +633,36 @@ function getRegionStart(str) {
     return re;
 }
 
+/**
+ * 
+ * @param {type} cb - callback cb(data)
+ * @returns {undefined}
+ */
+function rest_testNewTrack(cb) {
+    sails.log("addTrackJson()");
+    var g = sails.config.globals.jbrowse;
+
+    var theFile = g.jbrowsePath + g.dataSet[0].dataPath + g.jblast.blastResultPath + '/testTrack2.json';
+    
+    var addTrack = fs.readFileSync(theFile);
+    addTrack = JSON.parse(addTrack);
+    
+    console.log('addTrack',addTrack);
+    
+    var t = new Date().getTime()
+    
+    // generate random label
+    addTrack.label = "test" + t;
+    addTrack.key = addTrack.label;
+    
+    //addTrack = [addTrack];
+    
+    // publish notifications
+    //deferred.map (addTrack, function (track) {
+        var track = addTrack;
+        //sails.hooks['jbcore'].sendEvent("track-new",{"value":track});
+        sails.hooks['jbcore'].sendEvent("track-new",track);
+        sails.log ("Announced new track ",track.label);
+        cb({result:track.label});
+    //});
+}
