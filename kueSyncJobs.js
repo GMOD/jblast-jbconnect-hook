@@ -5,30 +5,17 @@
 
 var request = require('request');
 var requestp = require('request-promise');
-//var prettyjson = require('prettyjson');
 
-var $ = 0;
+module.exports = {
+    start: function(kWorkflowJob,hista) {
+        sails.log.info('galaxy_kue_sync starting');
+        setInterval(function(){
+            syncGalaxyHistories();
+        },2500);
+    }
+}
 
-var galaxyWorkflows = [];
-
-require("jsdom").env("", function(err, window) {
-	if (err) {
-		console.error(err);
-		return;
-	}
- 
-	$ = require("jquery")(window);
-});
-
-
-// prettyjson options
-var pOptions = {
-  keysColor: 'yellow',
-  dashColor: 'magenta',
-  stringColor: 'white'
-};
-
-
+/*
 module.exports = function galaxyKueSyncHook(sails) {
    return {
 
@@ -64,6 +51,8 @@ module.exports = function galaxyKueSyncHook(sails) {
         }
    };
 };
+*/
+
 /**
  * 
  * @returns {undefined}
