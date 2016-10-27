@@ -18,10 +18,9 @@ var historyName = '';
 var historyId = '';
 
 module.exports = function (sails) {
-
    return {
         initialize: function(cb) {
-            sails.log.info("Sails Hook: "+path.basename(__filename)+" initialize"); 
+            sails.log.info("Sails Hook: jb-galaxy-blast initialize"); 
             // todo: check that galaxy is running
 
             sails.on('hook:orm:loaded', function() {
