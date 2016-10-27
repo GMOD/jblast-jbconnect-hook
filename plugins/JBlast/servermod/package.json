@@ -1,0 +1,29 @@
+{
+  "name": "jb-galaxy-blast",
+  "version": "1.0.0",
+  "description": "JBlast Server Module",
+  "main": "index.js",
+  "sails": {
+    "isHook": true
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "JBrowse",
+    "Galaxy",
+    "Blast"
+  ],
+  "devDependencies": {
+    "sails": "~0.12.4"
+  },
+  "author": "eyao",
+  "license": "GNU LESSER GENERAL PUBLIC LICENSE",
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "deferred": "^0.7.5",
+    "fs": "0.0.1-security",
+    "request": "^2.76.0",
+    "request-promise": "^4.1.1"
+  }
+}
