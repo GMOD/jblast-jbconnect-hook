@@ -132,7 +132,7 @@ function addToTrackList(newTrackJson) {
     var trackListPath = g.jbrowsePath + g.dataSet[0].dataPath + 'trackList.json';
     
     sails.log("trackListPath = "+trackListPath);
-    sails.log("newTrackJson = ",newTrackJson);
+    sails.log("newTrackJson",newTrackJson.key);
     
     var p = fs.readFileAsync(trackListPath)
     .then(function (trackListData) {
