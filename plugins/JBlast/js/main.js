@@ -85,17 +85,9 @@ return declare( JBrowsePlugin,
 
         });      
         
-
-        //this.initSliders(this,browser);
-
-        
         // save the reference to the blast plugin in browser
         browser.blastPlugin = this;
         
-        // setup additional functions (necessary?)
-        //browser.subscribeToChannel = ext_subscribeToChannel;
-        //browser.initNotifications = ext_initNotifications;
-
         var newTrackHandler = function (eventType,data) {
             //return function (message) {
 
@@ -127,71 +119,6 @@ return declare( JBrowsePlugin,
             console.log("event track-test "+data.value);
             alert("event track-test value = "+data.value)
         });		
-/* obsolete
-        // subscribe to server track events
-        io.socket.on('jbtrack', function (event){
-            console.log("msg "+event.data.msg);
-            console.dir(event.data);
-
-            var data = event.data.value;
-
-            if (typeof event.data.msg === 'undefined') return;
-            
-            var newTrackHandler = function (eventType) {
-                //return function (message) {
-                    
-                    console.log("trackhandler "+eventType);
-                    var notifyStoreConf = dojo.clone (data);
-                    var notifyTrackConf = dojo.clone (data);
-                    notifyStoreConf.browser = browser;
-                    notifyStoreConf.type = notifyStoreConf.storeClass;
-                    notifyTrackConf.store = browser.addStoreConfig(undefined, notifyStoreConf);
-                    browser.publish ('/jbrowse/v1/v/tracks/' + eventType, [notifyTrackConf]);
-                //}
-            }
-
-            switch(event.data.msg) {
-                case "track-new":
-                    newTrackHandler ('new');
-                    break;
-                case "track-replace":
-                    newTrackHandler ('replace');
-                    break;
-                case "track-delete":
-                    browser.publish ('/jbrowse/v1/v/tracks/delete', browser.trackConfigs);
-                    break;
-                case "track-test":
-                    if (event.data.msg==="track-test") {
-                        console.log("event track-test "+event.data.value);
-                        alert("event track-test value = "+event.data.value)
-                    }
-                    break;
-                default:
-                    break;
-            }
-            
-        });            
-        io.socket.get('/jbtrack', function gotResponse(body, response) {
-          console.log('Current test: ', body);
-        });            
-*/
-
-        /*
-        dojo.subscribe("/jbrowse/v1/v/tracks/show", function(data){
-            console.log("GalaxyBlaster trapped /jbrowse/v1/v/tracks/show");
-            console.dir(data);
-        });
-        */
-        // trap the redraw event for handling resize
-        /*
-        dojo.subscribe("/jbrowse/v1/n/tracks/redraw", function(data){
-            console.dir(browser.view.tracks);
-            for (var i in browser.view.tracks) {
-                console.log(browser.view.tracks[i].labelHTML);
-                console.log(browser.view.tracks[i].config.menuTemplate);
-            }
-        });
-        */
         browser.afterMilestone( 'initView', function() {
             console.log('initView milestone');
 
@@ -200,99 +127,7 @@ return declare( JBrowsePlugin,
                 thisB.featureDetailMonitor();
             },500);
             
-            // setup goto button for features (depricated)
-            /*
-            browser.blastGoto = function(obj) {
-                //alert($(obj).attr('blastkey'));
-                $('#blastPanel').openMbExtruder(true);$('#blastPanel').openPanel();
-                var i = '#'+$(obj).attr('blastkey');
-                var item = $(i).parent();
-                console.log("blast goto", i, item.position().top);
-                $('#j-blast').animate({
-                    scrollTop: item.position().top
-                }, 500);
-                setTimeout(function() {
-                    $(i).collapse('show');
-                },1000);
-            };
-            */
-            
-            // process blast filter button "GO" in blast panel (obsolete)
-            /*
-            $('#blast-filter-go').click(function() {
-                obj = thisB.findObjNested(browser.config,"blastData");
-                if (Array.isArray(obj)) {
-                    console.log("blast go btn",obj[0]);
-                    //JBrowse.publish( '/jbrowse/v1/v/tracks/hide', [obj[0]] );
-                    //browser.publish( '/jbrowse/v1/v/tracks/show', [obj[0]] );
-                    
-                    browser.blastFilter = $('#blast-filter-input').val();
-                    
-                    var filter = browser.blastFilter.split("/");
-                    
-                    switch(filter[0]) {
-                        case "evalue":
-                        case "bit-score":
-                        case "gap":
-                        case "identity":
-                            break;
-                        default:
-                            filter[0] = "bit-score";
-                    }
-                    if (filter.length==1) filter[1] = 0;
-                    else {
-                        filter[1] = parseInt(filter[1]);
-                        if (filter[1]=="NaN") filter[1] = 0;
-                    }
-                    console.log("filter",filter);
-                    
-                    // can contain bit-score,evalue,gap,identity
-                    var filterText = "Hsp_" + filter[0];
-                    var filterNum = filter[1];
-                    createTestFilter(filterText,filterNum);
-                    
-                    $('#blast-accordion').html("");     // clearout the blast accordion
-                    $('.jblast-item').trigger('click');
-                    //setTimeout(function(){
-                    //    $('.jblast-item').trigger('click');
-                    //},300);
-                    
-                }
-            });
-            */
-            
         });
-        /*
-        browser.afterMilestone( 'loadConfig', function() {
-            
-            //  todo: need to fix. we should load data in HTMLFeatures constructor
-            // load blast data from blast track config
-            obj = thisB.findObjNested(browser.config,"blastData");
-            
-            if (Array.isArray(obj)) {
-                
-                // todo: handle more than one blast dataset
-                //console.log("blastData obj",obj[0]);
-                thisB.blastReadJSON(obj[0],function() {
-                    console.log("blastData",browser.blastData);
-                    //createTestFilter("Hsp_bit-score",20);
-                    thisB.gotBlastData();
-                });
-                
-            }
-            
-        });
-        */
-        /*
-        dojo.subscribe("/jbrowse/v1/v/tracks/hide", function(data){
-
-            // detect unselected track and remove blast panel stuff
-            if (typeof data[0].blastData !== 'undefined') {
-                //$('#blast-filter-group').remove();
-                //$('#blast-filter-open-btn').remove();
-            }
-        });        
-        */
     },
     // initial the blast track, called in HTMLFeatures constructor
     initBlastTrack: function(blastTrackConfig) {
@@ -319,19 +154,6 @@ return declare( JBrowsePlugin,
     blastRenderData: function() {
         var thisB = this;
         var browser = this.browser;
-        //var obj = browser.blastData;
-        //console.log("blastRenderData");
-        
-        //var blastDataFile = this.config.blastData;
-        
-        // save blast track - temporary solution
-        //if (typeof blastDataFile !== "undefined") {
-        //    browser.blastTrack = this;
-        //}
-        
-        //var hits = obj.BlastOutput.BlastOutput_iterations.Iteration.Hit;
-        
-        //var hits = browser.blastData;
         var hits = browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
 
         // clearout the blast panel accordion
@@ -404,10 +226,6 @@ return declare( JBrowsePlugin,
                         }
                     });
 
-                    //$(this).mouseover(function() {
-                    //    var key = $(this).attr('blastkey');
-                        //$('#test-test').html(key);
-                    //});
                 }
                 else {
                     console.log('undefined blastkey', key, '(this happens for test json file');
@@ -575,14 +393,10 @@ return declare( JBrowsePlugin,
         // toggle blast item
         // todo: toggle specific button based on currently selected
         var key = this.browser.blastKey;
-        //var blastRef = $('.jblast-item').attr('blastref');
-        //console.log('compare',key,blastRef)
-        //if (key == blastRef) {
             $(".jblast-item[blastref*='"+key+"']").trigger('click');  "input[name*='man']"
             setTimeout(function(){
                 $(".jblast-item[blastref*='"+key+"']").trigger('click');
             },300);
-        //}
     },
     
     // setup blast filter sliders
@@ -592,8 +406,6 @@ return declare( JBrowsePlugin,
         var thisB = this;
 
         var filterSlider = this.browser.jblast.filterSliders;
-        
-        //this.sliders.initSliders();
         
         // score slider
         
@@ -969,9 +781,6 @@ return declare( JBrowsePlugin,
     HTMLFeatures_renderFilter: function(feature) {
             var browser = this.browser;
             var render = 0;
-            //return 1;
-            //console.log('********************* blastDataJSON',browser.blastDataJSON);
-            //console.log(this);
 
             // if this is not a jblast track, then pass then render all features.
             if (typeof this.config.blastData === 'undefined') return 1;
