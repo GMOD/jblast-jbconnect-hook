@@ -76,13 +76,20 @@ return declare( JBrowsePlugin,
             // override FASTA
             require(["dojo/_base/lang", "JBrowse/View/FASTA"], function(lang, FASTA){
                 lang.extend(FASTA, {
-                    initData: thisB.FASTA_initData,
-                    addButtons: thisB.FASTA_addButtons,
-                    blastDialog: thisB.FASTA_blastDialog,
-                    destroyBlastDialog:thisB.FASTA_destroyBlastDialog
+                    //initData: thisB.FASTA_initData,
+                    addButtons: thisB.FASTA_addButtons
+                    //blastDialog: thisB.FASTA_blastDialog,
+                    //destroyBlastDialog:thisB.FASTA_destroyBlastDialog
                 });
             });
-
+            // override Browser
+            
+            require(["dojo/_base/lang", "JBrowse/Browser"], function(lang, Browser){
+                lang.extend(Browser, {
+                    jblastDialog: thisB.Browser_jblastDialog
+                });
+            });
+            
         });      
         
         // save the reference to the blast plugin in browser
@@ -869,7 +876,8 @@ return declare( JBrowsePlugin,
             title: 'BLAST this feature',
             disabled: ! has('save-generated-files'),
             onClick: function() {
-                thisB.blastDialog(text);
+                //thisB.blastDialog(text);
+                JBrowse.jblastDialog(text);
             }
         }));
     },
@@ -988,8 +996,150 @@ return declare( JBrowsePlugin,
         this.dialog.destroyRecursive();
         delete this.dialog;
         this.dialog = null;
-    } 
+    },
+    // display blast dialog
+    Browser_jblastDialog: function (region) {
+        var regionB = region;
+        var thisB = this;
+        var comboData = [];
+
+        getWorkflows(function(workflows){
+
+            if (workflows.length==0) {
+                alert("no workflows found");
+                return;
+            }
+            
+            var stateStore = new Memory({
+                data: comboData
+            });
+            
+            var dialog = new Dialog({ 
+                title: 'Process BLAST',
+                onHide: function() {
+                    dialog.destroyRecursive();
+                    delete stateStore;
+                }
+            });
+            
+            dojo.create('span', {
+                innerHTML: 'Workflow '
+            }, dialog.containerNode);
+            
+            dojo.create('button', {
+                id: 'blast-workflow-select'
+            }, dialog.containerNode);
+            
+            for(var i in workflows) {
+                console.log("workflow",workflows[i]);
+                if (!workflows[i].deleted) {
+                    comboData.push({'name': workflows[i].name, 'id':workflows[i].id});
+                }
+            }
+
+            var comboBox = new ComboBox({
+                id: "workflow-combo",
+                name: "workflow",
+                value: comboData[0].name,
+                store: stateStore,
+                searchAttr: "name"
+            }, "blast-workflow-select").startup();            
+            
+            dojo.create('div', {
+                id: 'blast-box',
+                style: {'margin-top': '20px'},
+                innerHTML: 'This will process a BLAST search against the selected database.<br/><button id="submit-btn" type="button">Submit</button> <button id="cancel-btn" type="button">Cancel</button>'
+            }, dialog.containerNode /* the content portion of the dialog you're creating */);
+
+            var submitBtn = new Button({
+                label: "Submit",
+                onClick: function(){
+                    
+                    // get selected workflow
+                    var selStr = dijit.byId('workflow-combo').get('value');
+                    for(var x in comboData) {
+                        if (comboData[x].name == selStr) {
+                            var selWorkflow = comboData[x].id;
+                            console.log('Selected workflow',selWorkflow,comboData[x].name);
+                        }
+                    }
+                    console.log('Selected workflow',selWorkflow);
+                    
+                    // do http post
+                    var xhrArgs = {
+                      //url: jbServer + '/jbapi/blastregion',
+                      url: jbServer + '/jbapi/workflowsubmit',
+                      postData: {
+                          region: regionB,
+                          //workflow: 'f2db41e1fa331b3e'
+                          workflow: selWorkflow
+                      },
+                      handleAs: "json",
+                      load: function(data){
+                        console.log("POST result");
+                        console.dir(data);
+                      },
+                      error: function(error){
+                          alert(error);
+                      }
+                    };
+                    var deferred = dojo.xhrPost(xhrArgs);
+
+
+                    // show confirm submit box
+                    var confirmBox = new Dialog({ title: 'Confirmation' });
+                    dojo.create('div', {
+                        id: 'confirm-btn',
+                        innerHTML: 'BLAST submitted...'
+                    }, confirmBox.containerNode /* the content portion of the dialog you're creating */);
+                    confirmBox.show();
+
+                    setTimeout(function(){
+                        confirmBox.destroyRecursive();
+                    }, 2000);
+
+                    dialog.destroyRecursive();
+                    delete stateStore;
+                }
+            }, "submit-btn").startup();
+            var cancelBtn = new Button({
+                label: "Cancel",
+                onClick: function(){
+                    dialog.destroyRecursive();
+                    delete stateStore;
+                }
+            }, "cancel-btn").startup();
+            
+            if (dialog) dialog.show();
+
+        });
+        
+    }
     
 });
 });
 
+/**
+ * get galaxy workflows (using jbrowse api)
+ * @param {type} cb - cb(workflows]]
+ * @returns {getWorkflows}
+ */
+function getWorkflows(cb) {
+    var thisB = this;
+
+    var xhrArgs = {
+      url: jbServer + "/jbapi/getworkflows",
+      handleAs: "json",
+      preventCache: true,
+      load: function(data){
+            console.log("get workflows result", data);
+            cb(data);
+      },
+      error: function(error){
+      }
+    }
+
+    // Call the asynchronous xhrGet
+    var deferred = dojo.xhrGet(xhrArgs);
+
+}
