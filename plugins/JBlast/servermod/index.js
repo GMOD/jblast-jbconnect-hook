@@ -332,6 +332,7 @@ function rest_WorkflowSubmit(req,res) {
             .then(function(data) {
                 kJob.data.workflow = data;
                 kJob.save();
+                res.send(data); // return POST
                 
                 // start monioring
                 monitorWorkflow(kJob);
@@ -340,6 +341,7 @@ function rest_WorkflowSubmit(req,res) {
                 sails.log.error(err);
                 kJob.data.error = err;
                 kJob.save();
+                res.send(err); // return POST
             });
     });    
 }
