@@ -862,6 +862,7 @@ return declare( JBrowsePlugin,
         var thisB = this;
         var comboData = [];
 
+
         getWorkflows(function(workflows){
 
             if (workflows.length==0) {
@@ -873,11 +874,17 @@ return declare( JBrowsePlugin,
                 data: comboData
             });
             
+            function destroyBlastDialog() {
+                dialog.destroyRecursive();
+                delete stateStore;
+                delete cancelBtn;
+                delete submitBtn;
+
+            };
             var dialog = new Dialog({ 
                 title: 'Process BLAST',
                 onHide: function() {
-                    dialog.destroyRecursive();
-                    delete stateStore;
+                    destroyBlastDialog();
                 }
             });
             
@@ -908,7 +915,8 @@ return declare( JBrowsePlugin,
                 id: 'blast-box',
                 style: {'margin-top': '20px'},
                 innerHTML: 'This will process a BLAST search against the selected database.<br/><button id="submit-btn" type="button">Submit</button> <button id="cancel-btn" type="button">Cancel</button>'
-            }, dialog.containerNode /* the content portion of the dialog you're creating */);
+                //innerHTML: 'This will process a BLAST search against the selected database.<br/>'
+            }, dialog.containerNode);
 
             var submitBtn = new Button({
                 label: "Submit",
@@ -950,22 +958,20 @@ return declare( JBrowsePlugin,
                     dojo.create('div', {
                         id: 'confirm-btn',
                         innerHTML: 'BLAST submitted...'
-                    }, confirmBox.containerNode /* the content portion of the dialog you're creating */);
+                    }, confirmBox.containerNode );
                     confirmBox.show();
 
                     setTimeout(function(){
                         confirmBox.destroyRecursive();
                     }, 2000);
 
-                    dialog.destroyRecursive();
-                    delete stateStore;
+                    destroyBlastDialog();
                 }
             }, "submit-btn").startup();
             var cancelBtn = new Button({
                 label: "Cancel",
                 onClick: function(){
-                    dialog.destroyRecursive();
-                    delete stateStore;
+                    destroyBlastDialog();
                 }
             }, "cancel-btn").startup();
             
