@@ -61,13 +61,13 @@
                 //console.dir(jdata);
                 
                 // filter type: galaxy-job
-                console.log("jdata len",jdata.length);
+                //console.log("jdata len",jdata.length);
                 var i = jdata.length;
                 while(i--) {
                     if (jdata[i].type!=='galaxy-job')
                         jdata.splice(i, 1);    
                 }
-                console.log("jdata len",jdata.length);
+                //console.log("jdata len",jdata.length);
                 
                 jdata.sort(function(a,b) {
                     if (a.data.galaxy_data.hid > b.data.galaxy_data.hid) return -1;
