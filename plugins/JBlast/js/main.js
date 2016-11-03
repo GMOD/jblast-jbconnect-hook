@@ -16,6 +16,8 @@ define([
            'dijit/Dialog',
            "dojo/store/Memory",
            "dijit/form/ComboBox",
+            'dijit/Menu',
+            'dijit/MenuItem',
            'JBrowse/has',
         './slidersMixin'
        ],
@@ -26,7 +28,7 @@ define([
         domConstruct,
         query,
         JBrowsePlugin,
-        Button, Dialog, Memory, ComboBox,has,
+        Button, Dialog, Memory, ComboBox,Menu,MenuItem,has,
         slidersMixin
        ) {
 return declare( JBrowsePlugin,
@@ -80,14 +82,23 @@ return declare( JBrowsePlugin,
                 });
             });
             // override Browser
-            
             require(["dojo/_base/lang", "JBrowse/Browser"], function(lang, Browser){
                 lang.extend(Browser, {
                     jblastDialog: thisB.Browser_jblastDialog
                 });
             });
+            // override BlockBased
+            require(["dojo/_base/lang", "JBrowse/View/Track/BlockBased"], function(lang, BlockBased){
+                lang.extend(BlockBased, {
+                    postRenderHighlight: thisB.BlockBased_postRenderHighlight
+                });
+            });
             
-        });      
+        }); 
+        
+        browser.afterMilestone( 'initView', function() {
+            thisB.jblastRightClickMenuInit();
+        });
         
         // save the reference to the blast plugin in browser
         browser.blastPlugin = this;
@@ -855,6 +866,54 @@ return declare( JBrowsePlugin,
                 JBrowse.jblastDialog(text);
             }
         }));
+    },
+    jblastRightClickMenuInit: function(highlight) {
+        console.log("jblastRightClickMenuInit");
+        var thisB = this;
+        var browser = this.browser;
+        var demo = {
+            // handler for clicks on task context menu items
+            onTaskItemClick: function(event){
+                    browser.jblastDialog();
+            },
+        };
+        // create task menu as context menu for task nodes.
+        
+        var menu = new Menu({
+                id: "jblastRCMenu"
+        });
+        menu.addChild(new MenuItem({
+                id: "jblast-region",
+                label: "BLAST highlighted region...",
+                onClick: lang.hitch(demo, "onTaskItemClick")
+        }) );
+        menu.startup();
+
+        browser.jblastHiliteMenu = menu;
+        /*
+        setInterval(function(){
+            var n1 = query(".global_highlight");
+            
+            for(var i in n1) {
+                if(dojo.hasClass(n1[i], "global_highlight")){
+                    browser.jblastHiliteMenu.bindDomNode(n1[i]);
+                }
+            }
+            //console.log('global-highlights',n1.length);
+        },5000);
+        */
+    },
+    /**
+     * called when highlight region is created
+     * @param {type} node - DOM Node of highlight region (yellow region)
+     * @returns nothing significant
+     */
+    BlockBased_postRenderHighlight: function(node) {
+        console.log('postRenderHighlight');
+        
+        // add hilight menu to node
+        if (typeof JBrowse.jblastHiliteMenu !== 'undefined')
+            JBrowse.jblastHiliteMenu.bindDomNode(node);
     },
     // display blast dialog
     Browser_jblastDialog: function (region) {
