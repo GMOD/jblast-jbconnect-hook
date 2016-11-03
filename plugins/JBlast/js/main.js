@@ -871,11 +871,31 @@ return declare( JBrowsePlugin,
         console.log("jblastRightClickMenuInit");
         var thisB = this;
         var browser = this.browser;
-        var demo = {
+        var handlers = {
             // handler for clicks on task context menu items
-            onTaskItemClick: function(event){
-                    browser.jblastDialog();
-            },
+            onTaskItemClick: function(event) {
+                //browser.jblastDialog();
+                // get sequence store and ac
+                browser.getStore('refseqs', dojo.hitch(this,function( refSeqStore ) {
+                    if( refSeqStore ) {
+                        var hilite = browser._highlight;
+                        refSeqStore.getReferenceSequence(
+                            hilite,
+                            dojo.hitch( this, function( seq ) {
+                                //console.log('found sequence',hilite,seq);
+                                require(["JBrowse/View/FASTA"], function(FASTA){
+                                    var fasta = new FASTA();
+                                    var fastaData = fasta.renderText(hilite,seq);
+                                    console.log('FASTA',fastaData);
+                                    delete fasta;
+                                    browser.jblastDialog(fastaData);
+                                });                                
+                                
+                            })
+                        );
+                    }
+                }));             
+            }
         };
         // create task menu as context menu for task nodes.
         
@@ -885,7 +905,7 @@ return declare( JBrowsePlugin,
         menu.addChild(new MenuItem({
                 id: "jblast-region",
                 label: "BLAST highlighted region...",
-                onClick: lang.hitch(demo, "onTaskItemClick")
+                onClick: lang.hitch(handlers, "onTaskItemClick")
         }) );
         menu.startup();
 
