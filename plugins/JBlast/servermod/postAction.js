@@ -4,6 +4,7 @@ var path = require('path');
 var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require("fs"));
 var deferred = require('deferred');
+var filter = require("./filter");   // filter processing
 
 module.exports = {
     doCompleteAction: function(kWorkflowJob,hista) {
@@ -30,7 +31,8 @@ function doCompleteAction(kWorkflowJob,hista) {
     //sails.log("steps",steps);
     kWorkflowJob.data.blastData.outputs = {};
     
-    // find entries with export labels
+    var filecount = 0;
+    // find entries with "export" labels and copy those files to the dataset path
     for(var i in steps) {
         var label = steps[i].workflow_step_label;
         var id = steps[i].job_id;
@@ -46,29 +48,52 @@ function doCompleteAction(kWorkflowJob,hista) {
             var ext = hista[id].extension;
             var url = g.galaxy.galaxyUrl+'/'+hista[id].url + "/display";
             var hid = hista[id].hid;
-            var filename = hid+'_'+id+'.'+ext;
-            var filepath = targetDir + '/' + filename;
+            var filename = hid+'_'+id;  //+'.'+ext;
+            var filepath = targetDir + '/' + filename + '.'+ext;
             
             kWorkflowJob.data.blastData.outputs[ext] = filename; 
             
-            sails.log.info(wId,'writing',filepath)
-            request(url).pipe(fs.createWriteStream(filepath));
+            sails.log.info(wId,'writing',filepath);
+            filecount++;
+            var stream = request(url).pipe(fs.createWriteStream(filepath));
+            stream.on('finish', function () {     // detect file finished copying
+                sails.log.debug("finished file");
+                filecount--;
+            });
         }
     }
-    kWorkflowJob.save();
     
-    // insert track into trackList.json
-    moveResultFiles(kWorkflowJob,function(newTrackJson){
-        addToTrackList(newTrackJson);
-    });
+    // wait for files to finish copying
+    var t = setInterval(function() {
+        if (filecount == 0) {
+            sails.log.debug("done moving files");
+            kWorkflowJob.save();
+
+            // insert track into trackList.json
+            postMoveResultFiles(kWorkflowJob,function(newTrackJson){
+                
+                processOffset(kWorkflowJob,newTrackJson);
+                
+                addToTrackList(kWorkflowJob,newTrackJson);
+            });
+            clearInterval(t);
+        }
+    },100);
 }
 /**
  * 
  * @returns {undefined}
  */
-function moveResultFiles(kWorkflowJob,cb) {
+function postMoveResultFiles(kWorkflowJob,cb) {
     var wId = kWorkflowJob.data.workflow.workflow_id;
     sails.log.debug(wId,'moveResultFiles()');
+
+    function escapeRegExp(str) {
+        return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+    }
+    function replaceAll(str, find, replace) {
+        return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+    }
 
     var g = sails.config.globals.jbrowse;
     // this is the track template file
@@ -103,34 +128,53 @@ function moveResultFiles(kWorkflowJob,cb) {
         var ts = new Date();  
         var trackLabel = kWorkflowJob.data.blastData.name+'-'+dateFormat(ts,"isoDateTime");
 
-        var fileGffOnly = kWorkflowJob.data.blastData.outputs.gff3;
-        var fileJsonOnly = kWorkflowJob.data.blastData.outputs.json;
+        var fileGffOnly = kWorkflowJob.data.blastData.outputs.gff3 +'.gff3';
+        var fileJsonOnly = kWorkflowJob.data.blastData.outputs.json + '.json';
+        var fileBlastFilter = kWorkflowJob.data.blastData.outputs.json + '_filtersettings.json';
 
         // replace some track info
         newTrackJson[0].baseUrl = g.dataSet[0].dataPath;
         newTrackJson[0].urlTemplate = g.jblast.blastResultPath+"/"+fileGffOnly;
-        newTrackJson[0].blastData = g.jblast.blastResultPath+"/"+fileJsonOnly;
+        newTrackJson[0].jblastData = g.jblast.blastResultPath+"/"+fileJsonOnly;
         newTrackJson[0].label = "jblast-"+ (new Date().getTime());
         newTrackJson[0].key = trackLabel;
         newTrackJson[0].category= g.jblast.blastResultCategory;
+        
+        // alternate track info
+        var dataset = replaceAll(g.dataSet[0].dataPath,'/','%2F');
+        
+        newTrackJson[0].baseUrl = '/';
+        newTrackJson[0].urlTemplate = '/jbapi/gettrackdata/' +kWorkflowJob.data.blastData.outputs.json + '/' + dataset;
+        newTrackJson[0].storeCache = false;
+        newTrackJson[0].filterSettings = g.jblast.blastResultPath+"/"+fileBlastFilter;
+        newTrackJson[0].jblastGff = kWorkflowJob.data.blastData.outputs.json + '.gff3';
 
-        addToTrackList(newTrackJson);
+        //addToTrackList(kWorkflowJob,newTrackJson);
+        //processOffset(kWorkflowJob,newTrackJson);
+        cb(newTrackJson);
     });
 }
 /**
- * 
- * @param {type} req
- * @param {type} res
- * @param {type} next
- * @returns {addTrackJson.indexAnonym$4}
+ * Process offsets 
+ * @param {type} newTrackJson
+ * @returns {undefined}
  */
-function addToTrackList(newTrackJson) {
+function processOffset(kWorkflowJob,newTrackJson) {
+    sails.log("processOffset()");
+    var g = sails.config.globals.jbrowse;
+    sails.log("nothing processed");
+    filter.filterSetup(kWorkflowJob,newTrackJson);
+}
+/**
+ * 
+ */
+function addToTrackList(kWorkflowJob,newTrackJson) {
     sails.log("addToTrackList()");
     var g = sails.config.globals.jbrowse;
     
     //todo: make this configurable later
     var trackListPath = g.jbrowsePath + g.dataSet[0].dataPath + 'trackList.json';
-    
+
     sails.log("trackListPath = "+trackListPath);
     sails.log("newTrackJson",newTrackJson.key);
     
@@ -181,6 +225,10 @@ function addToTrackList(newTrackJson) {
             }
             trackListJson.tracks = newTracks;
         });
+
+
+        //return;
+        
 
         // write the new track list
         sails.log("start track count "+trackListJson.tracks.length);
