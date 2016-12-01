@@ -17,6 +17,10 @@ var kueSyncJobs = require ('./kueSyncJobs');
 var historyName = '';
 var historyId = '';
 
+
+// for testing
+var file_i = 0;
+
 module.exports = function (sails) {
    return {
         initialize: function(cb) {
@@ -40,6 +44,22 @@ module.exports = function (sails) {
                   sails.log.info(path.basename(__filename),"/jbapi/workflowsubmit");
                   rest_WorkflowSubmit(req,res);
               },
+              /** post /jbapi/setfilter - send filter parameters
+               * 
+               * @param {type} req
+               *    data = req.body
+               *    data.filterParams
+               *    data.dataSet = (i.e. "sample_data/json/volvox")
+               *    data.trackLabel = the track label to affect.
+               * @param {type} res
+               * @param {type} next
+               * @returns {undefined}
+               */
+               
+              'post /jbapi/setfilter': function (req, res, next) {
+                  sails.log.info("JBlast server plugin","POST /jbapi/filter");
+                  rest_WorkflowSubmit(req,res);
+              },
               'get /jbapi/getworkflows': function (req, res, next) {
                     console.log("jb-galaxy-kue-sync /jbapi/getworkflows called");
                     //console.dir(req.params);
@@ -51,6 +71,25 @@ module.exports = function (sails) {
                         res.send([]);
                     });
                     //return res.send(galaxyWorkflows);
+              },
+              
+              'get /jbapi/gettrackdata/:asset/:dataset': function (req, res, next) {
+                    console.log("jb-galaxy-kue-sync /jbapi/gettrackdata called");
+                    var params = req.allParams();
+                    sails.log('asset',req.param('asset'));
+                    sails.log('dataset',req.param('dataset'));
+                    //sails.log('req.allParams()',req.allParams());
+                    
+                    var asset = req.param('asset');
+                    var dataset = req.param('dataset');
+                    
+                    var g = sails.config.globals.jbrowse;
+                    
+                    var gfffile = g.jbrowsePath + dataset +'/'+ g.jblast.blastResultPath + '/' + 'sampleResult.gff3';
+
+                    var content = fs.readFileSync(gfffile);
+
+                    res.send(content);
               },
               /*
                * test rest operations
@@ -65,6 +104,21 @@ module.exports = function (sails) {
                       res.send(data);
                   });
               },
+              'get /test/getgff': function (req, res, next) {
+                  sails.log.info(path.basename(__filename),"/test/getgff");
+                  var g = sails.config.globals.jbrowse;
+                  var blastPath = g.jbrowsePath + g.dataSet[0].dataPath + g.jblast.blastResultPath;
+                  
+                  var theGFF = blastPath+'/'+'test_'+file_i+'.gff3';
+                  file_i++;
+                  if (file_i >=3) file_i = 0;
+                  console.log(theGFF);
+                  
+                  var content = fs.readFileSync(theGFF);
+                  
+                  res.send(content);
+              },
+              
               /**
                * /test/post test post operation
                */
@@ -235,6 +289,7 @@ function rest_WorkflowSubmit(req,res) {
     var g = sails.config.globals;
     var region = req.body.region;
     var workflow = req.body.workflow;
+    var dataSetPath = req.body.dataSetPath;
     
     // get starting coord of region
     var startCoord = getRegionStart(region);
@@ -312,6 +367,7 @@ function rest_WorkflowSubmit(req,res) {
                 //console.log("send file result",data);
 
                 kJob.data.dataset = data;
+                kJob.data.jbrowseDataPath = dataSetPath;
                 kJob.save();
 
                 var fileId = data.outputs[0].id;
