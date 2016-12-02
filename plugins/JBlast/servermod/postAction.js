@@ -147,7 +147,7 @@ function postMoveResultFiles(kWorkflowJob,cb) {
         newTrackJson[0].urlTemplate = '/jbapi/gettrackdata/' +kWorkflowJob.data.blastData.outputs.json + '/' + dataset;
         newTrackJson[0].storeCache = false;
         newTrackJson[0].filterSettings = g.jblast.blastResultPath+"/"+fileBlastFilter;
-        newTrackJson[0].jblastGff = kWorkflowJob.data.blastData.outputs.json + '.gff3';
+        newTrackJson[0].jblastGff = g.jblast.blastResultPath+"/"+kWorkflowJob.data.blastData.outputs.json + '.gff3';
 
         //addToTrackList(kWorkflowJob,newTrackJson);
         //processOffset(kWorkflowJob,newTrackJson);
@@ -164,6 +164,7 @@ function processOffset(kWorkflowJob,newTrackJson) {
     var g = sails.config.globals.jbrowse;
     sails.log("nothing processed");
     filter.filterSetup(kWorkflowJob,newTrackJson);
+    filter.filterDo(kWorkflowJob,newTrackJson);
 }
 /**
  * 
