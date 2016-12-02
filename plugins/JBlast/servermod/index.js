@@ -344,13 +344,15 @@ function rest_WorkflowSubmit(req,res) {
         var theFile = jg.jbrowseURL + jg.dataSet[0].dataPath + jg.jblast.blastResultPath+'/'+theBlastFile;
         
         // create the kue job entry
-        var kJob = g.kue_queue.create('galaxy-workflow-watch', {
+        var jobdata = {
+            jbrowseDataPath: dataSetPath,
             blastData: blastData,
             dataset: {
                 workflow: workflow,
                 file: theFile
             }
-        })
+        };
+        var kJob = g.kue_queue.create('galaxy-workflow-watch', jobdata)
         .state('active')
         .save(function(err){
             if (!err) {
@@ -367,7 +369,6 @@ function rest_WorkflowSubmit(req,res) {
                 //console.log("send file result",data);
 
                 kJob.data.dataset = data;
-                kJob.data.jbrowseDataPath = dataSetPath;
                 kJob.save();
 
                 var fileId = data.outputs[0].id;
