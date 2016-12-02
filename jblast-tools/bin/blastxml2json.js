@@ -96,7 +96,8 @@ function doMain () {
                         Hit_def: hit.Hit_def,
                         Hit_accession: hit.Hit_accession,
                         Hit_len: hit.Hit_len,
-                        Hsp: fixHsp(hsp)
+                        Hsp: hsp
+                        //Hsp: fixHsp(hsp)
                     };
                 };
 
