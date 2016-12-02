@@ -95,27 +95,31 @@ return declare( JBrowsePlugin,
             });
             
         }); 
-        
+        // setup right click menu for highlight region
         browser.afterMilestone( 'initView', function() {
             thisB.jblastRightClickMenuInit();
         });
+        // setup feature detail dialog monitor
+        browser.afterMilestone( 'initView', function() {
+            setTimeout(function() {
+                thisB.featureDetailMonitor();
+            },500);
+        });
         
         // save the reference to the blast plugin in browser
-        browser.blastPlugin = this;
+        browser.jblastPlugin = this;
         
+        
+        // event handlers for server events
         var newTrackHandler = function (eventType,data) {
-            //return function (message) {
-
-                console.log("trackhandler "+eventType);
-                var notifyStoreConf = dojo.clone (data);
-                var notifyTrackConf = dojo.clone (data);
-                notifyStoreConf.browser = browser;
-                notifyStoreConf.type = notifyStoreConf.storeClass;
-                notifyTrackConf.store = browser.addStoreConfig(undefined, notifyStoreConf);
-                browser.publish ('/jbrowse/v1/v/tracks/' + eventType, [notifyTrackConf]);
-            //}
-        }
-
+            console.log("trackhandler "+eventType);
+            var notifyStoreConf = dojo.clone (data);
+            var notifyTrackConf = dojo.clone (data);
+            notifyStoreConf.browser = browser;
+            notifyStoreConf.type = notifyStoreConf.storeClass;
+            notifyTrackConf.store = browser.addStoreConfig(undefined, notifyStoreConf);
+            browser.publish ('/jbrowse/v1/v/tracks/' + eventType, [notifyTrackConf]);
+        };
 
         io.socket.on('track-new', function (data){
             console.log('event','track-new',data);
@@ -133,16 +137,8 @@ return declare( JBrowsePlugin,
             console.log('event','track-test',data);
             console.log("event track-test "+data.value);
             alert("event track-test value = "+data.value)
-        });		
-        browser.afterMilestone( 'initView', function() {
-            console.log('initView milestone');
-
-            setTimeout(function() {
-                //thisB.insertBlastPanel();
-                thisB.featureDetailMonitor();
-            },500);
-            
         });
+        
     },
     // initial the blast track, called in HTMLFeatures constructor
     initBlastTrack: function(blastTrackConfig) {
@@ -202,8 +198,8 @@ return declare( JBrowsePlugin,
             //console.log(e.target);
             var hit = browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit[key];
             console.log("expand hit",key,item);
-            var txt = browser.blastPlugin.blastRenderHit(hit);
-            txt += browser.blastPlugin.blastRenderHitBp(hit);
+            var txt = browser.jblastPlugin.blastRenderHit(hit);
+            txt += browser.jblastPlugin.blastRenderHitBp(hit);
             
             $('.panel-body',item).html(txt);
         });
@@ -217,7 +213,7 @@ return declare( JBrowsePlugin,
                 var hit = browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit[key];
                 //console.log('key-hit ',key,hit);
                 if (typeof hit !== 'undefined') {
-                    var text = '<div>'+browser.blastPlugin.blastRenderHit(hit); //+'<button class="btn btn-primary" blastkey="'+key+'"onclick="JBrowse.blastGoto(this)">Goto</button></div>';
+                    var text = '<div>'+browser.jblastPlugin.blastRenderHit(hit); //+'<button class="btn btn-primary" blastkey="'+key+'"onclick="JBrowse.blastGoto(this)">Goto</button></div>';
 
                     $(this).qtip({
                         content: {
@@ -253,7 +249,7 @@ return declare( JBrowsePlugin,
     // todo: should trigger on the appropriate event
     featureDetailMonitor: function() {
         var thisB = this;
-        var blastPlugin = this.browser.blastPlugin;
+        var blastPlugin = this.browser.jblastPlugin;
         var lastBlastKey = "";
         setInterval(function(){
             var blastShow = 0;
@@ -784,11 +780,11 @@ return declare( JBrowsePlugin,
     },
     HTMLFeatures_extendedInit: function() {
         // if jblast plugin available
-        if (typeof this.browser.blastPlugin !== 'undefined') {
+        if (typeof this.browser.jblastPlugin !== 'undefined') {
            
             // only if it a blastData track
             if (typeof this.config.blastData !== 'undefined') {
-                this.browser.blastPlugin.initBlastTrack(this.config);
+                this.browser.jblastPlugin.initBlastTrack(this.config);
             }
         }
         
@@ -1018,7 +1014,8 @@ return declare( JBrowsePlugin,
                       postData: {
                           region: regionB,
                           //workflow: 'f2db41e1fa331b3e'
-                          workflow: selWorkflow
+                          workflow: selWorkflow,
+                          dataSetPath: thisB.config.dataRoot
                       },
                       handleAs: "json",
                       load: function(data){
