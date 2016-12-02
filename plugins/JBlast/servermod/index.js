@@ -85,7 +85,8 @@ module.exports = function (sails) {
                     
                     var g = sails.config.globals.jbrowse;
                     
-                    var gfffile = g.jbrowsePath + dataset +'/'+ g.jblast.blastResultPath + '/' + 'sampleResult.gff3';
+                    //var gfffile = g.jbrowsePath + dataset +'/'+ g.jblast.blastResultPath + '/' + 'sampleResult.gff3';
+                    var gfffile = g.jbrowsePath + dataset +'/'+ g.jblast.blastResultPath + '/' + asset +'.gff3';
 
                     var content = fs.readFileSync(gfffile);
 
@@ -293,6 +294,8 @@ function rest_WorkflowSubmit(req,res) {
     
     // get starting coord of region
     var startCoord = getRegionStart(region);
+    
+    var seq = parseSeqData(region);
 
     var d = new Date();
 
@@ -346,6 +349,7 @@ function rest_WorkflowSubmit(req,res) {
         // create the kue job entry
         var jobdata = {
             jbrowseDataPath: dataSetPath,
+            sequence: seq,
             blastData: blastData,
             dataset: {
                 workflow: workflow,
@@ -504,7 +508,17 @@ function getRegionStart(str) {
     var re = line.split(":")[1].split("..")[0];
     return re;
 }
-
+function parseSeqData(str) {
+    var line = str.split("\n")[0];
+    return {
+        seq: line.split(">")[1].split(" ")[0],
+        start: line.split(":")[1].split("..")[0],
+        end: line.split("..")[1].split(" ")[0],
+        strand: line.split("(")[1].split(" ")[0],
+        class: line.split("class=")[1].split(" ")[0],
+        length: line.split("length=")[1]
+    };
+}
 /**
  * 
  * @param {type} cb - callback cb(data)
