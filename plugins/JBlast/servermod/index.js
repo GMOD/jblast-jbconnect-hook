@@ -11,6 +11,8 @@ var fs = Promise.promisifyAll(require("fs"));
 var deferred = require('deferred');
 var postAction = require('./postAction');
 var kueSyncJobs = require ('./kueSyncJobs');
+var filter = require("./filter");   // filter processing
+
 
 //var prettyjson = require('prettyjson');   // for debugging
 
@@ -48,17 +50,18 @@ module.exports = function (sails) {
                * 
                * @param {type} req
                *    data = req.body
-               *    data.filterParams
-               *    data.dataSet = (i.e. "sample_data/json/volvox")
-               *    data.trackLabel = the track label to affect.
+               *    data.filterParams = {score:{val: 50}, evalue:{val:-2}...
+               *    data.dataSet = (i.e. "sample_data/json/volvox" generally from config.dataRoot)
+               *    data.asset = 
                * @param {type} res
                * @param {type} next
                * @returns {undefined}
                */
                
               'post /jbapi/setfilter': function (req, res, next) {
-                  sails.log.info("JBlast server plugin","POST /jbapi/filter");
-                  rest_WorkflowSubmit(req,res);
+                  sails.log.info("JBlast server plugin","POST /jbapi/setfilter");
+                  //sails.log.debug("req.body", JSON.stringify(req.body));
+                  rest_applyFilter(req,res);
               },
               'get /jbapi/getworkflows': function (req, res, next) {
                     console.log("jb-galaxy-kue-sync /jbapi/getworkflows called");
@@ -279,7 +282,21 @@ function init_history(th) {
             console.log('init_history failed');
         });
 }
+function rest_applyFilter(req,res) {
+    var g = sails.config.globals;
+    var requestData = req.body;
+    
+    //sails.log.debug("data",JSON.stringify(data, null, 4));
 
+    var err = filter.writeFilterSettings(requestData,function(filterData) {
+        filter.applyFilter(filterData,requestData);        
+    });
+    
+    if (err)
+        res.send({result:err});
+    else
+        res.send({result:'success'});
+}
 /**
  * submit workflow
  * @param {type} req
@@ -322,6 +339,7 @@ function rest_WorkflowSubmit(req,res) {
     }
     catch (e) {
         console.log(e,theFullBlastFilePath);
+        res.send(e); // return POST
         return;
     }
     
@@ -340,6 +358,7 @@ function rest_WorkflowSubmit(req,res) {
         
         if (err) {
             console.log("jbcore: failed to save globals");
+            res.send(err); // return POST
             return;
         }
 
@@ -361,6 +380,7 @@ function rest_WorkflowSubmit(req,res) {
         .save(function(err){
             if (!err) {
                 console.log("workflow watch adding job id = "+kJob.id);
+                res.send(err); // return POST
                 return;
             }
             console.log('error creating workflow watch job');

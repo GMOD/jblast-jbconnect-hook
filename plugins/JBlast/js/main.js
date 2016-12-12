@@ -59,6 +59,7 @@ return declare( JBrowsePlugin,
             }
             
             // override HTMLFeatures
+            /*
             require(["dojo/_base/lang", "JBrowse/View/Track/HTMLFeatures"], function(lang, HTMLFeatures){
                 lang.extend(HTMLFeatures, {
                     renderFilter: thisB.HTMLFeatures_renderFilter,
@@ -66,7 +67,7 @@ return declare( JBrowsePlugin,
                     featureHook1: thisB.HTMLFeatures_featureHook1
                 });
             });
-
+            */
             // override Hierarchical
             require(["dojo/_base/lang", "JBrowse/View/TrackList/Hierarchical"], function(lang, Hierarchical){
                 lang.extend(Hierarchical, {
@@ -88,12 +89,13 @@ return declare( JBrowsePlugin,
                 });
             });
             // override BlockBased
+            /*
             require(["dojo/_base/lang", "JBrowse/View/Track/BlockBased"], function(lang, BlockBased){
                 lang.extend(BlockBased, {
                     postRenderHighlight: thisB.BlockBased_postRenderHighlight
                 });
             });
-            
+            */
         }); 
         // setup right click menu for highlight region
         browser.afterMilestone( 'initView', function() {
@@ -125,6 +127,15 @@ return declare( JBrowsePlugin,
             console.log('event','track-new',data);
             newTrackHandler ('new',data);
         });		
+        io.socket.on('track-update', function (data){
+            console.log('event','track-update',data);
+                var track = thisB.findTrackConfig(data);
+                if (track)
+                    thisB.browser.view.replaceTracks([track]);
+                else
+                    console.log("track not found");
+        });		
+        
         io.socket.on('track-replace', function (data){
             console.log('event','track-replace',data);
             newTrackHandler ('replace',data);
@@ -138,7 +149,33 @@ return declare( JBrowsePlugin,
             console.log("event track-test "+data.value);
             alert("event track-test value = "+data.value)
         });
+        dojo.subscribe("/jbrowse/v1/n/tracks/focus", function(track){
+            console.log("jblast plugin event: /jbrowse/v1/n/tracks/focus",track);
+            if (typeof track.config.filterSettings != 'undefined')
+                
+                // for jblast tracks, the label is the asset and also the reference to the filterSettings of the asset
+                thisB.browser.jblast.asset = track.config.label;
+                thisB.insertBlastPanel1(track.config);
+        });        
+        dojo.subscribe("/jbrowse/v1/n/tracks/unfocus", function(track){
+            console.log("jblast plugin event: /jbrowse/v1/n/tracks/unfocus",track);
+            if (typeof track.config.filterSettings != 'undefined')
+                thisB.removeBlastPanel1(track.config);
+        });        
         
+    },
+    // look in the browser's track configuration for the track with the given label
+    findTrackConfig: function( trackLabel ) {
+        if( ! trackLabel )
+            return null;
+
+        var tracks = this.browser.config.tracks;
+        
+        for(var i in tracks) {
+            if (tracks[i].label === trackLabel)
+                return tracks[i];
+        }
+        return null;
     },
     // initial the blast track, called in HTMLFeatures constructor
     initBlastTrack: function(blastTrackConfig) {
@@ -158,21 +195,23 @@ return declare( JBrowsePlugin,
             thisB.browser.blastTrackConfig = config;
             thisB.browser.blastKey = config.label;
             thisB.insertBlastPanel();
-            thisB.blastRenderData();
+            //thisB.blastRenderData();
         });
     },
     // render data into blast panel (bottom panel)
+    
     blastRenderData: function() {
         var thisB = this;
         var browser = this.browser;
         var hits = browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
 
         // clearout the blast panel accordion
-        
+        /*
         $('#blast-accordion').html('');
-
+        */
         //var txt = "";
         //console.log("hits",hits);
+        /*
         setTimeout(function() {
             console.log("rendering blast accordion");
             for (var x in hits) {
@@ -187,6 +226,8 @@ return declare( JBrowsePlugin,
                 }
             }
         },200);
+        */
+        /*
         $('#blast-accordion').on('show.bs.collapse', function(e) {
             var key = $(e.target).attr('id');
             item = e.target;
@@ -203,7 +244,7 @@ return declare( JBrowsePlugin,
             
             $('.panel-body',item).html(txt);
         });
-        
+        */
         // setup the feature tooltip
         // todo: this action should be triggered by the approrpiate event
         setTimeout(function() {
@@ -361,6 +402,32 @@ return declare( JBrowsePlugin,
         txt += '</tr></table>';  
         return txt;
     },
+    insertBlastPanel1: function(trackConfig) {
+        var thisB = this;
+        console.log('insertBlastPanel1()');
+        //relocate blast filter panel; put it in sidebar (this is from a template in BlastPanel.html)
+        $('#blast-filter-group').clone().prependTo('.jbrowseHierarchicalTrackSelector');
+        thisB.setupFilterSliders1(trackConfig);
+
+        // setup button open button in the Available Tracks title
+        
+        $('.jbrowseHierarchicalTrackSelector > .header').prepend('<button id="blast-filter-open-btn" class="btn btn-primary">BLAST Filter</button>');
+
+        setTimeout(function() {
+            $('#blast-filter-group').show(500);
+            $('#blast-filter-open-btn').click(function(){
+                $('#blast-filter-group').slideDown(500);
+                $('#blast-filter-open-btn').hide();
+            });
+        },500);
+        
+    },
+    removeBlastPanel1: function() {
+        
+        $(".jbrowseHierarchicalTrackSelector > #blast-filter-group").hide(500,function complete() {
+            $(".jbrowseHierarchicalTrackSelector > #blast-filter-group").remove();
+        });
+    },
     // this creates the side blast filter panel
     insertBlastPanel: function(postFn) {
         var thisB = this;
@@ -409,6 +476,198 @@ return declare( JBrowsePlugin,
                 $(".jblast-item[blastref*='"+key+"']").trigger('click');
             },300);
     },
+    setupFilterSliders1: function(trackConfig) {
+        console.log("setupFilterSliders1");
+        var thisB = this;
+        var config = this.browser.config;
+        var url = config.dataRoot + '/' + trackConfig.filterSettings;
+        var filterSlider = this.browser.jblast.filterSliders;
+        
+        console.log('url',url);
+        var jqxhr = $.getJSON( url, function(data) {
+            console.log( "success", data);
+
+            // score ****************************
+            
+            var lo = data.score.min;
+            var hi = data.score.max;
+            var step = Math.round((hi-lo) / 4);
+
+            // setup sliders
+            $("#slider-score").slider({
+                min: lo,
+                max: hi,
+                values: [data.score.val],
+                slide: function(event,ui) {
+                    var v = ui.value;
+                    $('#slider-score-data').html(v);
+                    filterSlider.score = parseInt(v);            
+                },
+                change: function(event,ui) {
+                    var data = {score:{val:filterSlider.score}};
+                    thisB.sendChange(data,trackConfig);
+                }
+            })
+            .slider('pips', {
+                rest:'label',
+                step: step
+            });
+
+            filterSlider.score = data.score.val;
+
+            // evalue slider *******************************
+
+            var hi = data.evalue.max;
+            var lo = data.evalue.min;
+            var step = (hi - lo) / 20;
+
+            var pstep = 5;
+            var labels = [];
+
+            for(var i=lo;i <= hi; i += pstep*step) {
+                var v = Math.pow(10,i);
+                labels.push(v.toExponential(1));
+            }
+            labels.push(Math.pow(10,hi).toExponential(1));
+
+            // push values to positive zone because slider pips cannot seem to handle negative numbers with custom labels
+            offset = Math.abs(lo);
+            lo = lo + offset;
+            hi = hi + offset;
+
+            console.log(labels);
+
+            $("#slider-evalue").slider({
+                min: lo,
+                max: hi,
+                step:step,
+                values: [data.evalue.val],
+                slide: function(event,ui) {
+                    var v = Math.pow(10,+ui.value - offset);
+                    $('#slider-evalue-data').html(v.toExponential(1));
+                    //filterSlider.evalue = v;
+                    filterSlider.evalue = +ui.value - offset;
+                },
+                change: function(event,ui) {
+                    var data = {evalue:{val:filterSlider.evalue}};
+                    thisB.sendChange(data,trackConfig);
+                }
+            }).slider("pips",{
+                rest:'label',
+                first:'label',
+                last:'label',
+                labels: labels,
+                step: pstep
+            });
+            filterSlider.evalue = data.evalue.val;
+
+            // identity slider
+
+            var hi = data.identity.max;
+            var lo = data.identity.min;
+            var step = (hi - lo) / 20;
+
+            // pip setup
+            var pstep = 5;
+            var labels = [];
+            for(var i=lo;i <= hi; i += pstep*step) {
+                labels.push(""+Math.round(i));
+            }
+
+            $("#slider-identity").slider({
+                min: lo,
+                max: hi,
+                step: step,
+                values: [data.identity.val],
+                slide: function(event,ui) {
+                    var v = ui.value + '%';
+                    $('#slider-identity-data').html(v);
+                    filterSlider.identity = parseInt(v);
+                },
+                change: function(event,ui) {
+                    var data = {identity:{val:filterSlider.identity}};
+                    thisB.sendChange(data,trackConfig);
+                }
+            }).slider("pips",{
+                rest:'label',
+                first:'label',
+                last:'label',
+                step: pstep,
+                //labels: labels,
+                suffix: '%'
+            });
+            filterSlider.identity = data.identity.val;
+
+            // gap slider
+
+            var hi = data.gaps.max;
+            var lo = data.gaps.min;
+            var step = (hi - lo) / 20;
+            //step = parseFloat(step.toFixed(2));
+
+            var pstep = 5;
+            //pstep = parseFloat(pstep.toFixed(2));
+            var labels = [];
+            for(var i=lo;i <= hi; i += pstep*step) {
+                labels.push(i);
+            }
+            $("#slider-gap").slider({
+                min: lo,
+                max: hi,
+                step: step,
+                values: [data.gaps.val],
+                slide: function(event,ui) {
+                    var v = ui.value + '%';
+                    $('#slider-gap-data').html(v);
+                    filterSlider.gaps = parseFloat(ui.value);
+                },
+                change: function(event,ui) {
+                    var data = {gaps:{val:filterSlider.gaps}};
+                    thisB.sendChange(data,trackConfig);
+                }
+                
+            }).slider("pips",{
+                rest: 'label',
+                first: 'label',
+                last: 'label',
+                step: pstep,
+                //labels: labels,
+                suffix: '%'
+            });
+            filterSlider.gaps = data.gaps.val;
+            
+            // do stuff once after sliders are initialized
+            setTimeout(function() {
+                var val = filterSlider.score;
+                $('#slider-score-data').html(val);
+
+                var val = filterSlider.evalue;
+                //val = Math.pow(10,val);
+                $('#slider-evalue-data').html(val.toExponential(1));
+
+                var v = filterSlider.identity + '%';
+                $('#slider-identity-data').html(v);
+
+                var v = filterSlider.gaps + '%';
+                $('#slider-gap-data').html(v);
+
+            },100);
+
+        });
+        
+    },
+    sendChange: function(data,trackConfig) {
+        // do http post
+        var postData = {
+              filterParams: data,
+              asset: this.browser.jblast.asset,
+              dataSet: this.browser.config.dataRoot
+        }
+        //console.log("postData",postData);
+        $.post( "/jbapi/setfilter", postData , function( result ) {
+            console.log( result );
+        }, "json");
+    },
     
     // setup blast filter sliders
     // ref: http://simeydotme.github.io/jQuery-ui-Slider-Pips/#options-pips
@@ -444,6 +703,8 @@ return declare( JBrowsePlugin,
         });
 
         filterSlider.score = lo;
+
+
 
         // evalue slider
 
@@ -1010,7 +1271,7 @@ return declare( JBrowsePlugin,
                     // do http post
                     var xhrArgs = {
                       //url: jbServer + '/jbapi/blastregion',
-                      url: jbServer + '/jbapi/workflowsubmit',
+                      url: '/jbapi/workflowsubmit',
                       postData: {
                           region: regionB,
                           //workflow: 'f2db41e1fa331b3e'
@@ -1026,7 +1287,16 @@ return declare( JBrowsePlugin,
                           alert(error);
                       }
                     };
-                    var deferred = dojo.xhrPost(xhrArgs);
+                    var postData = {
+                          region: regionB,
+                          //workflow: 'f2db41e1fa331b3e'
+                          workflow: selWorkflow,
+                          dataSetPath: thisB.config.dataRoot
+                      };
+                    //var deferred = dojo.xhrPost(xhrArgs);
+                    $.post( "/jbapi/setfilter", postData , function( result ) {
+                        console.log( result );
+                    }, "json");
 
 
                     // show confirm submit box
@@ -1069,7 +1339,7 @@ function getWorkflows(cb) {
     var thisB = this;
 
     var xhrArgs = {
-      url: jbServer + "/jbapi/getworkflows",
+      url: "/jbapi/getworkflows",
       handleAs: "json",
       preventCache: true,
       load: function(data){
@@ -1081,6 +1351,9 @@ function getWorkflows(cb) {
     }
 
     // Call the asynchronous xhrGet
-    var deferred = dojo.xhrGet(xhrArgs);
-
+    //var deferred = dojo.xhrGet(xhrArgs);
+    $.get( "/jbapi/getworkflows", function( data ) {
+        console.log("get workflows result", data);
+        cb(data);
+    });
 }

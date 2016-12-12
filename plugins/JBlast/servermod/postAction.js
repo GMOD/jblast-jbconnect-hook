@@ -136,7 +136,7 @@ function postMoveResultFiles(kWorkflowJob,cb) {
         newTrackJson[0].baseUrl = g.dataSet[0].dataPath;
         newTrackJson[0].urlTemplate = g.jblast.blastResultPath+"/"+fileGffOnly;
         newTrackJson[0].jblastData = g.jblast.blastResultPath+"/"+fileJsonOnly;
-        newTrackJson[0].label = "jblast-"+ (new Date().getTime());
+        newTrackJson[0].label = kWorkflowJob.data.blastData.outputs.json; //"jblast-"+ (new Date().getTime());
         newTrackJson[0].key = trackLabel;
         newTrackJson[0].category= g.jblast.blastResultCategory;
         
