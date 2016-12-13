@@ -44,6 +44,9 @@ return declare( JBrowsePlugin,
         
         
         browser.jblast = {
+            asset: null,
+            focusQueue: [],
+            focusQueueProc: 0,
             filterSliders: {
                 score: 0,
                 evalue: 0,
@@ -100,6 +103,9 @@ return declare( JBrowsePlugin,
         // setup right click menu for highlight region
         browser.afterMilestone( 'initView', function() {
             thisB.jblastRightClickMenuInit();
+            
+            // start filter panel hide/show queue
+            thisB.startFocusQueue();
         });
         // setup feature detail dialog monitor
         browser.afterMilestone( 'initView', function() {
@@ -149,18 +155,32 @@ return declare( JBrowsePlugin,
             console.log("event track-test "+data.value);
             alert("event track-test value = "+data.value)
         });
+        
+        
         dojo.subscribe("/jbrowse/v1/n/tracks/focus", function(track){
             console.log("jblast plugin event: /jbrowse/v1/n/tracks/focus",track);
-            if (typeof track.config.filterSettings != 'undefined')
-                
+            if (typeof track.config.filterSettings !== 'undefined') {
                 // for jblast tracks, the label is the asset and also the reference to the filterSettings of the asset
                 thisB.browser.jblast.asset = track.config.label;
-                thisB.insertBlastPanel1(track.config);
+                thisB.insertBlastPanel2(track.config);
+            }
         });        
         dojo.subscribe("/jbrowse/v1/n/tracks/unfocus", function(track){
             console.log("jblast plugin event: /jbrowse/v1/n/tracks/unfocus",track);
-            if (typeof track.config.filterSettings != 'undefined')
-                thisB.removeBlastPanel1(track.config);
+            if (typeof track.config.filterSettings !== 'undefined') {
+                thisB.removeBlastPanel2(track.config);
+                thisB.browser.jblast.asset = null;
+            }
+        });        
+        dojo.subscribe("/jbrowse/v1/v/tracks/show", function(trackConfigs){
+            console.log("jblast plugin event: /jbrowse/v1/v/tracks/show",trackConfigs);
+            if (typeof trackConfigs[0].filterSettings !== 'undefined')
+                thisB.insertBlastPanel2(trackConfigs[0]);
+        });        
+        dojo.subscribe("/jbrowse/v1/v/tracks/hide", function(trackConfigs){
+            console.log("jblast plugin event: /jbrowse/v1/v/tracks/hide",trackConfigs);
+            if (typeof trackConfigs[0].filterSettings !== 'undefined')
+                thisB.removeBlastPanel2(trackConfigs[0]);
         });        
         
     },
@@ -402,6 +422,48 @@ return declare( JBrowsePlugin,
         txt += '</tr></table>';  
         return txt;
     },
+    startFocusQueue: function() {
+        var thisB = this;
+        setInterval(function() {
+            if (thisB.browser.jblast.focusQueueProc == 0  && thisB.browser.jblast.focusQueue.length > 0)
+                thisB.processAction();
+        },300);
+    },
+    processAction: function() {
+        
+        var queue = this.browser.jblast.focusQueue;
+
+        var thisB = this;
+        var task = queue.shift();
+        this.browser.jblast.focusQueueProc++;
+
+        
+        if (task.action === 'show') {
+            this.insertBlastPanel1(task.trackConfig);
+            $('#blast-filter-group').show(500,function() {
+                thisB.browser.jblast.focusQueueProc--;
+            });
+        }
+        else if (task.action === 'hide') {
+            this.removeBlastPanel1(task.trackConfig);
+            if ($('#blast-filter-group').length) {
+                $('#blast-filter-group').hide(500);
+                setTimeout(function() { // hide complete event is broke in jquery, so we use a timer.
+                    thisB.browser.jblast.focusQueueProc--;
+                },700);
+            }
+        }
+    },
+    insertBlastPanel2: function(trackConfig) {
+        console.log("insertBlastPanel2",this.browser.jblast.focusQueue);
+        var queue = this.browser.jblast.focusQueue;
+        queue.push({action:'show',trackConfig:trackConfig});
+    },
+    removeBlastPanel2: function() {
+        console.log("removeBlastPanel2",this.browser.jblast.focusQueue);
+        var queue = this.browser.jblast.focusQueue;
+        queue.push({action:'hide'});
+    },
     insertBlastPanel1: function(trackConfig) {
         var thisB = this;
         console.log('insertBlastPanel1()');
@@ -411,8 +473,8 @@ return declare( JBrowsePlugin,
 
         // setup button open button in the Available Tracks title
         
-        $('.jbrowseHierarchicalTrackSelector > .header').prepend('<button id="blast-filter-open-btn" class="btn btn-primary">BLAST Filter</button>');
-
+        //$('.jbrowseHierarchicalTrackSelector > .header').prepend('<button id="blast-filter-open-btn" class="btn btn-primary">BLAST Filter</button>');
+/*
         setTimeout(function() {
             $('#blast-filter-group').show(500);
             $('#blast-filter-open-btn').click(function(){
@@ -420,7 +482,7 @@ return declare( JBrowsePlugin,
                 $('#blast-filter-open-btn').hide();
             });
         },500);
-        
+*/        
     },
     removeBlastPanel1: function() {
         
