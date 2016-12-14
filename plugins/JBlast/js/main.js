@@ -61,24 +61,6 @@ return declare( JBrowsePlugin,
                 browser.config.classInterceptList = {};
             }
             
-            // override HTMLFeatures
-            /*
-            require(["dojo/_base/lang", "JBrowse/View/Track/HTMLFeatures"], function(lang, HTMLFeatures){
-                lang.extend(HTMLFeatures, {
-                    renderFilter: thisB.HTMLFeatures_renderFilter,
-                    extendedInit: thisB.HTMLFeatures_extendedInit,
-                    featureHook1: thisB.HTMLFeatures_featureHook1
-                });
-            });
-            */
-            // override Hierarchical
-            require(["dojo/_base/lang", "JBrowse/View/TrackList/Hierarchical"], function(lang, Hierarchical){
-                lang.extend(Hierarchical, {
-                    extendCheckbox: thisB.Hierarchical_extendCheckbox,                    
-                    replaceTracks: thisB.Hierarchical_replaceTracks
-                });
-            });
-
             // override FASTA
             require(["dojo/_base/lang", "JBrowse/View/FASTA"], function(lang, FASTA){
                 lang.extend(FASTA, {
@@ -91,14 +73,6 @@ return declare( JBrowsePlugin,
                     jblastDialog: thisB.Browser_jblastDialog
                 });
             });
-            // override BlockBased
-            /*
-            require(["dojo/_base/lang", "JBrowse/View/Track/BlockBased"], function(lang, BlockBased){
-                lang.extend(BlockBased, {
-                    postRenderHighlight: thisB.BlockBased_postRenderHighlight
-                });
-            });
-            */
         }); 
         // setup right click menu for highlight region
         browser.afterMilestone( 'initView', function() {
@@ -197,76 +171,10 @@ return declare( JBrowsePlugin,
         }
         return null;
     },
-    // initial the blast track, called in HTMLFeatures constructor
-    initBlastTrack: function(blastTrackConfig) {
-        console.log('initBlastTrack()');
-        var thisB = this;
-        var config = blastTrackConfig;
-        
-        if (this.browser.jblast.BlastKey === config.label) return;
-        
-        console.log("blastKey",config.label);
-        
-        this.browser.jblast.BlastKey = config.label;
-        
-        this.blastReadJSON(config,function() {
-            //this.gotBlastData();
-            console.log("blastReadJSON callback");
-            thisB.browser.blastTrackConfig = config;
-            thisB.browser.blastKey = config.label;
-            thisB.insertBlastPanel();
-            //thisB.blastRenderData();
-        });
-    },
-    // render data into blast panel (bottom panel)
     
-    blastRenderData: function() {
+    setupFeatureToolTips: function() {
         var thisB = this;
         var browser = this.browser;
-        var hits = browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
-
-        // clearout the blast panel accordion
-        /*
-        $('#blast-accordion').html('');
-        */
-        //var txt = "";
-        //console.log("hits",hits);
-        /*
-        setTimeout(function() {
-            console.log("rendering blast accordion");
-            for (var x in hits) {
-                //console.log("accordion item", hit)
-                var key = hits[x].key;
-
-                // display only filtered results.
-                if (hits[x].selected==1) {
-                    //console.log("add to panel",hits[x]);
-                    var summary = thisB.blastRenderSummary(hits[x]);
-                    blast_addPanel(key,hits[x].Hit_def,summary);
-                }
-            }
-        },200);
-        */
-        /*
-        $('#blast-accordion').on('show.bs.collapse', function(e) {
-            var key = $(e.target).attr('id');
-            item = e.target;
-            
-            if (typeof key === 'undefined') {
-                item = $('.panel-collapse',e.target);
-                key = item.attr('id');
-            }
-            //console.log(e.target);
-            var hit = browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit[key];
-            console.log("expand hit",key,item);
-            var txt = browser.jblastPlugin.blastRenderHit(hit);
-            txt += browser.jblastPlugin.blastRenderHitBp(hit);
-            
-            $('.panel-body',item).html(txt);
-        });
-        */
-        // setup the feature tooltip
-        // todo: this action should be triggered by the approrpiate event
         setTimeout(function() {
             // setup tooltip
             $('.blast-feature').each(function() {
@@ -304,7 +212,6 @@ return declare( JBrowsePlugin,
                 }
             });            
         },1000);
-        
     },
     // monitor feature detail popup and insert blast data when necessary
     // todo: should trigger on the appropriate event
@@ -422,6 +329,10 @@ return declare( JBrowsePlugin,
         txt += '</tr></table>';  
         return txt;
     },
+/*********************************************************
+ * Track Focus - Blast Panel 
+ *********************************************************/    
+    
     startFocusQueue: function() {
         var thisB = this;
         setInterval(function() {
@@ -439,13 +350,18 @@ return declare( JBrowsePlugin,
 
         
         if (task.action === 'show') {
-            this.insertBlastPanel1(task.trackConfig);
+            //this.insertBlastPanel1(task.trackConfig);
+            $('#blast-filter-group').clone().prependTo('.jbrowseHierarchicalTrackSelector');
+            thisB.setupFilterSliders1(task.trackConfig);
             $('#blast-filter-group').show(500,function() {
                 thisB.browser.jblast.focusQueueProc--;
             });
         }
         else if (task.action === 'hide') {
-            this.removeBlastPanel1(task.trackConfig);
+            //this.removeBlastPanel1(task.trackConfig);
+            $(".jbrowseHierarchicalTrackSelector > #blast-filter-group").hide(500,function complete() {
+                $(".jbrowseHierarchicalTrackSelector > #blast-filter-group").remove();
+            });
             if ($('#blast-filter-group').length) {
                 $('#blast-filter-group').hide(500);
                 setTimeout(function() { // hide complete event is broke in jquery, so we use a timer.
@@ -454,6 +370,7 @@ return declare( JBrowsePlugin,
             }
         }
     },
+    
     insertBlastPanel2: function(trackConfig) {
         console.log("insertBlastPanel2",this.browser.jblast.focusQueue);
         var queue = this.browser.jblast.focusQueue;
@@ -463,80 +380,6 @@ return declare( JBrowsePlugin,
         console.log("removeBlastPanel2",this.browser.jblast.focusQueue);
         var queue = this.browser.jblast.focusQueue;
         queue.push({action:'hide'});
-    },
-    insertBlastPanel1: function(trackConfig) {
-        var thisB = this;
-        console.log('insertBlastPanel1()');
-        //relocate blast filter panel; put it in sidebar (this is from a template in BlastPanel.html)
-        $('#blast-filter-group').clone().prependTo('.jbrowseHierarchicalTrackSelector');
-        thisB.setupFilterSliders1(trackConfig);
-
-        // setup button open button in the Available Tracks title
-        
-        //$('.jbrowseHierarchicalTrackSelector > .header').prepend('<button id="blast-filter-open-btn" class="btn btn-primary">BLAST Filter</button>');
-/*
-        setTimeout(function() {
-            $('#blast-filter-group').show(500);
-            $('#blast-filter-open-btn').click(function(){
-                $('#blast-filter-group').slideDown(500);
-                $('#blast-filter-open-btn').hide();
-            });
-        },500);
-*/        
-    },
-    removeBlastPanel1: function() {
-        
-        $(".jbrowseHierarchicalTrackSelector > #blast-filter-group").hide(500,function complete() {
-            $(".jbrowseHierarchicalTrackSelector > #blast-filter-group").remove();
-        });
-    },
-    // this creates the side blast filter panel
-    insertBlastPanel: function(postFn) {
-        var thisB = this;
-        console.log('insertBlastPanel()');
-        //relocate blast filter panel; put it in sidebar (this is from a template in BlastPanel.html)
-        $('#blast-filter-group').prependTo('.jbrowseHierarchicalTrackSelector');
-        thisB.setupFilterSliders();
-
-        // setup button open button in the Available Tracks title
-        $('.jbrowseHierarchicalTrackSelector > .header').prepend('<button id="blast-filter-open-btn" class="btn btn-primary">BLAST Filter</button>');
-
-        setTimeout(function() {
-            $('#blast-filter-group').show(500);
-            $('#blast-filter-open-btn').click(function(){
-                $('#blast-filter-group').slideDown(500);
-                $('#blast-filter-open-btn').hide();
-            });
-        },500);
-    },
-    // filter hits based on scores
-    lastVal: 0,
-    scoreFilter: function(val){
-        
-        if (JSON.stringify(this.lastVal) == JSON.stringify(val)) return;    // deep compare
-        this.lastVal = JSON.parse(JSON.stringify(val));     // deep copy
-
-        console.log("val",val);
-
-        var blastData = this.browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
-
-        for(var x in blastData) {
-            blastData[x].selected = 0;
-            if (parseFloat(blastData[x].Hsp['Hsp_bit-score']) > val.score &&
-               +blastData[x].Hsp['Hsp_evalue'] < val.evalue &&     
-               ((parseFloat(blastData[x].Hsp['Hsp_identity']) / parseFloat(blastData[x].Hsp['Hsp_align-len'])) * 100) > val.identity &&    
-               ((parseFloat(blastData[x].Hsp['Hsp_gaps']) / parseFloat(blastData[x].Hsp['Hsp_align-len'])) * 100) < val.gaps   &&  
-               
-               1 ) blastData[x].selected = 1;
-        }
-
-        // toggle blast item
-        // todo: toggle specific button based on currently selected
-        var key = this.browser.blastKey;
-            $(".jblast-item[blastref*='"+key+"']").trigger('click');  "input[name*='man']"
-            setTimeout(function(){
-                $(".jblast-item[blastref*='"+key+"']").trigger('click');
-            },300);
     },
     setupFilterSliders1: function(trackConfig) {
         console.log("setupFilterSliders1");
@@ -731,446 +574,6 @@ return declare( JBrowsePlugin,
         }, "json");
     },
     
-    // setup blast filter sliders
-    // ref: http://simeydotme.github.io/jQuery-ui-Slider-Pips/#options-pips
-    setupFilterSliders: function() {
-        console.log("setupFilterSliders()");
-        var thisB = this;
-
-        var filterSlider = this.browser.jblast.filterSliders;
-        
-        // score slider
-        
-        var hi = Math.ceil(this.getHighest('Hsp_bit-score'));
-        var lo = Math.floor(this.getLowest('Hsp_bit-score'));
-        var step = Math.round((hi-lo) / 4);
-        console.log("score hi/lo",lo,hi);
-
-        var startPos = Math.round((hi - lo) * .8) + lo; // 80%
-
-        // setup sliders
-        $("#slider-score").slider({
-            min: lo,
-            max: hi,
-            values: [lo],
-            slide: function(event,ui) {
-                var v = ui.value;
-                $('#slider-score-data').html(v);
-                filterSlider.score = parseInt(v);            
-            }
-        })
-        .slider('pips', {
-            rest:'label',
-            step: step
-        });
-
-        filterSlider.score = lo;
-
-
-
-        // evalue slider
-
-        var hi = this.getHighest10('Hsp_evalue');
-        var lo = this.getLowest10('Hsp_evalue');
-        var step = (hi - lo) / 20;
-
-        console.log("evalue hi/lo/step,hival",lo,hi,step,this.getHighest('Hsp_evalue').toExponential(1));
-
-        var pstep = 5;
-        var labels = [];
-        
-        for(var i=lo;i <= hi; i += pstep*step) {
-            var v = Math.pow(10,i);
-            labels.push(v.toExponential(1));
-        }
-        labels.push(Math.pow(10,hi).toExponential(1));
-
-        // push values to positive zone because slider pips cannot seem to handle negative numbers with custom labels
-        offset = Math.abs(lo);
-	lo = lo + offset;
-        hi = hi + offset;
-
-        console.log(labels);
-
-        $("#slider-evalue").slider({
-            min: lo,
-            max: hi,
-            step:step,
-            values: [hi],
-            slide: function(event,ui) {
-                var v = Math.pow(10,+ui.value - offset);
-                $('#slider-evalue-data').html(v.toExponential(1));
-                filterSlider.evalue = v;
-            }
-        }).slider("pips",{
-            rest:'label',
-            first:'label',
-            last:'label',
-            labels: labels,
-            step: pstep
-        });
-        filterSlider.evalue = Math.pow(10,hi - offset);
-
-        // identity slider
-
-        var hi = Math.ceil(this.getHighestPct('Hsp_identity'));
-        var lo = Math.floor(this.getLowestPct('Hsp_identity'));
-        var step = (hi - lo) / 20;
-
-        // pip setup
-        var pstep = 5;
-        var labels = [];
-        for(var i=lo;i <= hi; i += pstep*step) {
-            labels.push(""+Math.round(i));
-        }
-        
-        $("#slider-identity").slider({
-            min: lo,
-            max: hi,
-            step: step,
-            values: [lo],
-            slide: function(event,ui) {
-                var v = ui.value + '%';
-                $('#slider-identity-data').html(v);
-                filterSlider.identity = parseInt(v);
-            }
-        }).slider("pips",{
-            rest:'label',
-            first:'label',
-            last:'label',
-            step: pstep,
-            //labels: labels,
-            suffix: '%'
-        });
-        filterSlider.identity = lo;
-
-        // gap slider
-
-        var hi = Math.ceil(this.getHighestPct('Hsp_gaps'));
-        var lo = Math.floor(this.getLowestPct('Hsp_gaps'));
-        var step = (hi - lo) / 20;
-        //step = parseFloat(step.toFixed(2));
-
-        var pstep = 5;
-        //pstep = parseFloat(pstep.toFixed(2));
-        var labels = [];
-        for(var i=lo;i <= hi; i += pstep*step) {
-            labels.push(i);
-        }
-        $("#slider-gap").slider({
-            min: lo,
-            max: hi,
-            step: step,
-            values: [hi],
-            slide: function(event,ui) {
-                var v = ui.value + '%';
-                $('#slider-gap-data').html(v);
-                filterSlider.gaps = parseFloat(ui.value);
-            }
-        }).slider("pips",{
-            rest: 'label',
-            first: 'label',
-            last: 'label',
-            step: pstep,
-            //labels: labels,
-            suffix: '%'
-        });
-        filterSlider.gaps = hi;
-
-        // do stuff once after sliders are initialized
-        setTimeout(function() {
-            var val = filterSlider.score;
-            $('#slider-score-data').html(val);
-            
-            var val = filterSlider.evalue;
-            //val = Math.pow(10,val);
-            $('#slider-evalue-data').html(val.toExponential(1));
-
-            var v = filterSlider.identity + '%';
-            $('#slider-identity-data').html(v);
-
-            var v = filterSlider.gaps + '%';
-            $('#slider-gap-data').html(v);
-            
-        },100);
-
-        // periodically scan slider value and rerender blast feature track
-        setInterval(function() {
-            //var val = $('#slider-score').slider("option", "value");
-            //var val = $('#slider-score').value;
-            //console.log('val',val);
-            
-            thisB.scoreFilter(filterSlider);
-        },3000);
-
-
-        // process blast Filter button (toggle)
-        $( "#blast-filter-close-btn" ).click(function() {
-            $('#blast-filter-group').slideUp(500); 
-            $('#blast-filter-open-btn').show();
-        });    
-
-    },
-    // get the hightest value of the blast data variable
-    getHighest: function(variable) {
-        var blastData = this.browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
-        var val = 0;
-        for(var x in blastData) {
-            //console.log(variable,blastData[x].Hsp[variable]);
-            if (+blastData[x].Hsp[variable] > val)
-                val = +blastData[x].Hsp[variable];
-        }
-        return val;
-    },
-    // get the lowest value of the blast data variable.
-    getLowest: function(variable) {
-        var blastData = this.browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
-        var val = -1;
-        for(var x in blastData) {
-            if (val === -1) val = +blastData[x].Hsp[variable];
-            if (+blastData[x].Hsp[variable] < val)
-                val = +blastData[x].Hsp[variable];
-        }
-        return val;
-    },
-    // get the hightest value of the blast data variable
-    getHighest10: function(variable) {
-        var blastData = this.browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
-        var val = Math.log10(Number.MIN_VALUE);
-        //console.log("smallest",val);
-        for(var x in blastData) {
-            var v = Math.log10(+blastData[x].Hsp[variable]);
-            //console.log('v',v,blastData[x].Hsp[variable]);
-            if (v > val) val = v;
-        }
-        return val;
-    },
-    // get the lowest value of the blast data variable.
-    getLowest10: function(variable) {
-        var blastData = this.browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
-        var val = -1;
-        for(var x in blastData) {
-            var v = Math.log10(+blastData[x].Hsp[variable]);
-            if (val === -1) val = v;
-            if (v < val)  val = v;
-        }
-        return val;
-    },
-    // get the hightest value of the blast data variable as a percent of align-len
-    getHighestPct: function(variable) {
-        var blastData = this.browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
-        var val = 0;
-        for(var x in blastData) {
-            //console.log(variable,blastData[x].Hsp[variable]);
-            var cval = parseFloat(blastData[x].Hsp[variable]) / parseFloat(blastData[x].Hsp['Hsp_align-len']) * 100;
-            if (cval > val) val = cval
-        }
-        return val;
-    },
-    // get the lowest value of the blast data variable as a percent of align-len
-    getLowestPct: function(variable) {
-        var blastData = this.browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
-        var val = -1;
-        for(var x in blastData) {
-            var cval = parseFloat(blastData[x].Hsp[variable]) / parseFloat(blastData[x].Hsp['Hsp_align-len']) * 100;
-            if (val === -1) val = cval;
-            if (cval < val) val = cval;
-        }
-        return val;
-    },
-    // blast data has been acquired, setup default filter.  (depricated)
-    gotBlastData: function() {
-
-        var browser = this.browser;
-        // initial score filter (top 20)
-        this.createTestFilter("Hsp_bit-score",20);
-
-
-    },
-    // a test filter to sorted (should be obsoleted)
-    createTestFilter:function(value,num) {
-        //console.log("createTestFilter",JBrowse.blastData);
-        var blastData = JBrowse.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
-
-        var sorted = [];
-
-        for(var x in blastData) {
-            //var newItem = new Object();
-            //newItem.key = x;
-            //newItem.hit = blastData[x];
-            if (num == 0)
-                blastData[x].selected = 1;  // clear all selected
-            else
-                blastData[x].selected = 0;  // clear all selected
-            sorted.push(blastData[x]);
-        }
-
-        // sort the list based on desired sort (value)
-        function compare(a,b) {
-            if (a.Hsp[value] < b.Hsp[value])
-                return -1;
-            if (a.Hsp[value] > b.Hsp[value])
-                return 1;
-            return 0;
-        }
-
-        sorted.sort(compare);
-
-
-        // chop the list based on (num)
-        if (num > 0) {
-            var filtered = [];
-            var count = num;
-
-            for(var i in sorted) {
-                if (count-- <= 0) continue; 
-                //filtered[sorted[i].key] = sorted[i].hit;
-                sorted[i].selected = 1; // mark selected
-                filtered.push(sorted[i]);
-            }
-            // debug show results
-            /*
-            for(var i in filtered) {
-                console.log(filtered[i].Hsp[value],filtered[i]);
-            }
-            */
-            //console.log("filtered list",filtered);
-            JBrowse.blastData = filtered;
-        }
-        return;
-    },
-    // retrieve blast data json into this.blastData
-    blastReadJSON: function(config,postFn) {
-        console.log("blastReadJSON()",config,config.baseUrl+config.blastData);
-        var thisB = this;
-        var browser = this.browser;
-
-        browser.blastDataJSON = 0;
-
-        //var blastDataFile = config.blastData;
-        if (typeof config.blastData !== "undefined") {
-            var success = 0;
-            var deferred = dojo.xhrGet({
-                url: config.baseUrl+config.blastData,
-                handleAs: "json",
-                preventCache: true,
-                load: function(obj) {
-                    browser.blastDataJSON = obj;
-                    success = 1;
-                    console.log("read success",obj,success);
-                },
-                error: function(err) {
-                    console.log(err);
-                }
-            });
-            // need to decouple the postFn() callback because errors in postFn cause xhrGet error trap to trigger.
-            var timeout = 0;
-            var timy = setInterval(function() {
-                if (success){
-                    console.log("blastReadJSON done", browser.blastDataJSON);
-                    clearInterval(timy);
-                    postFn();
-                }
-                if (timeout++ > 300) {
-                    clearInterval(timy);
-                    console.log("blastReadJSON did not call postFn()");
-                }
-            },10);
-        }
-    },
-    // recursively find id in a node tree
-    // find key in a complex object, recursive.  Returns the object list containing such key
-    findObjNested: function(obj, key, memo) {
-      var thisB = this;
-      var i,
-          proto = Object.prototype,
-          ts = proto.toString,
-          hasOwn = proto.hasOwnProperty.bind(obj);
-
-      if ('[object Array]' !== ts.call(memo)) memo = [];
-
-      for (i in obj) {
-        if (hasOwn(i)) {
-          if (i === key) {
-            memo.push(obj);
-          } else if ('[object Array]' === ts.call(obj[i]) || '[object Object]' === ts.call(obj[i])) {
-            thisB.findObjNested(obj[i], key, memo);
-          }
-        }
-      }
-
-      return memo;
-    },
-    HTMLFeatures_extendedInit: function() {
-        // if jblast plugin available
-        if (typeof this.browser.jblastPlugin !== 'undefined') {
-           
-            // only if it a blastData track
-            if (typeof this.config.blastData !== 'undefined') {
-                this.browser.jblastPlugin.initBlastTrack(this.config);
-            }
-        }
-        
-    },
-    HTMLFeatures_renderFilter: function(feature) {
-            var browser = this.browser;
-            var render = 0;
-
-            // if this is not a jblast track, then pass then render all features.
-            if (typeof this.config.blastData === 'undefined') return 1;
-
-            if ( (typeof browser.blastDataJSON==='undefined') || browser.blastDataJSON === 0) {
-                return 0;   /// not initialized yet
-            }
-
-            // jblast filter
-            var blastData = browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
-
-            var blasthit = feature.get('blasthit');
-            //console.log("featurefilter",blasthit);
-            if ((typeof blastData !== 'undefined') && (typeof blasthit !== 'undefined'))
-                if (typeof blastData[blasthit] !== 'undefined')
-                    render = blastData[blasthit].selected;
-
-            return render;
-    },
-    HTMLFeatures_featureHook1: function(feature,featDiv) {
-        /*
-        blast attributes
-        */
-        var blastHit = feature.get('blasthit');
-        if (typeof blastHit !== 'undefined') {
-            var blastKey = blastHit;
-            dojo.attr(featDiv,'blastkey',blastKey);
-            dojo.addClass(featDiv,'blast-feature');
-        }
-    },
-    Hierarchical_extendCheckbox: function(props,trackConf) {
-        //console.log("extendCheckbox",trackConf);
-        if (typeof trackConf.blastData !== 'undefined') {
-            console.log("extendCheckbox prop",props)
-            props.blastRef = trackConf.label;
-            props.className += " jblast-item";
-        }
-        return props;
-    },
-    Hierarchical_replaceTracks: function( trackConfigs ) {   // notification
-        var isChecked = {}
-        array.forEach( trackConfigs, function(conf) {
-            this._findTrack( conf.label, function( trackRecord, category ) {
-                isChecked[conf.label] = trackRecord.checkbox.checked;
-            });
-        },this);
-
-        this.deleteTracks (trackConfigs);
-        this.addTracks (trackConfigs);
-
-        array.forEach( trackConfigs, function(conf) {
-            this._findTrack( conf.label, function( trackRecord, category ) {
-                trackRecord.checkbox.checked = isChecked[conf.label];
-            });
-        },this);
-    },
     // adds Blast button
     FASTA_addButtons: function (region,seq, toolbar) {
         var text = this.renderText( region, seq );
@@ -1229,18 +632,6 @@ return declare( JBrowsePlugin,
         menu.startup();
 
         browser.jblastHiliteMenu = menu;
-        /*
-        setInterval(function(){
-            var n1 = query(".global_highlight");
-            
-            for(var i in n1) {
-                if(dojo.hasClass(n1[i], "global_highlight")){
-                    browser.jblastHiliteMenu.bindDomNode(n1[i]);
-                }
-            }
-            //console.log('global-highlights',n1.length);
-        },5000);
-        */
     },
     /**
      * called when highlight region is created
