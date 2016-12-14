@@ -136,25 +136,25 @@ return declare( JBrowsePlugin,
             if (typeof track.config.filterSettings !== 'undefined') {
                 // for jblast tracks, the label is the asset and also the reference to the filterSettings of the asset
                 thisB.browser.jblast.asset = track.config.label;
-                thisB.insertBlastPanel2(track.config);
+                thisB.insertBlastPanel(track.config);
             }
         });        
         dojo.subscribe("/jbrowse/v1/n/tracks/unfocus", function(track){
             console.log("jblast plugin event: /jbrowse/v1/n/tracks/unfocus",track);
             if (typeof track.config.filterSettings !== 'undefined') {
-                thisB.removeBlastPanel2(track.config);
+                thisB.removeBlastPanel(track.config);
                 thisB.browser.jblast.asset = null;
             }
         });        
         dojo.subscribe("/jbrowse/v1/v/tracks/show", function(trackConfigs){
             console.log("jblast plugin event: /jbrowse/v1/v/tracks/show",trackConfigs);
             if (typeof trackConfigs[0].filterSettings !== 'undefined')
-                thisB.insertBlastPanel2(trackConfigs[0]);
+                thisB.insertBlastPanel(trackConfigs[0]);
         });        
         dojo.subscribe("/jbrowse/v1/v/tracks/hide", function(trackConfigs){
             console.log("jblast plugin event: /jbrowse/v1/v/tracks/hide",trackConfigs);
             if (typeof trackConfigs[0].filterSettings !== 'undefined')
-                thisB.removeBlastPanel2(trackConfigs[0]);
+                thisB.removeBlastPanel(trackConfigs[0]);
         });        
         
     },
@@ -350,15 +350,13 @@ return declare( JBrowsePlugin,
 
         
         if (task.action === 'show') {
-            //this.insertBlastPanel1(task.trackConfig);
             $('#blast-filter-group').clone().prependTo('.jbrowseHierarchicalTrackSelector');
-            thisB.setupFilterSliders1(task.trackConfig);
+            thisB.setupFilterSliders(task.trackConfig);
             $('#blast-filter-group').show(500,function() {
                 thisB.browser.jblast.focusQueueProc--;
             });
         }
         else if (task.action === 'hide') {
-            //this.removeBlastPanel1(task.trackConfig);
             $(".jbrowseHierarchicalTrackSelector > #blast-filter-group").hide(500,function complete() {
                 $(".jbrowseHierarchicalTrackSelector > #blast-filter-group").remove();
             });
@@ -371,17 +369,17 @@ return declare( JBrowsePlugin,
         }
     },
     
-    insertBlastPanel2: function(trackConfig) {
-        console.log("insertBlastPanel2",this.browser.jblast.focusQueue);
+    insertBlastPanel: function(trackConfig) {
+        //console.log("insertBlastPanel2",this.browser.jblast.focusQueue);
         var queue = this.browser.jblast.focusQueue;
         queue.push({action:'show',trackConfig:trackConfig});
     },
-    removeBlastPanel2: function() {
-        console.log("removeBlastPanel2",this.browser.jblast.focusQueue);
+    removeBlastPanel: function() {
+        //console.log("removeBlastPanel2",this.browser.jblast.focusQueue);
         var queue = this.browser.jblast.focusQueue;
         queue.push({action:'hide'});
     },
-    setupFilterSliders1: function(trackConfig) {
+    setupFilterSliders: function(trackConfig) {
         console.log("setupFilterSliders1");
         var thisB = this;
         var config = this.browser.config;
@@ -573,7 +571,11 @@ return declare( JBrowsePlugin,
             console.log( result );
         }, "json");
     },
-    
+
+/*************************************************
+ * Class overrides
+ *************************************************/               
+               
     // adds Blast button
     FASTA_addButtons: function (region,seq, toolbar) {
         var text = this.renderText( region, seq );
