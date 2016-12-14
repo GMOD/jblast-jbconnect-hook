@@ -67,22 +67,23 @@ return declare( JBrowsePlugin,
                     addButtons: thisB.FASTA_addButtons
                 });
             });
-            // override Browser
-            require(["dojo/_base/lang", "JBrowse/Browser"], function(lang, Browser){
-                lang.extend(Browser, {
-                    jblastDialog: thisB.Browser_jblastDialog
-                });
-            });
+            browser.jblastDialog = thisB.Browser_jblastDialog;
+            
+            $.get("plugins/JBlast/BlastPanel.html", function(data){
+                console.log("loaded BlastPanel.html");
+                $('body').append(data);
+            });            
+            
         }); 
-        // setup right click menu for highlight region
         browser.afterMilestone( 'initView', function() {
+
+            // setup right click menu for highlight region - for arbitrary region selection
             thisB.jblastRightClickMenuInit();
             
-            // start filter panel hide/show queue
+            // start filter panel hide/show queue, filter panel management
             thisB.startFocusQueue();
-        });
-        // setup feature detail dialog monitor
-        browser.afterMilestone( 'initView', function() {
+
+            // setup feature detail dialog monitor
             setTimeout(function() {
                 thisB.featureDetailMonitor();
             },500);
@@ -632,6 +633,7 @@ return declare( JBrowsePlugin,
                 onClick: lang.hitch(handlers, "onTaskItemClick")
         }) );
         menu.startup();
+        menu.note = "right-click hilite menu";
 
         browser.jblastHiliteMenu = menu;
     },
