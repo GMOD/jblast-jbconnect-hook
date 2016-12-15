@@ -167,7 +167,7 @@ module.exports = {
         for(var x in blastData) {
             var selected = 0;
             if (parseFloat(blastData[x].Hsp['Hsp_bit-score']) > filterData.score.val &&
-               //+blastData[x].Hsp['Hsp_evalue'] < filterData.evalue.val &&     
+               +blastData[x].Hsp['Hsp_evalue'] < Math.pow(10,filterData.evalue.val) &&     
                ((parseFloat(blastData[x].Hsp['Hsp_identity']) / parseFloat(blastData[x].Hsp['Hsp_align-len'])) * 100) > filterData.identity.val &&    
                ((parseFloat(blastData[x].Hsp['Hsp_gaps']) / parseFloat(blastData[x].Hsp['Hsp_align-len'])) * 100) < filterData.gaps.val   &&  
                1 ) selected = 1;

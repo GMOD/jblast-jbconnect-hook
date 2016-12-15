@@ -461,38 +461,27 @@ return declare( JBrowsePlugin,
             var lo = data.evalue.min;
             var nstep = 100;
             var step = (hi - lo) / nstep;
-            console.log("lo,hi,val",lo,hi,data.evalue.val);
+            console.log("lo,hi,val,step",lo,hi,data.evalue.val,step);
 
             var pstep = 5;
             var labels = [];
 
             for(var i=lo;i <= hi; i += step) {
-                var v = Math.pow(10,i-offset);
+                var v = Math.pow(10,i);
                 labels.push(v.toExponential(1));
             }
             labels.push(Math.pow(10,hi).toExponential(1));
             console.log("labels",labels);
-
-            // push values to positive zone because slider pips cannot seem to handle negative numbers with custom labels
-            //offset = Math.abs(lo);
-            //var offset = Math.abs(hi)*2 + Math.abs(lo-hi);
-            //lo = lo + offset;
-            //hi = hi + offset;
-
-            console.log("lo,hi,val,offset",lo,hi,data.evalue.val+offset,offset);
-            //var v = Math.pow(10,+data.evalue.val).toExponential(1);
-            //var v = +data.evalue.val + offset;
-            //console.log("v",v);
+            
             $("#slider-evalue").slider({
                 min: lo,
                 max: hi,
                 step:step,
-//                values: [data.evalue.val -offset],
+                values: [data.evalue.val],
                 slide: function(event,ui) {
-                    console.log('evalue',ui.value,ui.value - offset);
-                    var ev = +ui.value -offset;
+                    //console.log('evalue',ui.value,ui.value);
+                    var ev = +ui.value;
                     $('#slider-evalue-data').html(Math.pow(10,ev).toExponential(1));
-                    //filterSlider.evalue = v;
                     filterSlider.evalue = ev;
                 },
                 change: function(event,ui) {
@@ -501,10 +490,10 @@ return declare( JBrowsePlugin,
                 }
             }).slider("pips",{
                 rest:'label',
-                first:'label',
-                last:'label',
+                //first:'label',
+                //last:'label',
                 labels: labels,
-                step: pstep
+                step: 25
             });
             filterSlider.evalue = data.evalue.val;
 
