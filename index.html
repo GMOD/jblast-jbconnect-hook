@@ -10,7 +10,6 @@
     <link href="templib/bootstrap.min.css" rel="stylesheet">
     <link href="templib/fuelux.min.css" rel="stylesheet">    
     <link type="text/css" rel="stylesheet" href="src/qTip/jquery.qtip.css" />
-    <link type="text/css" rel="stylesheet" href="src/slider-pips/dist/jquery-ui-slider-pips.min.css" />
     
     <script src="templib/jquery-1.11.0.js"></script>
     <script src="templib/bootstrap.min.js"></script>
@@ -24,7 +23,6 @@
     <!-- Include all compiled plugins (below), or include indi vidual files as needed -->
 
     <script type="text/javascript" src="src/qTip/jquery.qtip.js"></script>    
-    <script type="text/javascript" src="src/slider-pips/dist/jquery-ui-slider-pips.min.js"></script>    
     <script type="text/javascript">
         // for cross origin sails server access
         //var jbServer = 'http://192.168.56.x:1337';
@@ -34,17 +32,15 @@
     </script>
     
     <script type="text/javascript" src="/js/dependencies/sails.io.js"></script>
-   
-    <!--link href="//code.jquery.com/ui/1.11.4/themes/cupertino/jquery-ui.css" rel="stylesheet"-->
-
+<!--   
     <link href="src/mb.extruder/css/mbExtruder.css" media="all" rel="stylesheet" type="text/css">
-
     <script type="text/javascript" src="src/mb.extruder/inc/jquery.hoverIntent.min.js"></script>
     <script type="text/javascript" src="src/mb.extruder/inc/jquery.mb.flipText.js"></script>
     <script type="text/javascript" src="src/mb.extruder/inc/mbExtruder.js"></script>
-
-    <script type="text/javascript" src="src/test/gridDataSource.js"></script>
-    <script>
+-->
+    <!--script type="text/javascript" src="src/test/gridDataSource.js"></script-->
+    
+    <!--script>
         $(document).ready(function() {
 
             // setup extruder sidebar
@@ -64,31 +60,9 @@
                 onExtContentLoad:function(){},
                 onExtClose:function(){}
             });
-            
-            $("#blastPanel").buildMbExtruder({
-                position:"bottom",
-                width:1000,
-                extruderOpacity:.8,
-                //hidePanelsOnClose:true,
-                //accordionPanels:false,
-                onExtOpen:function(){},
-                onExtContentLoad:function(){},
-                onExtClose:function(){}
-            });
-            $("#blastFilterPanel").buildMbExtruder({
-                position:"bottom",
-                width:600,
-                extruderOpacity:.8,
-                //hidePanelsOnClose:true,
-                //accordionPanels:false,
-                onExtOpen:function(){},
-                onExtContentLoad:function(){},
-                onExtClose:function(){}
-            });
-            
         });
         
-    </script>
+    </script-->
 
     <!--script>
         setTimeout(function() {
@@ -204,8 +178,5 @@
   <body class="fuelux">
     <div id="GenomeBrowser" style="height: 100%; width: 100%; padding: 0; border: 0;"></div>
     <div style="display: none">JBrowseDefaultMainPage</div>
-    <div id="extruderLeft" class="{title:'Galaxy ', url:'plugins/JBlast/HistoryPanel.html'}"></div>
-    <!--div id="blastPanel" class="{title:'Blast Hits', url:'plugins/JBlast/BlastPanel.html'}"></div-->
-    <!--div id="blastFilterPanel" class="{title:'BLAST ', url:'plugins/GalaxyBlaster/BlastFilterPanel.html'}"></div-->
   </body>
 </html>
