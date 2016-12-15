@@ -133,3 +133,34 @@ div.blastSummary td.blastSummaryItem {
     background-color: #ccc;
     border-width:0px;
 }
+
+
+/*
+    history panel
+*/
+        #j-hist-grid {
+            position: absolute;
+            background-color:#eee;
+            overflow:auto;
+            width: 300px;
+            height:500px;
+        }
+        #j-blast {
+            position:absolute;
+            background-color:#eee;
+            overflow-x:hidden;
+            overflow-y:auto;
+            width: 100%;
+            padding:10px;
+            white-space:nowrap;
+        }
+        .extruder.right div.flap {
+            left: -29px;
+        }
+        span.flapLabel {
+            left: -7px;
+        }
+        // table
+        .tg  {border-collapse:collapse;border-spacing:0;}
+        .tg td{font-family:Arial, sans-serif;font-size:14px;padding:0px 0px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
+        .tg .tg-yw4l{vertical-align:top}
