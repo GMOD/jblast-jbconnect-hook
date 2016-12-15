@@ -18,23 +18,6 @@
     </style>
     <!--link rel="stylesheet" type="text/css" href="css/CSSTableGenerator.css"-->
 
-    <script type="text/javascript">
-        // fix position of flap
-        $("#extruderLeft div.flap").addClass("flapEx");
-        
-        // add gear icon (activity indicator)
-        $("#extruderLeft div.flap").prepend("<img class='cogwheel hidden' src='img/st_processing.gif' />");
-
-        $("#extruderLeft .extruder-content").css('height','300px');
-        $("#extruderLeft .extruder-content").css('border-bottom-left-radius','5px');
-
-        //adjust grid height
-        setInterval(function() {
-            var h = $("#extruderLeft div.extruder-content").height();
-            $("#j-hist-grid").height(h-3);
-        },1000);
-        
-    </script>
     
     <div id="j-hist-grid">
         <div class="CSSTableGenerator" >

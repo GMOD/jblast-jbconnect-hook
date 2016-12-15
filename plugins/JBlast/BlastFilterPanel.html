@@ -1,3 +1,39 @@
+<!--
+    <script type="text/javascript" src="/js/dependencies/sails.io.js"></script>
+-->
+   
+    <link href="src/mb.extruder/css/mbExtruder.css" media="all" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="src/mb.extruder/inc/jquery.hoverIntent.min.js"></script>
+    <script type="text/javascript" src="src/mb.extruder/inc/jquery.mb.flipText.js"></script>
+    <script type="text/javascript" src="src/mb.extruder/inc/mbExtruder.js"></script>
+
+    <script>
+        $(document).ready(function() {
+
+            // setup extruder sidebar
+            if (self.location.href == top.location.href){
+                $("body").css({font:"normal 13px/16px 'trebuchet MS', verdana, sans-serif"});
+                //var logo=$("<a href='http://pupunzi.com'><img id='logo' border='0' src='http://pupunzi.com/images/logo.png' alt='mb.ideas.repository' style='display:none;'></a>").css({position:"absolute"});
+                //$("body").prepend(logo);
+                //$("#logo").fadeIn();
+            }
+            $("#extruderLeft").buildMbExtruder({
+                position:"right",
+                width:300,
+                extruderOpacity:.8,
+                hidePanelsOnClose:true,
+                accordionPanels:true,
+                onExtOpen:function(){},
+                onExtContentLoad:function(){},
+                onExtClose:function(){}
+            });
+            
+        });
+        
+    </script>
+-->
+
+
     <div style="display:none">
                 <div id="blast-filter-group" class="input-group blast-filter-group" style="display:none">
                     <div class="blast-slider-title">

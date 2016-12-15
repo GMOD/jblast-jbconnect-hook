@@ -1,6 +1,15 @@
-<!DOCTYPE html>
-<html>
-<body>
+<link href="src/mb.extruder/css/mbExtruder.css" media="all" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="src/mb.extruder/inc/jquery.hoverIntent.min.js"></script>
+<script type="text/javascript" src="src/mb.extruder/inc/jquery.mb.flipText.js"></script>
+<script type="text/javascript" src="src/mb.extruder/inc/mbExtruder.js"></script>
+
+<script>
+
+    // setup extruder sidebar
+    if (self.location.href == top.location.href){
+        $("body").css({font:"normal 13px/16px 'trebuchet MS', verdana, sans-serif"});
+    }
+</script>
     <style>
         #j-hist-grid {
             position: absolute;
@@ -32,12 +41,6 @@
     <!--link rel="stylesheet" type="text/css" href="css/CSSTableGenerator.css"-->
     
     <script type="text/javascript">
-        // fix position of flap
-        //$("div.flap").addClass("flapEx");
-        
-        // add gear icon (activity indicator)
-        //$("div.flap").prepend("<img class='cogwheel hidden' src='img/st_processing.gif' />");
-
         //adjust grid height
         
         setInterval(function() {
@@ -124,138 +127,15 @@
     </script>
     <script type="text/javascript">
                             
-        io.socket.on('job-active', function (data){
-            console.log('event','job-active',data);
-            if (data.count===0) $("img.cogwheel").addClass("hidden");
-            else $("img.cogwheel").removeClass("hidden");
-        });		
-        io.socket.on('job-remove', function (data){
-            console.log('event','job-remove',data);
-            $("#j-hist-grid tr#"+data.job_id).remove();
-        });		
-        io.socket.on('job-add', function (data){
-            console.log('event','job-add',data);
-            var jdata = data.job;
-            $('#j-hist-grid #head').after("<tr id='"+jdata.id+"'><td class='state'>"+getJobState(jdata.data.galaxy_data.state)+"</td><td>"+jdata.data.galaxy_data.hid+"</td><td>"+jdata.data.galaxy_data.name+"</td></tr>");                
-        });		
-        io.socket.on('job-change', function (data){
-            console.log('event','job-change',data);
-            var jdata = data.job;
-            var id = jdata.id;
-            var newState = jdata.data.galaxy_data.state;
-            $('#j-hist-grid #'+id+" .state").html(getJobState(newState));
-        });		
-/*        
-        io.socket.on('test', function (event){
-            console.log("message "+event.data.message);
-            console.dir(event.data);
-       
-            if (event.data.message==="job-active") {
-                console.log("event job-active "+event.data.count);
-                if (0+event.data.count===0) $("img.cogwheel").addClass("hidden");
-                else $("img.cogwheel").removeClass("hidden");
-            }
-            else if (event.data.message==="job-remove") {
-                console.log("event job-remove "+event.data.job_id);
-                $("#j-hist-grid tr#"+event.data.job_id).remove();
-            }
-            else if (event.data.message==="job-add") {
-                console.log("event job-add "+event.data.job.id);
-                var jdata = event.data.job;
-                $('#j-hist-grid #head').after("<tr id='"+jdata.id+"'><td class='state'>"+getJobState(jdata.data.galaxy_data.state)+"</td><td>"+jdata.data.galaxy_data.hid+"</td><td>"+jdata.data.galaxy_data.name+"</td></tr>");                
-            }
-            else if (event.data.message==="job-change") {
-                console.log("event job-change "+event.data.job.id);
-                var jdata = event.data.job;
-                var id = jdata.id;
-                var newState = jdata.data.galaxy_data.state;
-                $('#j-hist-grid #'+id+" .state").html(getJobState(newState));
-            }
-            
-        });            
-        io.socket.get('/test', function gotResponse(body, response) {
-          console.log('Current test: ', body);
-        });
-*/
 </script>
 <script type="text/javascript">
     // accordion operations
     var blast_hash = 0;
     var $blast_template = $(".blast-panel-template");
     
-    var blast_addPanel = function(id,text,summary) {
-        var $newPanel = $blast_template.clone();
-        //console.log($newPanel);
-
-        //$newPanel.attr("id",id);
-        $newPanel.find(".collapse").removeClass("in");
-        $newPanel.find(".accordion-toggle").attr("href",  "#" + id)
-                 .text(text);
-        $newPanel.find(".panel-collapse").attr("id", id).addClass("collapse").removeClass("in");
-        $newPanel.find(".blastSummary").html(summary);
-        //$newPanel.attr("blastid", id);
-        $("#blast-accordion").append($newPanel.fadeIn());
-    };
-    
-    // overwrite a string with another string at the given location
-    function overwriteStr(subjStr, at, withStr) {
-      var partL = subjStr;
-      var withLen = withStr.length;
-      if (at >= subjStr.length) return subjStr;
-      var partL = subjStr.substring(0, at);
-            if ((at + withLen) > subjStr.length) {
-        var cut = (at + withLen) - subjStr.length;
-        return partL + withStr.substring(0,withLen-cut);
-      }
-      if ((withLen+partL.length) == subjStr.length) return partL + withStr;
-      var lenR = subjStr.length - withLen - partL.length;
-      var partR = subjStr.substring(subjStr.length - lenR, subjStr.length);
-      return partL + withStr + partR;
-    }
-
-    // return a string of characters (ch) length (count)
-    // "33333" = repearChar(5,"3");
-    function repeatChar(count, ch) {
-      if (count == 0) return "";
-      var count2 = count / 2,
-        result = ch;
-
-      while (result.length <= count2) {
-        result += result;
-      }
-      return result + result.substring(0, count - result.length);
-    };
-    // setup sliders
-    $(function() {
-    //    $("#slider-score").slider({min:0,max:100}).slider("float");
-        
-    });
-    // debugging display positions
-    /*
-    setInterval(function() {
-        $('.blast-debug-pos').each(function() {
-            //console.log("position",$(this).position().top);
-            $(this).html($(this).position().top);
-        });
-    },2000);
-    */
-    /*
-        var toggleChevron = function (e) {
-          $(e.target)
-            .prev('.panel-heading')
-            .find("i.indicator")
-            .toggleClass('glyphicon-chevron-down glyphicon-chevron-up');
-        };
-        
-        //$('#j-blast').html(txt);
-        
-        $('#blast-accordion').on('hidden.bs.collapse', toggleChevron);
-        $('#blast-accordion').on('shown.bs.collapse', toggleChevron);
-        */
-    
 </script>
 
-  <div style="width:100%;padding-left:5px;padding-right:5px;padding-top:2px">
+  <!--div style="width:100%;padding-left:5px;padding-right:5px;padding-top:2px">
     <table class="tg" style="width:100%">
       <tr>
         <td class="tg-yw4l" style="background-color: #eee">
@@ -271,29 +151,9 @@
                 
             </div>
         </td>
-        <!--td class="tg-yw4l" style="width: 300px">
-            <!--div id="j-hist-grid">
-                <div class="CSSTableGenerator"  >
-                        <table >
-                            <tr id="head">
-                                <td>
-                                    State
-                                </td>
-                                <td >
-                                    ID
-                                </td>
-                                <td>
-                                    Operation
-                                </td>
-                            </tr>
-                        </table>
-                </div>
-            </div>
-            
-        </td-->
       </tr>
     </table>
-  </div> 
+  </div--> 
 
     <div style="display:none">
       <div class="panel panel-default blast-panel-template">
@@ -313,65 +173,42 @@
       </div>
     </div>
     <div style="display:none">
-                <div id="blast-filter-group" class="input-group blast-filter-group" style="display:none">
-                    <div class="blast-slider-title">
-                        <h2 class="title">Blast Filter</h2>
-                        <button id="blast-filter-close-btn" style="float:right;" class="btn btn-primary">-</button>  
-                    </div>
-                    <table class="blast-filter-sliders" style="width:100%;cellpadding:10px">
-                        <tr>
-                            <td colspan="2" class="blast-slider-label">Score</td>
-                        </tr>
-                        <tr>
-                            <td class="blast-slider-item"><div id="slider-score"></td>
-                            <td class="blast-slider-item-c2"><div id="slider-score-data" class="blast-slider-item-data panel panel-default panel-body">Blah</div></td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" class="blast-slider-label">E-Value</td>
-                        </tr>
-                        <tr>
-                            <td class="blast-slider-item"><div id="slider-evalue"></td>
-                            <td class="blast-slider-item-c2"><div id="slider-evalue-data" class="blast-slider-item-data panel panel-default panel-body">Blah</div></td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" class="blast-slider-label">Identity</td>
-                        </tr>
-                        <tr>
-                            <td class="blast-slider-item"><div id="slider-identity"></td>
-                            <td class="blast-slider-item-c2"><div id="slider-identity-data" class="blast-slider-item-data panel panel-default panel-body">Blah</div></td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" class="blast-slider-label">Gaps</td>
-                        </tr>
-                        <tr>
-                            <td class="blast-slider-item"><div id="slider-gap"></td>
-                            <td class="blast-slider-item-c2"><div id="slider-gap-data" class="blast-slider-item-data panel panel-default panel-body">Blah</div></td>
-                        </tr>
-                    </table>
-                    <!--div class="blast-filter-sliders">
-                        <span class="blast-slider-label">Score</span>
-                        <div class="blast-slider-item" ><div id="slider-score"></div></div>
-                        <span class="blast-slider-label">E-Value</span>
-                        <div class="blast-slider-item" ><div id="slider-evalue"></div></div>
-                        <span class="blast-slider-label">Identity</span>
-                        <div class="blast-slider-item" ><div id="slider-identity"></div></div>
-                        <span class="blast-slider-label">Gap</span>
-                        <div class="blast-slider-item" ><div id="slider-gap"></div></div>
-                        <div>
-                            <input id="blast-textfilter-input" type="text" class="form-control" placeholder="Text Filter..." style="width:300px">
-                            <span class="input-group-btn">
-                              <button id="blast-textfilter-go" class="btn btn-secondary" type="button">Go</button>
-                            </span>
-                        </div>
-                    </div-->
-                  <!--
-                  <input id="blast-filter-input" type="text" class="form-control" placeholder="BLAST Filter...">
-                  <span class="input-group-btn">
-                    <button id="blast-filter-go" class="btn btn-secondary" type="button">Go</button>
-                  </span>
-                  -->
-                </div>
+        <div id="blast-filter-group" class="input-group blast-filter-group" style="display:none">
+            <div class="blast-slider-title">
+                <h2 class="title">Blast Filter</h2>
+                <button id="blast-filter-close-btn" style="float:right;" class="btn btn-primary">-</button>  
+            </div>
+            <table class="blast-filter-sliders" style="width:100%;cellpadding:10px">
+                <tr>
+                    <td colspan="2" class="blast-slider-label">Score</td>
+                </tr>
+                <tr>
+                    <td class="blast-slider-item"><div id="slider-score"></td>
+                    <td class="blast-slider-item-c2"><div id="slider-score-data" class="blast-slider-item-data panel panel-default panel-body">Blah</div></td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="blast-slider-label">E-Value</td>
+                </tr>
+                <tr>
+                    <td class="blast-slider-item"><div id="slider-evalue"></td>
+                    <td class="blast-slider-item-c2"><div id="slider-evalue-data" class="blast-slider-item-data panel panel-default panel-body">Blah</div></td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="blast-slider-label">Identity</td>
+                </tr>
+                <tr>
+                    <td class="blast-slider-item"><div id="slider-identity"></td>
+                    <td class="blast-slider-item-c2"><div id="slider-identity-data" class="blast-slider-item-data panel panel-default panel-body">Blah</div></td>
+                </tr>
+                <tr>
+                    <td colspan="2" class="blast-slider-label">Gaps</td>
+                </tr>
+                <tr>
+                    <td class="blast-slider-item"><div id="slider-gap"></td>
+                    <td class="blast-slider-item-c2"><div id="slider-gap-data" class="blast-slider-item-data panel panel-default panel-body">Blah</div></td>
+                </tr>
+            </table>
+        </div>
     </div>
-</body>
-</html>
 
+<div id="extruderLeft" class="{title:'Galaxy ', url:'plugins/JBlast/HistoryPanel.html'}"></div>

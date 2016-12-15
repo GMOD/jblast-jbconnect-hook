@@ -42,6 +42,23 @@ return declare( JBrowsePlugin,
 
         var sliders = new slidersMixin(this,browser);
         
+        $.get("plugins/JBlast/BlastPanel.html", function(data){
+            console.log("loaded BlastPanel.html");
+            $('body').append(data);
+
+            $("#extruderLeft").buildMbExtruder({
+                position:"right",
+                width:300,
+                extruderOpacity:.8,
+                hidePanelsOnClose:true,
+                accordionPanels:true,
+                onExtOpen:function(){},
+                onExtContentLoad:function(){
+                    jobPanelInit();
+                },
+                onExtClose:function(){}
+            });
+        });            
         
         browser.jblast = {
             asset: null,
@@ -69,10 +86,6 @@ return declare( JBrowsePlugin,
             });
             browser.jblastDialog = thisB.Browser_jblastDialog;
             
-            $.get("plugins/JBlast/BlastPanel.html", function(data){
-                console.log("loaded BlastPanel.html");
-                $('body').append(data);
-            });            
             
         }); 
         browser.afterMilestone( 'initView', function() {
@@ -115,6 +128,28 @@ return declare( JBrowsePlugin,
                     thisB.browser.view.replaceTracks([track]);
                 else
                     console.log("track not found");
+        });
+        
+        io.socket.on('job-active', function (data){
+            console.log('event','job-active',data);
+            if (data.count===0) $("img.cogwheel").addClass("hidden");
+            else $("img.cogwheel").removeClass("hidden");
+        });		
+        io.socket.on('job-remove', function (data){
+            console.log('event','job-remove',data);
+            $("#j-hist-grid tr#"+data.job_id).remove();
+        });		
+        io.socket.on('job-add', function (data){
+            console.log('event','job-add',data);
+            var jdata = data.job;
+            $('#j-hist-grid #head').after("<tr id='"+jdata.id+"'><td class='state'>"+getJobState(jdata.data.galaxy_data.state)+"</td><td>"+jdata.data.galaxy_data.hid+"</td><td>"+jdata.data.galaxy_data.name+"</td></tr>");                
+        });		
+        io.socket.on('job-change', function (data){
+            console.log('event','job-change',data);
+            var jdata = data.job;
+            var id = jdata.id;
+            var newState = jdata.data.galaxy_data.state;
+            $('#j-hist-grid #'+id+" .state").html(getJobState(newState));
         });		
         
         io.socket.on('track-replace', function (data){
@@ -421,36 +456,44 @@ return declare( JBrowsePlugin,
 
             // evalue slider *******************************
 
+            //var offset = Math.abs(data.evalue.max)*2 + Math.abs(data.evalue.min-data.evalue.max);
             var hi = data.evalue.max;
             var lo = data.evalue.min;
-            var step = (hi - lo) / 20;
+            var nstep = 100;
+            var step = (hi - lo) / nstep;
+            console.log("lo,hi,val",lo,hi,data.evalue.val);
 
             var pstep = 5;
             var labels = [];
 
-            for(var i=lo;i <= hi; i += pstep*step) {
-                var v = Math.pow(10,i);
+            for(var i=lo;i <= hi; i += step) {
+                var v = Math.pow(10,i-offset);
                 labels.push(v.toExponential(1));
             }
             labels.push(Math.pow(10,hi).toExponential(1));
+            console.log("labels",labels);
 
             // push values to positive zone because slider pips cannot seem to handle negative numbers with custom labels
-            offset = Math.abs(lo);
-            lo = lo + offset;
-            hi = hi + offset;
+            //offset = Math.abs(lo);
+            //var offset = Math.abs(hi)*2 + Math.abs(lo-hi);
+            //lo = lo + offset;
+            //hi = hi + offset;
 
-            console.log(labels);
-
+            console.log("lo,hi,val,offset",lo,hi,data.evalue.val+offset,offset);
+            //var v = Math.pow(10,+data.evalue.val).toExponential(1);
+            //var v = +data.evalue.val + offset;
+            //console.log("v",v);
             $("#slider-evalue").slider({
                 min: lo,
                 max: hi,
                 step:step,
-                values: [data.evalue.val],
+//                values: [data.evalue.val -offset],
                 slide: function(event,ui) {
-                    var v = Math.pow(10,+ui.value - offset);
-                    $('#slider-evalue-data').html(v.toExponential(1));
+                    console.log('evalue',ui.value,ui.value - offset);
+                    var ev = +ui.value -offset;
+                    $('#slider-evalue-data').html(Math.pow(10,ev).toExponential(1));
                     //filterSlider.evalue = v;
-                    filterSlider.evalue = +ui.value - offset;
+                    filterSlider.evalue = ev;
                 },
                 change: function(event,ui) {
                     var data = {evalue:{val:filterSlider.evalue}};
@@ -547,7 +590,7 @@ return declare( JBrowsePlugin,
 
                 var val = filterSlider.evalue;
                 //val = Math.pow(10,val);
-                $('#slider-evalue-data').html(val.toExponential(1));
+                $('#slider-evalue-data').html(Math.pow(10,val).toExponential(1));
 
                 var v = filterSlider.identity + '%';
                 $('#slider-identity-data').html(v);
@@ -814,3 +857,63 @@ function getWorkflows(cb) {
         cb(data);
     });
 }
+// overwrite a string with another string at the given location
+function overwriteStr(subjStr, at, withStr) {
+      var partL = subjStr;
+      var withLen = withStr.length;
+      if (at >= subjStr.length) return subjStr;
+      var partL = subjStr.substring(0, at);
+            if ((at + withLen) > subjStr.length) {
+        var cut = (at + withLen) - subjStr.length;
+        return partL + withStr.substring(0,withLen-cut);
+      }
+      if ((withLen+partL.length) == subjStr.length) return partL + withStr;
+      var lenR = subjStr.length - withLen - partL.length;
+      var partR = subjStr.substring(subjStr.length - lenR, subjStr.length);
+      return partL + withStr + partR;
+}
+
+// return a string of characters (ch) length (count)
+// "33333" = repearChar(5,"3");
+function repeatChar(count, ch) {
+      if (count == 0) return "";
+      var count2 = count / 2,
+        result = ch;
+
+      while (result.length <= count2) {
+        result += result;
+      }
+      return result + result.substring(0, count - result.length);
+}
+function jobPanelInit() {              
+    console.log("jobPanelInit()");
+    /*
+    $("#extruderLeft").buildMbExtruder({
+        position:"right",
+        width:300,
+        extruderOpacity:.8,
+        hidePanelsOnClose:true,
+        accordionPanels:true,
+        onExtOpen:function(){},
+        onExtContentLoad:function(){},
+        onExtClose:function(){}
+    });
+    */
+    // fix position of flap
+    $("#extruderLeft div.flap").addClass("flapEx");
+
+    // add gear icon (activity indicator)
+    $("#extruderLeft div.flap").prepend("<img class='cogwheel hidden' src='img/st_processing.gif' />");
+
+    $("#extruderLeft .extruder-content").css('height','300px');
+    $("#extruderLeft .extruder-content").css('border-bottom-left-radius','5px');
+
+
+
+    //adjust grid height
+    setInterval(function() {
+        var h = $("#extruderLeft div.extruder-content").height();
+        $("#j-hist-grid").height(h-3);
+    },1000);
+}
+
