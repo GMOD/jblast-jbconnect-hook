@@ -46,7 +46,7 @@ return declare( JBrowsePlugin,
             console.log("loaded BlastPanel.html");
             $('body').append(data);
 
-            $("#extruderLeft").buildMbExtruder({
+            $("#extruderRight").buildMbExtruder({
                 position:"right",
                 width:300,
                 extruderOpacity:.8,
@@ -123,11 +123,11 @@ return declare( JBrowsePlugin,
         });		
         io.socket.on('track-update', function (data){
             console.log('event','track-update',data);
-                var track = thisB.findTrackConfig(data);
-                if (track)
-                    thisB.browser.view.replaceTracks([track]);
-                else
-                    console.log("track not found");
+            var track = thisB.findTrackConfig(data);
+            if (track)
+                thisB.browser.view.replaceTracks([track]);
+            else
+                console.log("track not found");
         });
         
         io.socket.on('job-active', function (data){
@@ -778,12 +778,11 @@ return declare( JBrowsePlugin,
                     };
                     var postData = {
                           region: regionB,
-                          //workflow: 'f2db41e1fa331b3e'
                           workflow: selWorkflow,
                           dataSetPath: thisB.config.dataRoot
                       };
                     //var deferred = dojo.xhrPost(xhrArgs);
-                    $.post( "/jbapi/setfilter", postData , function( result ) {
+                    $.post( "/jbapi/workflowsubmit", postData , function( result ) {
                         console.log( result );
                     }, "json");
 
@@ -876,32 +875,21 @@ function repeatChar(count, ch) {
 }
 function jobPanelInit() {              
     console.log("jobPanelInit()");
-    /*
-    $("#extruderLeft").buildMbExtruder({
-        position:"right",
-        width:300,
-        extruderOpacity:.8,
-        hidePanelsOnClose:true,
-        accordionPanels:true,
-        onExtOpen:function(){},
-        onExtContentLoad:function(){},
-        onExtClose:function(){}
-    });
-    */
+    
     // fix position of flap
-    $("#extruderLeft div.flap").addClass("flapEx");
+    $("#extruderRight div.flap").addClass("flapEx");
 
     // add gear icon (activity indicator)
-    $("#extruderLeft div.flap").prepend("<img class='cogwheel hidden' src='img/st_processing.gif' />");
+    $("#extruderRight div.flap").prepend("<img class='cogwheel hidden' src='img/st_processing.gif' />");
 
-    $("#extruderLeft .extruder-content").css('height','300px');
-    $("#extruderLeft .extruder-content").css('border-bottom-left-radius','5px');
+    $("#extruderRight .extruder-content").css('height','300px');
+    $("#extruderRight .extruder-content").css('border-bottom-left-radius','5px');
 
 
 
     //adjust grid height
     setInterval(function() {
-        var h = $("#extruderLeft div.extruder-content").height();
+        var h = $("#extruderRight div.extruder-content").height();
         $("#j-hist-grid").height(h-3);
     },1000);
 }
