@@ -135,7 +135,7 @@ function postMoveResultFiles(kWorkflowJob,cb) {
         // replace some track info
         newTrackJson[0].baseUrl = g.dataSet[0].dataPath;
         newTrackJson[0].urlTemplate = g.jblast.blastResultPath+"/"+fileGffOnly;
-        newTrackJson[0].jblastData = g.jblast.blastResultPath+"/"+fileJsonOnly;
+        //newTrackJson[0].jblastData = g.jblast.blastResultPath+"/"+fileJsonOnly;
         newTrackJson[0].label = kWorkflowJob.data.blastData.outputs.json; //"jblast-"+ (new Date().getTime());
         newTrackJson[0].key = trackLabel;
         newTrackJson[0].category = g.jblast.blastResultCategory;
@@ -148,7 +148,7 @@ function postMoveResultFiles(kWorkflowJob,cb) {
         newTrackJson[0].urlTemplate = '/jbapi/gettrackdata/' +kWorkflowJob.data.blastData.outputs.json + '/' + dataset;
         newTrackJson[0].storeCache = false;
         newTrackJson[0].filterSettings = g.jblast.blastResultPath+"/"+fileBlastFilter;
-        newTrackJson[0].jblastGff = g.jblast.blastResultPath+"/"+kWorkflowJob.data.blastData.outputs.json + '.gff3';
+        //newTrackJson[0].jblastGff = g.jblast.blastResultPath+"/"+kWorkflowJob.data.blastData.outputs.json + '.gff3';
 
         //addToTrackList(kWorkflowJob,newTrackJson);
         //processOffset(kWorkflowJob,newTrackJson);
