@@ -228,7 +228,7 @@ module.exports = function (sails) {
                 },
                 json: params
             };
-
+            sails.log.debug("req",req);
             //console.log(req);
             requestp(req)
                 .then(function(data){
@@ -339,7 +339,7 @@ function rest_WorkflowSubmit(req,res) {
     }
     catch (e) {
         console.log(e,theFullBlastFilePath);
-        res.send(e); // return POST
+        //res.send(e); // return POST
         return;
     }
     
@@ -358,7 +358,7 @@ function rest_WorkflowSubmit(req,res) {
         
         if (err) {
             console.log("jbcore: failed to save globals");
-            res.send(err); // return POST
+            //res.send(err); // return POST
             return;
         }
 
@@ -380,7 +380,7 @@ function rest_WorkflowSubmit(req,res) {
         .save(function(err){
             if (!err) {
                 console.log("workflow watch adding job id = "+kJob.id);
-                res.send(err); // return POST
+                //res.send(err); // return POST
                 return;
             }
             console.log('error creating workflow watch job');
@@ -413,7 +413,7 @@ function rest_WorkflowSubmit(req,res) {
             .then(function(data) {
                 kJob.data.workflow = data;
                 kJob.save();
-                res.send(data); // return POST
+                //res.send(data); // return POST
                 
                 // start monioring
                 monitorWorkflow(kJob);
@@ -422,7 +422,7 @@ function rest_WorkflowSubmit(req,res) {
                 sails.log.error(err);
                 kJob.data.error = err;
                 kJob.save();
-                res.send(err); // return POST
+                //res.send(err); // return POST
             });
     });    
 }
