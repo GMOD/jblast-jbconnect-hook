@@ -26,7 +26,7 @@ var file_i = 0;
 module.exports = function (sails) {
    return {
         initialize: function(cb) {
-            sails.log.info("Sails Hook: jb-galaxy-blast initialize"); 
+            sails.log.info("Sails Hook: JBlast initialize"); 
             // todo: check that galaxy is running
 
             sails.on('hook:orm:loaded', function() {
@@ -59,12 +59,12 @@ module.exports = function (sails) {
                */
                
               'post /jbapi/setfilter': function (req, res, next) {
-                  sails.log.info("JBlast server plugin","POST /jbapi/setfilter");
+                  sails.log.info("JBlast","POST /jbapi/setfilter");
                   //sails.log.debug("req.body", JSON.stringify(req.body));
                   rest_applyFilter(req,res);
               },
               'get /jbapi/getworkflows': function (req, res, next) {
-                    console.log("jb-galaxy-kue-sync /jbapi/getworkflows called");
+                    console.log("JBlast /jbapi/getworkflows called");
                     //console.dir(req.params);
                     sails.hooks['jb-galaxy-blast'].galaxyGetAsync("/api/workflows").then(function(workflows) {
                         res.send(workflows);
@@ -77,7 +77,7 @@ module.exports = function (sails) {
               },
               
               'get /jbapi/gettrackdata/:asset/:dataset': function (req, res, next) {
-                    console.log("jb-galaxy-kue-sync /jbapi/gettrackdata called");
+                    console.log("JBlast /jbapi/gettrackdata called");
                     var params = req.allParams();
                     sails.log('asset',req.param('asset'));
                     sails.log('dataset',req.param('dataset'));
@@ -103,13 +103,13 @@ module.exports = function (sails) {
                * a new track is added to trackList.json and an add-track event is sent to listeners.
                */
               'get /test/newtrack': function (req, res, next) {
-                  sails.log.info(path.basename(__filename),"/test/newtrack");
+                  sails.log.info("JBlst /test/newtrack");
                   rest_testNewTrack(function(data) {
                       res.send(data);
                   });
               },
               'get /test/getgff': function (req, res, next) {
-                  sails.log.info(path.basename(__filename),"/test/getgff");
+                  sails.log.info("JBlast /test/getgff");
                   var g = sails.config.globals.jbrowse;
                   var blastPath = g.jbrowsePath + g.dataSet[0].dataPath + g.jblast.blastResultPath;
                   
@@ -127,7 +127,7 @@ module.exports = function (sails) {
                * /test/post test post operation
                */
               'post /test/post': function (req, res, next) {
-                  sails.log.info(path.basename(__filename),"/test/post");
+                  sails.log.info("JBlast /test/post");
                   res.header("Access-Control-Allow-Origin", "*");
                   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
                   res.send(req.body);
@@ -136,7 +136,7 @@ module.exports = function (sails) {
                * test get operation
                */
               'get /test/get': function (req, res, next) {
-                  sails.log.info(path.basename(__filename),"/test/get");
+                  sails.log.info("JBlast /test/get");
                   res.send({result:"jb-galaxy-blast /get/test success"});
                   //return next();
               }
