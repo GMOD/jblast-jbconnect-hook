@@ -15,7 +15,7 @@
     "Blast"
   ],
   "devDependencies": {
-    "sails": "~0.12.4"
+    "sails": "^0.12.11"
   },
   "author": "eyao",
   "license": "GNU LESSER GENERAL PUBLIC LICENSE",
@@ -25,7 +25,7 @@
     "deepmerge": "^1.3.1",
     "deferred": "^0.7.5",
     "fs": "0.0.1-security",
-    "request": "^2.76.0",
+    "request": "^2.79.0",
     "request-promise": "^4.1.1"
   }
 }
