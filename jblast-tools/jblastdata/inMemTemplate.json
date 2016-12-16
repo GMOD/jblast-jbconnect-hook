@@ -44,5 +44,6 @@
   "category": "Miscellaneous",
   "key": "Blast Results",
   "label": "blasttest1",
-  "baseUrl": "http://192.168.56.x/jb-galaxy-blaster/sample_data/json/volvox/"
+  "storeCache": false
+  
 }

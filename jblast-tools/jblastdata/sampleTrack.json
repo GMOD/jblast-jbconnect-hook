@@ -1,7 +1,6 @@
 {
   "maxHeight": 1200,
   "storeClass": "JBrowse/Store/SeqFeature/GFF3",
-  "urlTemplate": "jblastdata/sampleResult.gff3",
   "blastData": "jblastdata/sampleResult.json",
   "type": "JBrowse/View/Track/HTMLFeatures",
   "metadata": {
@@ -9,5 +8,8 @@
   },
   "category": "JBlast Results",
   "key": "Sample result track",
-  "label": "jblast_sample"
+  "label": "jblast_sample",
+  "urlTemplate": "/jbapi/gettrackdata/jblast_sample/sample_data%2Fjson%2Fvolvox%2F",
+  "baseUrl": "/",
+  "storeCache":false
 }
