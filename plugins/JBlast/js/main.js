@@ -117,55 +117,60 @@ return declare( JBrowsePlugin,
             browser.publish ('/jbrowse/v1/v/tracks/' + eventType, [notifyTrackConf]);
         };
 
-        io.socket.on('track-new', function (data){
-            console.log('event','track-new',data);
-            newTrackHandler ('new',data);
-        });		
-        io.socket.on('track-update', function (data){
-            console.log('event','track-update',data);
-            var track = thisB.findTrackConfig(data);
-            if (track)
-                thisB.browser.view.replaceTracks([track]);
-            else
-                console.log("track not found");
+        
+        dojo.subscribe("/jbrowse/jbclient_ready", function(io){
+            console.log("ready to receive events");
+            
+            io.socket.on('track-new', function (data){
+                console.log('event','track-new',data);
+                newTrackHandler ('new',data);
+            });		
+            io.socket.on('track-update', function (data){
+                console.log('event','track-update',data);
+                var track = thisB.findTrackConfig(data);
+                if (track)
+                    thisB.browser.view.replaceTracks([track]);
+                else
+                    console.log("track not found");
+            });
+
+            io.socket.on('job-active', function (data){
+                console.log('event','job-active',data);
+                if (data.count===0) $("img.cogwheel").addClass("hidden");
+                else $("img.cogwheel").removeClass("hidden");
+            });		
+            io.socket.on('job-remove', function (data){
+                console.log('event','job-remove',data);
+                $("#j-hist-grid tr#"+data.job_id).remove();
+            });		
+            io.socket.on('job-add', function (data){
+                console.log('event','job-add',data);
+                var jdata = data.job;
+                $('#j-hist-grid #head').after("<tr id='"+jdata.id+"'><td class='state'>"+getJobState(jdata.data.galaxy_data.state)+"</td><td>"+jdata.data.galaxy_data.hid+"</td><td>"+jdata.data.galaxy_data.name+"</td></tr>");                
+            });		
+            io.socket.on('job-change', function (data){
+                console.log('event','job-change',data);
+                var jdata = data.job;
+                var id = jdata.id;
+                var newState = jdata.data.galaxy_data.state;
+                $('#j-hist-grid #'+id+" .state").html(getJobState(newState));
+            });		
+
+            io.socket.on('track-replace', function (data){
+                console.log('event','track-replace',data);
+                newTrackHandler ('replace',data);
+            });		
+            io.socket.on('job-remove', function (data){
+                console.log('event','job-remove',data);
+                browser.publish ('/jbrowse/v1/v/tracks/delete', browser.trackConfigs);
+            });		
+            io.socket.on('track-test', function (data){
+                console.log('event','track-test',data);
+                console.log("event track-test "+data.value);
+                alert("event track-test value = "+data.value)
+            });
+                
         });
-        
-        io.socket.on('job-active', function (data){
-            console.log('event','job-active',data);
-            if (data.count===0) $("img.cogwheel").addClass("hidden");
-            else $("img.cogwheel").removeClass("hidden");
-        });		
-        io.socket.on('job-remove', function (data){
-            console.log('event','job-remove',data);
-            $("#j-hist-grid tr#"+data.job_id).remove();
-        });		
-        io.socket.on('job-add', function (data){
-            console.log('event','job-add',data);
-            var jdata = data.job;
-            $('#j-hist-grid #head').after("<tr id='"+jdata.id+"'><td class='state'>"+getJobState(jdata.data.galaxy_data.state)+"</td><td>"+jdata.data.galaxy_data.hid+"</td><td>"+jdata.data.galaxy_data.name+"</td></tr>");                
-        });		
-        io.socket.on('job-change', function (data){
-            console.log('event','job-change',data);
-            var jdata = data.job;
-            var id = jdata.id;
-            var newState = jdata.data.galaxy_data.state;
-            $('#j-hist-grid #'+id+" .state").html(getJobState(newState));
-        });		
-        
-        io.socket.on('track-replace', function (data){
-            console.log('event','track-replace',data);
-            newTrackHandler ('replace',data);
-        });		
-        io.socket.on('job-remove', function (data){
-            console.log('event','job-remove',data);
-            browser.publish ('/jbrowse/v1/v/tracks/delete', browser.trackConfigs);
-        });		
-        io.socket.on('track-test', function (data){
-            console.log('event','track-test',data);
-            console.log("event track-test "+data.value);
-            alert("event track-test value = "+data.value)
-        });
-        
         
         dojo.subscribe("/jbrowse/v1/n/tracks/focus", function(track){
             console.log("jblast plugin event: /jbrowse/v1/n/tracks/focus",track);
