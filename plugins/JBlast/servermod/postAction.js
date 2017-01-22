@@ -72,9 +72,9 @@ function doCompleteAction(kWorkflowJob,hista) {
             // insert track into trackList.json
             postMoveResultFiles(kWorkflowJob,function(newTrackJson){
                 
-                processOffset(kWorkflowJob,newTrackJson);
-                
-                addToTrackList(kWorkflowJob,newTrackJson);
+                processFilter(kWorkflowJob,newTrackJson,function() {
+                    addToTrackList(kWorkflowJob,newTrackJson);
+                });
             });
             clearInterval(t);
         }
@@ -163,19 +163,19 @@ function postMoveResultFiles(kWorkflowJob,cb) {
  * @param {type} newTrackJson
  * @returns {undefined}
  */
-function processOffset(kWorkflowJob,newTrackJson) {
+function processFilter(kWorkflowJob,newTrackJson,cb) {
     sails.log("processOffset()");
     var g = sails.config.globals.jbrowse;
-    sails.log("nothing processed");
-    var f = filter.filterInit(kWorkflowJob,newTrackJson);
-    //filter.filterDo(kWorkflowJob,newTrackJson);
-    var asset = {
-        "asset": newTrackJson[0].label,
-        "dataSet": g.dataSet[0].dataPath
-    };
-    filter.applyFilter(0,asset);
     
-    
+    filter.filterInit(kWorkflowJob,newTrackJson, function(filtered){
+        var asset = {
+            "asset": newTrackJson[0].label,
+            "dataSet": g.dataSet[0].dataPath
+        };
+        filter.applyFilter(0,asset,function() {
+            cb();
+        });
+    });
 }
 /**
  * 

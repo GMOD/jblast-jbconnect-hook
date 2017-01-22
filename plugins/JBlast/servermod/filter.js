@@ -16,7 +16,7 @@ module.exports = {
      *      newTrackJson[0].label must be defined
      * @returns {undefined|module.exports.filterInit.filter}
      */
-    filterInit: function(kWorkflowJob,newTrackJson) {
+    filterInit: function(kWorkflowJob,newTrackJson,cb) {
         sails.log("filterInit()");
         var g = sails.config.globals.jbrowse;
 
@@ -67,7 +67,7 @@ module.exports = {
         } catch(e) {
             sails.log.error("failed to write",blastFilterFile);
         }
-        return filter;
+        cb(filter);
     },
     // builds initial gff (unfiltered) from blast results  (obsolete)
     filterDo: function(kWorkflowJob,newTrackJson) {
@@ -163,7 +163,7 @@ module.exports = {
      *      "dataSet": "sample_data/json/volvox"
      * @returns {undefined}
      */
-    applyFilter: function(filterData,requestData) {
+    applyFilter: function(filterData,requestData,cb) {
         sails.log.debug('applyFilter()');
         var g = sails.config.globals.jbrowse;
         var asset = requestData.asset;
@@ -235,6 +235,7 @@ module.exports = {
         sails.hooks['jbcore'].sendEvent("track-update",requestData.asset);
         sails.log ("Announced track update",requestData,requestData.asset);
         
+        cb();
     },
     // get the hightest value of the blast data variable
     getHighest: function(variable) {
