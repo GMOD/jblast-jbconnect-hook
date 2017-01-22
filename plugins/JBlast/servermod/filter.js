@@ -7,12 +7,21 @@ var deferred = require('deferred');
 var merge = require('deepmerge');
 
 module.exports = {
-    filterSetup: function(kWorkflowJob,newTrackJson) {
-        sails.log("filterSetup()");
+
+    /**
+     * create initial filter settings file
+     * @param {type} kWorkflowJob
+     * @param {type} newTrackJson
+     *      newTrackJson[0].filterSettings must be defined
+     *      newTrackJson[0].label must be defined
+     * @returns {undefined|module.exports.filterInit.filter}
+     */
+    filterInit: function(kWorkflowJob,newTrackJson) {
+        sails.log("filterInit()");
         var g = sails.config.globals.jbrowse;
 
         // read blast json file
-        var blastfile = g.jbrowsePath + g.dataSet[0].dataPath + newTrackJson[0].jblastData;
+        var blastfile = g.jbrowsePath + g.dataSet[0].dataPath + g.jblast.blastResultPath +"/"+ newTrackJson[0].label + ".json";
         var blastFilterFile = g.jbrowsePath + g.dataSet[0].dataPath + newTrackJson[0].filterSettings;
         
         sails.log('blastfile',blastfile);
@@ -58,8 +67,9 @@ module.exports = {
         } catch(e) {
             sails.log.error("failed to write",blastFilterFile);
         }
+        return filter;
     },
-    // builds initial gff (unfiltered) from blast results
+    // builds initial gff (unfiltered) from blast results  (obsolete)
     filterDo: function(kWorkflowJob,newTrackJson) {
         sails.log("filterDo()");
         var g = sails.config.globals.jbrowse;
@@ -103,7 +113,14 @@ module.exports = {
         sails.log("file written",blastgff);
         
     },
+    /**
+     * write new data to filter settings file, given requestData
+     * @param {type} requestData
+     * @param {type} cb cb(filterData)
+     * @returns {err|Number}
+     */
     writeFilterSettings: function(requestData,cb) {
+        sails.log.debug('writeFilterSettings()');
         var asset = requestData.asset;
         var dataSet = requestData.dataSet;
         var filterData = requestData.filterParams;
@@ -136,7 +153,18 @@ module.exports = {
         return 0;
         
     },
+    /**
+     * Based on the filterData, generate a new gff3 file.
+     * If filterData == 0, then nothing will be filtered
+     * @param {type} filterData 
+     * @param {type} requestData
+     *    {
+     *      "asset": <the asset id>
+     *      "dataSet": "sample_data/json/volvox"
+     * @returns {undefined}
+     */
     applyFilter: function(filterData,requestData) {
+        sails.log.debug('applyFilter()');
         var g = sails.config.globals.jbrowse;
         var asset = requestData.asset;
         var dataSet = requestData.dataSet;
@@ -166,7 +194,8 @@ module.exports = {
        
         for(var x in blastData) {
             var selected = 0;
-            if (parseFloat(blastData[x].Hsp['Hsp_bit-score']) > filterData.score.val &&
+            if (filterData===0) selected = 1;
+            else if (parseFloat(blastData[x].Hsp['Hsp_bit-score']) > filterData.score.val &&
                +blastData[x].Hsp['Hsp_evalue'] < Math.pow(10,filterData.evalue.val) &&     
                ((parseFloat(blastData[x].Hsp['Hsp_identity']) / parseFloat(blastData[x].Hsp['Hsp_align-len'])) * 100) > filterData.identity.val &&    
                ((parseFloat(blastData[x].Hsp['Hsp_gaps']) / parseFloat(blastData[x].Hsp['Hsp_align-len'])) * 100) < filterData.gaps.val   &&  

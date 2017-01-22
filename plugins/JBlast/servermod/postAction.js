@@ -152,6 +152,9 @@ function postMoveResultFiles(kWorkflowJob,cb) {
 
         //addToTrackList(kWorkflowJob,newTrackJson);
         //processOffset(kWorkflowJob,newTrackJson);
+        kWorkflowJob.data.track = newTrackJson[0];
+        kWorkflowJob.save();
+        
         cb(newTrackJson);
     });
 }
@@ -164,8 +167,15 @@ function processOffset(kWorkflowJob,newTrackJson) {
     sails.log("processOffset()");
     var g = sails.config.globals.jbrowse;
     sails.log("nothing processed");
-    filter.filterSetup(kWorkflowJob,newTrackJson);
-    filter.filterDo(kWorkflowJob,newTrackJson);
+    var f = filter.filterInit(kWorkflowJob,newTrackJson);
+    //filter.filterDo(kWorkflowJob,newTrackJson);
+    var asset = {
+        "asset": newTrackJson[0].label,
+        "dataSet": g.dataSet[0].dataPath
+    };
+    filter.applyFilter(0,asset);
+    
+    
 }
 /**
  * 
