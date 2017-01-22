@@ -5,6 +5,7 @@ var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require("fs"));
 var deferred = require('deferred');
 var filter = require("./filter");   // filter processing
+var offsetfix = require("./offsetfix");
 
 module.exports = {
     doCompleteAction: function(kWorkflowJob,hista) {
@@ -65,15 +66,18 @@ function doCompleteAction(kWorkflowJob,hista) {
     
     // wait for files to finish copying
     var t = setInterval(function() {
-        if (filecount == 0) {
+        if (filecount === 0) {
             sails.log.debug("done moving files");
             kWorkflowJob.save();
 
             // insert track into trackList.json
             postMoveResultFiles(kWorkflowJob,function(newTrackJson){
                 
-                processFilter(kWorkflowJob,newTrackJson,function() {
-                    addToTrackList(kWorkflowJob,newTrackJson);
+                offsetfix.process(kWorkflowJob,newTrackJson,function() {
+                    processFilter(kWorkflowJob,newTrackJson,function() {
+                        addToTrackList(kWorkflowJob,newTrackJson);
+                    });
+                    
                 });
             });
             clearInterval(t);

@@ -283,19 +283,23 @@ function init_history(th) {
         });
 }
 function rest_applyFilter(req,res) {
+    sails.log.debug("rest_applyFilter()");
     var g = sails.config.globals;
     var requestData = req.body;
     
     //sails.log.debug("data",JSON.stringify(data, null, 4));
+    //sails.log.debug("requestData",requestData);
 
     var err = filter.writeFilterSettings(requestData,function(filterData) {
-        filter.applyFilter(filterData,requestData);        
+        filter.applyFilter(filterData,requestData,function() {
+    
+            res.send({result:'success'});
+            
+        });        
     });
     
     if (err)
         res.send({result:err});
-    else
-        res.send({result:'success'});
 }
 /**
  * submit workflow

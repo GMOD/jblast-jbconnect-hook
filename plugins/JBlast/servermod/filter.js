@@ -134,7 +134,7 @@ module.exports = {
             var f = JSON.parse(fs.readFileSync(filterfile));
             
         }catch (err) {
-            sails.log.error('failed to open',filterfile);
+            sails.log.error('failed to read',filterfile);
             return err;
         }
         var merged = merge(f,filterData);
