@@ -237,6 +237,51 @@ module.exports = {
         
         cb();
     },
+    /**
+     * find hit details given hit key
+     * @param {string} hitkey 
+     * @param (string) dataSet
+     * @param {function} cb     callback
+     * 
+     * The hit key looks like this "gi-402239547-gb-JN790190-1--3"
+     * Separate the hit id ==> "gi-402239547-gb-JN790190-1--" (basically remove the last number)
+     * Returns multiple HSPs for each hit id: data for "gi-402239547-gb-JN790190-1--1", "gi-402239547-gb-JN790190-1--2"...
+     */
+    getHitDetails: function(hitKey,dataSet,asset,cb) {
+        sails.log.debug('getHitDetails()');
+        var g = sails.config.globals.jbrowse;
+        var resultFile = g.jbrowsePath + dataSet +'/'+ g.jblast.blastResultPath+'/'+asset+'.json';
+        var blastGffFile = g.jbrowsePath + dataSet + '/' + g.jblast.blastResultPath+'/'+asset+'.gff3';
+
+        try {
+            var content = fs.readFileSync(resultFile, 'utf8');
+        } catch(e) {
+            sails.log.error("failed to read blast json",resultFile);
+            return;
+        }
+        var blastJSON = JSON.parse(content);
+        
+        var blastData = blastJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
+        
+        // open the blast json
+        
+        // separate hit id 
+        var hId = getHitId(hitKey);
+        
+        sails.log.debug("hId",hitKey,hId);
+        
+        // build hsp data list 
+        var i = 1;
+        var hitData = {};
+        var key = hId + '-' +i;
+        while ( typeof blastData[key] !== 'undefined') {
+            sails.log.debug("key",key);
+            hitData[key] = blastData[key];
+            key = hId + '-' + (++i);
+        }
+        
+        cb(hitData);
+    },
     // get the hightest value of the blast data variable
     getHighest: function(variable) {
         var blastData = this.blastData.BlastOutput.BlastOutput_iterations.Iteration.Hit;
@@ -323,4 +368,11 @@ function convert2Num(obj) {
         if (typeof obj[x].val === 'string')
             obj[x].val = Number(obj[x].val);
     }
+}
+
+function getHitId(hitkey) {
+    var a = hitkey.split('-');
+    var l = a.length;
+    a.splice(l-1,1);
+    return a.join('-');
 }

@@ -95,6 +95,15 @@ module.exports = function (sails) {
 
                     res.send(content);
               },
+              /**
+               * Return hits data given hit key
+               */
+              'get /jbapi/gethitdetails/:asset/:dataset/:hitkey': function (req, res, next) {
+                    console.log("JBlast /jbapi/gethitdetails called");
+                    rest_getHitDetails(req,res,function(hitData) {
+                        res.send(hitData);
+                    });
+              },
               /*
                * test rest operations
                */
@@ -258,6 +267,21 @@ module.exports = function (sails) {
             }); 
         }
     };
+};
+/**
+ * Process REST /jbapi/gethitdetails
+ * @param {type} req
+ * @param {type} res
+ * @param {type} cb
+ * @returns {undefined}
+ */
+function rest_getHitDetails(req,res, cb) {
+    var asset = req.param('asset');
+    var hitkey = req.param('hitkey');
+    var dataset = req.param('dataset');
+    filter.getHitDetails(hitkey, dataset, asset, function(hitData) {
+       cb(hitData); 
+    });
 };
 /**
  * acquire history id from galaxy
