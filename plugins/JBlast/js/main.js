@@ -77,6 +77,16 @@ return declare( JBrowsePlugin,
             if (typeof browser.config.classInterceptList === 'undefined') {
                 browser.config.classInterceptList = {};
             }
+            // override _FeatureDetailMixin
+            require(["dojo/_base/lang", "JBrowse/View/Track/_FeatureDetailMixin"], function(lang, _FeatureDetailMixin){
+                lang.extend(_FeatureDetailMixin, {
+                    extendedRender: function(track, f, featDiv, container) {
+                        setTimeout(function() {
+                            thisB.insertFeatureDetail(track);
+                        },1000);
+                    }
+                });
+            });
             
             // override FASTA
             require(["dojo/_base/lang", "JBrowse/View/FASTA"], function(lang, FASTA){
@@ -97,9 +107,11 @@ return declare( JBrowsePlugin,
             thisB.startFocusQueue();
 
             // setup feature detail dialog monitor
+            /*
             setTimeout(function() {
                 thisB.featureDetailMonitor();
             },500);
+            */
         });
         
         // save the reference to the blast plugin in browser
@@ -300,6 +312,73 @@ return declare( JBrowsePlugin,
             }
             
         },1000);
+    },
+    insertFeatureDetail: function(track) {
+        console.log("insertFeatureDetail track", track);
+        var thisB = this;
+        var blastPlugin = this.browser.jblastPlugin;
+        var lastBlastKey = "";
+        var blastShow = 0;
+        var blastField = $('div.popup-dialog div.feature-detail h2.blasthit')[0];
+
+        if (typeof blastField !== 'undefined') blastShow = $(blastField).attr('blastshown');
+
+        //console.log("monitor",blastField,blastShow,typeof blastShow);
+
+        if (typeof blastField !== 'undefined') {// && blastShow !== '1') {
+            //$(blastField).attr('blastshown',1);
+            var blastKey = $('div.popup-dialog div.feature-detail div.value_container div.blasthit').html();
+            if (blastKey !== lastBlastKey) {
+                console.log("new blast dialog key = "+blastKey);
+                var regionObj = $('div.popup-dialog div.feature-detail div.field_container h2.feature_sequence');
+                var rObjP = $(regionObj).parent();
+                //console.log(regionObj,rObjP);
+                var hasBlastDetail = $('#blastDialogDetail');
+                //console.log('blastDialogDetail',$('#blastDialogDetail').length);
+                if ($('#blastDialogDetail').length===0) {
+                    console.log('blastDialogDetail created');
+                    $('<div id="blastDialogDetail"><h2 class="blastDetailTitle sectiontitle">BLAST Results</h2><div id="blastHspBlock">Rendering...</div></div>').insertBefore(rObjP);
+
+                    var asset = track.config.label;
+                    var dataset = encodeURIComponent(track.browser.config.dataRoot);
+                    var hitkey = blastKey;
+                    var url = '/jbapi/gethitdetails/'+asset+'/'+dataset+'/'+hitkey;
+                    $.get( url, function(hitData) {
+                        console.log("gethitdetails data",hitData);
+                        var blastContent = "";
+                        for(i in hitData) {
+                            var hit = hitData[i];
+                            console.log("hit",hit);
+                            blastContent += "<div>Hsp #: "+hit.Hsp.Hsp_num+"</div>";
+                            blastContent += blastPlugin.blastRenderHit(hit);
+                            blastContent += blastPlugin.blastRenderHitBp(hit);
+                        }
+                        $('#blastHspBlock').html(blastContent);
+                    })
+                        .fail(function() {
+                            console.log("error",url);
+                        });                    
+
+                        //blastContent += '<h2 class="blastDetailTitle sectiontitle">BLAST Results</h2>';
+/*                        
+                    var blastContent = "";
+                    var blastData = thisB.browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
+                    var hit = blastData[blastKey];
+                    console.log('hit',hit);
+                    setTimeout(function() {
+                        blastContent += '<h2 class="blastDetailTitle sectiontitle">BLAST Results</h2>';
+                        blastContent += '<div class="blastDialogContent">';
+                        blastContent += '<span class="blast-desc-view">'+hit.Hit_def+'</span><br/>';
+                        blastContent += blastPlugin.blastRenderHit(hit);
+                        blastContent += blastPlugin.blastRenderHitBp(hit);
+                        blastContent += '</div>';
+                        $('#blastDialogDetail').html(blastContent);
+                    },100);
+*/
+                }
+            }
+        }
+            
     },
     // this renders the summary information for the hit
     blastRenderHit: function(hit){
