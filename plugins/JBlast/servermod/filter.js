@@ -218,8 +218,9 @@ module.exports = {
                 str += strand+"\t";                        // 7 strand
                 str += ".\t";                               // 8 phase
                 str += "blastHit="+x;
-                    str += ";Name="+blastData[x].Hit_def+"\t";
-                str += "\n";
+                    str += ";Name="+blastData[x].Hit_def;
+                    str += ";HitNum="+blastData[x].Hit_num;
+                str += "\t\n";
             }
             //console.log(str);
         }
