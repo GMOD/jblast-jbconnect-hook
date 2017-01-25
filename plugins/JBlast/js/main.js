@@ -106,12 +106,6 @@ return declare( JBrowsePlugin,
             // start filter panel hide/show queue, filter panel management
             thisB.startFocusQueue();
 
-            // setup feature detail dialog monitor
-            /*
-            setTimeout(function() {
-                thisB.featureDetailMonitor();
-            },500);
-            */
         });
         
         // save the reference to the blast plugin in browser
@@ -266,53 +260,11 @@ return declare( JBrowsePlugin,
             });            
         },1000);
     },
-    // monitor feature detail popup and insert blast data when necessary
-    // todo: should trigger on the appropriate event
-    featureDetailMonitor: function() {
-        var thisB = this;
-        var blastPlugin = this.browser.jblastPlugin;
-        var lastBlastKey = "";
-        setInterval(function(){
-            var blastShow = 0;
-            var blastField = $('div.popup-dialog div.feature-detail h2.blasthit')[0];
-            
-            if (typeof blastField !== 'undefined') blastShow = $(blastField).attr('blastshown');
-            
-            //console.log("monitor",blastField,blastShow,typeof blastShow);
-            
-            if (typeof blastField !== 'undefined') {// && blastShow !== '1') {
-                //$(blastField).attr('blastshown',1);
-                var blastKey = $('div.popup-dialog div.feature-detail div.value_container div.blasthit').html();
-                if (blastKey !== lastBlastKey) {
-                    console.log("new blast dialog key = "+blastKey);
-                    var regionObj = $('div.popup-dialog div.feature-detail div.field_container h2.feature_sequence');
-                    var rObjP = $(regionObj).parent();
-                    //console.log(regionObj,rObjP);
-                    var hasBlastDetail = $('#blastDialogDetail');
-                    //console.log('blastDialogDetail',$('#blastDialogDetail').length);
-                    if ($('#blastDialogDetail').length==0) {
-                        console.log('blastDialogDetail created');
-                        $('<div id="blastDialogDetail">BLAST</div>').insertBefore(rObjP);
-                        
-                        var blastContent = "";
-                        var blastData = thisB.browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
-                        var hit = blastData[blastKey];
-                        console.log('hit',hit);
-                        setTimeout(function() {
-                            blastContent += '<h2 class="blastDetailTitle sectiontitle">BLAST Results</h2>';
-                            blastContent += '<div class="blastDialogContent">';
-                            blastContent += '<span class="blast-desc-view">'+hit.Hit_def+'</span><br/>';
-                            blastContent += blastPlugin.blastRenderHit(hit);
-                            blastContent += blastPlugin.blastRenderHitBp(hit);
-                            blastContent += '</div>';
-                            $('#blastDialogDetail').html(blastContent);
-                        },100);
-                    }
-                }
-            }
-            
-        },1000);
-    },
+    /**
+     * inserts blast feature details if appropriate blast track
+     * @param {type} track
+     * @returns {undefined}
+     */
     insertFeatureDetail: function(track) {
         console.log("insertFeatureDetail track", track);
         var thisB = this;
@@ -358,23 +310,6 @@ return declare( JBrowsePlugin,
                         .fail(function() {
                             console.log("error",url);
                         });                    
-
-                        //blastContent += '<h2 class="blastDetailTitle sectiontitle">BLAST Results</h2>';
-/*                        
-                    var blastContent = "";
-                    var blastData = thisB.browser.blastDataJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
-                    var hit = blastData[blastKey];
-                    console.log('hit',hit);
-                    setTimeout(function() {
-                        blastContent += '<h2 class="blastDetailTitle sectiontitle">BLAST Results</h2>';
-                        blastContent += '<div class="blastDialogContent">';
-                        blastContent += '<span class="blast-desc-view">'+hit.Hit_def+'</span><br/>';
-                        blastContent += blastPlugin.blastRenderHit(hit);
-                        blastContent += blastPlugin.blastRenderHitBp(hit);
-                        blastContent += '</div>';
-                        $('#blastDialogDetail').html(blastContent);
-                    },100);
-*/
                 }
             }
         }
@@ -385,7 +320,7 @@ return declare( JBrowsePlugin,
         //console.log("blastRenderHit",hit);
         var txt = '';
         
-        txt += '<span class="blast-data-view">Sequence ID: '+hit.Hit_id+' Length: '+hit.Hit_len+' Matches: '+hit.Hit_count+'</span>';
+        txt += '<span class="blast-data-view">Sequence ID: '+hit.Hit_id+' Length: '+hit.Hit_len /*+' Matches: '+hit.Hit_count*/ +'</span>';
         //txt += '<div class="CSSTableGenerator">';
         txt += '<div class="blast-table-view">'
         txt += '<table class="CSSTableGenerator " style="width:100px"><tr id="head">';
