@@ -133,7 +133,12 @@ div.blastSummary td.blastSummaryItem {
     background-color: #ccc;
     border-width:0px;
 }
-
+/*
+    featureDetail dialog
+*/
+#blastHspBlock {
+    padding-left:20px;
+}
 
 /*
     history panel

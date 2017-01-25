@@ -304,6 +304,7 @@ return declare( JBrowsePlugin,
                             blastContent += "<div>Hsp #: "+hit.Hsp.Hsp_num+"</div>";
                             blastContent += blastPlugin.blastRenderHit(hit);
                             blastContent += blastPlugin.blastRenderHitBp(hit);
+                            blastContent += "<hr>";
                         }
                         $('#blastHspBlock').html(blastContent);
                     })
