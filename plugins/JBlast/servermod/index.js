@@ -283,7 +283,7 @@ module.exports = function (sails) {
  * @param {type} req
  * @param {type} res
  * @param {type} cb
- * @returns {undefined}
+ * Ref: https://www.ncbi.nlm.nih.gov/books/NBK25499/
  */
 function rest_lookupAccession(req,res, cb) {
     var accession = req.param('accession');
