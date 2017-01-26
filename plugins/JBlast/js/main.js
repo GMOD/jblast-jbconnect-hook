@@ -297,14 +297,22 @@ return declare( JBrowsePlugin,
                     var url = '/jbapi/gethitdetails/'+asset+'/'+dataset+'/'+hitkey;
                     $.get( url, function(hitData) {
                         console.log("gethitdetails data",hitData);
+                        
                         var blastContent = "";
+                        var count = 0;
                         for(i in hitData) {
                             var hit = hitData[i];
-                            console.log("hit",hit);
+                            
+                            // do only on first iteration because other iteratons have same data
+                            if (count===0) {
+                                blastContent += "Hit Accession: "+hit.Hit_accession+"<br/>";
+                            }
+                            
                             blastContent += "<div>Hsp #: "+hit.Hsp.Hsp_num+"</div>";
                             blastContent += blastPlugin.blastRenderHit(hit);
                             blastContent += blastPlugin.blastRenderHitBp(hit);
                             blastContent += "<hr>";
+                            count++;
                         }
                         $('#blastHspBlock').html(blastContent);
                     })
