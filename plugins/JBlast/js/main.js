@@ -341,13 +341,13 @@ return declare( JBrowsePlugin,
         //txt += '<div class="CSSTableGenerator">';
         txt += '<div class="blast-table-view">';
         txt += '<table class="hsp-table" style="width:100px"><tr id="head">';  //class="CSSTableGenerator "
-        txt +=    '<td class="field">Accession</td>';
-        txt +=    '<td class="field">Seq ID</td>';
-        txt +=    '<td class="field">Length</td>';
+        txt +=    '<td class="field blast-field">Accession</td>';
+        txt +=    '<td class="field blast-field">Sequence ID</td>';
+        txt +=    '<td class="field blast-field">Length</td>';
         txt += '</tr><tr>';
-        txt +=    '<td><a class="value" id="details_accession" target="_blank"></a></td>';
-        txt +=    '<td>'+ hit.Hit_id+'</td>';
-        txt +=    '<td>'+hit.Hit_len+'</td>';
+        txt +=    '<td class="blast-value"><a class="value" id="details_accession" target="_blank"></a></td>';
+        txt +=    '<td class="blast-value">'+ hit.Hit_id+'</td>';
+        txt +=    '<td class="blast-value">'+hit.Hit_len+'</td>';
         txt += '</tr></table>';
         txt += '</div>';
         txt += '<hr>';
@@ -359,26 +359,30 @@ return declare( JBrowsePlugin,
     blastRenderHit: function(hit){
         //console.log("blastRenderHit",hit);
         var txt = '';
+
+        var hstart = parseInt(hit.Hsp["Hsp_hit-from"]);
+        var hend = parseInt(hit.Hsp["Hsp_hit-to"]);
+        var strand = hend - hstart > 0 ? "+" : "-";
         
-        //txt += '<div class="CSSTableGenerator">';
         txt += '<div class="blast-table-view">';
         txt += '<table class="hsp-table" style="width:100px"><tr id="head">';  //class="CSSTableGenerator "
-        txt +=    '<td class="field">HSP Num</td>';
-        txt +=    '<td class="field">Score</td>';
-        txt +=    '<td class="field">Expect</td>';
-        txt +=    '<td class="field">Identities</td>';
-        txt +=    '<td class="field">Gaps</td>';
-        //txt +=    '<td>Strand</td>';
+        txt +=    '<td class="field blast-field">HSP Num</td>';
+        txt +=    '<td class="field blast-field">Score</td>';
+        txt +=    '<td class="field blast-field">Expect</td>';
+        txt +=    '<td class="field blast-field">Identities</td>';
+        txt +=    '<td class="field blast-field">Gaps</td>';
+        txt +=    '<td class="field blast-field">Strand</td>';
+        txt +=    '<td class="field blast-field">Align Len</td>';
         txt += '</tr><tr>';
-        txt +=    '<td>'+hit.Hsp.Hsp_num+'</td>';
-        txt +=    '<td>'+ parseInt(hit.Hsp['Hsp_bit-score'])+' ('+hit.Hsp.Hsp_score+')</td>';
-        txt +=    '<td>'+Number(hit.Hsp.Hsp_evalue).toExponential(2)+'</td>';
-        txt +=    '<td>'+(hit.Hsp.Hsp_identity/hit.Hsp['Hsp_align-len']*100).toFixed(2)+'</td>';
-        txt +=    '<td>'+(hit.Hsp.Hsp_gaps/hit.Hsp['Hsp_align-len']*100).toFixed(2)+'</td>';
-        //txt +=    '<td>'+hit.Hsp['Hsp_query-strand']+'/'+hit.Hsp['Hsp_hit-strand-len']+'</td>';
+        txt +=    '<td class="blast-value">'+hit.Hsp.Hsp_num+'</td>';
+        txt +=    '<td class="blast-value">'+ parseInt(hit.Hsp['Hsp_bit-score'])+' ('+hit.Hsp.Hsp_score+')</td>';
+        txt +=    '<td class="blast-value">'+Number(hit.Hsp.Hsp_evalue).toExponential(2)+'</td>';
+        txt +=    '<td class="blast-value">'+(hit.Hsp.Hsp_identity/hit.Hsp['Hsp_align-len']*100).toFixed(2)+'</td>';
+        txt +=    '<td class="blast-value">'+(hit.Hsp.Hsp_gaps/hit.Hsp['Hsp_align-len']*100).toFixed(2)+'</td>';
+        txt +=    '<td class="blast-value">'+strand+'</td>';
+        txt +=    '<td class="blast-value">'+hit.Hsp['Hsp_align-len']+'</td>';
         txt += '</tr></table>';
         txt += '</div>'
-        //txt += '</div>'
         
         return txt;
     },
