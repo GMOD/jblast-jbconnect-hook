@@ -139,7 +139,13 @@ div.blastSummary td.blastSummaryItem {
 #blastHspBlock {
     padding-left:20px;
 }
-
+.detail .blast-table-view .field {
+    display:table-cell;
+}
+.detail .hsp-table {
+    border-collapse: separate;
+    border-spacing: 5px;
+}
 /*
     history panel
 */

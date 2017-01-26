@@ -305,7 +305,7 @@ return declare( JBrowsePlugin,
                             
                             // do only on first iteration because other iteratons have same data
                             if (count===0) {
-                                blastContent += "Accession: <a id='details_accession' target='_blank'></a><br/>";
+                                blastContent += thisB.blastRenderHitCommon(hit);
                                 $.get('/jbapi/lookupaccession/'+hit.Hit_accession,function(data) {
                                     
                                     var count = 0;
@@ -319,7 +319,7 @@ return declare( JBrowsePlugin,
                                 });
                             }
                             
-                            blastContent += "<div>Hsp #: "+hit.Hsp.Hsp_num+"</div>";
+//                            blastContent += "<div><h2 class='field'>Hsp Num</h2><span class='value'>"+hit.Hsp.Hsp_num+"</span></div>";
                             blastContent += blastPlugin.blastRenderHit(hit);
                             blastContent += blastPlugin.blastRenderHitBp(hit);
                             blastContent += "<hr>";
@@ -335,25 +335,46 @@ return declare( JBrowsePlugin,
         }
             
     },
+    blastRenderHitCommon: function(hit) {
+        var txt = '';
+        
+        //txt += '<div class="CSSTableGenerator">';
+        txt += '<div class="blast-table-view">';
+        txt += '<table class="hsp-table" style="width:100px"><tr id="head">';  //class="CSSTableGenerator "
+        txt +=    '<td class="field">Accession</td>';
+        txt +=    '<td class="field">Seq ID</td>';
+        txt +=    '<td class="field">Length</td>';
+        txt += '</tr><tr>';
+        txt +=    '<td><a class="value" id="details_accession" target="_blank"></a></td>';
+        txt +=    '<td>'+ hit.Hit_id+'</td>';
+        txt +=    '<td>'+hit.Hit_len+'</td>';
+        txt += '</tr></table>';
+        txt += '</div>';
+        txt += '<hr>';
+        
+        return txt;
+        
+    },
     // this renders the summary information for the hit
     blastRenderHit: function(hit){
         //console.log("blastRenderHit",hit);
         var txt = '';
         
-        txt += '<span class="blast-data-view">Sequence ID: '+hit.Hit_id+' Length: '+hit.Hit_len /*+' Matches: '+hit.Hit_count*/ +'</span>';
         //txt += '<div class="CSSTableGenerator">';
-        txt += '<div class="blast-table-view">'
-        txt += '<table class="CSSTableGenerator " style="width:100px"><tr id="head">';
-        txt +=    '<td>Score</td>';
-        txt +=    '<td>Expect</td>';
-        txt +=    '<td>Identities</td>';
-        txt +=    '<td>Gaps</td>';
+        txt += '<div class="blast-table-view">';
+        txt += '<table class="hsp-table" style="width:100px"><tr id="head">';  //class="CSSTableGenerator "
+        txt +=    '<td class="field">HSP Num</td>';
+        txt +=    '<td class="field">Score</td>';
+        txt +=    '<td class="field">Expect</td>';
+        txt +=    '<td class="field">Identities</td>';
+        txt +=    '<td class="field">Gaps</td>';
         //txt +=    '<td>Strand</td>';
         txt += '</tr><tr>';
+        txt +=    '<td>'+hit.Hsp.Hsp_num+'</td>';
         txt +=    '<td>'+ parseInt(hit.Hsp['Hsp_bit-score'])+' ('+hit.Hsp.Hsp_score+')</td>';
-        txt +=    '<td>'+hit.Hsp.Hsp_evalue+'</td>';
-        txt +=    '<td>'+hit.Hsp.Hsp_identity/hit.Hsp['Hsp_align-len']*100+'</td>';
-        txt +=    '<td>'+hit.Hsp.Hsp_gaps/hit.Hsp['Hsp_align-len']*100+'</td>';
+        txt +=    '<td>'+Number(hit.Hsp.Hsp_evalue).toExponential(2)+'</td>';
+        txt +=    '<td>'+(hit.Hsp.Hsp_identity/hit.Hsp['Hsp_align-len']*100).toFixed(2)+'</td>';
+        txt +=    '<td>'+(hit.Hsp.Hsp_gaps/hit.Hsp['Hsp_align-len']*100).toFixed(2)+'</td>';
         //txt +=    '<td>'+hit.Hsp['Hsp_query-strand']+'/'+hit.Hsp['Hsp_hit-strand-len']+'</td>';
         txt += '</tr></table>';
         txt += '</div>'
