@@ -239,7 +239,7 @@ module.exports = {
         cb();
     },
     /**
-     * find hit details given hit key
+     * return hit details given hit key, including all HSPs of the original hit.
      * @param {string} hitkey 
      * @param (string) dataSet
      * @param {function} cb     callback
