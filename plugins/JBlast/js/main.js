@@ -305,7 +305,18 @@ return declare( JBrowsePlugin,
                             
                             // do only on first iteration because other iteratons have same data
                             if (count===0) {
-                                blastContent += "Hit Accession: "+hit.Hit_accession+"<br/>";
+                                blastContent += "Accession: <a id='details_accession' target='_blank'>"+hit.Hit_accession+"</a><br/>";
+                                $.get('/jbapi/lookupaccession/'+hit.Hit_accession,function(data) {
+                                    
+                                    var count = 0;
+                                    for(var i in data.result) {
+                                        if (count++ === 0) {
+                                            var link = data.result[i].link;
+                                            $('#details_accession').attr('href',link);
+                                            
+                                        }
+                                    }
+                                });
                             }
                             
                             blastContent += "<div>Hsp #: "+hit.Hsp.Hsp_num+"</div>";
