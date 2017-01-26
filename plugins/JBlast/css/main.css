@@ -145,7 +145,7 @@ div.blastSummary td.blastSummaryItem {
 }
 .detail .hsp-table {
     border-collapse: separate;
-    border-spacing: 5px;
+    border-spacing: 2px;
 }
 /*
     history panel
