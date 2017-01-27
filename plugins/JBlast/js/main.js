@@ -64,6 +64,7 @@ return declare( JBrowsePlugin,
             asset: null,
             focusQueue: [],
             focusQueueProc: 0,
+            focusTrackCurrent: null,
             panelDelayTimer: null,
             filterSliders: {
                 score: 0,
@@ -206,8 +207,7 @@ return declare( JBrowsePlugin,
                     browser.jblast.panelDelayTimer = setTimeout(function(){
                         console.log("timeout");
                         var track = thisB.findTrack(trackConfigs[0].label);
-                        browser.publish("/jbrowse/v1/n/tracks/focus",track);
-                        //thisB.insertBlastPanel(trackConfigs[0]);
+                        browser.view.setTrackFocus(track,1);
                         browser.jblast.panelDelayTimer = null;
                     },1000);
                 }
