@@ -64,6 +64,7 @@ return declare( JBrowsePlugin,
             asset: null,
             focusQueue: [],
             focusQueueProc: 0,
+            panelDelayTimer: null,
             filterSliders: {
                 score: 0,
                 evalue: 0,
@@ -200,8 +201,17 @@ return declare( JBrowsePlugin,
         });        
         dojo.subscribe("/jbrowse/v1/v/tracks/show", function(trackConfigs){
             console.log("jblast plugin event: /jbrowse/v1/v/tracks/show",trackConfigs);
-            if (typeof trackConfigs[0].jblast !== 'undefined')
-                thisB.insertBlastPanel(trackConfigs[0]);
+            if (typeof trackConfigs[0].jblast !== 'undefined') {
+                if (browser.jblast.panelDelayTimer === null){
+                    browser.jblast.panelDelayTimer = setTimeout(function(){
+                        console.log("timeout");
+                        var track = thisB.findTrack(trackConfigs[0].label);
+                        browser.publish("/jbrowse/v1/n/tracks/focus",track);
+                        //thisB.insertBlastPanel(trackConfigs[0]);
+                        browser.jblast.panelDelayTimer = null;
+                    },1000);
+                }
+            }
         });        
         dojo.subscribe("/jbrowse/v1/v/tracks/hide", function(trackConfigs){
             console.log("jblast plugin event: /jbrowse/v1/v/tracks/hide",trackConfigs);
@@ -219,6 +229,19 @@ return declare( JBrowsePlugin,
         
         for(var i in tracks) {
             if (tracks[i].label === trackLabel)
+                return tracks[i];
+        }
+        return null;
+    },
+    // find track given label
+    findTrack: function( trackLabel ) {
+        if( ! trackLabel )
+            return null;
+
+        var tracks = this.browser.view.tracks;
+        
+        for(var i in tracks) {
+            if (tracks[i].config.label === trackLabel)
                 return tracks[i];
         }
         return null;
