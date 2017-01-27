@@ -4,10 +4,11 @@ define([
 ], function(declare, dom){
     return declare(null, {
         constructor: function(plugin,browser) {
-            console.log("********************** slider constructor");
+            console.log("sliderMixin constructor");
             browser.afterMilestone( 'initView', function() {
             });
         },
+        /*
         initSliders: function() {
             console.log("******************** initSliders");
             
@@ -136,5 +137,6 @@ define([
             
             
         }
+        */
     });
 });

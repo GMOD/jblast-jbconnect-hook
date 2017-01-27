@@ -64,7 +64,6 @@ return declare( JBrowsePlugin,
             asset: null,
             focusQueue: [],
             focusQueueProc: 0,
-            focusTrackCurrent: null,
             panelDelayTimer: null,
             filterSliders: {
                 score: 0,
