@@ -72,7 +72,9 @@ return declare( JBrowsePlugin,
             }
         };
         
-        // create function intercepts
+        /*
+         * class override function intercepts
+         */
         browser.afterMilestone( 'loadConfig', function() {
             if (typeof browser.config.classInterceptList === 'undefined') {
                 browser.config.classInterceptList = {};
@@ -178,9 +180,12 @@ return declare( JBrowsePlugin,
                 
         });
         
+        /*
+         * JBrowse event handlers
+         */
         dojo.subscribe("/jbrowse/v1/n/tracks/focus", function(track){
             console.log("jblast plugin event: /jbrowse/v1/n/tracks/focus",track);
-            if (typeof track.config.filterSettings !== 'undefined') {
+            if (typeof track.config.jblast !== 'undefined') {
                 // for jblast tracks, the label is the asset and also the reference to the filterSettings of the asset
                 thisB.browser.jblast.asset = track.config.label;
                 thisB.insertBlastPanel(track.config);
@@ -188,19 +193,19 @@ return declare( JBrowsePlugin,
         });        
         dojo.subscribe("/jbrowse/v1/n/tracks/unfocus", function(track){
             console.log("jblast plugin event: /jbrowse/v1/n/tracks/unfocus",track);
-            if (typeof track.config.filterSettings !== 'undefined') {
+            if (typeof track.config.jblast !== 'undefined') {
                 thisB.removeBlastPanel(track.config);
                 thisB.browser.jblast.asset = null;
             }
         });        
         dojo.subscribe("/jbrowse/v1/v/tracks/show", function(trackConfigs){
             console.log("jblast plugin event: /jbrowse/v1/v/tracks/show",trackConfigs);
-            if (typeof trackConfigs[0].filterSettings !== 'undefined')
+            if (typeof trackConfigs[0].jblast !== 'undefined')
                 thisB.insertBlastPanel(trackConfigs[0]);
         });        
         dojo.subscribe("/jbrowse/v1/v/tracks/hide", function(trackConfigs){
             console.log("jblast plugin event: /jbrowse/v1/v/tracks/hide",trackConfigs);
-            if (typeof trackConfigs[0].filterSettings !== 'undefined')
+            if (typeof trackConfigs[0].jblast !== 'undefined')
                 thisB.removeBlastPanel(trackConfigs[0]);
         });        
         

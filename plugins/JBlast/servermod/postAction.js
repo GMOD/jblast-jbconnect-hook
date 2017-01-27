@@ -152,6 +152,7 @@ function postMoveResultFiles(kWorkflowJob,cb) {
         newTrackJson[0].urlTemplate = '/jbapi/gettrackdata/' +kWorkflowJob.data.blastData.outputs.json + '/' + dataset;
         newTrackJson[0].storeCache = false;
         newTrackJson[0].filterSettings = g.jblast.blastResultPath+"/"+fileBlastFilter;
+        newTrackJson[0].jblast = 1;     // indicate this is a jblast generated track
         //newTrackJson[0].jblastGff = g.jblast.blastResultPath+"/"+kWorkflowJob.data.blastData.outputs.json + '.gff3';
 
         //addToTrackList(kWorkflowJob,newTrackJson);
