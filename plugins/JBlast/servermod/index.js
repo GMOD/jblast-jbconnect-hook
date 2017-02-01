@@ -31,7 +31,6 @@ module.exports = function (sails) {
 
             sails.on('hook:orm:loaded', function() {
                 // do something after hooks are loaded
-                //console.log(sails.hooks);
                 return cb();
             });
             // initialize history
@@ -64,7 +63,7 @@ module.exports = function (sails) {
                   rest_applyFilter(req,res);
               },
               'get /jbapi/getworkflows': function (req, res, next) {
-                    console.log("JBlast /jbapi/getworkflows called");
+                    sails.log("JBlast /jbapi/getworkflows called");
                     //console.dir(req.params);
                     sails.hooks['jb-galaxy-blast'].galaxyGetAsync("/api/workflows").then(function(workflows) {
                         res.send(workflows);
@@ -77,7 +76,7 @@ module.exports = function (sails) {
               },
               
               'get /jbapi/gettrackdata/:asset/:dataset': function (req, res, next) {
-                    console.log("JBlast /jbapi/gettrackdata called");
+                    sails.log("JBlast /jbapi/gettrackdata called");
                     var params = req.allParams();
                     sails.log('asset',req.param('asset'));
                     sails.log('dataset',req.param('dataset'));
@@ -99,7 +98,7 @@ module.exports = function (sails) {
                * Return hits data given hit key
                */
               'get /jbapi/gethitdetails/:asset/:dataset/:hitkey': function (req, res, next) {
-                    console.log("JBlast /jbapi/gethitdetails called");
+                    sails.log("JBlast /jbapi/gethitdetails called");
                     rest_getHitDetails(req,res,function(hitData) {
                         res.send(hitData);
                     });
@@ -109,7 +108,7 @@ module.exports = function (sails) {
                * Utilizes Entrez service
                */
               'get /jbapi/lookupaccession/:accession': function (req, res, next) {
-                    console.log("JBlast /jbapi/lookupaccession called");
+                    sails.log("JBlast /jbapi/lookupaccession called");
                     rest_lookupAccession(req,res,function(data) {
                         res.send(data);
                     });
@@ -135,7 +134,6 @@ module.exports = function (sails) {
                   var theGFF = blastPath+'/'+'test_'+file_i+'.gff3';
                   file_i++;
                   if (file_i >=3) file_i = 0;
-                  console.log(theGFF);
                   
                   var content = fs.readFileSync(theGFF);
                   
@@ -202,12 +200,14 @@ module.exports = function (sails) {
                 json: true  // parse json response
             };
 
+            sails.log.debug("GET", options);
+
             requestp(options)
                 .then(function (data) {
                     cb(data);
                 })
                 .catch(function (err) {
-                    console.log('erro GET /api/histories');
+                    sails.log.error('erro GET');
                     cberr(err);
                 });
         },
@@ -248,7 +248,6 @@ module.exports = function (sails) {
                 json: params
             };
             sails.log.debug("req",req);
-            //console.log(req);
             requestp(req)
                 .then(function(data){
                     cb(data);
@@ -350,7 +349,7 @@ function init_history(th) {
             }
         })
         .catch(function(err) {
-            console.log('init_history failed');
+            sails.log.error('init_history failed');
         });
 }
 function rest_applyFilter(req,res) {
@@ -400,7 +399,6 @@ function rest_WorkflowSubmit(req,res) {
     
     var blastPath = g.jbrowse.jbrowsePath + g.jbrowse.dataSet[0].dataPath + g.jbrowse.jblast.blastResultPath;
     var theFullBlastFilePath = blastPath+'/'+theBlastFile; 
-    console.log("theBlastFile",theBlastFile);
             
     // if direcgtory doesn't exist, create it
     if (!fs.existsSync(blastPath)){
@@ -413,7 +411,7 @@ function rest_WorkflowSubmit(req,res) {
         ws.end();
     }
     catch (e) {
-        console.log(e,theFullBlastFilePath);
+        sails.log.error(e,theFullBlastFilePath);
         //res.send(e); // return POST
         return;
     }
@@ -432,7 +430,7 @@ function rest_WorkflowSubmit(req,res) {
     sails.hooks['jbcore'].setGlobalSection(blastData,"jblast", function(err) {
         
         if (err) {
-            console.log("jbcore: failed to save globals");
+            sails.log.error("jbcore: failed to save globals");
             //res.send(err); // return POST
             return;
         }
@@ -454,18 +452,17 @@ function rest_WorkflowSubmit(req,res) {
         .state('active')
         .save(function(err){
             if (!err) {
-                console.log("workflow watch adding job id = "+kJob.id);
+                sails.log.debug("workflow watch adding job id = "+kJob.id);
                 //res.send(err); // return POST
                 return;
             }
-            console.log('error creating workflow watch job');
+            sails.log.error('error creating workflow watch job');
         });
         
         // promise chain
         // send the file
         var p = sails.hooks['jb-galaxy-blast'].sendFileAsync(theFile,historyId)
             .then(function(data) {
-                //console.log("send file result",data);
 
                 kJob.data.dataset = data;
                 kJob.save();
@@ -489,6 +486,22 @@ function rest_WorkflowSubmit(req,res) {
                 kJob.data.workflow = data;
                 kJob.save();
                 //res.send(data); // return POST
+                sails.log.debug("********************* get workflows");
+                sails.hooks['jb-galaxy-blast'].galaxyGetJSON('/api/workflows',function(data){
+                    sails.log.debug("********************check data",data);
+                    for(var i in data) {
+                        var wf = data[i];
+                        if (wf.id === workflow) {
+                            sails.log.info("Workflow starting: "+wf.name+' - '+wf.id);
+                            kJob.data.workflow.name = wf.name;
+                            kJob.save();
+                        }
+                    }
+                },
+                function(err) {
+                    sails.log.error("err /api/workflows",err);
+                });
+                
                 
                 // start monioring
                 monitorWorkflow(kJob);
@@ -628,7 +641,6 @@ function rest_testNewTrack(cb) {
     var addTrack = fs.readFileSync(theFile);
     addTrack = JSON.parse(addTrack);
     
-    console.log('addTrack',addTrack);
     
     var t = new Date().getTime()
     

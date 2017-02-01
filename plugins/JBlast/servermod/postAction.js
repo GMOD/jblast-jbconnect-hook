@@ -111,9 +111,6 @@ function postMoveResultFiles(kWorkflowJob,cb) {
 
         var newTrackJson = JSON.parse(newTrackData);
 
-        //console.log("file content");
-        //console.info(newTrackJson);
-
         //if it's a single definition, coerce to an array
         if (Object.prototype.toString.call(newTrackJson) !== '[object Array]') {
             newTrackJson = [ newTrackJson ];
@@ -130,7 +127,15 @@ function postMoveResultFiles(kWorkflowJob,cb) {
         
         var dateFormat = require('dateformat');
         var ts = new Date();  
-        var trackLabel = kWorkflowJob.data.blastData.name+'-'+dateFormat(ts,"isoDateTime");
+        //var trackLabel = kWorkflowJob.data.blastData.name+'-'+dateFormat(ts,"isoDateTime");
+        
+        // galaxy history id
+        var galaxyHistId = kWorkflowJob.data.blastData.outputs.json.split("_")[0];
+        
+        var trackLabel = 'blast '+galaxyHistId+' '+kWorkflowJob.data.sequence.seq+':('+kWorkflowJob.data.sequence.start+'..'+kWorkflowJob.data.sequence.end+')'
+            + kWorkflowJob.data.sequence.strand+' len '+kWorkflowJob.data.sequence.length;
+    
+        sails.log.info('trackLabel',trackLabel);
 
         var fileGffOnly = kWorkflowJob.data.blastData.outputs.gff3 +'.gff3';
         var fileJsonOnly = kWorkflowJob.data.blastData.outputs.json + '.json';
@@ -142,6 +147,9 @@ function postMoveResultFiles(kWorkflowJob,cb) {
         //newTrackJson[0].jblastData = g.jblast.blastResultPath+"/"+fileJsonOnly;
         newTrackJson[0].label = kWorkflowJob.data.blastData.outputs.json; //"jblast-"+ (new Date().getTime());
         newTrackJson[0].key = trackLabel;
+        newTrackJson[0].metadata = {
+                description: 'Workflow: '+kWorkflowJob.data.workflow.name
+            }
         newTrackJson[0].category = g.jblast.blastResultCategory;
         newTrackJson[0].storeCache = false;
         
@@ -214,7 +222,7 @@ function addToTrackList(kWorkflowJob,newTrackJson) {
         sails.log("validating...");
         newTrackJson.forEach (function (track) {
             if (!track.label) {
-                console.log ("Invalid track JSON: missing a label element");
+                sails.log.error ("Invalid track JSON: missing a label element");
             }
         });
 
