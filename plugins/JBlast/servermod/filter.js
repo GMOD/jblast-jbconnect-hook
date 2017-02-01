@@ -107,7 +107,6 @@ module.exports = {
                 str += ";Name="+blastData[x].Hit_def+"\t";
             str += "\n";
             
-            //console.log(str);
         }
         fs.writeFileSync(blastgff,str);
         sails.log("file written",blastgff);
@@ -186,7 +185,6 @@ module.exports = {
 
         // determine the sequence (i.e. "ctgA")
         var seqstr = blastJSON.BlastOutput['BlastOutput_query-def'];
-        console.log('seqstr',seqstr);
         var seqdata = parseFastaHead(seqstr);
         var sequence = seqdata.seq;
 
@@ -222,7 +220,6 @@ module.exports = {
                     str += ";HitNum="+blastData[x].Hit_num;
                 str += "\t\n";
             }
-            //console.log(str);
         }
         try {
             fs.writeFileSync(blastGffFile,str);
@@ -288,7 +285,6 @@ module.exports = {
         var blastData = this.blastData.BlastOutput.BlastOutput_iterations.Iteration.Hit;
         var val = 0;
         for(var x in blastData) {
-            //console.log(variable,blastData[x].Hsp[variable]);
             if (+blastData[x].Hsp[variable] > val)
                 val = +blastData[x].Hsp[variable];
         }
@@ -309,10 +305,8 @@ module.exports = {
     getHighest10: function(variable) {
         var blastData = this.blastData.BlastOutput.BlastOutput_iterations.Iteration.Hit;
         var val = Math.log10(Number.MIN_VALUE);
-        //console.log("smallest",val);
         for(var x in blastData) {
             var v = Math.log10(+blastData[x].Hsp[variable]);
-            //console.log('v',v,blastData[x].Hsp[variable]);
             if (v > val) val = v;
         }
         return val;
@@ -333,7 +327,6 @@ module.exports = {
         var blastData = this.blastData.BlastOutput.BlastOutput_iterations.Iteration.Hit;
         var val = 0;
         for(var x in blastData) {
-            //console.log(variable,blastData[x].Hsp[variable]);
             var cval = parseFloat(blastData[x].Hsp[variable]) / parseFloat(blastData[x].Hsp['Hsp_align-len']) * 100;
             if (cval > val) val = cval;
         }
