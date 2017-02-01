@@ -39,7 +39,7 @@ module.exports = {
         // fix offsets
         for(var x in hits) {
             fixHsp(hits[x].Hsp);
-            sails.log.debug(hits[x]);
+            //sails.log.debug(hits[x]);
         }
         
         // write file
