@@ -124,7 +124,7 @@ module.exports = {
         var dataSet = requestData.dataSet;
         var filterData = requestData.filterParams;
         
-        sails.log.debug('fitlerData',filterData);
+        //sails.log.debug('fitlerData',filterData);
         
         var g = sails.config.globals.jbrowse;
         var filterfile = g.jbrowsePath + dataSet +'/'+ g.jblast.blastResultPath+'/'+asset+'_filtersettings.json';
@@ -140,7 +140,7 @@ module.exports = {
         
         convert2Num(merged);
         
-        sails.log.debug("merged",JSON.stringify(merged, null, 4));
+        //sails.log.debug("merged",JSON.stringify(merged, null, 4));
         
         try {
             fs.writeFileSync(filterfile,JSON.stringify(merged));
