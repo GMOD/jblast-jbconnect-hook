@@ -33,8 +33,6 @@ module.exports = {
             hsp['Hsp_query-from'] = "" + start;
             hsp['Hsp_query-to'] = "" + end;
 
-            //console.log(start,end);
-
             return hsp;
         };
         
