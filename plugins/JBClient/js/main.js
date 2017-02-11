@@ -32,6 +32,23 @@ return declare( JBrowsePlugin,
         setTimeout(function(){
             browser.publish ('/jbrowse/jbclient_ready',io);
         },500);
+        
+        $.get("/loginstate",function(data) {
+            console.log("loginstate",data);
+            var txt = "";
+            if (data.loginstate !== true) {
+                txt += '<form role="form" action="/auth/local" method="post">';
+                txt +=  '<input type="text" name="identifier" placeholder="Username or Email">';
+                txt +=  '<input type="password" name="password" placeholder="Password">';
+                txt +=  '<button type="submit">Sign in</button>';
+                txt += '</form>';
+            }
+            else {
+                txt += data.user.username;
+            }
+        $( "body" ).append( "<div class='jb-loginbox'>"+txt+"</div>" );
+        });
+        
 
     }
 

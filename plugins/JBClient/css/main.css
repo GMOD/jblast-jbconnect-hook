@@ -8,3 +8,9 @@ and open the template in the editor.
     Author     : Eric
 */
 
+
+.jb-loginbox {
+   position:absolute;
+   top:0;
+   right:100px;
+}
