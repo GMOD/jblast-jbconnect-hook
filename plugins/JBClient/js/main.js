@@ -23,6 +23,7 @@ define([
 return declare( JBrowsePlugin,
 {
     constructor: function( args ) {
+        var thisB = this;
         var browser = this.browser;
         console.log("plugin: JBClient");
         
@@ -37,19 +38,55 @@ return declare( JBrowsePlugin,
             console.log("loginstate",data);
             var txt = "";
             if (data.loginstate !== true) {
-                txt += '<form role="form" action="/auth/local" method="post">';
+                txt += '<form id="form-login" role="form" action="/auth/local?next=/jbrowse" method="post">';
                 txt +=  '<input type="text" name="identifier" placeholder="Username or Email">';
                 txt +=  '<input type="password" name="password" placeholder="Password">';
                 txt +=  '<button type="submit">Sign in</button>';
                 txt += '</form>';
+
+                txt += '<a class="btn btn-secondary" type="button" href="/register">Register</a>';
             }
             else {
-                txt += data.user.username;
+                //txt += data.user.username;
+                //txt += 
+                txt +=    '<div class="dropdown">';
+                txt +=    '      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" >';
+                txt +=    data.user.username;
+                txt +=    '      </button>';
+                txt +=    '      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">';
+                txt +=    '        <a id="button-logout" class="dropdown-item" href="/logout?next=/jbrowse">Logout</a>';
+                txt +=    '      </div>';
+                txt +=    '    </div>';
             }
         $( "body" ).append( "<div class='jb-loginbox'>"+txt+"</div>" );
         });
-        
+        /*
+         * class override function intercepts
+         */
+        browser.afterMilestone( 'loadConfig', function() {
+            if (typeof browser.config.classInterceptList === 'undefined') {
+                browser.config.classInterceptList = {};
+            }
+            // override Browser
+            require(["dojo/_base/lang", "JBrowse/Browser"], function(lang, Browser){
+                lang.extend(Browser, {
+                    extendedRender: function(track, f, featDiv, container) {
+                        setTimeout(function() {
+                            thisB.insertFeatureDetail(track);
+                        },1000);
+                    }
+                });
+            });
+        }); 
+        browser.afterMilestone( 'initView', function() {
 
+            $('#form-login').attr('action','/auth/local?next='+thisB.browser.makeCurrentViewURL());
+            $('#button-logout').attr('href','/logout?next='+thisB.browser.makeCurrentViewURL());
+
+        });
+    },
+    Browser_override_makeCurrentViewURL(x) {
+        
     }
 
 });
