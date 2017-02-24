@@ -53,6 +53,10 @@ img.cogwheel {
     padding: 5px;
     padding-top: 0px;
 }
+.blast-group-descript {
+    font-size: 120%;
+    font-weight: bold;
+}
 .blast-slider-label {
     position: absolute;
     font-weight: bolder;

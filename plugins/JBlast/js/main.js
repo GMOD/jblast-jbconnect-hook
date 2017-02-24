@@ -480,6 +480,11 @@ return declare( JBrowsePlugin,
             $('#blast-filter-group').clone().prependTo('.jbrowseHierarchicalTrackSelector');
             thisB.setupFilterSliders(task.trackConfig);
             $('#blast-filter-group').show(500,function() {
+                $('.blast-group-descript').html(task.trackConfig.key);
+                if (typeof task.trackConfig.metadata != 'undefined' && typeof task.trackConfig.metadata.description !== 'undefined') {
+                    $('.blast-group-descript').attr('title',task.trackConfig.metadata.description);
+                    $('.blast-group-descript').attr('alt',task.trackConfig.metadata.description);
+                }
                 thisB.browser.jblast.focusQueueProc--;
             });
         }
@@ -507,7 +512,7 @@ return declare( JBrowsePlugin,
         queue.push({action:'hide'});
     },
     setupFilterSliders: function(trackConfig) {
-        console.log("setupFilterSliders1");
+        //console.log("setupFilterSliders1");
         var thisB = this;
         var config = this.browser.config;
         var url = config.dataRoot + '/' + trackConfig.filterSettings;
