@@ -38,27 +38,31 @@ return declare( JBrowsePlugin,
             console.log("loginstate",data);
             var txt = "";
             if (data.loginstate !== true) {
-                txt += '<form id="form-login" role="form" action="/auth/local?next=/jbrowse" method="post">';
-                txt +=  '<input type="text" name="identifier" placeholder="Username or Email">';
-                txt +=  '<input type="password" name="password" placeholder="Password">';
-                txt +=  '<button type="submit">Sign in</button>';
-                txt += '</form>';
-
-                txt += '<a class="btn btn-secondary" type="button" href="/register">Register</a>';
+                txt += '<div class="dropdown">';
+                txt += '<button class="btn btn-secondary dropdown-toggle jb-dropdown jb-login-icon" type="button" id="dropdownMenuButton" data-toggle="dropdown" >Login</button>';
+                txt += '<div class="dropdown-menu dropdown-menu-right panel panel-default jb-login-panel"><div class="panel-body">';
+                txt +=   '<form id="form-login" class="form-group" role="form" action="/auth/local?next=/jbrowse" method="post">';
+                txt +=     '<div class="input-group">';
+                txt +=       '<input class="form-control" type="text" name="identifier" placeholder="Username or Email">';
+                txt +=       '<span class="input-group-addon"></span>';
+                txt +=       '<input class="form-control" type="password" name="password" placeholder="Password">';
+                txt +=     '</div>';
+                txt +=     '<button class="btn btn-secondary jb-form-button" type="submit">Sign in</button>';
+                txt +=     '<button class="btn btn-secondary jb-form-button" type="button" onclick="window.location=\'/register\'">Register</button>';
+                txt +=   '</form>';
+                txt += '</div></div>';
+                txt += '</div>';
             }
             else {
-                //txt += data.user.username;
-                //txt += 
                 txt +=    '<div class="dropdown">';
-                txt +=    '      <button class="btn btn-secondary dropdown-toggle jb-dropdown" type="button" id="dropdownMenuButton" data-toggle="dropdown" >';
-                txt +=    '      <img src="smiley.gif"></img>';
-                txt +=    data.user.username;
-                txt +=    '      </button>';
-                txt +=    '      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">';
-                txt +=    '        <li><a id="button-manage" class="dropdown-item jb-menuitem" href="#">Manage</a></li>';
-                txt +=    '        <li><a id="button-logout" class="dropdown-item jb-menuitem" href="/logout?next=/jbrowse">Logout</a></li>';
-                txt +=    '      </ul>';
-                txt +=    '    </div>';
+                txt +=      '<button class="btn btn-secondary dropdown-toggle jb-dropdown jb-user-icon" type="button" id="dropdownMenuButton" data-toggle="dropdown" >';
+                txt +=      data.user.username;
+                txt +=      '</button>';
+                txt +=      '<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">';
+                txt +=        '<li><a id="button-manage" class="dropdown-item jb-menuitem" href="#">Manage</a></li>';
+                txt +=        '<li><a id="button-logout" class="dropdown-item jb-menuitem" href="/logout?next=/jbrowse">Logout</a></li>';
+                txt +=      '</ul>';
+                txt +=    '</div>';
             }
         $( "body" ).append( "<div class='jb-loginbox'>"+txt+"</div>" );
         });
@@ -81,7 +85,7 @@ return declare( JBrowsePlugin,
             });
         }); 
         browser.afterMilestone( 'initView', function() {
-
+            // inject the actual login/logou redirect
             $('#form-login').attr('action','/auth/local?next='+thisB.browser.makeCurrentViewURL());
             $('#button-logout').attr('href','/logout?next='+thisB.browser.makeCurrentViewURL());
 
