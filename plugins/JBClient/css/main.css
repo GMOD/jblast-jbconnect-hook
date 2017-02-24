@@ -14,3 +14,15 @@ and open the template in the editor.
    top:0;
    right:100px;
 }
+
+.jb-dropdown {
+    line-height: .9 !important;
+    padding-left: 40px !important;
+    background-image: url("../img/user1.png");
+    background-size: 20px 20px;
+    background-repeat: no-repeat;
+    background-position: 2px;
+}
+.jb-menuitem {
+    padding-left: 10px;
+}

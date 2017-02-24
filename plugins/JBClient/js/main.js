@@ -50,12 +50,14 @@ return declare( JBrowsePlugin,
                 //txt += data.user.username;
                 //txt += 
                 txt +=    '<div class="dropdown">';
-                txt +=    '      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" >';
+                txt +=    '      <button class="btn btn-secondary dropdown-toggle jb-dropdown" type="button" id="dropdownMenuButton" data-toggle="dropdown" >';
+                txt +=    '      <img src="smiley.gif"></img>';
                 txt +=    data.user.username;
                 txt +=    '      </button>';
-                txt +=    '      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">';
-                txt +=    '        <a id="button-logout" class="dropdown-item" href="/logout?next=/jbrowse">Logout</a>';
-                txt +=    '      </div>';
+                txt +=    '      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">';
+                txt +=    '        <li><a id="button-manage" class="dropdown-item jb-menuitem" href="#">Manage</a></li>';
+                txt +=    '        <li><a id="button-logout" class="dropdown-item jb-menuitem" href="/logout?next=/jbrowse">Logout</a></li>';
+                txt +=    '      </ul>';
                 txt +=    '    </div>';
             }
         $( "body" ).append( "<div class='jb-loginbox'>"+txt+"</div>" );
