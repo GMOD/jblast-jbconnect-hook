@@ -207,7 +207,7 @@ module.exports = function (sails) {
                     cb(data);
                 })
                 .catch(function (err) {
-                    sails.log.error('erro GET');
+                    sails.log.error('error GET',err);
                     cberr(err);
                 });
         },
@@ -349,7 +349,7 @@ function init_history(th) {
             }
         })
         .catch(function(err) {
-            sails.log.error('init_history failed');
+            sails.log.error('init_history failed - is galaxy running?',err);
         });
 }
 function rest_applyFilter(req,res) {
