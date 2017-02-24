@@ -44,6 +44,12 @@ img.cogwheel {
     border-bottom-style: solid;
     border-bottom-color: #bbb;
 }
+.blast-hit-data {
+    position:absolute;
+    font-size: 140%;
+    top: 23px;
+    right: 20px;    
+}
 .blast-filter-sliders {
     width:100%;
     padding:25px;

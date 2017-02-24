@@ -59,9 +59,16 @@ module.exports = function (sails) {
                
               'post /jbapi/setfilter': function (req, res, next) {
                   sails.log.info("JBlast","POST /jbapi/setfilter");
-                  //sails.log.debug("req.body", JSON.stringify(req.body));
                   rest_applyFilter(req,res);
               },
+              /*
+               * Get info about the given track
+               */
+              'get /jbapi/getblastdata/:asset/:dataset': function (req, res, next) {
+                  sails.log.info("JBlast","/jbapi/getblastdata");
+                  rest_applyFilter(req,res);
+              },
+              
               'get /jbapi/getworkflows': function (req, res, next) {
                     sails.log("JBlast /jbapi/getworkflows called");
                     //console.dir(req.params);
@@ -356,17 +363,21 @@ function rest_applyFilter(req,res) {
     sails.log.debug("rest_applyFilter()");
     var g = sails.config.globals;
     var requestData = req.body;
+
+    // get /jbapi/getdata is used then the asset and dataset will be in th params, so extract them.
+    var asset = req.param('asset');
+    var dataSet = req.param('dataset');
+
+    if (typeof asset !== 'undefined') requestData.asset = asset;
+    if (typeof dataSet !== 'undefined') requestData.dataSet = dataSet;
     
     //sails.log.debug("data",JSON.stringify(data, null, 4));
-    //sails.log.debug("requestData",requestData);
+    sails.log.debug("requestData",requestData);
 
     var err = filter.writeFilterSettings(requestData,function(filterData) {
         filter.applyFilter(filterData,requestData,function(data) {
     
-            //data.result = "success";
-        
             res.send(data);
-            
         });        
     });
     

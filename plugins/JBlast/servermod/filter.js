@@ -122,6 +122,7 @@ module.exports = {
         sails.log.debug('writeFilterSettings()');
         var asset = requestData.asset;
         var dataSet = requestData.dataSet;
+        
         var filterData = requestData.filterParams;
         
         //sails.log.debug('fitlerData',filterData);
@@ -136,7 +137,12 @@ module.exports = {
             sails.log.error('failed to read',filterfile);
             return err;
         }
-        var merged = merge(f,filterData);
+        
+        var merged = f;
+        
+        // special case if no filter data, then don't merge
+        if (typeof filterData !== 'undefined')
+            merged = merge(f,filterData);
         
         convert2Num(merged);
         
@@ -235,19 +241,24 @@ module.exports = {
                 str += "\t\n";
             }
         }
-        try {
-            fs.writeFileSync(blastGffFile,str);
-        } catch (err) {
-            sails.log.error('failed to write',blastGffFile);
-            cb({result:'fail', error: 'failed to write '+blastGffFile});
-            return;
+        
+        // only write and notify if this is a /setfilter call (with filterParams)
+        if (typeof requestData.filterParams !== 'undefined') {
+            
+            // write new 
+            try {
+                fs.writeFileSync(blastGffFile,str);
+            } catch (err) {
+                sails.log.error('failed to write',blastGffFile);
+                cb({result:'fail', error: 'failed to write '+blastGffFile});
+                return;
+            }
+            sails.log("file written",blastGffFile);
+            
+            // track change notification
+            sails.hooks['jbcore'].sendEvent("track-update",requestData.asset);
+            sails.log ("Announced track update",requestData,requestData.asset);
         }
-        sails.log("file written",blastGffFile);
-        
-        // asset = track label
-        sails.hooks['jbcore'].sendEvent("track-update",requestData.asset);
-        sails.log ("Announced track update",requestData,requestData.asset);
-        
         var retdata = {
             result:'success',
             hits: hitCount,

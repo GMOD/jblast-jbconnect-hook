@@ -484,6 +484,13 @@ return declare( JBrowsePlugin,
                 if (typeof task.trackConfig.metadata != 'undefined' && typeof task.trackConfig.metadata.description !== 'undefined') {
                     $('.blast-group-descript').attr('title',task.trackConfig.metadata.description);
                     $('.blast-group-descript').attr('alt',task.trackConfig.metadata.description);
+
+                    $.get("/jbapi/getblastdata/"+JBrowse.jblast.asset+'/'+encodeURIComponent(JBrowse.config.dataRoot), function(data){
+                        console.log( data );
+                        $('.blast-hit-data').html("Hits: ("+data.filteredHits+'/'+data.hits+")");
+                    });
+                    
+                    
                 }
                 thisB.browser.jblast.focusQueueProc--;
             });
@@ -696,8 +703,9 @@ return declare( JBrowsePlugin,
               dataSet: this.browser.config.dataRoot
         }
         //console.log("postData",postData);
-        $.post( "/jbapi/setfilter", postData , function( result ) {
-            console.log( result );
+        $.post( "/jbapi/setfilter", postData , function( data) {
+            console.log( data );
+            $('.blast-hit-data').html("Hits: ("+data.filteredHits+'/'+data.hits+")");
         }, "json");
     },
 
