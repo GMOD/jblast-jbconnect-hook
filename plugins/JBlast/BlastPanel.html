@@ -29,36 +29,25 @@
         <div id="blast-filter-group" class="input-group blast-filter-group" style="display:none">
             <div class="blast-slider-title">
                 <h2 class="title">Blast Filter</h2>
-                <button id="blast-filter-close-btn" style="float:right;" class="btn btn-primary">-</button>  
+                <!--button id="blast-filter-close-btn" style="float:right;" class="btn btn-primary">-</button-->
+                <p class="blast-group-descript">...</p>
             </div>
             <table class="blast-filter-sliders" style="width:100%;cellpadding:10px">
                 <tr>
-                    <td colspan="2" class="blast-slider-label">Score</td>
+                    <td class="blast-slider-item"><div id="slider-score"></div><div class="blast-slider-label">Score</div></td>
+                    <td class="blast-slider-item-c2"><div id="slider-score-data" class="blast-slider-item-data panel panel-default panel-body">0</div></td>
+                </tr>
+                <tr class="blast-slider-itemgroup">
+                    <td class="blast-slider-item"><div id="slider-evalue"></div><div class="blast-slider-label">E-Value</div></td>
+                    <td class="blast-slider-item-c2"><div id="slider-evalue-data" class="blast-slider-item-data panel panel-default panel-body">0</div></td>
                 </tr>
                 <tr>
-                    <td class="blast-slider-item"><div id="slider-score"></td>
-                    <td class="blast-slider-item-c2"><div id="slider-score-data" class="blast-slider-item-data panel panel-default panel-body">Blah</div></td>
+                    <td class="blast-slider-item"><div id="slider-identity"></div><div class="blast-slider-label">Identity</div></td>
+                    <td class="blast-slider-item-c2"><div id="slider-identity-data" class="blast-slider-item-data panel panel-default panel-body">0</div></td>
                 </tr>
                 <tr>
-                    <td colspan="2" class="blast-slider-label">E-Value</td>
-                </tr>
-                <tr>
-                    <td class="blast-slider-item"><div id="slider-evalue"></td>
-                    <td class="blast-slider-item-c2"><div id="slider-evalue-data" class="blast-slider-item-data panel panel-default panel-body">Blah</div></td>
-                </tr>
-                <tr>
-                    <td colspan="2" class="blast-slider-label">Identity</td>
-                </tr>
-                <tr>
-                    <td class="blast-slider-item"><div id="slider-identity"></td>
-                    <td class="blast-slider-item-c2"><div id="slider-identity-data" class="blast-slider-item-data panel panel-default panel-body">Blah</div></td>
-                </tr>
-                <tr>
-                    <td colspan="2" class="blast-slider-label">Gaps</td>
-                </tr>
-                <tr>
-                    <td class="blast-slider-item"><div id="slider-gap"></td>
-                    <td class="blast-slider-item-c2"><div id="slider-gap-data" class="blast-slider-item-data panel panel-default panel-body">Blah</div></td>
+                    <td class="blast-slider-item"><div id="slider-gap"></div><div class="blast-slider-label">Gaps</div></td>
+                    <td class="blast-slider-item-c2"><div id="slider-gap-data" class="blast-slider-item-data panel panel-default panel-body">0</div></td>
                 </tr>
             </table>
         </div>
