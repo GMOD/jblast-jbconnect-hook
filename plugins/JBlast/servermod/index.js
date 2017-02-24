@@ -361,9 +361,11 @@ function rest_applyFilter(req,res) {
     //sails.log.debug("requestData",requestData);
 
     var err = filter.writeFilterSettings(requestData,function(filterData) {
-        filter.applyFilter(filterData,requestData,function() {
+        filter.applyFilter(filterData,requestData,function(data) {
     
-            res.send({result:'success'});
+            //data.result = "success";
+        
+            res.send(data);
             
         });        
     });

@@ -161,6 +161,12 @@ module.exports = {
      *      "asset": <the asset id>
      *      "dataSet": "sample_data/json/volvox"
      * @returns {undefined}
+     * 
+     * callback:
+     *  cb({
+     *      totalFeatures: x,               // total number of features
+     *      filteredFeatures: x             // filtered features.
+     *  })
      */
     applyFilter: function(filterData,requestData,cb) {
         sails.log.debug('applyFilter()');
@@ -176,6 +182,7 @@ module.exports = {
             var content = fs.readFileSync(resultFile, 'utf8');
         } catch(e) {
             sails.log.error("failed to read blast json",resultFile);
+            cb({result:'fail', error: 'failed to read '+blastGffFile});
             return;
         }
         var blastJSON = JSON.parse(content);
@@ -188,9 +195,14 @@ module.exports = {
         var seqdata = parseFastaHead(seqstr);
         var sequence = seqdata.seq;
 
+        var hitCount = 0;
+        var filteredHits = 0;
+
         var str = "";
        
         for(var x in blastData) {
+            hitCount++;
+            
             var selected = 0;
             if (filterData===0) selected = 1;
             else if (parseFloat(blastData[x].Hsp['Hsp_bit-score']) > filterData.score.val &&
@@ -200,6 +212,8 @@ module.exports = {
                1 ) selected = 1;
        
             if (selected) {
+                filteredHits++;
+                
                 var qstart = blastData[x].Hsp["Hsp_query-from"];
                 var qend = blastData[x].Hsp["Hsp_query-to"];
                 var hstart = parseInt(blastData[x].Hsp["Hsp_hit-from"]);
@@ -225,6 +239,7 @@ module.exports = {
             fs.writeFileSync(blastGffFile,str);
         } catch (err) {
             sails.log.error('failed to write',blastGffFile);
+            cb({result:'fail', error: 'failed to write '+blastGffFile});
             return;
         }
         sails.log("file written",blastGffFile);
@@ -233,7 +248,13 @@ module.exports = {
         sails.hooks['jbcore'].sendEvent("track-update",requestData.asset);
         sails.log ("Announced track update",requestData,requestData.asset);
         
-        cb();
+        var retdata = {
+            result:'success',
+            hits: hitCount,
+            filteredHits: filteredHits
+        };
+        sails.log.debug(retdata);
+        cb(retdata);
     },
     /**
      * return hit details given hit key, including all HSPs of the original hit.
