@@ -43,7 +43,7 @@ return declare( JBrowsePlugin,
                 txt += '<div class="dropdown-menu dropdown-menu-right panel panel-default jb-login-panel"><div class="panel-body">';
                 txt +=   '<form id="form-login" class="form-group" role="form" action="/auth/local?next=/jbrowse" method="post">';
                 txt +=     '<div class="input-group">';
-                txt +=       '<input class="form-control" type="text" name="identifier" placeholder="Username or Email">';
+                txt +=       '<input class="form-control" type="text" name="identifier" placeholder="Username">';
                 txt +=       '<span class="input-group-addon"></span>';
                 txt +=       '<input class="form-control" type="password" name="password" placeholder="Password">';
                 txt +=     '</div>';
