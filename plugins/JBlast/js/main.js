@@ -862,6 +862,7 @@ return declare( JBrowsePlugin,
                     console.log('Selected workflow',selWorkflow);
                     
                     // do http post
+                    /*
                     var xhrArgs = {
                       //url: jbServer + '/jbapi/blastregion',
                       url: '/jbapi/workflowsubmit',
@@ -880,6 +881,7 @@ return declare( JBrowsePlugin,
                           alert(error);
                       }
                     };
+                    */
                     var postData = {
                           region: regionB,
                           workflow: selWorkflow,
