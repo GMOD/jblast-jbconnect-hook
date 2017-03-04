@@ -16,7 +16,7 @@ var getopt = new getopt([
     ['t' , 'setuptools'       , 'setup jblast tools for galaxy'],
     ['d' , 'setupdata'        , 'setup data and samples'],
     ['h' , 'setuphistory'     , 'setup history'],
-    ['v' , 'view'             , 'view status of config'],
+//    ['v' , 'view'             , 'view status of config'],
     
     ['h' , 'help'            , 'display this help']
 ]);              // create Getopt instance
