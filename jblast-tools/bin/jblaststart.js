@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-/** 
+/** this tool is obsolete
  * get global data and output files to specified location.
  * from global file /etc/jbrowse/globals.dat
  * format in global:

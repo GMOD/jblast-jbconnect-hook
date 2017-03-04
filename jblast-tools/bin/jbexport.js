@@ -37,7 +37,8 @@ util.getGlobals (function(g) {
 
     // export will copy result files into <dataset dir>/jblast (i.e. "/sample_data/json/volvox/jblast"
     //var blastResultDir = g.jbrowse.blastResultPath;
-    var blastResultDir = g.jbrowse.jblast.blastResultPath;
+    //var blastResultDir = g.jbrowse.jblast.blastResultPath;
+    var blastResultDir = g.jblast.blastResultPath;
 
     /*
      * export the gff file to jbrowse
