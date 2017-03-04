@@ -1,5 +1,5 @@
 <tool id="jb_simblast" name="Sim Blastn" version="1.0.0">
-  <description>Simulate Blastn</description>
+  <description>Simulate Blastn with hits</description>
   <command>jblast-simblast -i $input1 -o $output -b blastn-sample-with-hits.blastxml</command>
   <inputs>
     <param format="fasta" name="input1" type="data" label="fasta"/>
