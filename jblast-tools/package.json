@@ -15,7 +15,7 @@
     "jblast-xml2csv": "./bin/blastxml2csv.js",
     "jblast-tab2gff": "./bin/Blast2Gff.pl",
     "jblast-simblast": "./bin/simblast.js",
-    "jblast": "./bin/configutil.js"
+    "jblast": "./bin/jblastutil.js"
   },
   "dependencies": {
     "bluebird": "^3.4.6",
