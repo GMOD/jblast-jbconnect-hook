@@ -2,6 +2,39 @@
 This is the set of tools and sample workflow specific to jblast.
 The scripts in /bin are used by jblast workflow.
 
+```
+npm install -g
+```
+
+
+jblast
+Usage: jblast [OPTION]
+  -a, --setupall          equivelant to -w -t -d combined
+      --globals[=ARG]     show globals
+  -p, --blastdbpath=PATH  existing database path
+  -w, --setupworkflows    [install|<path>] "install" project wf, or specify .ga file 
+  -t, --setuptools        setup jblast tools for galaxy
+  -d, --setupdata         setup data and samples
+  -h, --setuphistory      setup history
+  -v, --view              view status of config
+  -h, --help              display this help
+
+Examples:
+
+Install an existing blast database
+Jblast --blastdbpath [local path]
+
+Install jblast package workflows to galaxy
+Jblast --gurl <galaxy url> --setupworkflows
+
+Install jblast package tools to galaxy
+Jblast --setuptools
+
+Setup data and samples
+Jblast --setudata
+
+
+
 Instructions for getting the Galaxy API key.
 https://wiki.galaxyproject.org/Learn/API
 
