@@ -33,7 +33,7 @@ getopt.setHelp(
     "Jblast --blastdbpath [local path]\n" +
     "\n" +
     "Install jblast package workflows to galaxy\n" +
-    "Jblast --gurl <galaxy url> --setupworkflows\n" +
+    "Jblast --setupworkflows\n" +
     "\n" +
     "Install jblast package tools to galaxy\n" +
     "Jblast --setuptools\n"+
