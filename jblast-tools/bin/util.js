@@ -29,21 +29,17 @@ module.exports = {
      * @returns {undefined}
      */
     getGlobals: function (cb) {
-
         var reqOptions = {
-            uri: this.url+':'+this.port+'/jbglobal/1',
+            uri: this.url+':'+this.port+'/jb/globals.js',
             json: true // Automatically parses the JSON string in the response 
         };
-
         requestp(reqOptions)
             .then(function (repos) {
-                if (IsJbrowseValue(repos))
-                    cb(repos.jbrowse);
-                else
-                    cb({result:'error',error:'global.js: invalid JSON'})
+                    cb(repos);
             })
             .catch(function (err) {
-                console.log(err.RequestError);
+                console.log(err.name,err.message);
+                console.log("Is JBServer running?");
                 cb(null);
             });
     },

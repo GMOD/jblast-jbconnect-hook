@@ -55,13 +55,14 @@ if (!process.argv.slice(2).length) {
 var globals = opt.options['globals'];
 if (typeof globals !== 'undefined') {
     util.getGlobals(function(g) {
+        //console.log("hehehe");
         if (g===null)
             process.exit(1);
         
         console.log('jbserver globals:');
         console.log(g);
         process.exit(0);
-    })
+    });
 }
 
 /*
@@ -89,6 +90,7 @@ try {
 }
 catch(err) {
     console.log(gdataroot,'does not exist');
+    console.log("Is Galaxy installed?  Is galaxyPath= defined in config.js properly?");
     process.exit(1);
 }
 try {
@@ -96,8 +98,11 @@ try {
     fs.accessSync(gdatapath, fs.F_OK);
 }
 catch (err) {
-    console.log(gdatapath,'does not exist');
+    //console.log(gdatapath,'does not exist');
     gdatapath = gpath;
+}
+if (gdatapath != gpath) {
+    console.log("Using Galaxy Docker");
 }
 
 /*
@@ -261,6 +266,8 @@ function exec_setupworkflows() {
                 .then(function(data){
                     console.log('Workflow imported:',data.name);
                     console.log(data.url);
+                    
+                    console.log("Restart Galaxy server for changes to take effect.");
                 })
                 .catch(function(err) {      // todo: not sure why failure not hitting this
                     console.log('Workflow Upload Error',err.message);
@@ -300,6 +307,8 @@ function exec_setuphistory() {
         console.log("POST /api/histories",result)
         console.log("Created History:",result.name);
         console.log(result.url);
+        
+        console.log("Restart Galaxy server for changes to take effect.");
     })
     .catch(function(err) {
         console.log('Read histories error',err.message);
@@ -350,6 +359,7 @@ function exec_blastdbpath() {
             
         }
     }
+    console.log("Restart Galaxy server for changes to take effect.");
     
 }
 
@@ -382,4 +392,6 @@ function exec_setuptools() {
     var content2 = content.replace("../shed_tools", "/export/shed_tools");
     console.log("modifying",shed_conf);
     fs.writeFileSync(shed_conf,content2);
+    
+    console.log("Restart Galaxy server for changes to take effect.");
 }
