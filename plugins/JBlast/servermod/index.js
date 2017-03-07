@@ -95,9 +95,18 @@ module.exports = function (sails) {
                     var g = sails.config.globals.jbrowse;
                     
                     //var gfffile = g.jbrowsePath + dataset +'/'+ g.jblast.blastResultPath + '/' + 'sampleResult.gff3';
-                    var gfffile = g.jbrowsePath + dataset +'/'+ g.jblast.blastResultPath + '/' + asset +'.gff3';
+                    var gfffile = g.jbrowsePath + dataset + g.jblast.blastResultPath + '/' + asset +'.gff3';
 
-                    var content = fs.readFileSync(gfffile);
+                    try {
+                        var content = fs.readFileSync(gfffile);
+                    }
+                    catch (err) {
+                        var str = JSON.stringify(err);
+                        //var str = str.split("\n");
+                        sails.log.error("failed to retrieve gff3 file",str);
+                        res.error(JSON.str);
+                        return;
+                    };
 
                     res.send(content);
               },
@@ -207,7 +216,7 @@ module.exports = function (sails) {
                 json: true  // parse json response
             };
 
-            sails.log.debug("GET", options);
+            //sails.log.debug("GET", options);
 
             requestp(options)
                 .then(function (data) {
@@ -254,7 +263,7 @@ module.exports = function (sails) {
                 },
                 json: params
             };
-            sails.log.debug("req",req);
+            //sails.log.debug("req",req);
             requestp(req)
                 .then(function(data){
                     cb(data);
@@ -354,6 +363,7 @@ function init_history(th) {
                     return;
                 }
             }
+            sails.log.error("id not found for",historyName);
         })
         .catch(function(err) {
             sails.log.error('init_history failed - is galaxy running?',err);
@@ -398,19 +408,13 @@ function rest_WorkflowSubmit(req,res) {
     
     // get starting coord of region
     var startCoord = getRegionStart(region);
-    
     var seq = parseSeqData(region);
 
     var d = new Date();
 
     // write the BLAST region file
-    
     var theBlastFile = "blast_region"+d.getTime()+".fa";
-    
-    // write the received region into a file
-    // todo: handle errors
-    
-    var blastPath = g.jbrowse.jbrowsePath + g.jbrowse.dataSet[0].dataPath + g.jbrowse.jblast.blastResultPath;
+    var blastPath = g.jbrowse.jbrowsePath + dataSetPath +'/'+ g.jbrowse.jblast.blastResultPath;
     var theFullBlastFilePath = blastPath+'/'+theBlastFile; 
             
     // if direcgtory doesn't exist, create it
@@ -425,13 +429,14 @@ function rest_WorkflowSubmit(req,res) {
     }
     catch (e) {
         sails.log.error(e,theFullBlastFilePath);
-        //res.send(e); // return POST
+        res.send("error - failed to write",e); // return POST
         return;
     }
     
     // write variable to global
     // todo: later the name and perhaps additional info should come from the FASTA header (ie: JBlast ctgA ctgA:46990..48410 (- strand)
     // which should appear as the track name when the operation is done.
+    
     var blastData = {
             "name": "JBlast", 
             //"blastSeq": "/var/www/html/jb-galaxy-blaster/tmp/44705works.fasta",
@@ -440,16 +445,18 @@ function rest_WorkflowSubmit(req,res) {
             "offset": startCoord
     };
     
-    sails.hooks['jbcore'].setGlobalSection(blastData,"jblast", function(err) {
+    //sails.hooks['jbcore'].setGlobalSection(blastData,"jblast", function(err) {
         
-        if (err) {
-            sails.log.error("jbcore: failed to save globals");
-            //res.send(err); // return POST
-            return;
-        }
+    //    if (err) {
+    //        sails.log.error("jbcore: failed to save globals");
+    //        res.send("error setGlobalSection()",err); // return POST
+    //        return;
+    //    }
 
         var jg = g.jbrowse;
-        var theFile = jg.jbrowseURL + jg.dataSet[0].dataPath + jg.jblast.blastResultPath+'/'+theBlastFile;
+        //var theFile = jg.jbrowseURL + jg.dataSet[0].dataPath + jg.jblast.blastResultPath+'/'+theBlastFile;
+        var theFile = jg.jbrowseURL + dataSetPath+'/' + jg.jblast.blastResultPath+'/'+theBlastFile;
+        //sails.log.debug("theFile",theFile);
         
         // create the kue job entry
         var jobdata = {
@@ -465,67 +472,84 @@ function rest_WorkflowSubmit(req,res) {
         .state('active')
         .save(function(err){
             if (!err) {
-                sails.log.debug("workflow watch adding job id = "+kJob.id);
-                //res.send(err); // return POST
-                return;
+                sails.log.debug("galaxy-workflow-watch job id = "+kJob.id);
+
+                // promise chain
+                // send the file
+                var terminatePromise = false;
+                sails.log.info("uploading file to galaxy",theFile)
+                var p = sails.hooks['jb-galaxy-blast'].sendFileAsync(theFile,historyId)
+                    .then(function(data) {
+                        kJob.data.dataset = data;
+                        kJob.save();
+
+                        if (terminatePromise) return;
+
+                        if (typeof data.error !== 'undefined') {
+                            // handle error
+                            sails.log.error("error",data.message);
+                            terminatePromise = true;
+                            return;
+                        }
+
+                        var fileId = data.outputs[0].id;
+
+                        var params = {
+                            workflow_id: workflow,
+                            history: 'hist_id='+historyId,
+                            ds_map: {
+                                "0": {
+                                    src: 'hda',
+                                    id: fileId
+                                }
+                            }
+                        };
+                        // submit the workflow
+                        return sails.hooks['jb-galaxy-blast'].galaxyPostAsync('/api/workflows',params);
+                    })
+                    .then(function(data) {
+                        kJob.data.workflow = data;
+                        kJob.save();
+                        
+                        if (terminatePromise) return;
+                        
+                        //res.send(data); // return POST
+                        sails.hooks['jb-galaxy-blast'].galaxyGetJSON('/api/workflows',function(data){
+                            for(var i in data) {
+                                var wf = data[i];
+                                if (wf.id === workflow) {
+                                    sails.log.info("Workflow starting: "+wf.name+' - '+wf.id);
+                                    kJob.data.workflow.name = wf.name;
+                                    kJob.save();
+                                    
+                                    // start monitoring
+                                    monitorWorkflow(kJob);
+                                }
+                            }
+                        },
+                        function(err) {
+                            sails.log.error("err /api/workflows",err);
+                            terminatePromise = true;
+                        });
+
+
+                        // start monioring
+                        //monitorWorkflow(kJob);
+                    })
+                    .catch(function(err){
+                        sails.log.error("",err);
+                        kJob.data.error = err;
+                        kJob.save();
+                        //res.send(err); // return POST
+                    });
+            
             }
-            sails.log.error('error creating workflow watch job');
+            else {
+                res.send("error create kue galaxy-workflow-watch",err); // return POST
+            }
         });
         
-        // promise chain
-        // send the file
-        var p = sails.hooks['jb-galaxy-blast'].sendFileAsync(theFile,historyId)
-            .then(function(data) {
-
-                kJob.data.dataset = data;
-                kJob.save();
-
-                var fileId = data.outputs[0].id;
-
-                var params = {
-                    workflow_id: workflow,
-                    history: 'hist_id='+historyId,
-                    ds_map: {
-                        "0": {
-                            src: 'hda',
-                            id: fileId
-                        }
-                    }
-                };
-                // submit the workflow
-                return sails.hooks['jb-galaxy-blast'].galaxyPostAsync('/api/workflows',params);
-            })
-            .then(function(data) {
-                kJob.data.workflow = data;
-                kJob.save();
-                //res.send(data); // return POST
-                sails.log.debug("********************* get workflows");
-                sails.hooks['jb-galaxy-blast'].galaxyGetJSON('/api/workflows',function(data){
-                    sails.log.debug("********************check data",data);
-                    for(var i in data) {
-                        var wf = data[i];
-                        if (wf.id === workflow) {
-                            sails.log.info("Workflow starting: "+wf.name+' - '+wf.id);
-                            kJob.data.workflow.name = wf.name;
-                            kJob.save();
-                        }
-                    }
-                },
-                function(err) {
-                    sails.log.error("err /api/workflows",err);
-                });
-                
-                
-                // start monioring
-                monitorWorkflow(kJob);
-            })
-            .catch(function(err){
-                sails.log.error(err);
-                kJob.data.error = err;
-                kJob.save();
-                //res.send(err); // return POST
-            });
-    });    
+//    });    
 }
 /**
  * Monitor workflow
