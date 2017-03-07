@@ -243,7 +243,7 @@ module.exports = {
         }
         
         // only write and notify if this is a /setfilter call (with filterParams)
-        if (typeof requestData.filterParams !== 'undefined') {
+        //if (typeof requestData.filterParams !== 'undefined') {
             
             // write new 
             try {
@@ -255,6 +255,7 @@ module.exports = {
             }
             sails.log("file written",blastGffFile);
             
+        if (typeof requestData.filterParams !== 'undefined') {
             // track change notification
             sails.hooks['jbcore'].sendEvent("track-update",requestData.asset);
             sails.log ("Announced track update",requestData,requestData.asset);
