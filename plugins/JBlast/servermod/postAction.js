@@ -32,15 +32,21 @@ function doCompleteAction(kWorkflowJob,hista) {
     //sails.log("steps",steps);
     kWorkflowJob.data.blastData.outputs = {};
     
-    var filecount = 0;
+    var filecount = 0;  // this is used to identify number of outstanding files to copy, when it reaches zero, we are finished copying.
+    
+    sails.log.debug("wf steps", steps);
+    
     // find entries with "export" labels and copy those files to the dataset path
+    var filesToMove = 0;
     for(var i in steps) {
         var label = steps[i].workflow_step_label;
         var id = steps[i].job_id;
         //sails.log.debug(wId,'step',i,"typeof label",label);
         sails.log('step',i,'id',id);
         if (label != null && label.indexOf('export') !== -1) {
-            sails.log('label',label);
+            
+            filesToMove++;
+            //sails.log('label',label);
             if (typeof hista[id] === 'undefined'){
                 sails.log("undefined hist[id]",id);
                 continue;
@@ -56,6 +62,8 @@ function doCompleteAction(kWorkflowJob,hista) {
             
             sails.log.info(wId,'writing',filepath);
             filecount++;
+            
+            // move the files to the destination folder
             var stream = request(url).pipe(fs.createWriteStream(filepath));
             stream.on('finish', function () {     // detect file finished copying
                 sails.log.debug("finished file");
@@ -63,26 +71,32 @@ function doCompleteAction(kWorkflowJob,hista) {
             });
         }
     }
-    
-    // wait for files to finish copying
-    var t = setInterval(function() {
-        if (filecount === 0) {
-            sails.log.debug("done moving files");
-            kWorkflowJob.save();
+    if (filesToMove==0) {
+        sails.log.error("No files moved.  Is the label: export [type] defined in the workflow?  ");
+        kWorkflowJob.state = 'failed';
+        kWorkflowJob.save();
+    }
+    else {
+        // wait for files to finish copying
+        var t = setInterval(function() {
+            if (filecount === 0) {
+                sails.log.debug("done moving files");
+                kWorkflowJob.save();
 
-            // insert track into trackList.json
-            postMoveResultFiles(kWorkflowJob,function(newTrackJson){
-                
-                offsetfix.process(kWorkflowJob,newTrackJson,function() {
-                    processFilter(kWorkflowJob,newTrackJson,function() {
-                        addToTrackList(kWorkflowJob,newTrackJson);
+                // insert track into trackList.json
+                postMoveResultFiles(kWorkflowJob,function(newTrackJson){
+
+                    offsetfix.process(kWorkflowJob,newTrackJson,function() {
+                        processFilter(kWorkflowJob,newTrackJson,function() {
+                            addToTrackList(kWorkflowJob,newTrackJson);
+                        });
+
                     });
-                    
                 });
-            });
-            clearInterval(t);
-        }
-    },100);
+                clearInterval(t);
+            }
+        },100);
+    }
 }
 /**
  * 
@@ -177,7 +191,7 @@ function postMoveResultFiles(kWorkflowJob,cb) {
  * @returns {undefined}
  */
 function processFilter(kWorkflowJob,newTrackJson,cb) {
-    sails.log("processOffset()");
+    sails.log("processFilter()");
     var g = sails.config.globals.jbrowse;
     
     filter.filterInit(kWorkflowJob,newTrackJson, function(filtered){
