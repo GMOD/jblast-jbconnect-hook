@@ -91,6 +91,13 @@ return declare( JBrowsePlugin,
                 });
             });
             
+            // override BlockBased
+            require(["dojo/_base/lang", "JBrowse/View/Track/BlockBased"], function(lang, BlockBased){
+                lang.extend(BlockBased, {
+                    postRenderHighlight: thisB.BlockBased_postRenderHighlight
+                });
+            });
+            
             // override FASTA
             require(["dojo/_base/lang", "JBrowse/View/FASTA"], function(lang, FASTA){
                 lang.extend(FASTA, {
