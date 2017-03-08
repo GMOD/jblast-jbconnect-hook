@@ -95,7 +95,7 @@ module.exports = function (sails) {
                     var g = sails.config.globals.jbrowse;
                     
                     //var gfffile = g.jbrowsePath + dataset +'/'+ g.jblast.blastResultPath + '/' + 'sampleResult.gff3';
-                    var gfffile = g.jbrowsePath + dataset + g.jblast.blastResultPath + '/' + asset +'.gff3';
+                    var gfffile = g.jbrowsePath + dataset + '/'+ g.jblast.blastResultPath + '/' + asset +'.gff3';
 
                     try {
                         var content = fs.readFileSync(gfffile);
@@ -104,7 +104,7 @@ module.exports = function (sails) {
                         var str = JSON.stringify(err);
                         //var str = str.split("\n");
                         sails.log.error("failed to retrieve gff3 file",str);
-                        res.error(JSON.str);
+                        res.error(str);
                         return;
                     };
 
