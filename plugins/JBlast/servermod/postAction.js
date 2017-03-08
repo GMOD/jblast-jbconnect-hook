@@ -26,7 +26,7 @@ function doCompleteAction(kWorkflowJob,hista) {
     
     var steps = kWorkflowJob.data.workflow.steps;
     var g = sails.config.globals.jbrowse;
-    var dataSetPath = g.jbrowsePath + g.dataSet[0].dataPath;
+    var dataSetPath = g.jbrowsePath + kWorkflowJob.data.jbrowseDataPath + '/';    //g.dataSet[0].dataPath;
     var targetDir = dataSetPath + g.jblast.blastResultPath;
     
     //sails.log("steps",steps);
@@ -88,12 +88,20 @@ function doCompleteAction(kWorkflowJob,hista) {
                 // insert track into trackList.json
                 postMoveResultFiles(kWorkflowJob,function(newTrackJson){
 
-                    offsetfix.process(kWorkflowJob,newTrackJson,function() {
-                        processFilter(kWorkflowJob,newTrackJson,function() {
-                            addToTrackList(kWorkflowJob,newTrackJson);
+                    if (getHits(kWorkflowJob,newTrackJson)===0) {
+                        var msg = "No Blast Hits";
+                        sails.log.error(msg);
+                        kWorkflowJob.data.errorMsg = msg;
+                        kWorkflowJob.state('failed');
+                        kWorkflowJob.save();
+                    }
+                    else {
+                        offsetfix.process(kWorkflowJob,newTrackJson,function() {
+                            processFilter(kWorkflowJob,newTrackJson,function() {
+                                addToTrackList(kWorkflowJob,newTrackJson);
+                            });
                         });
-
-                    });
+                    }
                 });
                 clearInterval(t);
             }
@@ -117,9 +125,9 @@ function postMoveResultFiles(kWorkflowJob,cb) {
 
     var g = sails.config.globals.jbrowse;
     // this is the track template file
-    var trackListPath = g.jbrowsePath+g.dataSet[0].dataPath;// + g.jblast.blastResultPath;
-    var blastResultPath = trackListPath + g.jblast.blastResultPath;
-    var newTrackPath = blastResultPath+'/'+"inMemTemplate.json";
+    var trackListPath = g.jbrowsePath + kWorkflowJob.data.jbrowseDataPath; //g.dataSet[0].dataPath;// + g.jblast.blastResultPath;
+    var blastResultPath = trackListPath +'/'+ g.jblast.blastResultPath;
+    var newTrackPath = blastResultPath+'/'+g.jblast.insertTrackTemplate; //"inMemTemplate.json"
     
     var p = fs.readFileAsync (newTrackPath)
     .then(function(newTrackData) {
@@ -158,7 +166,7 @@ function postMoveResultFiles(kWorkflowJob,cb) {
         var fileBlastFilter = kWorkflowJob.data.blastData.outputs.json + '_filtersettings.json';
 
         // replace some track info
-        newTrackJson[0].baseUrl = g.dataSet[0].dataPath;
+        newTrackJson[0].baseUrl = kWorkflowJob.data.jbrowseDataPath; //g.dataSet[0].dataPath;
         newTrackJson[0].urlTemplate = g.jblast.blastResultPath+"/"+fileGffOnly;
         //newTrackJson[0].jblastData = g.jblast.blastResultPath+"/"+fileJsonOnly;
         newTrackJson[0].label = kWorkflowJob.data.blastData.outputs.json; //"jblast-"+ (new Date().getTime());
@@ -170,7 +178,7 @@ function postMoveResultFiles(kWorkflowJob,cb) {
         newTrackJson[0].storeCache = false;
         
         // alternate track info
-        var dataset = replaceAll(g.dataSet[0].dataPath,'/','%2F');
+        var dataset = replaceAll(kWorkflowJob.data.jbrowseDataPath,'/','%2F');   //g.dataSet[0].dataPath
         
         newTrackJson[0].baseUrl = '/';
         newTrackJson[0].urlTemplate = '/jbapi/gettrackdata/' +kWorkflowJob.data.blastData.outputs.json + '/' + dataset;
@@ -194,17 +202,37 @@ function postMoveResultFiles(kWorkflowJob,cb) {
  */
 function processFilter(kWorkflowJob,newTrackJson,cb) {
     sails.log("processFilter()");
-    var g = sails.config.globals.jbrowse;
+    //var g = sails.config.globals.jbrowse;
     
     filter.filterInit(kWorkflowJob,newTrackJson, function(filtered){
         var asset = {
             "asset": newTrackJson[0].label,
-            "dataSet": g.dataSet[0].dataPath
+            "dataSet": kWorkflowJob.data.jbrowseDataPath   //g.dataSet[0].dataPath
         };
         filter.applyFilter(0,asset,function() {
             cb();
         });
     });
+}
+function getHits(kWorkflowJob,newTrackJson) {
+    sails.log.debug('applyFilter()');
+    var g = sails.config.globals.jbrowse;
+    var asset = newTrackJson[0].label;
+    var dataSet = kWorkflowJob.data.jbrowseDataPath;
+    //var filterData = requestData.filterParams;
+    //sails.log.debug('newTrackJson',newTrackJson);
+
+    var resultFile = g.jbrowsePath + dataSet +'/'+ g.jblast.blastResultPath+'/'+asset+'.json';
+
+    try {
+        var content = fs.readFileSync(resultFile, 'utf8');
+    } catch(e) {
+        sails.log.error("failed to read blast json",resultFile);
+        return 0;
+    }
+    var blastJSON = JSON.parse(content);
+    
+    return 0; false;
 }
 /**
  * 
@@ -214,7 +242,7 @@ function addToTrackList(kWorkflowJob,newTrackJson) {
     var g = sails.config.globals.jbrowse;
     
     //todo: make this configurable later
-    var trackListPath = g.jbrowsePath + g.dataSet[0].dataPath + 'trackList.json';
+    var trackListPath = g.jbrowsePath + kWorkflowJob.data.jbrowseDataPath + '/trackList.json';   //g.dataSet[0].dataPath
 
     sails.log("trackListPath = "+trackListPath);
     sails.log("newTrackJson",newTrackJson.key);
