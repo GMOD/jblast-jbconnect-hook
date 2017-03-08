@@ -34,7 +34,7 @@ function doCompleteAction(kWorkflowJob,hista) {
     
     var filecount = 0;  // this is used to identify number of outstanding files to copy, when it reaches zero, we are finished copying.
     
-    sails.log.debug("wf steps", steps);
+    //sails.log.debug("wf steps", steps);
     
     // find entries with "export" labels and copy those files to the dataset path
     var filesToMove = 0;
@@ -72,8 +72,10 @@ function doCompleteAction(kWorkflowJob,hista) {
         }
     }
     if (filesToMove==0) {
-        sails.log.error("No files moved.  Is the label: export [type] defined in the workflow?  ");
-        kWorkflowJob.state = 'failed';
+        var msg = "No files to export.  Is the label: export [type] defined in the workflow?";
+        sails.log.error(msg);
+        kWorkflowJob.data.errorMsg = msg;
+        kWorkflowJob.state('failed');
         kWorkflowJob.save();
     }
     else {
@@ -186,7 +188,7 @@ function postMoveResultFiles(kWorkflowJob,cb) {
     });
 }
 /**
- * Process offsets 
+ * Generate the GFF file 
  * @param {type} newTrackJson
  * @returns {undefined}
  */
