@@ -231,8 +231,13 @@ function getHits(kWorkflowJob,newTrackJson) {
         return 0;
     }
     var blastJSON = JSON.parse(content);
+    var blastData = blastJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
+    var hits = 0;
+    for(var x in blastData) {
+        hits ++;
+    }
     
-    return 0; false;
+    return hits;
 }
 /**
  * 
