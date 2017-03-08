@@ -460,6 +460,7 @@ function rest_WorkflowSubmit(req,res) {
         
         // create the kue job entry
         var jobdata = {
+            name: "Galaxy workflow",
             jbrowseDataPath: dataSetPath,
             sequence: seq,
             blastData: blastData,
@@ -520,6 +521,7 @@ function rest_WorkflowSubmit(req,res) {
                                 if (wf.id === workflow) {
                                     sails.log.info("Workflow starting: "+wf.name+' - '+wf.id);
                                     kJob.data.workflow.name = wf.name;
+                                    kJob.data.name = "Galaxy workflow: "+wf.name;
                                     kJob.save();
                                     
                                     // start monitoring
