@@ -21,8 +21,8 @@ module.exports = {
         var g = sails.config.globals.jbrowse;
 
         // read blast json file
-        var blastfile = g.jbrowsePath + g.dataSet[0].dataPath + g.jblast.blastResultPath +"/"+ newTrackJson[0].label + ".json";
-        var blastFilterFile = g.jbrowsePath + g.dataSet[0].dataPath + newTrackJson[0].filterSettings;
+        var blastfile = g.jbrowsePath + kWorkflowJob.data.jbrowseDataPath +'/' + g.jblast.blastResultPath +"/"+ newTrackJson[0].label + ".json";
+        var blastFilterFile = g.jbrowsePath + kWorkflowJob.data.jbrowseDataPath + '/' + newTrackJson[0].filterSettings;
         
         sails.log('blastfile',blastfile);
         try {
@@ -68,49 +68,6 @@ module.exports = {
             sails.log.error("failed to write",blastFilterFile);
         }
         cb(filter);
-    },
-    // builds initial gff (unfiltered) from blast results  (obsolete)
-    filterDo: function(kWorkflowJob,newTrackJson) {
-        sails.log("filterDo()");
-        var g = sails.config.globals.jbrowse;
-        var blastdata = g.jbrowsePath + g.dataSet[0].dataPath + newTrackJson[0].jblastData;
-        var blastgff = g.jbrowsePath + g.dataSet[0].dataPath + newTrackJson[0].jblastGff;
-        
-        try {
-            var content = fs.readFileSync(blastdata, 'utf8');
-        } catch(e) {
-            sails.log.error("failed to read blast json",blastdata);
-            return;
-        }
-        var blastJSON = JSON.parse(content);
-        
-        var blastData = blastJSON.BlastOutput.BlastOutput_iterations.Iteration.Hit;
-
-        var str = "";
-        for(var x in blastData) {
-            var qstart = blastData[x].Hsp["Hsp_query-from"];
-            var qend = blastData[x].Hsp["Hsp_query-to"];
-            var hstart = parseInt(blastData[x].Hsp["Hsp_hit-from"]);
-            var hend = parseInt(blastData[x].Hsp["Hsp_hit-to"]);
-            var strand = hend - hstart > 0 ? "+" : "-";
-            var score = blastData[x].Hsp["Hsp_bit-score"];
-            var seq = kWorkflowJob.data.sequence.seq;
-            str += "ctgA\t";                            // 1 seqid
-            str += "blastn:blastdb\t";                  // 2 source
-            str += "blastn\t";                          // 3 type
-            str += qstart+"\t";                         // 4 start
-            str += qend+"\t";                           // 5 end
-            str += score+"\t";                          // 6 score
-            str += strand+"\t";                        // 7 strand
-            str += ".\t";                               // 8 phase
-            str += "blastHit="+x;
-                str += ";Name="+blastData[x].Hit_def+"\t";
-            str += "\n";
-            
-        }
-        fs.writeFileSync(blastgff,str);
-        sails.log("file written",blastgff);
-        
     },
     /**
      * write new data to filter settings file, given requestData
