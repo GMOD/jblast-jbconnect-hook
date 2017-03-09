@@ -12,8 +12,9 @@ var deferred = require('deferred');
 var postAction = require('./postAction');
 var kueSyncJobs = require ('./kueSyncJobs');
 var filter = require("./filter");   // filter processing
+var kueJobMon = require('./kueJobMon');
 
-
+kueJobMon.start();
 //var prettyjson = require('prettyjson');   // for debugging
 
 var historyName = '';
@@ -26,7 +27,7 @@ var file_i = 0;
 module.exports = function (sails) {
    return {
         initialize: function(cb) {
-            sails.log.info("Sails Hook: JBlast initialize"); 
+            sails.log.info("starting kueJobMon"); 
             // todo: check that galaxy is running
 
             sails.on('hook:orm:loaded', function() {
@@ -77,7 +78,7 @@ module.exports = function (sails) {
                     }).catch(function(err){
                         sails.log.error(err.message);
                         sails.log.error(err.options.uri);
-                        res.send([]);
+                        res.error([]);
                     });
                     //return res.send(galaxyWorkflows);
               },
@@ -429,129 +430,123 @@ function rest_WorkflowSubmit(req,res) {
     }
     catch (e) {
         sails.log.error(e,theFullBlastFilePath);
-        res.send("error - failed to write",e); // return POST
+        res.error("error - failed to write",e); // return POST
         return;
     }
     
-    // write variable to global
-    // todo: later the name and perhaps additional info should come from the FASTA header (ie: JBlast ctgA ctgA:46990..48410 (- strand)
-    // which should appear as the track name when the operation is done.
-    
     var blastData = {
             "name": "JBlast", 
-            //"blastSeq": "/var/www/html/jb-galaxy-blaster/tmp/44705works.fasta",
             "blastSeq": theFullBlastFilePath,
-//            "originalSeq": "/var/www/html/jb-galaxy-blaster/tmp/volvox.fa",
             "offset": startCoord
     };
     
-    //sails.hooks['jbcore'].setGlobalSection(blastData,"jblast", function(err) {
-        
-    //    if (err) {
-    //        sails.log.error("jbcore: failed to save globals");
-    //        res.send("error setGlobalSection()",err); // return POST
-    //        return;
-    //    }
 
-        var jg = g.jbrowse;
-        //var theFile = jg.jbrowseURL + jg.dataSet[0].dataPath + jg.jblast.blastResultPath+'/'+theBlastFile;
-        var theFile = jg.jbrowseURL + dataSetPath+'/' + jg.jblast.blastResultPath+'/'+theBlastFile;
-        //sails.log.debug("theFile",theFile);
-        
-        // create the kue job entry
-        var jobdata = {
-            name: "Galaxy workflow",
-            jbrowseDataPath: dataSetPath,
-            sequence: seq,
-            blastData: blastData,
-            dataset: {
-                workflow: workflow,
-                file: theFile
-            }
-        };
-        var kJob = g.kue_queue.create('galaxy-workflow-watch', jobdata)
-        .state('active')
-        .save(function(err){
-            if (!err) {
-                sails.log.debug("galaxy-workflow-watch job id = "+kJob.id);
+    var jg = g.jbrowse;
+    //var theFile = jg.jbrowseURL + jg.dataSet[0].dataPath + jg.jblast.blastResultPath+'/'+theBlastFile;
+    var theFile = jg.jbrowseURL + dataSetPath+'/' + jg.jblast.blastResultPath+'/'+theBlastFile;
+    //sails.log.debug("theFile",theFile);
 
-                // promise chain
-                // send the file
-                var terminatePromise = false;
-                sails.log.info("uploading file to galaxy",theFile)
-                var p = sails.hooks['jb-galaxy-blast'].sendFileAsync(theFile,historyId)
-                    .then(function(data) {
-                        kJob.data.dataset = data;
-                        kJob.save();
+    // create the kue job entry
+    var jobdata = {
+        name: "Galaxy workflow",
+        jbrowseDataPath: dataSetPath,
+        sequence: seq,
+        blastData: blastData,
+        dataset: {
+            workflow: workflow,
+            file: theFile
+        }
+    };
+    var job = g.kue_queue.create('galaxy-workflow-watch', jobdata)
+    //.state('active')
+    .save(function(err){
+        if (err) {
+            res.error("error create kue galaxy-workflow-watch",err); // return POST
+        }
+    });
+    // process job
+    sails.log.debug("checkpoint 1");
+    g.kue_queue.process('galaxy-workflow-watch', function(kJob, kDone){
+        kJob.kDoneFn = kDone;
+        sails.log.debug("galaxy-workflow-watch job id = "+kJob.id);
 
-                        if (terminatePromise) return;
+        // promise chain
 
-                        if (typeof data.error !== 'undefined') {
-                            // handle error
-                            sails.log.error("error",data.message);
-                            terminatePromise = true;
-                            return;
+        kJob.progress(0,10,{file_upload:0});
+
+        // send the file
+        var terminatePromise = false;
+        sails.log.info("uploading file to galaxy",theFile)
+        var p = sails.hooks['jb-galaxy-blast'].sendFileAsync(theFile,historyId)
+            .then(function(data) {
+                kJob.data.dataset = data;
+                kJob.save();
+                
+                if (typeof data.error !== 'undefined') {
+                    // handle error
+                    sails.log.error("error",data.message);
+                    terminatePromise = true;
+                    res.error(data.message);
+                    return kDone(new Error(data.message));
+                }
+
+                kJob.progress(1,10,{file_upload:'done'});
+
+                var fileId = data.outputs[0].id;
+
+                var params = {
+                    workflow_id: workflow,
+                    history: 'hist_id='+historyId,
+                    ds_map: {
+                        "0": {
+                            src: 'hda',
+                            id: fileId
                         }
+                    }
+                };
+                // submit the workflow
+                return sails.hooks['jb-galaxy-blast'].galaxyPostAsync('/api/workflows',params);
+            })
+            .then(function(data) {
+                if (terminatePromise) return;
 
-                        var fileId = data.outputs[0].id;
-
-                        var params = {
-                            workflow_id: workflow,
-                            history: 'hist_id='+historyId,
-                            ds_map: {
-                                "0": {
-                                    src: 'hda',
-                                    id: fileId
-                                }
-                            }
-                        };
-                        // submit the workflow
-                        return sails.hooks['jb-galaxy-blast'].galaxyPostAsync('/api/workflows',params);
-                    })
-                    .then(function(data) {
-                        kJob.data.workflow = data;
-                        kJob.save();
-                        
-                        if (terminatePromise) return;
-                        
-                        //res.send(data); // return POST
-                        sails.hooks['jb-galaxy-blast'].galaxyGetJSON('/api/workflows',function(data){
-                            for(var i in data) {
-                                var wf = data[i];
-                                if (wf.id === workflow) {
-                                    sails.log.info("Workflow starting: "+wf.name+' - '+wf.id);
-                                    kJob.data.workflow.name = wf.name;
-                                    kJob.data.name = "Galaxy workflow: "+wf.name;
-                                    kJob.save();
-                                    
-                                    // start monitoring
-                                    monitorWorkflow(kJob);
-                                }
-                            }
-                        },
-                        function(err) {
-                            sails.log.error("err /api/workflows",err);
-                            terminatePromise = true;
-                        });
+                kJob.data.workflow = data;
+                kJob.save();
 
 
-                        // start monioring
-                        //monitorWorkflow(kJob);
-                    })
-                    .catch(function(err){
-                        sails.log.error("",err);
-                        kJob.data.error = err;
-                        kJob.save();
-                        //res.send(err); // return POST
-                    });
-            
-            }
-            else {
-                res.send("error create kue galaxy-workflow-watch",err); // return POST
-            }
-        });
+                sails.hooks['jb-galaxy-blast'].galaxyGetJSON('/api/workflows',function(data){
+                    for(var i in data) {
+                        var wf = data[i];
+                        if (wf.id === workflow) {
+                            sails.log.info("Workflow starting: "+wf.name+' - '+wf.id);
+                            kJob.data.workflow.name = wf.name;
+                            kJob.data.name = "Galaxy workflow: "+wf.name;
+                            kJob.save();
+                            
+                            kJob.progress(2,10,{start_workflow:'done'});
+
+                            res.send({status:'success'});
+                            // start monitoring
+                            monitorWorkflow(kJob);
+                        }
+                    }
+                },
+                function(err) {
+                    var msg = 'failed GET /api/workflows';
+                    sails.log.error(msg,err);
+                    terminatePromise = true;
+                    kDone(new Error(msg));
+                    res.error(err);
+                });
+            })
+            .catch(function(err){
+                sails.log.error("failed to upload or launch workflow",err);
+                kDone(new Error('failed to upload or launch workflow'));
+                res.error(err);
+            });
+
+    });
         
-//    });    
 }
 /**
  * Monitor workflow
@@ -560,12 +555,14 @@ function rest_WorkflowSubmit(req,res) {
  */
 function monitorWorkflow(kWorkflowJob){
     var wId = kWorkflowJob.data.workflow.workflow_id;
-    sails.log.debug(wId,'monitorWorkflow starting');
+    sails.log.debug('monitorWorkflow starting, wId',wId);
     
     var timerloop = setInterval(function(){
         var hId = sails.hooks['jb-galaxy-blast'].getHistoryId();
         var outputs = kWorkflowJob.data.workflow.outputs;    // list of workflow output history ids
         var outputCount = outputs.length;
+        
+        sails.log.info ("history",hId);
         
         // get history entries
         var p = sails.hooks['jb-galaxy-blast'].galaxyGetAsync('/api/histories/'+hId+'/contents')
@@ -593,6 +590,9 @@ function monitorWorkflow(kWorkflowJob){
                     okCount++;
             }
             sails.log.debug(wId,'workflow step',okCount,'of',outputCount);
+            
+            kWorkflowJob.progress(okCount,outputCount+1,{workflow_id:wId});
+
             // complete if all states ok
             if (outputCount === okCount) {
                 clearInterval(timerloop);
@@ -600,13 +600,15 @@ function monitorWorkflow(kWorkflowJob){
                 kWorkflowJob.save();
                 sails.log.debug(wId,'workflow completed');
                 setTimeout(function() {
-                    postAction.doCompleteAction(kWorkflowJob,hista);
+                    postAction.doCompleteAction(kWorkflowJob,hista);            // workflow completed
                 },10);
             }
         })
         .catch(function(err){
-            sails.log.error(wId,"monitorWorkflow: failed to get history",hId);
+            var msg = wId + " monitorWorkflow: failed to get history "+hId;
+            sails.log.error(msg,err);
             clearInterval(timerloop);
+            kWorkflowJob.kDoneFn(new Error(msg))
         });
         
     },3000);

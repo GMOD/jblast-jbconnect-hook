@@ -74,9 +74,10 @@ function doCompleteAction(kWorkflowJob,hista) {
     if (filesToMove==0) {
         var msg = "No files to export.  Is the label: export [type] defined in the workflow?";
         sails.log.error(msg);
-        kWorkflowJob.data.errorMsg = msg;
-        kWorkflowJob.state('failed');
-        kWorkflowJob.save();
+        //kWorkflowJob.data.errorMsg = msg;
+        //kWorkflowJob.state('failed');
+        //kWorkflowJob.save();
+        kWorkflowJob.kDoneFn(new Error(msg));
     }
     else {
         // wait for files to finish copying
@@ -91,9 +92,11 @@ function doCompleteAction(kWorkflowJob,hista) {
                     if (getHits(kWorkflowJob,newTrackJson)===0) {
                         var msg = "No Blast Hits";
                         sails.log.error(msg);
-                        kWorkflowJob.data.errorMsg = msg;
-                        kWorkflowJob.state('failed');
-                        kWorkflowJob.save();
+                        //kWorkflowJob.data.errorMsg = msg;
+                        //kWorkflowJob.state('failed');
+                        //kWorkflowJob.save();
+                        kWorkflowJob.kDoneFn(new Error(msg));
+
                     }
                     else {
                         offsetfix.process(kWorkflowJob,newTrackJson,function() {
@@ -320,6 +323,10 @@ function addToTrackList(kWorkflowJob,newTrackJson) {
             sails.hooks['jbcore'].sendEvent("track-replace",track);
             sails.log ("Announced replacement track ",track.label);
         });
+        
+        kWorkflowJob.progress(100,100);
+        
+        kWorkflowJob.kDoneFn();                                                 // kue workflow completed successfully
     });
 }
 
