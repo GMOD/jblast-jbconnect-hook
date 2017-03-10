@@ -319,10 +319,10 @@ function addToTrackList(kWorkflowJob,newTrackJson) {
             sails.hooks['jbcore'].sendEvent("track-new",track);
             sails.log ("Announced new track ",track.label);
         });
-        deferred.map (replacedTracks, function (track) {
-            sails.hooks['jbcore'].sendEvent("track-replace",track);
-            sails.log ("Announced replacement track ",track.label);
-        });
+        //deferred.map (replacedTracks, function (track) {
+        //    sails.hooks['jbcore'].sendEvent("track-replace",track);
+        //    sails.log ("Announced replacement track ",track.label);
+        //});
         
         kWorkflowJob.progress(100,100);
         
