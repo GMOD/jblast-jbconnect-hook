@@ -689,14 +689,11 @@ function rest_testNewTrack(cb) {
     addTrack.label = "test" + t;
     addTrack.key = addTrack.label;
     
-    //addTrack = [addTrack];
     
     // publish notifications
-    //deferred.map (addTrack, function (track) {
-        var track = addTrack;
-        //sails.hooks['jbcore'].sendEvent("track-new",{"value":track});
-        sails.hooks['jbcore'].sendEvent("track-new",track);
-        sails.log ("Announced new track ",track.label);
-        cb({result:track.label});
-    //});
+    var track = addTrack;
+    //sails.hooks['jbcore'].sendEvent("track-new",{"value":track});
+    sails.hooks['jbcore'].sendEvent("track-new",track);
+    sails.log ("Announced new track ",track.label);
+    cb({result:track.label});
 }
