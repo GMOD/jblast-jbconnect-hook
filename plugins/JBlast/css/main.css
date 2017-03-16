@@ -200,7 +200,8 @@ div.blastSummary td.blastSummaryItem {
             left: -7px;
         }
         
-        // table
+        /* table
+        */
         .tg  {border-collapse:collapse;border-spacing:0;}
         .tg td{font-family:Arial, sans-serif;font-size:14px;padding:0px 0px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
         .tg .tg-yw4l{vertical-align:top}
