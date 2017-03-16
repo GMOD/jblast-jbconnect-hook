@@ -12,7 +12,9 @@ var deferred = require('deferred');
 var postAction = require('./postAction');
 var kueSyncJobs = require ('./kueSyncJobs');
 var filter = require("./filter");   // filter processing
+var kueJobMon = require('./kueJobMon');
 
+kueJobMon.start();
 //var prettyjson = require('prettyjson');   // for debugging
 
 var historyName = '';
@@ -25,7 +27,7 @@ var file_i = 0;
 module.exports = function (sails) {
    return {
         initialize: function(cb) {
-            sails.log.info("starting jblast"); 
+            sails.log.info("starting kueJobMon"); 
             // todo: check that galaxy is running
 
             sails.on('hook:orm:loaded', function() {
