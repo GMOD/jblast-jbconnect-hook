@@ -76,10 +76,10 @@ function doGetQueue() {
         for (var x in jdata) {
             // filter out non galaxy-job type
             if (jdata[x].type === typeToWatch) {
-
+                
                 $("#j-hist-grid table").append("<tr id='"+jdata[x].id+"'>"
                     +"<td>"+jdata[x].id+"</td>"
-                    +"<td class='state'>"+getQueState(jdata[x].state)+"</td><td>"
+                    +"<td class='state'>"+getQueState(jdata[x].state,jdata[x])+"</td><td>"
                     +jdata[x].progress+"</td><td>"+jdata[x].data.name+"</td></tr>");
             }
         }
@@ -89,16 +89,29 @@ function doGetQueue() {
 
 // convert state info image or text
 
-function getQueState(state){
+function getQueState(state,data){
     switch(state) {
         case "active":
             $("img.cogwheel").removeClass("hidden");        // turn on the tab progress cog
-            return "<img style='width:20px' src='img/st_processing.gif' />";
+            return "<img style='width:20px' src='img/st_processing.gif' title='"+state+"' alt='"+state+"' />";
         case "complete":
-            return "<img style='width:20px' src='img/st_green_check.png' />";
+            return "<img style='width:20px' src='img/st_green_check.png' title='"+state+"' alt='"+state+"' />";
         case "failed":
-            return "<img style='width:20px' src='img/st_red_x.png' />";
+            var errmsg = "undefined error";
+            if (typeof data.error !== 'undefined') {
+                errmsg = data.error;
+                //if (errmsg.length > 100)
+                //    errmsg = errmsg.substring(0, 99);
+            }
+            errmsg = state+' - '+errmsg;
+            return "<img style='width:20px' src='img/st_red_x.png' title='"+errmsg+"' alt='"+errmsg+"' />";
         default:
-            return "<span style='color:red;font-weight:bold'>"+state+"</span>";
+            var st = state;
+            if (typeof state === 'undefined') 
+                st = state = typeof state;
+            if (state.length > 3)
+                st = state.substring(0, 3);
+            
+            return "<span style='color:red;font-weight:bold' title='"+state+"' alt='"+state+"'>"+st+"</span>";
     }
 }
