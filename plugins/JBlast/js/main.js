@@ -161,6 +161,7 @@ return declare( JBrowsePlugin,
             });
 
             // handle job panel events
+            /*
             io.socket.on('job-active', function (data){
                 console.log('event','job-active',data);
                 if (data.count===0) $("img.cogwheel").addClass("hidden");
@@ -181,40 +182,15 @@ return declare( JBrowsePlugin,
                 var id = jdata.id;
                 var newState = jdata.data.galaxy_data.state;
                 $('#j-hist-grid #'+id+" .state").html(getJobState(newState));
-            });		
+            });
+            */
+            /*
             io.socket.on('job-remove', function (data){
                 console.log('event','job-remove',data);
-                browser.publish ('/jbrowse/v1/v/tracks/delete', browser.trackConfigs);
+                //browser.publish ('/jbrowse/v1/v/tracks/delete', browser.trackConfigs);
             });		
-
-            /*
-             * queue events
-             */
-            io.socket.on('queue-enqueue', function (data){
-                console.log('event','queue-enqueue',data.type,data.id,data);
-            });		
-            io.socket.on('queue-start', function (data){
-                console.log('event','queue-start',data.type,data.id,data);
-            });		
-            io.socket.on('queue-failed', function (data){
-                console.log('event','queue-failed',data.type,data.id,data);
-            });		
-            io.socket.on('queue-failed-attempt', function (data){
-                console.log('event','queue-failed-attempt',data.type,data.id,data);
-            });		
-            io.socket.on('queue-progress', function (data){
-                console.log('event','queue-progress',data.type,data.id,data);
-            });		
-            io.socket.on('queue-complete', function (data){
-                console.log('event','queue-complete',data.type,data.id,data);
-            });		
-            io.socket.on('queue-remove', function (data){
-                console.log('event','queue-remove',data.type,data.id,data);
-            });		
-            io.socket.on('queue-promotion', function (data){
-                console.log('event','queue-promotion',data.type,data.id,data);
-            });		
-                
+            */
+            initQueue(io);
         });
         
         /*

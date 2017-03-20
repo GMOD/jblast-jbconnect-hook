@@ -1,4 +1,53 @@
-
+function initQueue(io) {
+    /*
+     * queue events
+     */
+    io.socket.on('queue-active', function (data){
+        console.log('event','queue-active',data);
+        if (data.count===0) $("img.cogwheel").addClass("hidden");
+        else $("img.cogwheel").removeClass("hidden");
+    });		
+    io.socket.on('queue-enqueue', function (data){
+        console.log('event','queue-enqueue',data.type,data.id,data);
+        $('#j-hist-grid #head').after("<tr id='"+data.id+"'><td>"+data.id+"</td><td class='state'>"+getQueState(data.state)+"</td><td class='progress'>"+data.progress+"</td><td class='name'>"+data.name+"</td></tr>");                
+    });		
+    io.socket.on('queue-start', function (data){
+        console.log('event','queue-start',data.type,data.id,data);
+        $('#j-hist-grid #'+data.id+" .state").html(getQueState(data.state));
+        $('#j-hist-grid #'+data.id+" .name").html(data.data.name);
+    });		
+    io.socket.on('queue-failed', function (data){
+        console.log('event','queue-failed',data.type,data.id,data);
+        $('#j-hist-grid #'+data.id+" .state").html(getQueState(data.state));
+        $('#j-hist-grid #'+data.id+" .name").html(data.data.name);
+    });		
+    io.socket.on('queue-failed-attempt', function (data){
+        console.log('event','queue-failed-attempt',data.type,data.id,data);
+        $('#j-hist-grid #'+data.id+" .state").html(getQueState(data.state));
+        $('#j-hist-grid #'+data.id+" .name").html(data.data.name);
+    });		
+    io.socket.on('queue-progress', function (data){
+        console.log('event','queue-progress',data.type,data.id,data);
+        $('#j-hist-grid #'+data.id+" .progress").html(data.progress);
+        if (typeof data.data !== 'undefined' && typeof data.data.name !== 'undefined')
+            $('#j-hist-grid #'+data.id+" .name").html(data.data.name);
+    });		
+    io.socket.on('queue-complete', function (data){
+        console.log('event','queue-complete',data.type,data.id,data);
+        $('#j-hist-grid #'+data.id+" .state").html(getQueState(data.state));
+        $('#j-hist-grid #'+data.id+" .name").html(data.data.name);
+    });		
+    io.socket.on('queue-remove', function (data){
+        console.log('event','queue-remove',data.type,data.id,data);
+        $("#j-hist-grid tr#"+data.id).remove();
+    });
+    /*
+    io.socket.on('queue-promotion', function (data){
+        console.log('event','queue-promotion',data.type,data.id,data);
+    });		
+    */    
+    doGetQueue();
+}
 
 function doGetQueue() {
     
