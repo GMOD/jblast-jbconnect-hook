@@ -1,39 +1,4 @@
 
-function doGetQueue() {
-    getJobs(function(data){
-        jdata = $.parseJSON(data);
-
-        //console.dir(jdata);
-
-        // filter type: galaxy-job
-        //console.log("jdata len",jdata.length);
-        var i = jdata.length;
-        while(i--) {
-            if (jdata[i].type!=='galaxy-workflow-job')
-                jdata.splice(i, 1);    
-        }
-        //console.log("jdata len",jdata.length);
-
-        jdata.sort(function(a,b) {
-            if (a.data.galaxy_data.hid > b.data.galaxy_data.hid) return -1;
-            if (a.data.galaxy_data.hid < b.data.galaxy_data.hid) return 1;
-            else return 0;
-        });
-
-        for (var x in jdata) {
-            // filter out non galaxy-job type
-            if (jdata[x].type === 'galaxy-workflow-job') {
-
-                $("#j-hist-grid table").append("<tr id='"+jdata[x].id+"'><td class='state'>"
-                    +getJobState(jdata[x].data.galaxy_data.state)+"</td><td>"
-                    +jdata[x].data.galaxy_data.hid+"</td><td>"+jdata[x].data.galaxy_data.name+"</td></tr>");
-            }
-        }
-
-    });
-}
-
-
 function doGetJobs() {
     getJobs(function(data){
         jdata = $.parseJSON(data);
