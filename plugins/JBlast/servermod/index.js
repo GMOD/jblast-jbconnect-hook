@@ -12,9 +12,7 @@ var deferred = require('deferred');
 var postAction = require('./postAction');
 var kueSyncJobs = require ('./kueSyncJobs');
 var filter = require("./filter");   // filter processing
-var kueJobMon = require('./kueJobMon');
 
-kueJobMon.start();
 //var prettyjson = require('prettyjson');   // for debugging
 
 var historyName = '';
