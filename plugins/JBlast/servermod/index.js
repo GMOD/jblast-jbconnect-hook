@@ -76,7 +76,7 @@ module.exports = function (sails) {
                     }).catch(function(err){
                         sails.log.error(err.message);
                         sails.log.error(err.options.uri);
-                        res.error({status:'error',msg:"galaxy GET /api/workflows failed",err:err});
+                        res.send({status:'error',msg:"galaxy GET /api/workflows failed",err:err});
                     });
                     //return res.send(galaxyWorkflows);
               },
@@ -103,7 +103,7 @@ module.exports = function (sails) {
                         var str = JSON.stringify(err);
                         //var str = str.split("\n");
                         sails.log.error("failed to retrieve gff3 file",str);
-                        res.error({status: 'error', msg: str, err:err});
+                        res.send({status: 'error', msg: str, err:err});
                         return;
                     };
 
@@ -391,7 +391,7 @@ function rest_applyFilter(req,res) {
     });
     
     if (err)
-        res.error({result:err});
+        res.send({status:'error',err:err});
 }
 /**
  * submit workflow
@@ -428,7 +428,7 @@ function rest_WorkflowSubmit(req,res) {
     }
     catch (e) {
         sails.log.error(e,theFullBlastFilePath);
-        res.error({status: 'error', msg: "failed to write",err:e}); // return POST
+        res.send({status: 'error', msg: "failed to write",err:e}); // return POST
         return;
     }
     
@@ -459,7 +459,7 @@ function rest_WorkflowSubmit(req,res) {
     //.state('active')
     .save(function(err){
         if (err) {
-            res.error({status:'error',msg: "error create kue galaxy-workflow-watch",err:err}); // return POST
+            res.send({status:'error',msg: "error create kue galaxy-workflow-watch",err:err}); // return POST
         }
     });
     // process job
@@ -484,7 +484,7 @@ function rest_WorkflowSubmit(req,res) {
                     // handle error
                     sails.log.error("error",data.message);
                     terminatePromise = true;
-                    res.error({status: 'error',err:data.message});
+                    res.send({status: 'error',err:data.message});
                     return kDone(new Error(data.message));
                 }
 
@@ -531,7 +531,7 @@ function rest_WorkflowSubmit(req,res) {
                     }
                     // if we get here, somethings wrong
                     var errmsg = 'failed to match workflow id '+workflow;
-                    res.error({status:'error',msg: errmsg});
+                    res.send({status:'error',msg: errmsg});
                     sails.log.error(errmsg);
                 },
                 function(err) {
@@ -539,14 +539,14 @@ function rest_WorkflowSubmit(req,res) {
                     sails.log.error(msg,err);
                     terminatePromise = true;
                     kDone(new Error(msg));
-                    res.error({status: 'error',msg:msg,err: err});
+                    res.send({status: 'error',msg:msg,err: err});
                 });
             })
             .catch(function(err){
                 var msg = "failed to upload or launch workflow";
                 sails.log.error(msg,err);
                 kDone(new Error(msg));
-                res.error({status: 'error',msg: msg,err: err});
+                res.send({status: 'error',msg: msg,err: err});
             });
 
     });
