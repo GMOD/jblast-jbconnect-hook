@@ -7,10 +7,10 @@ var request = require('request');
 var requestp = require('request-promise');
 
 module.exports = {
-    start: function(kWorkflowJob,hista) {
+    start: function(historyId) {
         sails.log.info('galaxy_kue_sync starting');
         setInterval(function(){
-            syncGalaxyHistories();
+            syncGalaxyHistories(historyId);
         },2500);
     }
 }
@@ -19,9 +19,9 @@ module.exports = {
  * 
  * @returns {undefined}
  */
-function syncGalaxyHistories() {
+function syncGalaxyHistories(historyId) {
     var g = sails.config.globals;
-    var historyId = sails.hooks['jb-galaxy-blast'].getHistoryId();
+    //var historyId = sails.hooks['jb-galaxy-blast'].getHistoryId();
    
     syncGalaxyJobs(historyId);
 };
