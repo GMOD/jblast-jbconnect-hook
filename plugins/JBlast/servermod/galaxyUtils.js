@@ -1,8 +1,9 @@
 var request = require('request');
-var requestp = require('request-promise');
-var path = require('path');
+//var requestp = require('request-promise');
+//var path = require('path');
 var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require("fs"));
+var util = require('./utils');
 
 module.exports = {
     init: function(cb,cberr) {
@@ -53,6 +54,10 @@ module.exports = {
 
         //sails.log.debug("GET", options);
         var url = gurl+api+"?key="+apikey
+        
+        sails.log.debug("galaxyPOST",url);
+
+        
         request(gurl+api+"?key="+apikey, function (error, response, body) {
             sails.log('error',error, 'response',typeof body, response && response.statusCode,url);
 
@@ -77,6 +82,8 @@ module.exports = {
         var gurl = g.galaxy.galaxyUrl;
         var apikey = g.galaxy.galaxyAPIKey;
 
+        var pstr = JSON.stringify(params);
+
         var url = gurl+api+"?key="+apikey; 
         var headers = {
             'Connection': 'keep-alive',
@@ -86,7 +93,9 @@ module.exports = {
             'Content-Length' : pstr.length
         };
 
-        var request = require('request');
+        sails.log.debug("galaxyPOST",url,params,headers);
+
+        //var request = require('request');
         request.post({
             headers: headers,
             url:     url,
@@ -114,11 +123,13 @@ module.exports = {
         var thisb = this;
         
         var g = sails.config.globals.jbrowse;
+        this.historyName = g.galaxy.historyName;
         
         this.galaxyGET('/api/histories',function(histlist) {
-            sails.log.debug('histlist',histlist);
+            //sails.log.debug('histlist',histlist);
             for(var i in histlist) {
-                if (histlist[i].name===this.historyName) {
+                //sails.log.debug("historylist[i].name",histlist[i].name,thisb.historyName);
+                if (histlist[i].name === thisb.historyName) {
                     thisb.historyId = histlist[i].id;
                     sails.log.info('Galaxy History: "'+thisb.historyName+'"',thisb.historyId);
                     cb({
@@ -157,6 +168,7 @@ module.exports = {
      * @returns {undefined}
      */
     sendFile: function(theFile,hId,cb,cberr) {
+        sails.log.debug("sendFile",theFile,hId);
         var params = 
         {
             "tool_id": "upload1",
@@ -171,7 +183,9 @@ module.exports = {
                 "files_0|url_paste":theFile
             }
         };
-        this.galaxyPOST('/api/tools',params,
+        sails.log.debug("params",params);
+        var strParams = JSON.stringify(params)
+        this.galaxyPOST('/api/tools',strParams,
             function(data) {
                 cb(data);
             },
@@ -189,14 +203,16 @@ module.exports = {
         var monitorFn = params.monitorFn;
 
         // get starting coord of region
-        var startCoord = getRegionStart(region);
-        var seq = parseSeqData(region);
+        var startCoord = util.getRegionStart(region);
+        var seq = util.parseSeqData(region);
 
         var d = new Date();
 
+        //sails.log.debug('g.jbrowse',g.jbrowse);
+
         // write the BLAST region file
         var theBlastFile = "blast_region"+d.getTime()+".fa";
-        var blastPath = g.jbrowse.jbrowsePath + dataSetPath +'/'+ g.jblast.jbrowse.blastResultPath;
+        var blastPath = g.jbrowse.jbrowsePath + dataSetPath +'/'+ g.jbrowse.jblast.blastResultPath;
         var theFullBlastFilePath = blastPath+'/'+theBlastFile; 
 
         // if direcgtory doesn't exist, create it
@@ -261,8 +277,8 @@ module.exports = {
                 cberr({status: 'error',msg:msg,err: err});
             };
             
-            thisb.sendFile(theFile,historyId,
-                function(data) {
+            thisb.sendFile(theFile,thisb.historyId, function(data) {
+                    sails.log.debug("send complete");
                     kJob.data.dataset = data;
                     kJob.save();
 
@@ -272,7 +288,7 @@ module.exports = {
 
                     var params = {
                         workflow_id: workflow,
-                        history: 'hist_id='+historyId,
+                        history: 'hist_id='+thisb.historyId,
                         ds_map: {
                             "0": {
                                 src: 'hda',
