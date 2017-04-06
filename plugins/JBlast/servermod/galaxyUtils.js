@@ -272,9 +272,7 @@ module.exports = {
                     if (err !== null) {
                         var msg = "Error sendFile";
                         sails.log.error(msg,err);
-                        kDone(new Error(msg));
-//                        cb(data,{status: 'error',msg:msg,err: err});
-                        return;
+                        return kDone(new Error(msg));;
                     }
 
                     sails.log.debug("sendFile complete data,err",data,err);
@@ -304,9 +302,7 @@ module.exports = {
                         if (err !== null) {
                             var msg = "Error run workflow";
                             sails.log.error(msg,err);
-                            kDone(new Error(msg));
-//                            cb(data,{status: 'error',msg:msg,err: err});
-                            return;
+                            return kDone(new Error(msg));
                         }
 
                         sails.log.debug('POST /api/workflows completed',data,err);
@@ -326,17 +322,15 @@ module.exports = {
 
                                     kJob.progress(2,10,{start_workflow:'done'});
 
-//                                    cb({status:'success',jobId: kJob.id},null);
-
-                                    // start monitoring the workflow
+                                    // start monitoring the workflow, kDone is called within.
                                     monitorFn(kJob);
-                                    return ;
+                                    return;
                                 }
                             }
                             // if we get here, somethings wrong
                             var errmsg = 'failed to match workflow id '+workflow;
-//                            cb(data,{status:'error',msg: errmsg});
                             sails.log.error(errmsg);
+                            return kDone(new Error(msg));
                         });
                     });
                 });
