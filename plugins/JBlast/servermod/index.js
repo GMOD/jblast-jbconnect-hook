@@ -47,24 +47,23 @@ module.exports = function (sails) {
                     monitorFn:monitorWorkflow
                   };
                   galaxy.workflowSubmit(params,
-                    function(data) {
+                    function(data,err) {
+                        if (err !== null) {
+                            sails.hooks['jbcore'].resSend(res,err);
+                        }
                         sails.hooks['jbcore'].resSend(res,data);
-                    },
-                    function(err) {
-                        sails.hooks['jbcore'].resSend(res,err);
                     });
               },
               
               'get /jbapi/getworkflows': function (req, res, next) {
                     sails.log("JBlast /jbapi/getworkflows called");
                     
-                    galaxy.galaxyGET("/api/workflows",
-                        function(workflows) {
-                            return sails.hooks['jbcore'].resSend(res,workflows);
-                        },
-                        function(error) {
-                            return sails.hooks['jbcore'].resSend(res,{status:'error',msg:"galaxy GET /api/workflows failed",err:error});
-                        });
+                    galaxy.galaxyGET("/api/workflows",function(workflows,err) {
+                        if (err !== null) {
+                            return res.send({status:'error',msg:"galaxy GET /api/workflows failed",err:err});
+                        }
+                        return res.send(workflows);
+                    });
               },
               /** post /jbapi/setfilter - send filter parameters
                * 
@@ -122,8 +121,8 @@ module.exports = function (sails) {
               'get /jbapi/gethitdetails/:asset/:dataset/:hitkey': function (req, res, next) {
                     sails.log("JBlast /jbapi/gethitdetails called");
                     //todo: handle errors
-                    rest_getHitDetails(req,res,function(hitData) {
-                        return sails.hooks['jbcore'].resSend(res,hitData);
+                    rest_getHitDetails(req,res,function(hitData,err) {
+                        return res.send(hitData);
                     });
               },
               /**
@@ -132,7 +131,7 @@ module.exports = function (sails) {
                */
               'get /jbapi/lookupaccession/:accession': function (req, res, next) {
                     sails.log("JBlast /jbapi/lookupaccession called");
-                    rest_lookupAccession(req,res,function(data) {
+                    rest_lookupAccession(req,res,function(data,err) {
                         res.send(data);
                     });
               }
@@ -215,11 +214,11 @@ function rest_applyFilter(req,res) {
     var err = filter.writeFilterSettings(requestData,function(filterData) {
         filter.applyFilter(filterData,requestData,function(data) {
     
-            return sails.hooks['jbcore'].resSend(res,data);
+            return res.send(data);
         });
     });
     if (err) {
-        return sails.hooks['jbcore'].resSend(res,{status:'error',err:err});
+        return res.send({status:'error',err:err});
     }
 };
     
@@ -234,16 +233,23 @@ function monitorWorkflow(kWorkflowJob){
     sails.log.debug('monitorWorkflow starting, wId',wId);
     
     var timerloop = setInterval(function(){
-        var hId = sails.hooks['jb-galaxy-blast'].getHistoryId();
+        var hId = kWorkflowJob.data.workflow.history_id;
         var outputs = kWorkflowJob.data.workflow.outputs;    // list of workflow output history ids
         var outputCount = outputs.length;
         
         sails.log.info ("history",hId);
         
         // get history entries
-        var p = sails.hooks['jb-galaxy-blast'].galaxyGetAsync('/api/histories/'+hId+'/contents')
-        .then(function(hist) {
-            p.exited = 0;
+        var url = '/api/histories/'+hId+'/contents';
+        galaxy.galaxyGET(url,function(hist,err) {
+
+            if (err !== null) {
+                var msg = wId + " monitorWorkflow: failed to get history "+hId;
+                sails.log.error(msg,err);
+                clearInterval(timerloop);
+                kWorkflowJob.kDoneFn(new Error(msg));
+                return;
+            }
             // reorg to assoc array
             var hista = {};
             for(var i in hist) hista[hist[i].id] = hist[i];
@@ -279,12 +285,6 @@ function monitorWorkflow(kWorkflowJob){
                     postAction.doCompleteAction(kWorkflowJob,hista);            // workflow completed
                 },10);
             }
-        })
-        .catch(function(err){
-            var msg = wId + " monitorWorkflow: failed to get history "+hId;
-            sails.log.error(msg,err);
-            clearInterval(timerloop);
-            kWorkflowJob.kDoneFn(new Error(msg))
         });
         
     },3000);

@@ -47,7 +47,7 @@ module.exports = {
      * @returns {undefined}
      * 
      */
-    galaxyGET: function(api,cb,cberr) {
+    galaxyGET: function(api,cb) {
         var g = sails.config.globals.jbrowse;
         var gurl = g.galaxy.galaxyUrl;
         var apikey = g.galaxy.galaxyAPIKey;
@@ -55,17 +55,16 @@ module.exports = {
         //sails.log.debug("GET", options);
         var url = gurl+api+"?key="+apikey
         
-        sails.log.debug("galaxyPOST",url);
-
+        sails.log.debug("galaxyGET",url);
         
-        request(gurl+api+"?key="+apikey, function (error, response, body) {
-            sails.log('error',error, 'response',typeof body, response && response.statusCode,url);
+        request(url, function (err, response, body) {
+            //sails.log('error',err, 'response',typeof body, response && response.statusCode,url);
 
-            if (error !== null) {
-                cberr(error);
+            if (err !== null) {
+                cb(body,err);
                 return;
             }
-            cb(JSON.parse(body));
+            cb(JSON.parse(body),err);
         });
     },
     /* send JSON POST request to galaxy server
@@ -76,7 +75,7 @@ module.exports = {
      * 
      * retval return {status: x, data:y}
      */
-    galaxyPOST: function(api,params,cb,cberr) {
+    galaxyPOST: function(api,params,cb) {
 
         var g = sails.config.globals.jbrowse;
         var gurl = g.galaxy.galaxyUrl;
@@ -86,26 +85,25 @@ module.exports = {
 
         var url = gurl+api+"?key="+apikey; 
         var headers = {
-            'Connection': 'keep-alive',
-            'Accept-Encoding' : 'gzip, deflate',
-            'Accept': '*/*',
-            'Accept-Language' : 'en-US,en;q=0.5',
-            'Content-Length' : pstr.length
+              'Content-Type': 'application/json'
+//            'Connection': 'keep-alive'
+//            'Accept-Encoding' : 'gzip, deflate',
+//            'Accept': '*/*',
+//            'Accept-Language' : 'en-US,en;q=0.5',
+//            'Content-Length' : pstr.length
         };
 
         sails.log.debug("galaxyPOST",url,params,headers);
 
         //var request = require('request');
-        request.post({
-            headers: headers,
+        request({
+            //headers: headers,
             url:     url,
+            method: 'POST',
+            json: true,
             body:    params
-        }, function(error, response, body){
-              if (error !== null) {
-                  cberr(body);
-                  return;
-              }
-              cb(JSON.parse(body));
+        }, function(err, response, body){
+              cb(body,err);
         });
     },
     getHistoryId: function() {
@@ -118,15 +116,21 @@ module.exports = {
      * acquire history id from galaxy
      * @returns {undefined}
      */
-    initHistory: function (cb,cberr) {
+    initHistory: function (cb) {
         sails.log("init_history");
         var thisb = this;
         
         var g = sails.config.globals.jbrowse;
         this.historyName = g.galaxy.historyName;
         
-        this.galaxyGET('/api/histories',function(histlist) {
+        this.galaxyGET('/api/histories',function(histlist,err) {
             //sails.log.debug('histlist',histlist);
+            if (err !== null) {
+                var errmsg = 'init_history failed - is galaxy running?';
+                sails.log.error(errmsg);
+                cb(histlist,{status:'error',msg:errmsg,err:err});
+                return;
+            }
             for(var i in histlist) {
                 //sails.log.debug("historylist[i].name",histlist[i].name,thisb.historyName);
                 if (histlist[i].name === thisb.historyName) {
@@ -135,29 +139,23 @@ module.exports = {
                     cb({
                         historyName:thisb.historyName,
                         historyId:thisb.historyId
-                    });
+                    },null);
                     return;
                 }
             }
             var errmsg = "id not found for "+thisb.historyName;
             sails.log.error(errmsg);
-            cberr({status:'error',msg:errmsg});
-        },
-        function(err) {
-            var errmsg = 'init_history failed - is galaxy running?';
-            sails.log.error(errmsg);
-            cberr({status:'error',msg:errmsg,err:err});
+            cb(histlist,{status:'error',msg:errmsg});
         });
     },
-    getWorkflows: function(cb,cberr) {
+    getWorkflows: function(cb) {
         
-        this.galaxyGET("/api/workflows",
-            function(workflows) {
-                cb(workflows)
-            },
-            function(error) {
-                cberr({status:'error',msg:"galaxy GET /api/workflows failed",err:error});
-            });
+        this.galaxyGET("/api/workflows",function(workflows,err) {
+            if (err !== null) {
+                sails.log.error('GET /api/workflows failed');
+            }
+            cb(workflows,err);
+        });
     },
     /**
      * 
@@ -167,7 +165,7 @@ module.exports = {
      * @param {type} cberr
      * @returns {undefined}
      */
-    sendFile: function(theFile,hId,cb,cberr) {
+    sendFile: function(theFile,hId,cb) {
         sails.log.debug("sendFile",theFile,hId);
         var params = 
         {
@@ -184,17 +182,16 @@ module.exports = {
             }
         };
         sails.log.debug("params",params);
-        var strParams = JSON.stringify(params)
-        this.galaxyPOST('/api/tools',strParams,
-            function(data) {
-                cb(data);
-            },
-            function(error) {
-                cberr(error);
-            });
+        //var strParams = JSON.stringify(params)
+        this.galaxyPOST('/api/tools',params,function(data,err) {
+            if (err !== null) {
+                sails.log.error('POST /api/tools failed');
+            }
+            cb(data,err);
+        });
 
     },
-    workflowSubmit: function(params,cb,cberr) {
+    workflowSubmit: function(params,cb) {
         var thisb = this;
         var g = sails.config.globals;
         var region = params.region;
@@ -227,7 +224,7 @@ module.exports = {
         }
         catch (e) {
             sails.log.error(e,theFullBlastFilePath);
-            cb({status: 'error', msg: "failed to write",err:e});
+            cb(null,{status: 'error', msg: "failed to write",err:e});
             return;
         }
 
@@ -253,32 +250,34 @@ module.exports = {
         var job = g.kue_queue.create('galaxy-workflow-watch', jobdata)
         .save(function(err){
             if (err) {
-                cberr({status:'error',msg: "error create kue galaxy-workflow-watch",err:err});
+                cb(null,{status:'error',msg: "error create kue galaxy-workflow-watch",err:err});
+                return;
             }
-        });
-        // process job
-        sails.log.debug("checkpoint 1");
-        g.kue_queue.process('galaxy-workflow-watch', function(kJob, kDone){
-            kJob.kDoneFn = kDone;
-            sails.log.debug("galaxy-workflow-watch job id = "+kJob.id);
-
-
-            kJob.progress(0,10,{file_upload:0});
-
-            // send the file
-            var terminatePromise = false;
-            sails.log.info("uploading file to galaxy",theFile)
-
-            // error handler
-            var errorFn = function(err) {
-                var msg = "Error in WorkflowSubmit";
-                sails.log.error(msg,err);
-                kDone(new Error(msg));
-                cberr({status: 'error',msg:msg,err: err});
-            };
+            cb({status:'success',jobId: job.id},null);
             
-            thisb.sendFile(theFile,thisb.historyId, function(data) {
-                    sails.log.debug("send complete");
+            // process job
+            sails.log.debug("checkpoint 1");
+            g.kue_queue.process('galaxy-workflow-watch', function(kJob, kDone){
+                kJob.kDoneFn = kDone;
+                sails.log.debug("galaxy-workflow-watch job id = "+kJob.id);
+
+
+                kJob.progress(0,10,{file_upload:0});
+
+                // send the file
+                sails.log.info("uploading file to galaxy",theFile)
+
+                thisb.sendFile(theFile,thisb.historyId, function(data,err) {
+
+                    if (err !== null) {
+                        var msg = "Error sendFile";
+                        sails.log.error(msg,err);
+                        kDone(new Error(msg));
+//                        cb(data,{status: 'error',msg:msg,err: err});
+                        return;
+                    }
+
+                    sails.log.debug("sendFile complete data,err",data,err);
                     kJob.data.dataset = data;
                     kJob.save();
 
@@ -296,32 +295,52 @@ module.exports = {
                             }
                         }
                     };
+                    // premature return - testing
+                    //sails.log.error("premature stop");
+                    //return;
                     // submit the workflow
-                    galaxyPOST('/api/workflows',params,
-                    function(data) {
-                        for(var i in data) {
-                            var wf = data[i];
-                            if (wf.id === workflow) {
-                                sails.log.info("Workflow starting: "+wf.name+' - '+wf.id);
-                                kJob.data.workflow.name = wf.name;
-                                kJob.data.name = "Galaxy workflow: "+wf.name;
-                                kJob.save();
+                    thisb.galaxyPOST('/api/workflows',params,function(data,err) {
 
-                                kJob.progress(2,10,{start_workflow:'done'});
-
-                                // start monitoring
-                                monitorFn(kJob);
-
-                                cb({status:'success',jobId: kJob.id});
-                                return ;
-                            }
+                        if (err !== null) {
+                            var msg = "Error run workflow";
+                            sails.log.error(msg,err);
+                            kDone(new Error(msg));
+//                            cb(data,{status: 'error',msg:msg,err: err});
+                            return;
                         }
-                        // if we get here, somethings wrong
-                        var errmsg = 'failed to match workflow id '+workflow;
-                        cberr({status:'error',msg: errmsg});
-                        sails.log.error(errmsg);
-                    },errorFn);
-                },errorFn);
+
+                        sails.log.debug('POST /api/workflows completed',data,err);
+
+                        kJob.data.workflow = data;
+                        kJob.save();
+
+                        thisb.galaxyGET('/api/workflows',function(data,err){
+                            sails.log.debug('GET /api/workflows',data,err);
+                            for(var i in data) {
+                                var wf = data[i];
+                                if (wf.id === workflow) {
+                                    sails.log.info("Workflow starting: "+wf.name+' - '+wf.id);
+                                    kJob.data.workflow.name = wf.name;
+                                    kJob.data.name = "Galaxy workflow: "+wf.name;
+                                    kJob.save();
+
+                                    kJob.progress(2,10,{start_workflow:'done'});
+
+//                                    cb({status:'success',jobId: kJob.id},null);
+
+                                    // start monitoring the workflow
+                                    monitorFn(kJob);
+                                    return ;
+                                }
+                            }
+                            // if we get here, somethings wrong
+                            var errmsg = 'failed to match workflow id '+workflow;
+//                            cb(data,{status:'error',msg: errmsg});
+                            sails.log.error(errmsg);
+                        });
+                    });
+                });
+            });
         });
     }
 };
