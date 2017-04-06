@@ -199,6 +199,8 @@ module.exports = {
         var dataSetPath = params.dataSetPath;
         var monitorFn = params.monitorFn;
 
+        sails.log.debug("1 workflow",workflow);
+
         // get starting coord of region
         var startCoord = util.getRegionStart(region);
         var seq = util.parseSeqData(region);
@@ -239,6 +241,7 @@ module.exports = {
         // create the kue job entry
         var jobdata = {
             name: "Galaxy workflow",
+            requestParams: params, 
             jbrowseDataPath: dataSetPath,
             sequence: seq,
             blastData: blastData,
@@ -254,13 +257,11 @@ module.exports = {
                 return;
             }
             cb({status:'success',jobId: job.id},null);
-            
+
             // process job
-            sails.log.debug("checkpoint 1");
             g.kue_queue.process('galaxy-workflow-watch', function(kJob, kDone){
                 kJob.kDoneFn = kDone;
-                sails.log.debug("galaxy-workflow-watch job id = "+kJob.id);
-
+                sails.log.info("galaxy-workflow-watch job id = "+kJob.id);
 
                 kJob.progress(0,10,{file_upload:0});
 
@@ -275,16 +276,17 @@ module.exports = {
                         return kDone(new Error(msg));;
                     }
 
-                    sails.log.debug("sendFile complete data,err",data,err);
+                    //sails.log.debug("sendFile complete data,err",data,err);
                     kJob.data.dataset = data;
                     kJob.save();
 
                     kJob.progress(1,10,{file_upload:'done'});
 
+
                     var fileId = data.outputs[0].id;
 
                     var params = {
-                        workflow_id: workflow,
+                        workflow_id: kJob.data.requestParams.workflow,
                         history: 'hist_id='+thisb.historyId,
                         ds_map: {
                             "0": {
@@ -293,9 +295,6 @@ module.exports = {
                             }
                         }
                     };
-                    // premature return - testing
-                    //sails.log.error("premature stop");
-                    //return;
                     // submit the workflow
                     thisb.galaxyPOST('/api/workflows',params,function(data,err) {
 
@@ -305,16 +304,17 @@ module.exports = {
                             return kDone(new Error(msg));
                         }
 
-                        sails.log.debug('POST /api/workflows completed',data,err);
+                        //sails.log.debug('POST /api/workflows completed',data,err);
 
                         kJob.data.workflow = data;
                         kJob.save();
 
                         thisb.galaxyGET('/api/workflows',function(data,err){
-                            sails.log.debug('GET /api/workflows',data,err);
+                            //sails.log.debug('GET /api/workflows',data,err);
+
                             for(var i in data) {
                                 var wf = data[i];
-                                if (wf.id === workflow) {
+                                if (wf.id === kJob.data.requestParams.workflow) {
                                     sails.log.info("Workflow starting: "+wf.name+' - '+wf.id);
                                     kJob.data.workflow.name = wf.name;
                                     kJob.data.name = "Galaxy workflow: "+wf.name;
@@ -328,7 +328,7 @@ module.exports = {
                                 }
                             }
                             // if we get here, somethings wrong
-                            var errmsg = 'failed to match workflow id '+workflow;
+                            var errmsg = 'failed to match workflow id '+kJob.data.requestParams.workflow;
                             sails.log.error(errmsg);
                             return kDone(new Error(msg));
                         });
