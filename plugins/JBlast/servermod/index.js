@@ -39,7 +39,7 @@ module.exports = function (sails) {
         routes: {
            after: {
               'post /jbapi/workflowsubmit': function (req, res, next) {
-                  sails.log.info("/jbapi/workflowsubmit");
+                  sails.log.info("JBlast POST /jbapi/workflowsubmit",req.body);
                   var params = {
                     region:req.body.region,
                     workflow:req.body.workflow,
@@ -56,7 +56,7 @@ module.exports = function (sails) {
               },
               
               'get /jbapi/getworkflows': function (req, res, next) {
-                    sails.log("JBlast /jbapi/getworkflows called");
+                    sails.log("JBlast GET /jbapi/getworkflows");
                     
                     galaxy.galaxyGET("/api/workflows",function(workflows,err) {
                         if (err !== null) {
@@ -78,7 +78,7 @@ module.exports = function (sails) {
                */
                
               'post /jbapi/setfilter': function (req, res, next) {
-                  sails.log.info("JBlast","POST /jbapi/setfilter");
+                  sails.log.info("JBlast","POST /jbapi/setfilter",req.body);
                   rest_applyFilter(req,res);
               },
               /**
