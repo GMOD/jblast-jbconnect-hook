@@ -55,7 +55,8 @@ function doCompleteAction(kWorkflowJob,hista) {
             var ext = hista[id].extension;
             var url = g.galaxy.galaxyUrl+'/'+hista[id].url + "/display";
             var hid = hista[id].hid;
-            var filename = hid+'_'+id;  //+'.'+ext;
+            //var filename = hid+'_'+id;  //+'.'+ext;
+            var filename = kWorkflowJob.id+'_'+id;  //+'.'+ext;
             var filepath = targetDir + '/' + filename + '.'+ext;
             
             kWorkflowJob.data.blastData.outputs[ext] = filename; 
