@@ -481,7 +481,7 @@ return declare( JBrowsePlugin,
             });
         }
         else if (task.action === 'hide') {
-            $(".jbrowseHierarchicalTrackSelector > #blast-filter-group").hide(500,function complete() {
+            $(".jbrowseHierarchicalTrackSelector > #blast-filter-group").hide(100,function complete() {
                 $(".jbrowseHierarchicalTrackSelector > #blast-filter-group").remove();
             });
             if ($('#blast-filter-group').length) {
