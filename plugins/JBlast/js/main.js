@@ -160,37 +160,9 @@ return declare( JBrowsePlugin,
                 alert("event track-test value = "+data.value)
             });
 
-            // handle job panel events
-            /*
-            io.socket.on('job-active', function (data){
-                console.log('event','job-active',data);
-                if (data.count===0) $("img.cogwheel").addClass("hidden");
-                else $("img.cogwheel").removeClass("hidden");
-            });		
-            io.socket.on('job-remove', function (data){
-                console.log('event','job-remove',data);
-                $("#j-hist-grid tr#"+data.job_id).remove();
-            });		
-            io.socket.on('job-add', function (data){
-                console.log('event','job-add',data);
-                var jdata = data.job;
-                $('#j-hist-grid #head').after("<tr id='"+jdata.id+"'><td class='state'>"+getJobState(jdata.data.galaxy_data.state)+"</td><td>"+jdata.data.galaxy_data.hid+"</td><td>"+jdata.data.galaxy_data.name+"</td></tr>");                
-            });		
-            io.socket.on('job-change', function (data){
-                console.log('event','job-change',data);
-                var jdata = data.job;
-                var id = jdata.id;
-                var newState = jdata.data.galaxy_data.state;
-                $('#j-hist-grid #'+id+" .state").html(getJobState(newState));
-            });
-            */
-            /*
-            io.socket.on('job-remove', function (data){
-                console.log('event','job-remove',data);
-                //browser.publish ('/jbrowse/v1/v/tracks/delete', browser.trackConfigs);
-            });		
-            */
-            initQueue(io);
+            setTimeout(function() {
+                initQueue(io);
+            },1000);
         });
         
         /*
