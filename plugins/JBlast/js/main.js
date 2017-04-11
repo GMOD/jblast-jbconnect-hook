@@ -192,7 +192,7 @@ return declare( JBrowsePlugin,
                         var track = thisB.findTrack(trackConfigs[0].label);
                         browser.view.setTrackFocus(track,1);
                         browser.jblast.panelDelayTimer = null;
-                    },1000);
+                    },100);     // normally 1000
                 }
             }
         });        
@@ -463,7 +463,8 @@ return declare( JBrowsePlugin,
         if (task.action === 'show') {
             $('#blast-filter-group').clone().prependTo('.jbrowseHierarchicalTrackSelector');
             thisB.setupFilterSliders(task.trackConfig);
-            $('#blast-filter-group').show(500,function() {
+            //$('#blast-filter-group').show(500,function() {
+            $('#blast-filter-group').show(0,function() {
                 $('.blast-group-descript').html(task.trackConfig.key);
                 if (typeof task.trackConfig.metadata != 'undefined' && typeof task.trackConfig.metadata.description !== 'undefined') {
                     $('.blast-group-descript').attr('title',task.trackConfig.metadata.description);
@@ -484,7 +485,8 @@ return declare( JBrowsePlugin,
                 $(".jbrowseHierarchicalTrackSelector > #blast-filter-group").remove();
             });
             if ($('#blast-filter-group').length) {
-                $('#blast-filter-group').hide(500);
+                //$('#blast-filter-group').hide(500);
+                $('#blast-filter-group').hide();
                 setTimeout(function() { // hide complete event is broke in jquery, so we use a timer.
                     thisB.browser.jblast.focusQueueProc--;
                 },700);
