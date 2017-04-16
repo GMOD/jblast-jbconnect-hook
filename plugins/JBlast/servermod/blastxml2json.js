@@ -37,7 +37,7 @@ module.exports = {
         fs.readFile(blastxml, function(err, xml) {
 
             if (err) {
-                console.log(err);
+                sails.log.error(err);
                 cb({status:'error',err:err});
                 return;
             }
@@ -128,11 +128,12 @@ module.exports = {
 
                 fs.writeFile(jsonfile,JSON.stringify(data,null,2), function (err) {
                     if (err) {
-                        console.log(err);
+                        sails.log.error('failed to write',jsonfile,err);
                         cb({status:'error',err:err});
                         return;
                     }
-                    cb({status:'success'});
+                    sails.log.debug("convert successful", blastxml);
+                    cb(null);
                 });
 
             });    

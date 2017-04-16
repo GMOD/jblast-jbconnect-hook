@@ -144,7 +144,7 @@ module.exports = {
         try {
             var content = fs.readFileSync(resultFile, 'utf8');
         } catch(e) {
-            sails.log.error("failed to read blast json",resultFile);
+            sails.log.error("failed to read blast json in applyFilter",resultFile);
             cb({result:'fail', error: 'failed to read '+blastGffFile});
             return;
         }
@@ -244,7 +244,7 @@ module.exports = {
         try {
             var content = fs.readFileSync(resultFile, 'utf8');
         } catch(e) {
-            sails.log.error("failed to read blast json",resultFile);
+            sails.log.error("failed to read blast json in getHitDetails()",resultFile);
             return;
         }
         var blastJSON = JSON.parse(content);

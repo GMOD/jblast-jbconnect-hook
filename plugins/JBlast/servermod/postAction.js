@@ -100,6 +100,8 @@ function doCompleteAction(kWorkflowJob,hista) {
                             kWorkflowJob.kDoneFn(new Error(err.msg));
                             return;
                         }
+                        sails.log.debug("post convert newTrackJson",newTrackJson);
+                        
                         // check if there were any hits.
                         if (getHits(kWorkflowJob,newTrackJson)===0) {
                             var msg = "No Blast Hits";
@@ -214,7 +216,9 @@ function postMoveResultFiles(kWorkflowJob,cb) {
         newTrackJson[0].baseUrl = kWorkflowJob.data.jbrowseDataPath; //g.dataSet[0].dataPath;
         newTrackJson[0].urlTemplate = g.jblast.blastResultPath+"/"+fileGffOnly;
         //newTrackJson[0].jblastData = g.jblast.blastResultPath+"/"+fileJsonOnly;
-        newTrackJson[0].label = kWorkflowJob.data.blastData.outputs.json; //"jblast-"+ (new Date().getTime());
+        
+        // todo: should not be outputs.blastxml (too specific to filetype);  should be something like assetId
+        newTrackJson[0].label = kWorkflowJob.data.blastData.outputs.blastxml; //"jblast-"+ (new Date().getTime());
         newTrackJson[0].key = trackLabel;
         newTrackJson[0].metadata = {
                 description: 'Workflow: '+kWorkflowJob.data.workflow.name
@@ -260,7 +264,7 @@ function processFilter(kWorkflowJob,newTrackJson,cb) {
     });
 }
 function getHits(kWorkflowJob,newTrackJson) {
-    sails.log.debug('applyFilter()');
+    sails.log.debug('getHits()');
     var g = sails.config.globals.jbrowse;
     var asset = newTrackJson[0].label;
     var dataSet = kWorkflowJob.data.jbrowseDataPath;
@@ -272,7 +276,7 @@ function getHits(kWorkflowJob,newTrackJson) {
     try {
         var content = fs.readFileSync(resultFile, 'utf8');
     } catch(e) {
-        sails.log.error("failed to read blast json",resultFile);
+        sails.log.error("failed to read blast json in getHits",resultFile);
         return 0;
     }
     var blastJSON = JSON.parse(content);
