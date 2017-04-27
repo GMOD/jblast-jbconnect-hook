@@ -1,7 +1,7 @@
 {
   "name": "jbh-jblast",
-  "version": "0.0.3",
-  "description": "hooktest with marlinspike",
+  "version": "0.0.4",
+  "description": "JBlast",
   "main": "dist/api/hooks/jblast/index.js",
   "scripts": {
     "test": "mocha --reporter spec --compilers js:babel-core/register",
