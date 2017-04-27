@@ -1,0 +1,46 @@
+{
+  "name": "jbh-jblast",
+  "version": "0.0.3",
+  "description": "hooktest with marlinspike",
+  "main": "dist/api/hooks/jblast/index.js",
+  "scripts": {
+    "test": "mocha --reporter spec --compilers js:babel-core/register",
+    "prepublish": "gulp"
+  },
+  "keywords": [
+    "sails",
+    "sails.js",
+    "jbrowse"
+  ],
+  "author": "enuggetry",
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "^4.16",
+    "marlinspike": "^1.0"
+  },
+  "bundledDependencies": [
+    "lodash"
+  ],
+  "devDependencies": {
+    "babel": "^6.5.2",
+    "babel-cli": "^6.14.0",
+    "babel-core": "^6.14.0",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-preset-es2015": "^6.14.0",
+    "gulp": "^3.9.0",
+    "gulp-babel": "^6.1.2",
+    "mocha": "^3.1.0",
+    "sails": "^0.12.5",
+    "socket.io-client": "^1.3.5",
+    "supertest": "^2.0.0",
+    "waterline-sqlite3": "^1.0.3"
+  },
+  "engines": {
+    "node": ">= 0.12",
+    "npm": ">= 2.11"
+  },
+  "sails": {
+    "isHook": true,
+    "hookName": "jblast"
+  }
+}
