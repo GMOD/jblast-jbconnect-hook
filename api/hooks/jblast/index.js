@@ -26,9 +26,8 @@ if (!thisHook) {
     routes () {
       return {
         // http://sailsjs.org/documentation/concepts/extending-sails/hooks/hook-specification/routes
-      }
+      };
     }
-}
   }
 
   thisHook = Marlinspike.createSailsHook(Hook)
