@@ -17,10 +17,13 @@ if (!thisHook) {
     configure () {
       // this.sails = sails
       // http://sailsjs.org/documentation/concepts/extending-sails/hooks/hook-specification/configure
+      //JbUtils.testFunction("called from jblast configure");
     }
 
     initialize (next) {
       // http://sailsjs.org/documentation/concepts/extending-sails/hooks/hook-specification/initialize
+      JbUtils.testFunction("called from jblast initialize");
+      return next();
     }
 
     routes () {
