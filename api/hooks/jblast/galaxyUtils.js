@@ -7,9 +7,8 @@ var util = require('./utils');
 
 module.exports = {
     init: function(cb,cberr) {
+        sails.log.debug('galaxyUtils init');
         var g = sails.config.globals.jbrowse;
-        
-        sails.log.debug('galaxyUtils globals',g);
         
         this.historyName = g.galaxy.historyName;
         
