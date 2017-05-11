@@ -14,131 +14,127 @@ var galaxy = require("./galaxyUtils");
 var util = require("./utils");
 //var prettyjson = require('prettyjson');   // for debugging
 
-module.exports = function (sails) {
-    return {
-        initialize: function(cb) {
-            // todo: check that galaxy is running
+module.exports = {
 
-            galaxy.init(function(history) {
-                
-                historyId = history.historyId;
-                
-                sails.log.info("starting kueJobMon"); 
-                //kueSyncJobs.start(historyId);
-                
-            }, function(err) {
-                sails.log.error("failed galaxy.init",err);
-            });
+    initialize: function(cb) {
+        // todo: check that galaxy is running
+
+        galaxy.init(function(history) {
+
+            historyId = history.historyId;
+
+            sails.log.info("starting kueJobMon"); 
+            //kueSyncJobs.start(historyId);
+
+        }, function(err) {
+            sails.log.error("failed galaxy.init",err);
+        });
 
 
-            sails.on('hook:orm:loaded', function() {
-                // do something after hooks are loaded
-                return cb();
-            });
-        },
-        routes: {
-           after: {
-              'post /jbapi/workflowsubmit': function (req, res, next) {
-                  sails.log.info("JBlast POST /jbapi/workflowsubmit",req.body);
-                  var params = {
-                    region:req.body.region,
-                    workflow:req.body.workflow,
-                    dataSetPath:req.body.dataSetPath,
-                    monitorFn:monitorWorkflow
-                  };
-                  galaxy.workflowSubmit(params,
-                    function(data,err) {
-                        if (err !== null) {
-                            sails.hooks['jbcore'].resSend(res,err);
-                        }
-                        sails.hooks['jbcore'].resSend(res,data);
-                    });
-              },
-              
-              'get /jbapi/getworkflows': function (req, res, next) {
-                    sails.log("JBlast GET /jbapi/getworkflows");
-                    
-                    galaxy.galaxyGET("/api/workflows",function(workflows,err) {
-                        if (err !== null) {
-                            return res.send({status:'error',msg:"galaxy GET /api/workflows failed",err:err});
-                        }
-                        return res.send(workflows);
-                    });
-              },
-              /** post /jbapi/setfilter - send filter parameters
-               * 
-               * @param {type} req
-               *    data = req.body
-               *    data.filterParams = {score:{val: 50}, evalue:{val:-2}...
-               *    data.dataSet = (i.e. "sample_data/json/volvox" generally from config.dataRoot)
-               *    data.asset = 
-               * @param {type} res
-               * @param {type} next
-               * @returns {undefined}
-               */
-               
-              'post /jbapi/setfilter': function (req, res, next) {
-                  sails.log.info("JBlast","POST /jbapi/setfilter",req.body);
-                  rest_applyFilter(req,res);
-              },
-              /**
-               * Get info about the given track
-               */
-              'get /jbapi/getblastdata/:asset/:dataset': function (req, res, next) {
-                  sails.log.info("JBlast","/jbapi/getblastdata");
-                  rest_applyFilter(req,res);
-              },
-              'get /jbapi/gettrackdata/:asset/:dataset': function (req, res, next) {
-                    sails.log("JBlast /jbapi/gettrackdata called");
-                    var params = req.allParams();
-                    sails.log('asset',req.param('asset'));
-                    sails.log('dataset',req.param('dataset'));
-                    //sails.log('req.allParams()',req.allParams());
-                    
-                    var asset = req.param('asset');
-                    var dataset = req.param('dataset');
-                    
-                    var g = sails.config.globals.jbrowse;
-                    
-                    //var gfffile = g.jbrowsePath + dataset +'/'+ g.jblast.blastResultPath + '/' + 'sampleResult.gff3';
-                    var gfffile = g.jbrowsePath + dataset + '/'+ g.jblast.blastResultPath + '/' + asset +'.gff3';
+        sails.on('hook:orm:loaded', function() {
+            // do something after hooks are loaded
+            return cb();
+        });
+    },
 
-                    try {
-                        var content = fs.readFileSync(gfffile);
-                    }
-                    catch (err) {
-                        var str = JSON.stringify(err);
-                        //var str = str.split("\n");
-                        sails.log.error("failed to retrieve gff3 file",str);
-                        return sails.hooks['jbcore'].resSend(res,{status: 'error', msg: str, err:err});
-                    };
-
-                    return res.send(content);
-              },
-              /**
-               * Return hits data given hit key
-               */
-              'get /jbapi/gethitdetails/:asset/:dataset/:hitkey': function (req, res, next) {
-                    sails.log("JBlast /jbapi/gethitdetails called");
-                    //todo: handle errors
-                    rest_getHitDetails(req,res,function(hitData,err) {
-                        return res.send(hitData);
-                    });
-              },
-              /**
-               * returns accession data given accesion number.
-               * Utilizes Entrez service
-               */
-              'get /jbapi/lookupaccession/:accession': function (req, res, next) {
-                    sails.log("JBlast /jbapi/lookupaccession called");
-                    rest_lookupAccession(req,res,function(data,err) {
-                        res.send(data);
-                    });
+    workflowSubmit: function (req, res, next) {
+        sails.log.info("JBlast POST /jbapi/workflowsubmit",req.body);
+        var params = {
+          region:req.body.region,
+          workflow:req.body.workflow,
+          dataSetPath:req.body.dataSetPath,
+          monitorFn:monitorWorkflow
+        };
+        galaxy.workflowSubmit(params,
+          function(data,err) {
+              if (err !== null) {
+                  sails.hooks['jbcore'].resSend(res,err);
               }
-              
-           }
-        }
-    };
+              sails.hooks['jbcore'].resSend(res,data);
+          });
+    },
+
+    getWorkflows: function (req, res, next) {
+          sails.log("JBlast GET /jbapi/getworkflows");
+
+          galaxy.galaxyGET("/api/workflows",function(workflows,err) {
+              if (err !== null) {
+                  return res.send({status:'error',msg:"galaxy GET /api/workflows failed",err:err});
+              }
+              return res.send(workflows);
+          });
+    },
+    /** post /jbapi/setfilter - send filter parameters
+     * 
+     * @param {type} req
+     *    data = req.body
+     *    data.filterParams = {score:{val: 50}, evalue:{val:-2}...
+     *    data.dataSet = (i.e. "sample_data/json/volvox" generally from config.dataRoot)
+     *    data.asset = 
+     * @param {type} res
+     * @param {type} next
+     * @returns {undefined}
+     */
+
+    setFilter: function (req, res, next) {
+        sails.log.info("JBlast","POST /jbapi/setfilter",req.body);
+        rest_applyFilter(req,res);
+    },
+    /**
+     * Get info about the given track
+     */
+    getBlastData: function (req, res, next) {
+        sails.log.info("JBlast","/jbapi/getblastdata");
+        rest_applyFilter(req,res);
+    },
+    getTrackData: function (req, res, next) {
+          sails.log("JBlast /jbapi/gettrackdata called");
+          var params = req.allParams();
+          sails.log('asset',req.param('asset'));
+          sails.log('dataset',req.param('dataset'));
+          //sails.log('req.allParams()',req.allParams());
+
+          var asset = req.param('asset');
+          var dataset = req.param('dataset');
+
+          var g = sails.config.globals.jbrowse;
+
+          //var gfffile = g.jbrowsePath + dataset +'/'+ g.jblast.blastResultPath + '/' + 'sampleResult.gff3';
+          var gfffile = g.jbrowsePath + dataset + '/'+ g.jblast.blastResultPath + '/' + asset +'.gff3';
+
+          try {
+              var content = fs.readFileSync(gfffile);
+          }
+          catch (err) {
+              var str = JSON.stringify(err);
+              //var str = str.split("\n");
+              sails.log.error("failed to retrieve gff3 file",str);
+              return sails.hooks['jbcore'].resSend(res,{status: 'error', msg: str, err:err});
+          };
+
+          return res.send(content);
+    },
+    /**
+     * Return hits data given hit key
+     */
+    getHitDetails: function (req, res, next) {
+          sails.log("JBlast /jbapi/gethitdetails called");
+          //todo: handle errors
+          rest_getHitDetails(req,res,function(hitData,err) {
+              return res.send(hitData);
+          });
+    },
+    /**
+     * returns accession data given accesion number.
+     * Utilizes Entrez service
+     */
+    lookupAccession: function (req, res, next) {
+          sails.log("JBlast /jbapi/lookupaccession called");
+          rest_lookupAccession(req,res,function(data,err) {
+              res.send(data);
+          });
+    }
+
 };
 
 /**
