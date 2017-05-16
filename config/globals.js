@@ -3,13 +3,6 @@
  */
 module.exports.globals = {
     jbrowse: {
-        jbrowsePath:    "/var/www/html/jbrowse/",
-        jbrowseURL:     "http://localhost:1337/jbrowse/",
-        dataSet: [
-            {
-                dataPath: "sample_data/json/volvox/"
-            }
-        ],
         galaxy: {
             galaxyUrl: "http://localhost:8080",
 
