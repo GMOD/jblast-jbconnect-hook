@@ -1,0 +1,55 @@
+{
+  "name": "jbh-jblast",
+  "version": "0.0.79",
+  "description": "JBlast",
+  "main": "api/hooks/jblast/index.js",
+  "scripts": {
+    "test": "mocha --reporter spec --compilers js:babel-core/register",
+    "prepublish": "grunt bump"
+  },
+  "keywords": [
+    "sails",
+    "sails.js",
+    "jbrowse",
+    "galaxy"
+  ],
+  "author": "enuggetry",
+  "license": "MIT",
+  "dependencies": {
+    "bluebird": "^3.5.0",
+    "deepmerge": "^1.3.2",
+    "deferred": "^0.7.6",
+    "fs": "0.0.1-security",
+    "jQuery-ui-Slider-Pips": "github:simeydotme/jQuery-ui-Slider-Pips#v1.11.4",
+    "jquery-ui-dist": "^1.12.1",
+    "jquery.mb.extruder": "^2.6.0",
+    "lodash": "^4.16",
+    "path": "^0.12.7",
+    "request": "^2.81.0",
+    "request-promise": "^4.2.1",
+    "require-all": "^2.2.0",
+    "xmljson": "^0.2.0"
+  },
+  "bundledDependencies": [
+    "lodash"
+  ],
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-bump": "^0.8.0",
+    "grunt-contrib-jshint": "^1.1.0",
+    "grunt-version-bump": "^1.0.8",
+    "mocha": "^3.1.0",
+    "sails": "^0.12.5",
+    "socket.io-client": "^1.3.5",
+    "supertest": "^2.0.0",
+    "waterline-sqlite3": "^1.0.3"
+  },
+  "engines": {
+    "node": ">= 0.12",
+    "npm": ">= 2.11"
+  },
+  "sails": {
+    "isHook": true,
+    "hookName": "jblast"
+  }
+}

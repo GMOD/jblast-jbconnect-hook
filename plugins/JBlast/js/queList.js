@@ -9,21 +9,27 @@ function initQueue(io) {
     });		
     io.socket.on('queue-enqueue', function (data){
         console.log('event','queue-enqueue',data.type,data.id,data);
-        $('#j-hist-grid #head').after("<tr id='"+data.id+"'><td>"+data.id+"</td><td class='state'>"+getQueState(data.state,data)+"</td><td class='progress'>"+data.progress+"</td><td class='name'>"+data.name+"</td></tr>");                
+        $('#j-hist-grid #head').after(
+                "<tr id='"+data.id+"'>"
+                +"<td>"+data.id+"</td>"
+                +"<td class='state' questate='"+getQueState(data.state)+"'></td>"
+                +"<td class='progress'>"+data.progress+"</td>"
+                +"<td class='name'>"+data.name+"</td>"
+                +"</tr>");                
     });		
     io.socket.on('queue-start', function (data){
         console.log('event','queue-start',data.type,data.id,data);
-        $('#j-hist-grid #'+data.id+" .state").html(getQueState(data.state,data));
+        $('#j-hist-grid #'+data.id+" .state").attr('questate',getQueState(data.state));
         $('#j-hist-grid #'+data.id+" .name").html(data.data.name);
     });		
     io.socket.on('queue-failed', function (data){
         console.log('event','queue-failed',data.type,data.id,data);
-        $('#j-hist-grid #'+data.id+" .state").html(getQueState(data.state,data));
+        $('#j-hist-grid #'+data.id+" .state").attr('questate',getQueState(data.state));
         $('#j-hist-grid #'+data.id+" .name").html(data.data.name);
     });		
     io.socket.on('queue-failed-attempt', function (data){
         console.log('event','queue-failed-attempt',data.type,data.id,data);
-        $('#j-hist-grid #'+data.id+" .state").html(getQueState(data.state,data));
+        $('#j-hist-grid #'+data.id+" .state").attr('questate',getQueState(data.state));
         $('#j-hist-grid #'+data.id+" .name").html(data.data.name);
     });		
     io.socket.on('queue-progress', function (data){
@@ -34,7 +40,7 @@ function initQueue(io) {
     });		
     io.socket.on('queue-complete', function (data){
         console.log('event','queue-complete',data.type,data.id,data);
-        $('#j-hist-grid #'+data.id+" .state").html(getQueState(data.state,data));
+        $('#j-hist-grid #'+data.id+" .state").attr('questate',getQueState(data.state));
         $('#j-hist-grid #'+data.id+" .name").html(data.data.name);
     });		
     io.socket.on('queue-remove', function (data){
@@ -77,18 +83,34 @@ function doGetQueue() {
             // filter out non galaxy-job type
             if (jdata[x].type === typeToWatch) {
                 
-                $("#j-hist-grid table").append("<tr id='"+jdata[x].id+"'>"
+                $("#j-hist-grid table").append(
+                    "<tr id='"+jdata[x].id+"'>"
                     +"<td>"+jdata[x].id+"</td>"
-                    +"<td class='state'>"+getQueState(jdata[x].state,jdata[x])+"</td><td>"
-                    +jdata[x].progress+"</td><td>"+jdata[x].data.name+"</td></tr>");
+                    //+"<td class='state'>"+getQueState(jdata[x].state,jdata[x])+"</td><td>"
+                    +"<td class='state' questate='"+getQueState(jdata[x].state)+"'></td>"
+                    +"<td>"+jdata[x].progress+"</td>"
+                    +"<td>"+jdata[x].data.name+"</td>"
+                    +"</tr>");
             }
         }
 
     });
 }
+function getJobs(callback) {
+
+    console.log("Load History");
+    $.ajax({
+        url: "/api/jobs/0..10000",
+        dataType: "text",
+        success: function (data) {
+          callback(data);
+        }
+        // todo: handle errors
+    });
+};
 
 // convert state info image or text
-
+/*
 function getQueState(state,data){
     switch(state) {
         case "active":
@@ -115,3 +137,16 @@ function getQueState(state,data){
             return "<span style='color:red;font-weight:bold' title='"+state+"' alt='"+state+"'>"+st+"</span>";
     }
 }
+*/
+function getQueState(state) {
+    switch(state) {
+        case 'active':
+        case 'complete':
+        case 'failed':
+            return state;
+        default: 
+            return 'unknown';
+    }
+}
+
+
