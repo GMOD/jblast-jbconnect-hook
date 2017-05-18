@@ -230,7 +230,7 @@ function postMoveResultFiles(kWorkflowJob,cb) {
         var dataset = replaceAll(kWorkflowJob.data.jbrowseDataPath,'/','%2F');   //g.dataSet[0].dataPath
         
         newTrackJson[0].baseUrl = '/';
-        newTrackJson[0].urlTemplate = '/jbapi/gettrackdata/' +kWorkflowJob.data.blastData.outputs.json + '/' + dataset;
+        newTrackJson[0].urlTemplate = '/jbapi/gettrackdata/' +kWorkflowJob.data.blastData.outputs.blastxml + '/' + dataset;
         newTrackJson[0].storeCache = false;
         newTrackJson[0].filterSettings = g.jblast.blastResultPath+"/"+fileBlastFilter;
         newTrackJson[0].jblast = 1;     // indicate this is a jblast generated track
