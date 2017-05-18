@@ -2,7 +2,7 @@
     "a_galaxy_workflow": "true", 
     "annotation": "", 
     "format-version": "0.1", 
-    "name": "JBlast Sim No Hits", 
+    "name": "Sim no label", 
     "steps": {
         "0": {
             "annotation": "", 
@@ -19,8 +19,8 @@
             "name": "Input dataset", 
             "outputs": [], 
             "position": {
-                "left": 188, 
-                "top": 214.5
+                "left": 210, 
+                "top": 221
             }, 
             "tool_errors": null, 
             "tool_id": null, 
@@ -32,7 +32,7 @@
         }, 
         "1": {
             "annotation": "", 
-            "content_id": "jb_simblast_nohits", 
+            "content_id": "jb_simblast", 
             "id": 1, 
             "input_connections": {
                 "input1": {
@@ -42,12 +42,12 @@
             }, 
             "inputs": [
                 {
-                    "description": "runtime parameter for tool Sim Blastn No Hits", 
+                    "description": "runtime parameter for tool Sim Blastn", 
                     "name": "input1"
                 }
             ], 
             "label": null, 
-            "name": "Sim Blastn No Hits", 
+            "name": "Sim Blastn", 
             "outputs": [
                 {
                     "name": "output", 
@@ -55,20 +55,20 @@
                 }
             ], 
             "position": {
-                "left": 424.5, 
-                "top": 200
+                "left": 417.5, 
+                "top": 147.5
             }, 
             "post_job_actions": {}, 
             "tool_errors": null, 
-            "tool_id": "jb_simblast_nohits", 
+            "tool_id": "jb_simblast", 
             "tool_state": "{\"__page__\": 0, \"__rerun_remap_job_id__\": null, \"input1\": \"{\\\"__class__\\\": \\\"RuntimeValue\\\"}\"}", 
             "tool_version": "1.0.0", 
             "type": "tool", 
-            "uuid": "5e487ce1-fb14-4a16-ad13-81d1ab8aae4e", 
+            "uuid": "effe61af-85ef-4bc4-a296-04666ffee622", 
             "workflow_outputs": []
         }, 
         "2": {
-            "annotation": "export json", 
+            "annotation": "", 
             "content_id": "jb_blastxml2json", 
             "id": 2, 
             "input_connections": {
@@ -83,7 +83,7 @@
                     "name": "input1"
                 }
             ], 
-            "label": "export json", 
+            "label": null, 
             "name": "BlastXml 2 json", 
             "outputs": [
                 {
@@ -92,8 +92,8 @@
                 }
             ], 
             "position": {
-                "left": 690.5, 
-                "top": 202
+                "left": 642, 
+                "top": 222.5
             }, 
             "post_job_actions": {}, 
             "tool_errors": null, 
@@ -101,9 +101,9 @@
             "tool_state": "{\"__page__\": 0, \"__rerun_remap_job_id__\": null, \"input1\": \"{\\\"__class__\\\": \\\"RuntimeValue\\\"}\"}", 
             "tool_version": "1.0.0", 
             "type": "tool", 
-            "uuid": "7a62a1e3-afe4-49ad-ae48-f4b63061be33", 
+            "uuid": "815d8758-64f6-4101-af32-2f17fdf0ac9f", 
             "workflow_outputs": []
         }
     }, 
-    "uuid": "2e1a51ff-f51e-4ce5-955e-56a7e27fc74d"
+    "uuid": "34bf00ab-8db7-41cc-9430-59ca140d1df3"
 }

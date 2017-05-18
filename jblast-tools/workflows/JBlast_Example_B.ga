@@ -2,7 +2,7 @@
     "a_galaxy_workflow": "true", 
     "annotation": "", 
     "format-version": "0.1", 
-    "name": "JBlast Example", 
+    "name": "JBlast Example B", 
     "steps": {
         "0": {
             "annotation": "", 
@@ -19,8 +19,8 @@
             "name": "Input dataset", 
             "outputs": [], 
             "position": {
-                "left": 200, 
-                "top": 133
+                "left": 178, 
+                "top": 163
             }, 
             "tool_errors": null, 
             "tool_id": null, 
@@ -46,7 +46,7 @@
                     "name": "query"
                 }
             ], 
-            "label": null, 
+            "label": "export blastxml", 
             "name": "NCBI BLAST+ blastn", 
             "outputs": [
                 {
@@ -72,44 +72,7 @@
             "type": "tool", 
             "uuid": "30f68292-67ed-4299-8ba5-2bc5b8e8c525", 
             "workflow_outputs": []
-        }, 
-        "2": {
-            "annotation": "export json", 
-            "content_id": "jb_blastxml2json", 
-            "id": 2, 
-            "input_connections": {
-                "input1": {
-                    "id": 1, 
-                    "output_name": "output1"
-                }
-            }, 
-            "inputs": [
-                {
-                    "description": "runtime parameter for tool BlastXml 2 json", 
-                    "name": "input1"
-                }
-            ], 
-            "label": "export json", 
-            "name": "BlastXml 2 json", 
-            "outputs": [
-                {
-                    "name": "jblast_output_json", 
-                    "type": "json"
-                }
-            ], 
-            "position": {
-                "left": 768.5, 
-                "top": 165.5
-            }, 
-            "post_job_actions": {}, 
-            "tool_errors": null, 
-            "tool_id": "jb_blastxml2json", 
-            "tool_state": "{\"__page__\": 0, \"__rerun_remap_job_id__\": null, \"input1\": \"{\\\"__class__\\\": \\\"RuntimeValue\\\"}\"}", 
-            "tool_version": "1.0.0", 
-            "type": "tool", 
-            "uuid": "7a62a1e3-afe4-49ad-ae48-f4b63061be33", 
-            "workflow_outputs": []
         }
     }, 
-    "uuid": "c3ba47dd-b82a-4f9a-99b9-9cedc74f42b4"
+    "uuid": "a267f0cf-27cd-4f0d-a80a-19ef72f95dec"
 }
