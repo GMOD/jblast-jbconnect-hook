@@ -210,7 +210,7 @@ function postMoveResultFiles(kWorkflowJob,cb) {
 
         var fileGffOnly = kWorkflowJob.data.blastData.outputs.gff3 +'.gff3';
         var fileJsonOnly = kWorkflowJob.data.blastData.outputs.json + '.json';
-        var fileBlastFilter = kWorkflowJob.data.blastData.outputs.json + '_filtersettings.json';
+        var fileBlastFilter = kWorkflowJob.data.blastData.outputs.blastxml + '_filtersettings.json';
 
         // replace some track info
         newTrackJson[0].baseUrl = kWorkflowJob.data.jbrowseDataPath; //g.dataSet[0].dataPath;
