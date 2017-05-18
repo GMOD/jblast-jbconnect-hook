@@ -1,6 +1,7 @@
 'use strict';
 
-var jblastProc = require('./jblastProc');
+var mapRoutes = require('./mapRoutes');
+var jblastProc = require('../../services/jblastProc');
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -58,10 +59,20 @@ if (!thisHook) {
     }, {
       key: 'routes',
       value: function routes() {
+        sails.log('>>> setup jbh-jblast routes');
+        return mapRoutes.routes();
+        /*
         return {
             // http://sailsjs.org/documentation/concepts/extending-sails/hooks/hook-specification/routes
             
              after: {
+                'get /hello': function (req, res, next) {
+                    return res.send('hello');
+                },
+                'get /hi': {
+                    controller: 'JblastController',
+                    action: 'hello'
+                },
                 'post /jbapi/workflowsubmit': 'jblastProc.workflowSubmit',
                 'get /jbapi/getworkflows': 'jblastProc.getWorkflows',
                 'post /jbapi/setfilter': 'jblastProc.setFilter',
@@ -69,9 +80,11 @@ if (!thisHook) {
                 'get /jbapi/gettrackdata/:asset/:dataset': 'jblastProc.getTrackData',
                 'get /jbapi/gethitdetails/:asset/:dataset/:hitkey': 'jblastProc.getHitDetails',
                 'get /jbapi/lookupaccession/:accession': 'jblastProc.lookupAccession'
-                
             }
+
         };
+        */
+
       }
     }]);
 
