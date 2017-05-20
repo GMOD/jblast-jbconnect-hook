@@ -12,12 +12,16 @@ var config = require('../config.js');
 module.exports = {
     getOptions: function() {
         return [
-            ['p' , 'blastdbpath=PATH' , 'existing database path'],
-            ['w' , 'setupworkflows', '[install|<path>] "install" project wf, or specify .ga file '],
-            ['t' , 'setuptools'       , 'setup jblast tools for galaxy'],
-            ['d' , 'setupdata'        , 'setup data and samples'],
-            ['h' , 'setuphistory'     , 'setup history']
+            ['' , 'blastdbpath=PATH' , 'existing database path'],
+            ['' , 'setupworkflows', '[install|<path>] "install" project wf, or specify .ga file '],
+            ['' , 'setuptools'       , 'setup jblast tools for galaxy'],
+            ['' , 'setupdata'        , 'setup data and samples'],
+            //['' , 'setuphistory'     , 'setup history']
         ];        
+    },
+    getHelpNotes: function() {
+        return "";
+        
     },
     process: function(argv,path) {
         console.log("extended jbutil", path,argv);
