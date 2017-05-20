@@ -8,6 +8,23 @@ var util = require('./util.js');
 var Finder = require('fs-finder');
 var config = require('../config.js');
 
+
+module.exports = {
+    getOptions: function() {
+        return [
+            ['p' , 'blastdbpath=PATH' , 'existing database path'],
+            ['w' , 'setupworkflows', '[install|<path>] "install" project wf, or specify .ga file '],
+            ['t' , 'setuptools'       , 'setup jblast tools for galaxy'],
+            ['d' , 'setupdata'        , 'setup data and samples'],
+            ['h' , 'setuphistory'     , 'setup history']
+        ];        
+    },
+    process: function(argv,path) {
+        console.log("extended jbutil", path,argv);
+    }
+};
+
+
 var getopt = new getopt([
     ['a' , 'setupall'         , 'equivelant to -w -t -d combined'],
     [''  , 'globals[=ARG]'    , 'show globals'],
