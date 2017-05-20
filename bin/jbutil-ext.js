@@ -3,89 +3,32 @@
 //var requestp = require('request-promise');
 var fs = require('fs');
 var path = require('path');
-var getopt = require('node-getopt');
-var util = require('./util.js');
-var Finder = require('fs-finder');
-var config = require('../config.js');
+//var getopt = require('node-getopt');
+var util = ""; //require('./util.js');
+var Finder = ""; //require('fs-finder');
+var config = ""; //require('../config.js');
 
 
 module.exports = {
     getOptions: function() {
         return [
-            ['' , 'blastdbpath=PATH' , 'existing database path'],
-            ['' , 'setupworkflows', '[install|<path>] "install" project wf, or specify .ga file '],
-            ['' , 'setuptools'       , 'setup jblast tools for galaxy'],
-            ['' , 'setupdata'        , 'setup data and samples'],
+            ['' , 'blastdbpath=PATH' , 'jblast - existing database path'],
+            ['' , 'setupworkflows'   , 'jblast - [install|<path>] "install" project wf, or specify .ga file '],
+            ['' , 'setuptools'       , 'jblast - setup jblast tools for galaxy'],
+            ['' , 'setupdata'        , 'jblast - setup data and samples'],
             //['' , 'setuphistory'     , 'setup history']
         ];        
     },
-    getHelpNotes: function() {
+    getHelpText: function() {
         return "";
         
     },
-    process: function(argv,path) {
-        console.log("extended jbutil", path,argv);
+    process: function(opt,path) {
+        console.log("extended jbutil", opt,path);
     }
 };
 
-
-var getopt = new getopt([
-    ['a' , 'setupall'         , 'equivelant to -w -t -d combined'],
-    [''  , 'globals[=ARG]'    , 'show globals'],
-    ['p' , 'blastdbpath=PATH' , 'existing database path'],
-    ['w' , 'setupworkflows', '[install|<path>] "install" project wf, or specify .ga file '],
-    ['t' , 'setuptools'       , 'setup jblast tools for galaxy'],
-    ['d' , 'setupdata'        , 'setup data and samples'],
-    ['h' , 'setuphistory'     , 'setup history'],
-//    ['v' , 'view'             , 'view status of config'],
-    
-    ['h' , 'help'            , 'display this help']
-]);              // create Getopt instance
-getopt.bindHelp();     // bind option 'help' to default action
-opt = getopt.parseSystem(); // parse command line
-
-getopt.setHelp(
-    "Usage: jblast [OPTION]\n" +
-    "[[OPTIONS]]\n" +
-    "\n" +
-    "Examples:\n" +
-    "\n" +
-    "Install an existing blast database\n" +
-    "Jblast --blastdbpath [local path]\n" +
-    "\n" +
-    "Install jblast package workflows to galaxy\n" +
-    "Jblast --setupworkflows\n" +
-    "\n" +
-    "Install jblast package tools to galaxy\n" +
-    "Jblast --setuptools\n"+
-    "\n" +
-    "Setup data and samples\n" +
-    "Jblast --setudata\n"
-);
-
-/* Display help if no arguments are passed */
-if (!process.argv.slice(2).length) {
-	getopt.showHelp();
-	process.exit(1);
-}
-
-/*
- * process --globals
- * 
- */
-var globals = opt.options['globals'];
-if (typeof globals !== 'undefined') {
-    util.getGlobals(function(g) {
-        //console.log("hehehe");
-        if (g===null)
-            process.exit(1);
-        
-        console.log('jbserver globals:');
-        console.log(g);
-        process.exit(0);
-    });
-}
-
+return;
 /*
  * get values for --gpath, apikey and gurl; grab from saved globals if necessary
  */
