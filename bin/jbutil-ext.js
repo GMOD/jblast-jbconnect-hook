@@ -203,8 +203,6 @@ function exec_setupdata(params) {
     
     util.checkDir(targetdir+config.jblast.blastResultPath);
     
-    //todo: create subdir if it doesn't exist
-    
     util.cmd('cp -R -v "'+srcpath+'/jblastdata" "'+targetdir+'"');
 
 }
