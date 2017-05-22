@@ -94,7 +94,7 @@ module.exports = {
          * figure source path of jblast-galaxy-tools 
          *   (installed with -g option on RHEL: /usr/lib/node_modules/jblast-tools)
          */
-        this.srcpath = __dirname+"/..";
+        this.srcpath = __dirname+"/../jblast-tools/";
         //console.log("srcpath",srcpath);
         try {
             fs.accessSync(this.srcpath, fs.F_OK);
@@ -197,6 +197,7 @@ function exec_setupdata(params) {
     var srcpath = params.srcpath;
 
     console.log("Setting up data directory...");
+    console.log('config',config);
     
     var targetdir = config.jbrowsePath+config.dataSet[0].dataPath;
     
