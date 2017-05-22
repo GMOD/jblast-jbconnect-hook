@@ -7,7 +7,7 @@ var fs = Promise.promisifyAll(require("fs"));
 var jsonfile = require('jsonfile');
 var requestp = require('request-promise');
 var execSync = require('child_process').execSync;
-var config = require('../config.js');
+var config = ""; //require('../config.js');
 
 var cfgDir = '/etc/jbrowse';
 

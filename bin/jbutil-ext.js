@@ -4,7 +4,7 @@
 var fs = require('fs');
 var path = require('path');
 //var getopt = require('node-getopt');
-var util = ""; //require('./util.js');
+var util = require('./util.js');
 var Finder = ""; //require('fs-finder');
 var config = ""; //require('../config.js');
 
@@ -15,7 +15,7 @@ module.exports = {
             ['' , 'blastdbpath=PATH' , 'jblast - existing database path'],
             ['' , 'setupworkflows'   , 'jblast - [install|<path>] "install" project wf, or specify .ga file '],
             ['' , 'setuptools'       , 'jblast - setup jblast tools for galaxy'],
-            ['' , 'setupdata'        , 'jblast - setup data and samples'],
+            ['' , 'setupdata'        , 'jblast - setup data and samples']
             //['' , 'setuphistory'     , 'setup history']
         ];        
     },
@@ -23,68 +23,95 @@ module.exports = {
         return "";
         
     },
-    process: function(opt,path) {
+    process: function(opt,path,config) {
         console.log("extended jbutil", opt,path);
+        
+        if (!this.init(config)) {
+            console.log("jblast - failed to initialize");
+            return;
+        }
+        
+        var setuptools = opt.options['setuptools'];
+        if (typeof setuptools !== 'undefined') {
+            exec_setuptools();
+        }
+        var blastdbpath = opt.options['blastdbpath'];
+        if (typeof blastdbpath !== 'undefined') {
+            exec_blastdbpath();
+        }
+        var setupworkflows = opt.options['setupworkflows'];
+        if (typeof setupworkflows !== 'undefined') {
+            exec_setupworkflows();
+        }
+        var setuphistory = opt.options['setuphistory'];
+        if (typeof setuphistory !== 'undefined') {
+            exec_setuphistory();
+        }
+        var setupdata = opt.options['setupdata'];
+        if (typeof setupdata !== 'undefined') {
+            exec_setupdata({config:config,srcpath:this.srcpath});
+            exec_setuptrack({config:config});
+        }
+    },
+    init: function(config) {
+        //console.log("config",config);
+        /*
+         * get values for --gpath, apikey and gurl; grab from saved globals if necessary
+         */
+        this.gurl = config.galaxy.galaxyUrl;
+        this.gpath = config.galaxy.galaxyPath;
+        this.apikey = config.galaxy.galaxyAPIKey;
+        /*
+         * figure target paths
+         * gdataroot is the root of the where galaxy is installed (default: /var/www/galaxy)
+         *     if docker this is the docker export directory.
+         * gdatapath is galaxy data dir.  For regular installations, this is the same as gdataroot.
+         *     if docker, this is /galaxy-central under gdataroot
+         */
+        this.gdataroot = this.gpath;                      // root of local path of galaxy
+        this.gdatapath = this.gpath+"/galaxy-central";    // galaxy data files, if docker
+        try {
+            // check if gdatapath directory exists
+            fs.accessSync(this.gdataroot, fs.F_OK);
+        }
+        catch(err) {
+            console.log(this.gdataroot,'does not exist');
+            console.log("Is Galaxy installed?  Is galaxyPath= defined in config.js properly?");
+            return 0;   // init failed
+        }
+        try {
+            // check if gdatapath directory exists
+            fs.accessSync(this.gdatapath, fs.F_OK);
+        }
+        catch (err) {
+            //console.log(gdatapath,'does not exist');
+            this.gdatapath = this.gpath;
+        }
+        if (this.gdatapath != this.gpath) {
+            console.log("Using Galaxy Docker");
+        }
+        /*
+         * figure source path of jblast-galaxy-tools 
+         *   (installed with -g option on RHEL: /usr/lib/node_modules/jblast-tools)
+         */
+        this.srcpath = __dirname+"/..";
+        //console.log("srcpath",srcpath);
+        try {
+            fs.accessSync(this.srcpath, fs.F_OK);
+        }
+        catch(err) {
+            console.log(this.srcpath,'source path does not exist');
+            return 0;   // failed init
+        }
+        return 1; // successful init
     }
+    
 };
-
-return;
-/*
- * get values for --gpath, apikey and gurl; grab from saved globals if necessary
- */
-
-var gurl = config.galaxy.galaxyUrl;
-var gpath = config.galaxy.galaxyPath;
-var apikey = config.galaxy.galaxyAPIKey;
-
-
-
-/*
- * figure target paths
- * gdataroot is the root of the where galaxy is installed (default: /var/www/galaxy)
- *     if docker this is the docker export directory.
- * gdatapath is galaxy data dir.  For regular installations, this is the same as gdataroot.
- *     if docker, this is /galaxy-central under gdataroot
- */
-var gdataroot = gpath;                      // root of local path of galaxy
-var gdatapath = gpath+"/galaxy-central";    // galaxy data files, if docker
-try {
-    // check if gdatapath directory exists
-    fs.accessSync(gdataroot, fs.F_OK);
-}
-catch(err) {
-    console.log(gdataroot,'does not exist');
-    console.log("Is Galaxy installed?  Is galaxyPath= defined in config.js properly?");
-    process.exit(1);
-}
-try {
-    // check if gdatapath directory exists
-    fs.accessSync(gdatapath, fs.F_OK);
-}
-catch (err) {
-    //console.log(gdatapath,'does not exist');
-    gdatapath = gpath;
-}
-if (gdatapath != gpath) {
-    console.log("Using Galaxy Docker");
-}
-
-/*
- * figure source path of jblast-galaxy-tools 
- *   (installed with -g option on RHEL: /usr/lib/node_modules/jblast-tools)
- */
-var srcpath = __dirname+"/..";
-//console.log("srcpath",srcpath);
-try {
-    fs.accessSync(srcpath, fs.F_OK);
-}
-catch(err) {
-    console.log(srcpath,'does not exist');
-}
 
 /*
  * process --setupall
  */
+/*
 var setupall = opt.options['setupall'];
 if (typeof setupall !== 'undefined') {
     exec_setuptools();
@@ -93,37 +120,18 @@ if (typeof setupall !== 'undefined') {
     exec_setupdata();
     process.exit(0);
 }
+*/
 /*
  * process commands arguments
  */
-var setuptools = opt.options['setuptools'];
-if (typeof setuptools !== 'undefined') {
-    exec_setuptools();
-}
-var blastdbpath = opt.options['blastdbpath'];
-if (typeof blastdbpath !== 'undefined') {
-    exec_blastdbpath();
-}
-var setupworkflows = opt.options['setupworkflows'];
-if (typeof setupworkflows !== 'undefined') {
-    exec_setupworkflows();
-}
-var setuphistory = opt.options['setuphistory'];
-if (typeof setuphistory !== 'undefined') {
-    exec_setuphistory();
-}
-var setupdata = opt.options['setupdata'];
-if (typeof setupdata !== 'undefined') {
-    exec_setupdata();
-    exec_setuptrack();
-}
 
 /*
  * setup sample track
  */
-function exec_setuptrack() {
+function exec_setuptrack(params) {
+    var config = params.config;
     console.log("Setting up sample track...");
-    var g = require('../config.js');
+    var g = config;//require('../config.js');
     // todo: why can't I access config from here?
 
     var trackListPath = g.jbrowsePath + g.dataSet[0].dataPath + 'trackList.json';
@@ -154,10 +162,10 @@ function exec_setuptrack() {
     }
     if (error) return;
     
-    var config = JSON.parse(trackListData);
+    var conf = JSON.parse(trackListData);
 
     // add the JBlast plugin  
-    config.plugins.push("JBlast");
+    conf.plugins.push("JBlast");
 
     // check if sample track exists in trackList.json (by checking for the label)
     var hasLabel = 0;
@@ -170,11 +178,11 @@ function exec_setuptrack() {
         return;
     }
     // add the sample track
-    config.tracks.push(sampleTrack);
+    conf.tracks.push(sampleTrack);
     
     // write trackList.json
     try {
-      fs.writeFileSync(trackListPath,JSON.stringify(config,null,4));
+      fs.writeFileSync(trackListPath,JSON.stringify(conf,null,4));
     }
     catch(err) {
       console.log("failed write",trackListPath,err);
@@ -183,13 +191,18 @@ function exec_setuptrack() {
 /*
  * setup data directory and sample
  */
-function exec_setupdata() {
+function exec_setupdata(params) {
+    
+    var config = params.config;
+    var srcpath = params.srcpath;
 
     console.log("Setting up data directory...");
     
     var targetdir = config.jbrowsePath+config.dataSet[0].dataPath;
     
     util.checkDir(targetdir+config.jblast.blastResultPath);
+    
+    //todo: create subdir if it doesn't exist
     
     util.cmd('cp -R -v "'+srcpath+'/jblastdata" "'+targetdir+'"');
 
