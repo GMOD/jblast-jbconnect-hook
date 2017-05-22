@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<toolbox tool_path="./jblasttools">
+  <section id="jbrowseTools" name="JBblast Tools">
+    <tool file="simblast.xml" />
+    <tool file="simblast_nohits.xml" />
+  </section>
+</toolbox>
