@@ -1,11 +1,11 @@
 {
   "name": "jbh-jblast",
-  "version": "0.0.79",
+  "version": "0.0.137",
   "description": "JBlast",
   "main": "api/hooks/jblast/index.js",
   "scripts": {
     "test": "mocha --reporter spec --compilers js:babel-core/register",
-    "prepublish": "grunt bump"
+    "prepublish": "grunt bump-publish"
   },
   "keywords": [
     "sails",
