@@ -9,8 +9,8 @@
 var fs = require('fs');
 //var path = require('path');
 var getopt = require('node-getopt');
-var util = require('./util.js');
-var config = require('../config.js');
+//var util = require('./util.js');
+//var config = require('../config.js');
 
 var getopt = new getopt([
     ['b' , 'blastxml=FILE'          , 'sim blastxml result file (found in /jblastdata)'],
@@ -49,7 +49,7 @@ var infile = opt.options['infile'];
 
 
 if (typeof blastxml !== 'undefined') {
-    var src = config.jbrowsePath+config.dataSet[0].dataPath+config.jblast.blastResultPath+'/'+blastxml;
+    var src = 'data/' + blastxml;
 
     console.log("blastxml src",src);
     console.log("infile",infile);

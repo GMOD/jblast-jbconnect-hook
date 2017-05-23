@@ -1,0 +1,14 @@
+{
+  "name": "jblast-simtool",
+  "description": "JBlast simulation tool (npm install -g",
+  "version": "0.1.0",
+  "author": "eyao",
+  "license": "MIT",
+  "bin": {
+    "jblast-simblast": "./simblast.js",
+  },
+  "dependencies": {
+    "fs": "^0.0.2",
+    "node-getopt": "^0.2.3",
+  }
+}
