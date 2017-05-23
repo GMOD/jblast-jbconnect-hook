@@ -91,10 +91,9 @@ module.exports = {
             console.log("Using Galaxy Docker");
         }
         /*
-         * figure source path of jblast-galaxy-tools 
-         *   (installed with -g option on RHEL: /usr/lib/node_modules/jblast-tools)
+         * figure source path of setup 
          */
-        this.srcpath = __dirname+"/../jblast-tools/";
+        this.srcpath = __dirname+"/../setup";
         //console.log("srcpath",srcpath);
         try {
             fs.accessSync(this.srcpath, fs.F_OK);
@@ -197,7 +196,6 @@ function exec_setupdata(params) {
     var srcpath = params.srcpath;
 
     console.log("Setting up data directory...");
-    console.log('config',config);
     
     var targetdir = config.jbrowsePath+config.dataSet[0].dataPath;
     
