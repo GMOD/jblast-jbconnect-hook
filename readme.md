@@ -1,11 +1,29 @@
-# JBlast BLAST/Galaxy JBrowse Plugin
+# JBlast BLAST/Galaxy JBrowse Server Hook
 
-##Requires:
-JBrowse Server
-Prerequsite:
-npm install gulp
-sudo chown -R <username> jbh-test
+###Prerequsite:
 
+Install JBrowse
 
-##Installation:
-[Instructions](https://github.com/GMOD/jblast/tree/master/jblast-tools).
+Install Galaxy
+
+```
+git clone https://github.com/GMOD/jbserver.git
+cd jbserver
+```
+
+###Installation
+```
+npm install jbh-jblast
+```
+
+###Setup Steps:
+```
+./jbutil ...
+```
+
+###Launch
+```
+sails lift
+```
+
+(more to come)
