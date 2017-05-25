@@ -1,21 +1,21 @@
 #!/usr/bin/env node
 
 //var requestp = require('request-promise');
-var fs = require('fs');
+var fs = require('fs-extra');
 var path = require('path');
 //var getopt = require('node-getopt');
 var util = require('./util.js');
 var Finder = ""; //require('fs-finder');
-var config = ""; //require('../config.js');
 
 
 module.exports = {
     getOptions: function() {
         return [
-            ['' , 'blastdbpath=PATH' , 'jblast - existing database path'],
-            ['' , 'setupworkflows'   , 'jblast - [install|<path>] "install" project wf, or specify .ga file '],
-            ['' , 'setuptools'       , 'jblast - setup jblast tools for galaxy'],
-            ['' , 'setupdata'        , 'jblast - setup data and samples']
+            ['' , 'blastdbpath=PATH' , '(jblast) existing database path'],
+            ['' , 'setupworkflows'   , '(jblast) [install|<path>] "install" project wf, or specify .ga file '],
+            ['' , 'setuptools'       , '(jblast) setup jblast tools for galaxy'],
+            ['' , 'setupdata'        , '(jblast) setup data and samples'],
+            ['' , 'setupindex'       , '(jblast) setup index.html in the jbrowse directory']
             //['' , 'setuphistory'     , 'setup history']
         ];        
     },
@@ -31,21 +31,26 @@ module.exports = {
             return;
         }
         
+        var tool = opt.options['setupindex'];
+        if (typeof tool !== 'undefined') {
+            exec_setupindex({config:config,srcpath:this.srcpath});
+        }
+        
         var setuptools = opt.options['setuptools'];
         if (typeof setuptools !== 'undefined') {
-            exec_setuptools();
+            exec_setuptools({config:config,srcpath:this.srcpath,gdatapath:this.gdatapath});
         }
         var blastdbpath = opt.options['blastdbpath'];
         if (typeof blastdbpath !== 'undefined') {
-            exec_blastdbpath();
+            exec_blastdbpath({config:config,srcpath:this.srcpath});
         }
         var setupworkflows = opt.options['setupworkflows'];
         if (typeof setupworkflows !== 'undefined') {
-            exec_setupworkflows();
+            exec_setupworkflows({config:config,srcpath:this.srcpath});
         }
         var setuphistory = opt.options['setuphistory'];
         if (typeof setuphistory !== 'undefined') {
-            exec_setuphistory();
+            exec_setuphistory({config:config,srcpath:this.srcpath});
         }
         var setupdata = opt.options['setupdata'];
         if (typeof setupdata !== 'undefined') {
@@ -107,24 +112,26 @@ module.exports = {
     
 };
 
-/*
- * process --setupall
- */
-/*
-var setupall = opt.options['setupall'];
-if (typeof setupall !== 'undefined') {
-    exec_setuptools();
-    exec_setupworkflows();
-    exec_setuphistory();
-    exec_setupdata();
-    process.exit(0);
-}
-*/
-/*
- * process commands arguments
- */
+/**********************************************
+ * process commands arguments - implementation
+ **********************************************/
 
-/*
+/**
+ * 
+ * @param {type} params 
+ * @returns {undefined}
+ */
+function exec_setupindex(params) {
+    var g = params.config;
+    var srcpath = path.normalize(params.srcpath);
+    console.log("processing --setupindex");
+    console.log(srcpath+'/index.html',g.jbrowsePath+'index.html');
+    var bakfile = util.safeCopy(srcpath+'/index.html',g.jbrowsePath+'/index.html');
+    if (bakfile)
+        console.log('a backup of jbrowse/index.html was made in', bakfile);
+}
+
+/**
  * setup sample track
  */
 function exec_setuptrack(params) {
@@ -207,11 +214,13 @@ function exec_setupdata(params) {
 /*
  * import the package workflows
  */
-function exec_setupworkflows() {
+function exec_setupworkflows(params) {
+    var srcpath = params.srcpath;
     
     console.log("Setting up sample workflow(s)...");
     
     var srcdir = srcpath+'/workflows';
+    console.log('from %s',srcdir);
 
     // get existing workflow list
     var p = util.galaxyGetAsync('/api/workflows')
@@ -250,7 +259,7 @@ function exec_setupworkflows() {
             }
         }
     }).catch(function(err) {
-        console.log('Get Histories',err.message);
+        console.log('Get Workflow',err.message);
         console.log(err.options.uri);
     });
 }
@@ -296,6 +305,8 @@ function exec_blastdbpath() {
 
     console.log("Setting BLAST DB path");
 
+    //todo: check for galaxy target directory
+
     // target directory
     var tooldir = gdatapath+'/tool-data';
     
@@ -340,7 +351,9 @@ function exec_blastdbpath() {
 /*
  * setup tools - 
  */
-function exec_setuptools() {
+function exec_setuptools(params) {
+    var srcpath = params.srcpath;
+    var gdatapath = params.gdatapath;
     
     // copy tools to export root.
     util.cmd('cp -R -v "'+srcpath+'/jblasttools" "'+gdataroot+'"');
