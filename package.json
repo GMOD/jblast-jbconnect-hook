@@ -1,7 +1,7 @@
 {
   "name": "jbh-jblast",
-  "version": "0.0.147",
-  "description": "JBlast - JBrowse Server Hook",
+  "version": "0.0.148",
+  "description": "JBlast - Integrated JBrowse BLAST with Galaxy (JBrowse Server Hook)",
   "main": "api/hooks/jblast/index.js",
   "scripts": {
     "test": "mocha --reporter spec --compilers js:babel-core/register",
