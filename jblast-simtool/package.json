@@ -1,0 +1,26 @@
+{
+  "name": "jblast-simtool",
+  "description": "JBlast simulation tool (npm install -g",
+  "version": "0.0.137",
+  "author": "eyao",
+  "license": "MIT",
+  "main":"simblast.js",
+  "scripts": {
+    "test": "mocha --reporter spec --compilers js:babel-core/register",
+    "x_prepublish": "grunt bump"
+  },
+  "bin": {
+    "jblast-simblast": "./simblast.js"
+  },
+  "dependencies": {
+    "fs": "^0.0.2",
+    "node-getopt": "^0.2.3"
+  },
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-bump": "^0.8.0",
+    "grunt-contrib-jshint": "^1.1.0",
+    "grunt-version-bump": "^1.0.8",
+    "mocha": "^3.1.0" 
+  }
+}

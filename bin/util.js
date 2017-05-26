@@ -2,12 +2,14 @@ var request = require('request');
 var requestp = require('request-promise');
 var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require("fs"));
-//var fs = require('fs');
-//var request = require('request');
+var fse = require('fs-extra');
 var jsonfile = require('jsonfile');
 var requestp = require('request-promise');
 var execSync = require('child_process').execSync;
-var config = require('../config.js');
+var path = require('path');
+
+//var config = ""; //require('../config.js');
+
 
 var cfgDir = '/etc/jbrowse';
 
@@ -22,6 +24,35 @@ module.exports = {
     port: '1337',
     cfgFile: cfgDir+'/config.json',
 
+    /**
+     * copy src to targ, but if targ exists, it will backup the target by appending a number
+     * @param {string} src source
+     * @param {string} targ target
+     * @returns {string} final target filename, 
+     */
+    safeCopy: function(src,origTarg) {
+        
+        var newTarg = origTarg;
+        var index = 0;
+        var backup = false;
+
+        while(fse.pathExistsSync(newTarg)) {
+            backup = true;
+            // create new target name (inc)
+            index++;
+            newTarg = path.dirname(origTarg) + '/' + path.basename(origTarg, '.html') + index + '.html';
+            //console.log("trying new",newTarg);
+        }
+        // make backup of origTarg
+        if (backup)
+            fse.copySync(origTarg,newTarg);
+        
+        // copy ssource to origTarg
+        fse.copySync(src,origTarg);
+
+        if (origTarg===newTarg) return null;
+        return newTarg;
+    },
 
     /**
      * regrieve globals by performing a REST call to the jbrowse server
