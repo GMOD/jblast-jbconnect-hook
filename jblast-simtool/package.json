@@ -1,6 +1,6 @@
 {
   "name": "jblast-simtool",
-  "description": "JBlast simulation tool (npm install -g",
+  "description": "JBlast simulation tool",
   "version": "0.0.137",
   "author": "eyao",
   "license": "MIT",
