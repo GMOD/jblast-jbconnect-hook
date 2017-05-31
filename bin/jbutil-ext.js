@@ -5,7 +5,7 @@ var fs = require('fs-extra');
 var path = require('path');
 //var getopt = require('node-getopt');
 var util = require('./util.js');
-var Finder = ""; //require('fs-finder');
+var Finder = require('fs-finder');
 
 
 module.exports = {
@@ -15,8 +15,8 @@ module.exports = {
             ['' , 'setupworkflows'   , '(jblast) [install|<path>] "install" project wf, or specify .ga file '],
             ['' , 'setuptools'       , '(jblast) setup jblast tools for galaxy'],
             ['' , 'setupdata'        , '(jblast) setup data and samples'],
-            ['' , 'setupindex'       , '(jblast) setup index.html in the jbrowse directory']
-            //['' , 'setuphistory'     , 'setup history']
+            ['' , 'setupindex'       , '(jblast) setup index.html in the jbrowse directory'],
+            ['' , 'setuphistory'     , 'setup history']
         ];        
     },
     getHelpText: function() {
@@ -24,7 +24,10 @@ module.exports = {
         
     },
     process: function(opt,path,config) {
-        console.log("extended jbutil", opt,path);
+        //console.log("extended jbutil", opt,path);
+        
+        this.config = config;
+        util.init(config);
         
         if (!this.init(config)) {
             console.log("jblast - failed to initialize");
@@ -33,29 +36,29 @@ module.exports = {
         
         var tool = opt.options['setupindex'];
         if (typeof tool !== 'undefined') {
-            exec_setupindex({config:config,srcpath:this.srcpath});
+            exec_setupindex(this);
         }
         
         var setuptools = opt.options['setuptools'];
         if (typeof setuptools !== 'undefined') {
-            exec_setuptools({config:config,srcpath:this.srcpath,gdatapath:this.gdatapath});
+            exec_setuptools(this);
         }
         var blastdbpath = opt.options['blastdbpath'];
         if (typeof blastdbpath !== 'undefined') {
-            exec_blastdbpath({config:config,srcpath:this.srcpath});
+            exec_blastdbpath(this);
         }
         var setupworkflows = opt.options['setupworkflows'];
         if (typeof setupworkflows !== 'undefined') {
-            exec_setupworkflows({config:config,srcpath:this.srcpath});
+            exec_setupworkflows(this);
         }
         var setuphistory = opt.options['setuphistory'];
         if (typeof setuphistory !== 'undefined') {
-            exec_setuphistory({config:config,srcpath:this.srcpath});
+            exec_setuphistory(this);
         }
         var setupdata = opt.options['setupdata'];
         if (typeof setupdata !== 'undefined') {
-            exec_setupdata({config:config,srcpath:this.srcpath});
-            exec_setuptrack({config:config});
+            exec_setupdata(this);
+            exec_setuptrack(this);
         }
     },
     init: function(config) {
@@ -170,8 +173,9 @@ function exec_setuptrack(params) {
     
     var conf = JSON.parse(trackListData);
 
-    // add the JBlast plugin  
-    conf.plugins.push("JBlast");
+    // add the JBlast & JBClient plugin  
+    if (typeof conf.plugins['JBClient'] === 'undefined') conf.plugins.push("JBClient");
+    if (typeof conf.plugins['JBlast'] === 'undefined') conf.plugins.push("JBlast");
 
     // check if sample track exists in trackList.json (by checking for the label)
     var hasLabel = 0;
@@ -215,12 +219,10 @@ function exec_setupdata(params) {
  * import the package workflows
  */
 function exec_setupworkflows(params) {
-    var srcpath = params.srcpath;
-    
-    console.log("Setting up sample workflow(s)...");
+    var srcpath = path.normalize(params.srcpath);
     
     var srcdir = srcpath+'/workflows';
-    console.log('from %s',srcdir);
+    console.log('"Setting up sample workflow(s) from %s',srcdir);
 
     // get existing workflow list
     var p = util.galaxyGetAsync('/api/workflows')
@@ -259,26 +261,28 @@ function exec_setupworkflows(params) {
             }
         }
     }).catch(function(err) {
-        console.log('Get Workflow',err.message);
-        console.log(err.options.uri);
+        console.log('Get Workflow -',err.message);
+        console.log(err);
     });
 }
 /*
  * setup galaxy history given historyName in config.js
  */
-function exec_setuphistory() {
+function exec_setuphistory(params) {
+    
+    var config = params.config;
     
     console.log("Setting up history...");
     
     var p = util.galaxyGetAsync('/api/histories')
     .then(function(data) {
         p.meexit = 0;       // this is wrong, but it works for now
-        console.log("GET /api histories",data);
+        //console.log("GET /api histories",data);
         var histName = config.galaxy.historyName;
         for(var i in data) {
             if (data[i].name.indexOf(histName) !== -1) {
                 console.log('History already exists: ', data[i].name);
-                console.log(data[i].url);
+                //console.log(data[i].url);
                 p.meexit = 1;
                 return;
             }
@@ -287,7 +291,7 @@ function exec_setuphistory() {
     })
     .then(function(result) {
         if (p.meexit) return;
-        console.log("POST /api/histories",result)
+        //console.log("POST /api/histories",result)
         console.log("Created History:",result.name);
         console.log(result.url);
         
@@ -333,9 +337,9 @@ function exec_blastdbpath() {
             }
             content += "\n";
             content += "13apr2014-htgs\thtgs 13-Apr-2014\t"+blastdbpath+"/htgs/13apr2014/htgs\n";
-            content += "17apr2014-nt\tnt 17-Apr-2014\t"+blastdbpath+"/nt/17apr2014/nt\n";
-            content += "20apr2014-wgs\twgs 20-Apr-2014\t"+blastdbpath+"/wgs/20apr2014/wgs\n";
-            content += "phiX174\tphiX\t"+blastdbpath+"/phiX/27aug2010/phiX\n";
+            //content += "17apr2014-nt\tnt 17-Apr-2014\t"+blastdbpath+"/nt/17apr2014/nt\n";
+            //content += "20apr2014-wgs\twgs 20-Apr-2014\t"+blastdbpath+"/wgs/20apr2014/wgs\n";
+            //content += "phiX174\tphiX\t"+blastdbpath+"/phiX/27aug2010/phiX\n";
             
             console.log(content);
             
@@ -354,7 +358,7 @@ function exec_blastdbpath() {
 function exec_setuptools(params) {
     var srcpath = params.srcpath;
     var gdatapath = params.gdatapath;
-    
+    var gdataroot = params.gdataroot;
     // copy tools to export root.
     util.cmd('cp -R -v "'+srcpath+'/jblasttools" "'+gdataroot+'"');
     
