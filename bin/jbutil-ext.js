@@ -45,6 +45,7 @@ module.exports = {
         }
         var blastdbpath = opt.options['blastdbpath'];
         if (typeof blastdbpath !== 'undefined') {
+            this.blastdbpath = blastdbpath
             exec_blastdbpath(this);
         }
         var setupworkflows = opt.options['setupworkflows'];
@@ -305,7 +306,10 @@ function exec_setuphistory(params) {
 /*
  * register blast nucleotide databases
  */
-function exec_blastdbpath() {
+function exec_blastdbpath(params) {
+    
+    var gdatapath = params.gdatapath;
+    var blastdbpath = params.blastdbpath
 
     console.log("Setting BLAST DB path");
 
@@ -321,7 +325,7 @@ function exec_blastdbpath() {
     }
     catch (err) {
         console.log(blastdbpath,'does not exist');
-        process.exit(1);
+        return; //process.exit(1);
     }
     console.log('files',files);
     for(var i in files) {
