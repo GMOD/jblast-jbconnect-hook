@@ -21,6 +21,7 @@
     "deferred": "^0.7.6",
     "fs": "0.0.1-security",
     "fs-extra": "^3.0.1",
+    "fs-finder": "^1.8.1",
     "jQuery-ui-Slider-Pips": "github:simeydotme/jQuery-ui-Slider-Pips#v1.11.4",
     "jquery-ui-dist": "^1.12.1",
     "jquery.mb.extruder": "^2.6.0",
