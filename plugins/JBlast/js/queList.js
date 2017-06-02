@@ -1,4 +1,4 @@
-function initQueue(io) {
+function initQueue() {
     /*
      * queue events
      */
