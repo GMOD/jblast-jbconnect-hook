@@ -141,8 +141,7 @@ function exec_setupindex(params) {
 function exec_setuptrack(params) {
     var config = params.config;
     console.log("Setting up sample track...");
-    var g = config;//require('../config.js');
-    // todo: why can't I access config from here?
+    var g = config;
 
     var trackListPath = g.jbrowsePath + g.dataSet[0].dataPath + 'trackList.json';
     var sampleTrackFile = g.jbrowsePath + g.dataSet[0].dataPath;
@@ -152,7 +151,7 @@ function exec_setuptrack(params) {
     // read sampleTrack.json file
     var error = 0;
     try {
-      var sampleTrackData = fs.readFileSync (sampleTrackFile);
+      var sampleTrackData = fs.readFileSync (sampleTrackFile,'utf8');
     }
     catch(err){
         console.log("failed read",trackListPath,err);
@@ -160,8 +159,11 @@ function exec_setuptrack(params) {
     }
     if (error) return;
     
+    // insert blastResultPath
+    //console.log("typeof sampleTrackData",typeof sampleTrackData,sampleTrackData);
+    sampleTrackData = sampleTrackData.replace("[[blastResultPath]]",g.jblast.blastResultPath);
+    sampleTrackData = sampleTrackData.replace("[[blastResultPath]]",g.jblast.blastResultPath);
     var sampleTrack = JSON.parse(sampleTrackData);
-    
     // read trackList.json
     try {
       var trackListData = fs.readFileSync (trackListPath);
@@ -174,9 +176,10 @@ function exec_setuptrack(params) {
     
     var conf = JSON.parse(trackListData);
 
-    // add the JBlast & JBClient plugin  
-    if (typeof conf.plugins['JBClient'] === 'undefined') conf.plugins.push("JBClient");
-    if (typeof conf.plugins['JBlast'] === 'undefined') conf.plugins.push("JBlast");
+    console.log("Adding plugins JBClient & JBlast in trackList.json");
+    // add the JBlast & JBClient plugin, if they don't already exist  
+    if (conf.plugins.indexOf('JBClient') === -1) conf.plugins.push("JBClient");
+    if (conf.plugins.indexOf('JBlast') === -1) conf.plugins.push("JBlast");
 
     // check if sample track exists in trackList.json (by checking for the label)
     var hasLabel = 0;
