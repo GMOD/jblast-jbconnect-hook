@@ -5,12 +5,10 @@
  * 
  */
 
-//var requestp = require('request-promise');
 var fs = require('fs');
-//var path = require('path');
 var getopt = require('node-getopt');
-//var util = require('./util.js');
-//var config = require('../config.js');
+//var path = require('path');
+//var sh = require('shelljs');
 
 var getopt = new getopt([
     ['b' , 'blastxml=FILE'          , 'sim blastxml result file (found in /jblastdata)'],
@@ -49,7 +47,10 @@ var infile = opt.options['infile'];
 
 
 if (typeof blastxml !== 'undefined') {
-    var src = 'data/' + blastxml;
+    
+    //var cwd = sh.pwd();
+
+    var src = __dirname + '/data/' + blastxml;
 
     console.log("blastxml src",src);
     console.log("infile",infile);
