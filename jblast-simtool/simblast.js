@@ -67,3 +67,8 @@ if (typeof blastxml !== 'undefined') {
     });    
     
 }
+else {
+    console.log('--blastxml parameter not defined');
+    process.exit(1);
+   
+}
