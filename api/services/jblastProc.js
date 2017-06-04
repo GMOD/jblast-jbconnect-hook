@@ -130,19 +130,30 @@ module.exports = {
      */
     lookupAccession: function (req, res, next) {
         sails.log("JBlast /jbapi/lookupaccession called");
-        var g = sails.config.globals.jbrowse;
-        var accModule = g.accessionModule;
 
-        if (typeof accModule === 'undefined') accModule = "./accessionEntrez";
-
-        var accession = require(accModule);   
-
-        accession.init(req,res,function() {
-            accession.lookup(req,res,function(data,err) {
+        function accessionLookup(req,res) {
+            this.accession.lookup(req,res,function(data,err) {
                 res.send(data);
             });
-        });
-          
+            
+        }
+        // load accession module only on first time call
+        if (typeof this.accession === 'undefined') {
+            
+            var g = sails.config.globals.jbrowse;
+            var accModule = g.accessionModule;
+
+            if (typeof accModule === 'undefined') accModule = "./accessionEntrez";
+
+            this.accession = require(accModule);
+            
+            this.accession.init(req,res,function() {
+                accessionLookup(req,res);
+            });
+        }
+        else {
+            accessionLookup(req,res);
+        }
     }
 
 };
