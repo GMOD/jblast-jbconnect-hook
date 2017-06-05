@@ -23,6 +23,11 @@ module.exports = {
     url: 'http://localhost',
     port: '1337',
     cfgFile: cfgDir+'/config.json',
+    config: {},
+    
+    init: function(config) {
+        this.config = config;
+    },
 
     /**
      * copy src to targ, but if targ exists, it will backup the target by appending a number
@@ -107,7 +112,7 @@ module.exports = {
      * 
      */
     galaxyGetJSON: function(api,cb,cberr) {
-        var g = config;
+        var g = this.config;
         var gurl = g.galaxy.galaxyUrl;
         var apikey = g.galaxy.galaxyAPIKey;
 
@@ -140,7 +145,7 @@ module.exports = {
      */
     galaxyPostJSON: function(api,params,cb,cberr) {
 
-        var g = config;
+        var g = this.config;
         var gurl = g.galaxy.galaxyUrl;
         var apikey = g.galaxy.galaxyAPIKey;
 

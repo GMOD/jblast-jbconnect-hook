@@ -129,51 +129,33 @@ module.exports = {
      * Utilizes Entrez service
      */
     lookupAccession: function (req, res, next) {
-          sails.log("JBlast /jbapi/lookupaccession called");
-          rest_lookupAccession(req,res,function(data,err) {
-              res.send(data);
-          });
+        sails.log("JBlast /jbapi/lookupaccession called");
+
+        function accessionLookup(req,res) {
+            this.accession.lookup(req,res,function(data,err) {
+                res.send(data);
+            });
+            
+        }
+        // load accession module only on first time call
+        if (typeof this.accession === 'undefined') {
+            
+            var g = sails.config.globals.jbrowse;
+            var accModule = g.accessionModule;
+
+            if (typeof accModule === 'undefined') accModule = "./accessionEntrez";
+
+            this.accession = require(accModule);
+            
+            this.accession.init(req,res,function() {
+                accessionLookup(req,res);
+            });
+        }
+        else {
+            accessionLookup(req,res);
+        }
     }
 
-};
-
-/**
- * this does an esummary lookup (using Entrez api), adding the link field into the result.
- * @param {type} req
- * @param {type} res
- * @param {type} cb
- * Ref: https://www.ncbi.nlm.nih.gov/books/NBK25499/
- */
-
-function rest_lookupAccession(req,res, cb) {
-    var accession = req.param('accession');
-    
-    var req = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=nucleotide&id=[[accession]]&retmode=json";
-    var linkout = "https://www.ncbi.nlm.nih.gov/nucleotide/[[linkout]]?report=genbank";
-    
-    req = req.replace("[[accession]]",accession);
-    
-    var options = {
-        uri: req,
-        headers: {
-            'User-Agent': 'Request-Promise'
-        },
-        json: true
-    };
-
-    sails.log.debug("options",options,accession,typeof accession);
-
-    requestp(options)
-        .then(function (data) {
-            for (var i in data.result) {
-                var link = linkout.replace("[[linkout]]",data.result[i].uid);
-                data.result[i].link = link;
-            }
-            cb(data);
-        })
-        .catch(function (err) {
-            cb(err);
-        });    
 };
 
 /**

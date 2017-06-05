@@ -12,7 +12,7 @@ module.exports.globals = {
             galaxyAPIKey: "c7be32db9329841598b1a5705655f633",
 
             // jblast will use this Galaxy history
-            historyName: "JBlast History"
+            historyName: "Unnamed history"
         },
         jblast: {
             blastResultPath: "jblastdata",
