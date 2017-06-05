@@ -40,12 +40,14 @@ function doCompleteAction(kWorkflowJob,hista) {
     // find entries with "export" labels and copy those files to the dataset path
     var filesToMove = 0;
     for(var i in steps) {
-        var label = steps[i].workflow_step_label;
+        //var label = steps[i].workflow_step_label;
         var id = steps[i].job_id;
         //sails.log.debug(wId,'step',i,"typeof label",label);
         sails.log('step',i,'id',id);
-        if (label != null && label.indexOf('export') !== -1) {
-            
+        //if (label != null && label.indexOf('export') !== -1) {
+        // check extension is importable (defined in the global import list)
+        if (id !== null && typeof hista[id].extension !== 'undefined' && g.jblast.import.indexOf(hista[id].extension) !== -1) {
+        
             filesToMove++;
             //sails.log('label',label);
             if (typeof hista[id] === 'undefined'){

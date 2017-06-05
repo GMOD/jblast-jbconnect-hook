@@ -134,7 +134,7 @@ return declare( JBrowsePlugin,
         };
 
         
-        dojo.subscribe("/jbrowse/jbclient_ready", function(io){
+        dojo.subscribe("/jbrowse/jbclient_ready", function(){
             console.log("ready to receive events");
             
             // handle track events
@@ -161,7 +161,7 @@ return declare( JBrowsePlugin,
             });
 
             setTimeout(function() {
-                initQueue(io);
+                initQueue();
             },1000);
         });
         

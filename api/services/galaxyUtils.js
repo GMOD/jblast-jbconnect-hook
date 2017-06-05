@@ -213,7 +213,7 @@ module.exports = {
 
         // write the BLAST region file
         var theBlastFile = "blast_region"+d.getTime()+".fa";
-        var blastPath = g.jbrowse.jbrowsePath + dataSetPath +'/'+ g.jbrowse.jblast.blastResultPath;
+        var blastPath = g.jbrowse.jbrowsePath + '/' + dataSetPath +'/'+ g.jbrowse.jblast.blastResultPath;
         var theFullBlastFilePath = blastPath+'/'+theBlastFile; 
 
         // if direcgtory doesn't exist, create it
@@ -238,7 +238,9 @@ module.exports = {
                 "offset": startCoord
         };
 
-        var theFile = g.jbrowse.jbrowseURL + dataSetPath+'/' + g.jbrowse.jblast.blastResultPath+'/'+theBlastFile;
+        //sails.log.debug('>>> jbrowse globals',g.jbrowse);
+
+        var theFile = g.jbrowse.jbrowseRest+'/'+g.jbrowse.routePrefix+'/'+ dataSetPath+'/' + g.jbrowse.jblast.blastResultPath+'/'+theBlastFile;
 
         // create the kue job entry
         var jobdata = {
@@ -269,6 +271,8 @@ module.exports = {
 
                 // send the file
                 sails.log.info("uploading file to galaxy",theFile)
+
+                //process.exit(1);    // short circuit for testing
 
                 thisb.sendFile(theFile,thisb.historyId, function(data,err) {
 
