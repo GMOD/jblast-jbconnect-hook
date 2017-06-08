@@ -8,7 +8,6 @@ var jblastProc = require('../../services/jblastProc');
 module.exports = {
     routes: function() {
         return {
-            // these routes generally not under policy engine unless specifically defined
             before: {
                 'get /hi': {
                     controller: 'WorkflowMgrController',
@@ -16,7 +15,6 @@ module.exports = {
                 }
                 
             },
-            // these routes are behind global policies
             after: {
                 'post /jbapi/workflowsubmit': jblastProc.workflowSubmit,
                 'get /jbapi/getworkflows': jblastProc.getWorkflows,
