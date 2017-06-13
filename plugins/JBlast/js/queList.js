@@ -57,7 +57,7 @@ function initQueue() {
 
 function doGetQueue() {
     
-    var typeToWatch = 'galaxy-workflow-watch';
+    var typeToWatch = 'workflow';
     
     getJobs(function(data){
         jdata = $.parseJSON(data);

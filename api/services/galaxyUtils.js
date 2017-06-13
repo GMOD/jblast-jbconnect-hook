@@ -244,7 +244,7 @@ module.exports = {
 
         // create the kue job entry
         var jobdata = {
-            name: "Galaxy workflow",
+            name: "workflow",
             requestParams: params, 
             jbrowseDataPath: dataSetPath,
             sequence: seq,
@@ -254,18 +254,18 @@ module.exports = {
                 file: theFile
             }
         };
-        var job = g.kue_queue.create('galaxy-workflow-watch', jobdata)
+        var job = g.kue_queue.create('workflow', jobdata)
         .save(function(err){
             if (err) {
-                cb(null,{status:'error',msg: "error create kue galaxy-workflow-watch",err:err});
+                cb(null,{status:'error',msg: "error create kue workflow",err:err});
                 return;
             }
             cb({status:'success',jobId: job.id},null);
 
             // process job
-            g.kue_queue.process('galaxy-workflow-watch', function(kJob, kDone){
+            g.kue_queue.process('workflow', function(kJob, kDone){
                 kJob.kDoneFn = kDone;
-                sails.log.info("galaxy-workflow-watch job id = "+kJob.id);
+                sails.log.info("workflow job id = "+kJob.id);
 
                 kJob.progress(0,10,{file_upload:0});
 
