@@ -8,7 +8,6 @@ var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require("fs"));
 var deferred = require('deferred');
 var postAction = require('./postAction');
-//var kueSyncJobs = require ('./kueSyncJobs');
 var filter = require("./filter");   // filter processing
 var galaxy = require("./galaxyUtils");
 var util = require("./utils");
@@ -22,9 +21,6 @@ module.exports = {
         galaxy.init(function(history) {
 
             historyId = history.historyId;
-
-            sails.log.info("starting kueJobMon"); 
-            //kueSyncJobs.start(historyId);
 
         }, function(err) {
             sails.log.error("failed galaxy.init",err);
