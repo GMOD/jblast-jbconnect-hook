@@ -560,7 +560,7 @@ return declare( JBrowsePlugin,
                 labels.push(v.toExponential(1));
             }
             labels.push(Math.pow(10,hi).toExponential(1));
-            console.log("labels",labels);
+            //console.log("labels",labels);
             
             $("#slider-evalue").slider({
                 min: lo,
