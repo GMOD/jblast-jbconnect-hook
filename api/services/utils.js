@@ -17,8 +17,8 @@ module.exports = {
             seq: line.split(">")[1].split(" ")[0],
             start: line.split(":")[1].split("..")[0],
             end: line.split("..")[1].split(" ")[0],
-            strand: line.split("(")[1].split(" ")[0],
-            class: line.split("class=")[1].split(" ")[0],
+            strand: line.indexOf('strand') >= 0 ? line.split("(")[1].split(" ")[0] : '',
+            class: line.indexOf('class') >= 0 ? line.split("class=")[1].split(" ")[0] : '',
             length: line.split("length=")[1]
         };
     }
