@@ -1,0 +1,72 @@
+{
+    "a_galaxy_workflow": "true", 
+    "annotation": "", 
+    "format-version": "0.1", 
+    "name": "JBlast Sim Hits", 
+    "steps": {
+        "0": {
+            "annotation": "", 
+            "content_id": null, 
+            "id": 0, 
+            "input_connections": {}, 
+            "inputs": [
+                {
+                    "description": "", 
+                    "name": "Input fasta"
+                }
+            ], 
+            "label": null, 
+            "name": "Input dataset", 
+            "outputs": [], 
+            "position": {
+                "left": 194, 
+                "top": 149
+            }, 
+            "tool_errors": null, 
+            "tool_id": null, 
+            "tool_state": "{\"name\": \"Input fasta\"}", 
+            "tool_version": null, 
+            "type": "data_input", 
+            "uuid": "aeebb08f-9c75-4058-a0fa-787df3dbc718", 
+            "workflow_outputs": []
+        }, 
+        "1": {
+            "annotation": "", 
+            "content_id": "jb_simblast", 
+            "id": 1, 
+            "input_connections": {
+                "input1": {
+                    "id": 0, 
+                    "output_name": "output"
+                }
+            }, 
+            "inputs": [
+                {
+                    "description": "runtime parameter for tool Sim Blastn", 
+                    "name": "input1"
+                }
+            ], 
+            "label": "export blastxml", 
+            "name": "Sim Blastn", 
+            "outputs": [
+                {
+                    "name": "output", 
+                    "type": "blastxml"
+                }
+            ], 
+            "position": {
+                "left": 417.5, 
+                "top": 147.5
+            }, 
+            "post_job_actions": {}, 
+            "tool_errors": null, 
+            "tool_id": "jb_simblast", 
+            "tool_state": "{\"__page__\": 0, \"__rerun_remap_job_id__\": null, \"input1\": \"{\\\"__class__\\\": \\\"RuntimeValue\\\"}\"}", 
+            "tool_version": "1.0.0", 
+            "type": "tool", 
+            "uuid": "effe61af-85ef-4bc4-a296-04666ffee622", 
+            "workflow_outputs": []
+        }
+    }, 
+    "uuid": "cd9518e7-d10c-4957-8082-ad585c6812c9"
+}
