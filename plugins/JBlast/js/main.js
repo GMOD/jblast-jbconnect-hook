@@ -958,7 +958,8 @@ function jobPanelInit() {
     $("#extruderRight div.flap").addClass("flapEx");
 
     // add gear icon (activity indicator)
-    $("#extruderRight div.flap").prepend("<img class='cogwheel hidden' src='plugins/JBlast/img/st_active.gif' />");
+    //$("#extruderRight div.flap").prepend("<img class='cogwheel hidden' src='plugins/JBlast/img/st_active.gif' />");
+    $("#extruderRight div.flap").attr('title','Workflow queue');
 
     $("#extruderRight .extruder-content").css('height','300px');
     $("#extruderRight .extruder-content").css('border-bottom-left-radius','5px');

@@ -4,8 +4,8 @@ function initQueue() {
      */
     io.socket.on('queue-active', function (data){
         console.log('event','queue-active',data);
-        if (data.count===0) $("img.cogwheel").addClass("hidden");
-        else $("img.cogwheel").removeClass("hidden");
+        if (data.count===0) $("div.flapEx").removeClass("cogwheel");
+        else $("div.flapEx").addClass("cogwheel");
     });		
     io.socket.on('queue-enqueue', function (data){
         console.log('event','queue-enqueue',data.type,data.id,data);
