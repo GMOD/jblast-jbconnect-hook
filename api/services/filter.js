@@ -16,7 +16,7 @@ module.exports = {
      *      newTrackJson[0].label must be defined
      * @returns {undefined|module.exports.filterInit.filter}
      */
-    filterInit: function(kWorkflowJob,newTrackJson,cb) {
+    filterInit: function(kWorkflowJob,cb) {
         sails.log("filterInit()");
         var g = sails.config.globals.jbrowse;
 

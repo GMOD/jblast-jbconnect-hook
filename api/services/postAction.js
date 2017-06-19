@@ -254,17 +254,16 @@ function postMoveResultFiles(kWorkflowJob,cb) {
 function processFilter(kWorkflowJob,newTrackJson,cb) {
     sails.log("processFilter()");
     var g = sails.config.globals.jbrowse;
+    var fileBlastFilter = kWorkflowJob.data.blastData.outputs.blastxml + '_filtersettings.json';
+    kWorkflowJob.data.blastData.filterSettings = g.jblast.blastResultPath+"/"+fileBlastFilter;
+    kWorkflowJob.save();
 
-    filter.filterInit(kWorkflowJob,newTrackJson, function(filtered){
+    filter.filterInit(kWorkflowJob, function(filtered){
         var asset = {
             "asset": kWorkflowJob.data.blastData.outputs.blastxml, //newTrackJson[0].label,
             "dataSet": kWorkflowJob.data.jbrowseDataPath   //g.dataSet[0].dataPath
         };
         filter.applyFilter(0,asset,function(hitdata) {
-            var fileBlastFilter = kWorkflowJob.data.blastData.outputs.blastxml + '_filtersettings.json';
-            // this is a bit of a hack because we dont have hit data earlier
-
-            kWorkflowJob.data.blastData.filterSettings = g.jblast.blastResultPath+"/"+fileBlastFilter;
             kWorkflowJob.data.blastData.hits = hitdata.hits;
             
             var trackLabel = 'blast '+kWorkflowJob.id+' ('+kWorkflowJob.data.sequence.start+'..'+kWorkflowJob.data.sequence.end+')'
