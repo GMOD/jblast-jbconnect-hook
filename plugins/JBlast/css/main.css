@@ -180,7 +180,7 @@ div.blastSummary td.blastSummaryItem {
             position: absolute;
             background-color:#eee;
             overflow-y:auto;
-            overflow-x:hidden
+            overflow-x:hidden;
             width: 300px;
             height:500px;
         }
