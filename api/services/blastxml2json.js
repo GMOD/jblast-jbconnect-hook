@@ -20,7 +20,7 @@ var to_json = require('xmljson').to_json;
 module.exports = {
 
     convert: function (kJob,trackJson,cb) {
-
+        sails.log('converting blast to json');
         var g = sails.config.globals.jbrowse;
         // i.e. /var/www/html/jbrowse/sample_data/json/volvox/jblastdata
         var jblastDataPath = g.jbrowsePath + kJob.data.requestParams.dataSetPath + '/' + g.jblast.blastResultPath + '/';

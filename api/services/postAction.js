@@ -92,8 +92,8 @@ function doCompleteAction(kWorkflowJob,hista) {
                 sails.log.debug("done moving files");
                 kWorkflowJob.save();
 
-                // insert track into trackList.json
-                postMoveResultFiles(kWorkflowJob,function(newTrackJson){
+                    // insert track into trackList.json
+                    postMoveResultFiles(kWorkflowJob,function(newTrackJson){
 
                     // convert xml to json
                     blast2json.convert(kWorkflowJob,newTrackJson,function(err) {
@@ -103,7 +103,7 @@ function doCompleteAction(kWorkflowJob,hista) {
                             return;
                         }
                         sails.log.debug("post convert newTrackJson",newTrackJson);
-                        
+
                         // check if there were any hits.
                         if (getHits(kWorkflowJob,newTrackJson)===0) {
                             var msg = "No Blast Hits";
@@ -115,12 +115,12 @@ function doCompleteAction(kWorkflowJob,hista) {
                         }
                         else {
                             offsetfix.process(kWorkflowJob,newTrackJson,function() {
-                                processFilter(kWorkflowJob,newTrackJson,function() {
+                                processFilter(kWorkflowJob,newTrackJson,function(hitdata) {
                                     addToTrackList(kWorkflowJob,newTrackJson);
                                 });
                             });
                         }
-                        
+
                     });
 
                 });
@@ -205,8 +205,8 @@ function postMoveResultFiles(kWorkflowJob,cb) {
         // galaxy history id
         //var galaxyHistId = kWorkflowJob.data.blastData.outputs.json.split("_")[0];
         
-        var trackLabel = 'blast '+kWorkflowJob.id+' '+kWorkflowJob.data.sequence.seq+':('+kWorkflowJob.data.sequence.start+'..'+kWorkflowJob.data.sequence.end+')'
-            + kWorkflowJob.data.sequence.strand+' len '+kWorkflowJob.data.sequence.length;
+        var trackLabel = 'blast '+kWorkflowJob.id+' ('+kWorkflowJob.data.sequence.start+'..'+kWorkflowJob.data.sequence.end+')'
+            +' '+kWorkflowJob.data.blastData.hits + ' hits';
     
         sails.log.info('trackLabel',trackLabel);
 
@@ -253,15 +253,26 @@ function postMoveResultFiles(kWorkflowJob,cb) {
  */
 function processFilter(kWorkflowJob,newTrackJson,cb) {
     sails.log("processFilter()");
-    //var g = sails.config.globals.jbrowse;
-    
+    var g = sails.config.globals.jbrowse;
+
     filter.filterInit(kWorkflowJob,newTrackJson, function(filtered){
         var asset = {
-            "asset": newTrackJson[0].label,
+            "asset": kWorkflowJob.data.blastData.outputs.blastxml, //newTrackJson[0].label,
             "dataSet": kWorkflowJob.data.jbrowseDataPath   //g.dataSet[0].dataPath
         };
-        filter.applyFilter(0,asset,function() {
-            cb();
+        filter.applyFilter(0,asset,function(hitdata) {
+            var fileBlastFilter = kWorkflowJob.data.blastData.outputs.blastxml + '_filtersettings.json';
+            // this is a bit of a hack because we dont have hit data earlier
+
+            kWorkflowJob.data.blastData.filterSettings = g.jblast.blastResultPath+"/"+fileBlastFilter;
+            kWorkflowJob.data.blastData.hits = hitdata.hits;
+            
+            var trackLabel = 'blast '+kWorkflowJob.id+' ('+kWorkflowJob.data.sequence.start+'..'+kWorkflowJob.data.sequence.end+')'
+                +' '+hitdata.hits + ' hits';
+            newTrackJson[0].key = trackLabel;
+            
+            kWorkflowJob.save();
+            cb(hitdata);
         });
     });
 }
@@ -294,7 +305,7 @@ function getHits(kWorkflowJob,newTrackJson) {
  * 
  */
 function addToTrackList(kWorkflowJob,newTrackJson) {
-    sails.log("addToTrackList()");
+    sails.log("addToTrackList()",newTrackJson);
     var g = sails.config.globals.jbrowse;
     
     //todo: make this configurable later

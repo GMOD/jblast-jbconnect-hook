@@ -21,8 +21,10 @@ module.exports = {
         var g = sails.config.globals.jbrowse;
 
         // read blast json file
-        var blastfile = g.jbrowsePath + kWorkflowJob.data.jbrowseDataPath +'/' + g.jblast.blastResultPath +"/"+ newTrackJson[0].label + ".json";
-        var blastFilterFile = g.jbrowsePath + kWorkflowJob.data.jbrowseDataPath + '/' + newTrackJson[0].filterSettings;
+        //var blastfile = g.jbrowsePath + kWorkflowJob.data.jbrowseDataPath +'/' + g.jblast.blastResultPath +"/"+ newTrackJson[0].label + ".json";
+        //var blastFilterFile = g.jbrowsePath + kWorkflowJob.data.jbrowseDataPath + '/' + newTrackJson[0].filterSettings;
+        var blastfile = g.jbrowsePath + kWorkflowJob.data.jbrowseDataPath +'/' + g.jblast.blastResultPath +"/"+ kWorkflowJob.data.blastData.outputs.blastxml + ".json";
+        var blastFilterFile = g.jbrowsePath + kWorkflowJob.data.jbrowseDataPath + '/' + kWorkflowJob.data.blastData.filterSettings;
         
         sails.log('blastfile',blastfile);
         try {
