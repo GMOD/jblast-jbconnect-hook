@@ -5,7 +5,16 @@
 
 @import url("CSSTableGenerator.css");
 
+/* toolbar blast button */
 
+#jblast-toolbtn {
+    height:17px;
+}
+[widgetid='jblast-toolbtn'] {  
+	display: none;      /* default state */
+}
+
+/* job queue panel */
 div.flapEx {
     padding-top:35px !important;
     background-repeat: no-repeat !important;

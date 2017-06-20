@@ -98,6 +98,20 @@ return declare( JBrowsePlugin,
                     addButtons: thisB.FASTA_addButtons
                 });
             });
+            // override Browser
+            require(["dojo/_base/lang", "JBrowse/Browser"], function(lang, Browser){
+                lang.extend(Browser, {
+					// handle highlight off 
+                    clearHighlight: function() {
+                        if( this._highlight ) {
+                            $("[widgetid='jblast-toolbtn']").hide();
+                            //domStyle.set(thisB.browser.jblast.blastButton, 'display', 'none');  // don't work, why?
+                            delete this._highlight;
+                            this.publish( '/jbrowse/v1/n/globalHighlightChanged', [] );
+                        }
+                    }
+                });
+            });
             browser.jblastDialog = thisB.Browser_jblastDialog;
             
             
@@ -110,6 +124,32 @@ return declare( JBrowsePlugin,
             // start filter panel hide/show queue, filter panel management
             thisB.startFocusQueue();
 
+        });
+        // create the blast button on the toolbar
+        this.browser.afterMilestone( 'initView', function() {
+
+            var navBox = dojo.byId("navbox");
+
+            thisB.browser.jblast.blastButton = new Button(
+            {
+                title: "BLAST highlighted region",
+                id: "jblast-toolbtn",
+                //width: "24px",
+				//height: "17px",
+				label: "Blast",
+                onClick: dojo.hitch( thisB, function(event) {
+                    //thisB.browser.showTrackLabels("toggle");
+					//console.log("blast click");
+					thisB.startBlast();
+                    dojo.stopEvent(event);
+                })
+            }, dojo.create('button',{},navBox));   //thisB.browser.navBox));
+/* 
+            if(queryParams.tracklabels == 0 || thisB.browser.config.show_tracklabels == 0) {
+                query('.track-label').style('visibility', 'hidden')
+                dojo.attr(dom.byId("hidetitles-btn"),"hidden-titles","");       // if shown, hide
+            }
+*/
         });
         
         // save the reference to the blast plugin in browser
@@ -709,25 +749,7 @@ return declare( JBrowsePlugin,
             onTaskItemClick: function(event) {
                 //browser.jblastDialog();
                 // get sequence store and ac
-                browser.getStore('refseqs', dojo.hitch(this,function( refSeqStore ) {
-                    if( refSeqStore ) {
-                        var hilite = browser._highlight;
-                        refSeqStore.getReferenceSequence(
-                            hilite,
-                            dojo.hitch( this, function( seq ) {
-                                //console.log('found sequence',hilite,seq);
-                                require(["JBrowse/View/FASTA"], function(FASTA){
-                                    var fasta = new FASTA();
-                                    var fastaData = fasta.renderText(hilite,seq);
-                                    console.log('FASTA',fastaData);
-                                    delete fasta;
-                                    browser.jblastDialog(fastaData);
-                                });                                
-                                
-                            })
-                        );
-                    }
-                }));             
+		thisB.startBlast();
             }
         };
         // create task menu as context menu for task nodes.
@@ -746,6 +768,33 @@ return declare( JBrowsePlugin,
         browser.jblastHiliteMenu = menu;
     },
     /**
+     * Display blast dialog box
+     * @returns {undefined}
+     */
+    startBlast: function() {
+        var thisB = this;
+        var browser = this.browser;
+        browser.getStore('refseqs', dojo.hitch(this,function( refSeqStore ) {
+            if( refSeqStore ) {
+                var hilite = browser._highlight;
+                refSeqStore.getReferenceSequence(
+                    hilite,
+                    dojo.hitch( this, function( seq ) {
+                        //console.log('found sequence',hilite,seq);
+                        require(["JBrowse/View/FASTA"], function(FASTA){
+                            var fasta = new FASTA();
+                            var fastaData = fasta.renderText(hilite,seq);
+                            console.log('FASTA',fastaData);
+                            delete fasta;
+                            browser.jblastDialog(fastaData);
+                        });                                
+
+                    })
+                );
+            }
+        }));             
+    },
+    /**
      * called when highlight region is created
      * @param {type} node - DOM Node of highlight region (yellow region)
      * @returns nothing significant
@@ -754,8 +803,11 @@ return declare( JBrowsePlugin,
         console.log('postRenderHighlight');
         
         // add hilight menu to node
-        if (typeof JBrowse.jblastHiliteMenu !== 'undefined')
+        if (typeof JBrowse.jblastHiliteMenu !== 'undefined') {
             JBrowse.jblastHiliteMenu.bindDomNode(node);
+            $("[widgetid='jblast-toolbtn']").show();
+            //domStyle.set(thisB.browser.jblast.blastButton, 'display', 'inline'); // dont work, why??
+        }
     },
     // display blast dialog
     Browser_jblastDialog: function (region) {
