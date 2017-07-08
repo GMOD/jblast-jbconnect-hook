@@ -1,11 +1,11 @@
 {
   "name": "jbh-jblast",
-  "version": "0.0.148",
+  "version": "0.0.238",
   "description": "JBlast - Integrated JBrowse BLAST with Galaxy (JBrowse Server Hook)",
   "main": "api/hooks/jblast/index.js",
   "scripts": {
     "test": "mocha --reporter spec --compilers js:babel-core/register",
-    "prepublish": "grunt bump-publish"
+    "prepublish": "grunt bump-publish --force"
   },
   "keywords": [
     "sails",
@@ -17,8 +17,8 @@
   "license": "MIT",
   "dependencies": {
     "bluebird": "^3.5.0",
-    "deepmerge": "^1.3.2",
-    "deferred": "^0.7.6",
+    "deepmerge": "^1.5.0",
+    "deferred": "^0.7.8",
     "fs": "0.0.1-security",
     "fs-extra": "^3.0.1",
     "fs-finder": "^1.8.1",
@@ -41,8 +41,9 @@
     "grunt-bump": "^0.8.0",
     "grunt-contrib-jshint": "^1.1.0",
     "grunt-version-bump": "^1.0.8",
-    "mocha": "^3.1.0",
-    "sails": "^0.12.5",
+    "jbserver": "github:gmod/jbserver",
+    "mocha": "^3.4.2",
+    "sails": "^0.12.13",
     "socket.io-client": "^1.3.5",
     "supertest": "^2.0.0",
     "waterline-sqlite3": "^1.0.3"
