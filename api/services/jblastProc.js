@@ -16,7 +16,7 @@ var util = require("./utils");
 module.exports = {
 
     initialize: function(cb) {
-        // todo: check that galaxy is running
+        // TODO: check that galaxy is running
 
         galaxy.init(function(history) {
 
@@ -115,7 +115,7 @@ module.exports = {
      */
     getHitDetails: function (req, res, next) {
           sails.log("JBlast /jbapi/gethitdetails called");
-          //todo: handle errors
+          // TODO: handle errors
           rest_getHitDetails(req,res,function(hitData,err) {
               return res.send(hitData);
           });
@@ -208,6 +208,8 @@ function monitorWorkflow(kWorkflowJob){
     
     var timerloop = setInterval(function(){
         var hId = kWorkflowJob.data.workflow.history_id;
+        
+        // TODO: if workflow fails, output will not exist.  Need to handle this.
         var outputs = kWorkflowJob.data.workflow.outputs;    // list of workflow output history ids
         var outputCount = outputs.length;
         
