@@ -1,11 +1,11 @@
 {
   "name": "jbh-jblast",
-  "version": "0.0.238",
+  "version": "0.0.240",
   "description": "JBlast - Integrated JBrowse BLAST with Galaxy (JBrowse Server Hook)",
   "main": "api/hooks/jblast/index.js",
   "scripts": {
-    "test": "mocha --reporter spec --compilers js:babel-core/register",
-    "prepublish": "grunt bump-publish --force"
+    "prepublish": "grunt bump-publish --force",
+    "test": "node ./node_modules/mocha/bin/mocha test/**/*.test.js --nightwatch-test phantomjs"
   },
   "keywords": [
     "sails",
@@ -40,13 +40,12 @@
     "grunt": "^1.0.1",
     "grunt-bump": "^0.8.0",
     "grunt-contrib-jshint": "^1.1.0",
+    "grunt-publish": "^1.0.0",
     "grunt-version-bump": "^1.0.8",
-    "jbserver": "github:gmod/jbserver",
+    "jbserver": "github:enuggetry/jbserver",
     "mocha": "^3.4.2",
-    "sails": "^0.12.13",
-    "socket.io-client": "^1.3.5",
-    "supertest": "^2.0.0",
-    "waterline-sqlite3": "^1.0.3"
+    "node-pre-gyp": "^0.6.36",
+    "supertest": "^2.0.0"
   },
   "engines": {
     "node": ">= 0.12",
