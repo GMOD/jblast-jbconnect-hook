@@ -1,11 +1,11 @@
 {
   "name": "jbh-jblast",
-  "version": "0.0.240",
+  "version": "0.0.242",
   "description": "JBlast - Integrated JBrowse BLAST with Galaxy (JBrowse Server Hook)",
   "main": "api/hooks/jblast/index.js",
   "scripts": {
     "prepublish": "grunt bump-publish --force",
-    "test": "node ./node_modules/mocha/bin/mocha test/**/*.test.js --nightwatch-test phantomjs"
+    "test": "nyc node ./node_modules/mocha/bin/mocha test/**/*.test.js --nightwatch-test phantomjs"
   },
   "keywords": [
     "sails",
@@ -37,15 +37,23 @@
     "lodash"
   ],
   "devDependencies": {
+    "chai": "^4.0.2",
+    "chromedriver": "^2.30.1",
     "grunt": "^1.0.1",
     "grunt-bump": "^0.8.0",
     "grunt-contrib-jshint": "^1.1.0",
     "grunt-publish": "^1.0.0",
     "grunt-version-bump": "^1.0.8",
     "jbserver": "github:enuggetry/jbserver",
+    "minimist": "^1.2.0",
     "mocha": "^3.4.2",
+    "nightwatch": "^0.9.16",
     "node-pre-gyp": "^0.6.36",
-    "supertest": "^2.0.0"
+    "nyc": "^11.0.3",
+    "phantomjs-prebuilt": "^2.1.14",
+    "sails": "^0.12.13",
+    "selenium-webdriver": "^3.4.0",
+    "supertest": "^3.0.0"
   },
   "engines": {
     "node": ">= 0.12",
