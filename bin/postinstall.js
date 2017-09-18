@@ -1,5 +1,5 @@
 var shelljs = require('shelljs');
 
-// run blast_getBlast.js
+// gets the blast util - (module blastjs)
 shelljs.exec('node blast_getBlast.js');
 
