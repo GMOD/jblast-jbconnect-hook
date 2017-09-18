@@ -6,7 +6,8 @@
   "scripts": {
     "prepublish": "grunt bump-publish --force",
     "test": "nyc node ./node_modules/mocha/bin/mocha test/**/*.test.js --nightwatch-test phantomjs",
-    "postinstall": "node bin/postinstall.js"
+    "postinstall": "node bin/postinstall.js",
+    "gendocs": "node docs/gendocs_run.js"
   },
   "keywords": [
     "sails",
