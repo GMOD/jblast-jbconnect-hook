@@ -49,6 +49,8 @@
     "grunt-version-bump": "^1.0.8",
     "jbrowse": "github:gmod/jbrowse",
     "jbserver": "github:enuggetry/jbserver",
+    "jsdoc": "^3.5.5",
+    "jsdoc-sphinx": "0.0.6",
     "minimist": "^1.2.0",
     "mocha": "^3.4.2",
     "nightwatch": "^0.9.16",
