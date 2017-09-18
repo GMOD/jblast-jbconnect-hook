@@ -8,6 +8,5 @@ Contents
    :caption: API
 
    top
-   hooks
    features
    api

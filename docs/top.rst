@@ -1,7 +1,8 @@
-*******************************************************
-JBlast - (jbh-jblast) JBrowse BLAST plugin for JBServer
-*******************************************************
+*******************
+JBlast (jbh-jblast)
+*******************
 
+JBrowse BLAST plugin for JBServer
 
 Install
 =======
