@@ -39,7 +39,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'JBServer'
+project = u'JBlast'
 copyright = u'2017, '
 author = u'eyao'
 
