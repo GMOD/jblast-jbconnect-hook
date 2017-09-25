@@ -2,48 +2,12 @@
 Setup Options
 **************
 
-.. _jbs-separate-dir:
-
-JBrowse Installed In Separate Directory 
-=======================================
-
-If JBrowse is already installed in another directory, use this command to specify
-the JBrowse directory after JBServer is installed.
-
-``todo: ./jbutil --jbpath <path where JBrowse is installed>``
-
-
-The JBrowse directory can also be configured manually. (See :ref:`jbs-globals-js`)
- 
 
 
 Configuration Files
 ===================
 
-A number of configuration files are in the ``./config`` directory.  A few of the
-more important ones (ones that JBSserver touches) are described mentioned in the table below.  
-See `Sails Configuration <http://sailsjs.com/documentation/reference/configuration>`_
-for a better description of all the files.
-
-+-------------------------------+----------------------------------------------------------+
-| :ref:`jbs-globals-js`         | global configuration file                                |
-+-------------------------------+----------------------------------------------------------+
-| http.js                       | custom middleware and /jbrowse route is setup here.      |
-+-------------------------------+----------------------------------------------------------+
-| :ref:`libroutes.js`           | library routes (non-sails)                               |
-+-------------------------------+----------------------------------------------------------+
-| passport.js, policies.js      | passport framework and auth policies config              |
-+-------------------------------+----------------------------------------------------------+
-| routes.js                     | various route config                                     |
-+-------------------------------+----------------------------------------------------------+
-| connections.js                | choice of database - local, mongo, mysql, ...            |
-|                               | (we use local by default.)  The DB file is in the        |
-|                               | ``./data/localDiskDb.db``.                               |
-+-------------------------------+----------------------------------------------------------+
-
-
-
-.. _jbs-globals-js
+.. _jbl-globals-js
 
 globals.js
 ----------
@@ -59,44 +23,59 @@ Edit config file: ``nano config/globals.js``
 
 :: 
 
-    jbrowse: {
-        jbrowseRest: "http://localhost:1337",       // path accessible by web browser
-        jbrowsePath: jbPath,                        // or point to jbrowse directory (ie. "/var/www/jbrowse/") 
-        routePrefix: "jbrowse",                     // jbrowse is accessed with http://<addr>/jbrowse
-        dataSet: [
-            {
-                dataPath: "sample_data/json/volvox" // datasets.  
+    module.exports.globals = {
+        jbrowse: {
+            galaxy: {
+                galaxyUrl: "http://localhost:8080",                 // URL of Galaxy
+
+                galaxyPath: "/var/www/html/galaxy",                 // path of Galaxy
+                //galaxyPath: "/var/www/html/galaxy_jblast",        // path of Galaxy, if docker
+
+                galaxyAPIKey: "c7be32db9329841598b1a5705655f633",   //
+
+                // jblast will use this Galaxy history
+                historyName: "Unnamed history"                      // default history name
+            },
+            jblast: {
+                blastResultPath: "jblastdata",                      
+                blastResultCategory: "JBlast Results",
+                insertTrackTemplate: "inMemTemplate.json",
+                import: ["blastxml"]
             }
-        ]
-    }
+        }
+    };
+
+* ``blastResultPath`` is the sub directory within the dataset directory where the blast results are stored
+* ``blastResultCategory`` is the name of the JBrowse track selectory category.
+* ``insertTrackTemplate`` is the track insertion template.
+* ``import`` is the file extension to process from the Galaxy workflow.
 
 
 
-.. _jbs-hook-install:
-
-Installing JBServer jbh-hooks
-=============================
-
-A 'JBServer Hook' is basically an *installable sails hook* with specific methods for
-extending JBServer.  JBServer hooks must have the prefix ``jbh-`` prepended to the name.
-For example: jbh-jblast.  When the hook is installed (i.e. ``npm install jbh-jblast``).  JBServer
-will automatically integrate a number of features of the hook directly into JBServer upon ``sails lift``.
-
-The jbh- hook can extend JBServer in the following ways:
-
-* Extend models, controllers, policies and services
-* Integrated client-side JBrowse plugins injection
-* Integrated client-side npm module injection
-* Integrated configuration tool (jbutil)
-* Aggregated configurations
+Get Galaxy API Key
+==================
 
 
-Installing a hook:
 
-``npm install jbh-<hook name>`` (i.e. jbh-jblast)
+jbutil Command
+==============
 
+``jbutil`` is a setup/configuration utility for JBServer.  jbh-hook can extend
+``jbutil`` command options. (see: :ref:`jbs-hooks-extend`)
 
-For detailed info on jbh-hooks, see: :ref:`jbs-hooks`
+This example shows that ``jbh-jblast`` adds a number of commands to ``jbutil``
 
+::
+
+    $ ./jbutil --help
+    Usage: jbutil [OPTION]
+          --config            display merged config
+          --blastdbpath=PATH  (jblast) existing database path
+          --setupworkflows    (jblast) [install|<path>] "install" project wf, or specify .ga file 
+          --setuptools        (jblast) setup jblast tools for galaxy
+          --setupdata         (jblast) setup data and samples
+          --setupindex        (jblast) setup index.html in the jbrowse directory
+          --setuphistory      setup history
+      -h, --help              display this help
 
 

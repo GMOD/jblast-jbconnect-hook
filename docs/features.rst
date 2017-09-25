@@ -2,6 +2,20 @@
 Features
 ********
 
+Proxy to Galaxy Server
+History Monitor
+Blast Workflow Execution and Monitor
+Blast Filter API
+
+
+Submit region for blast search
+Inject result track into trackList.json w/ dynamic track update in track selector
+Dynamic Filter Panel
+Blast Feature Detail Panel
+Visual Queue Monitor
+
+
+
 .. _jbs-features:
 
 JBServer is a Sails.js application
@@ -10,72 +24,6 @@ JBServer is a Sails.js application
 JBServer utilizes Sails.js, provideing the following features:
 
 
-+-------------------------------------------------------------------------------+
-| **Javascript** (NODE-based)                                                   |
-+-------------------------------------------------------------------------------+
-| **Blueprints** Auto-generate  CRUD APIs, ESTful APIs, Socket.io (events)      |
-+-------------------------------------------------------------------------------+
-| **Waterline** ORM, Any Database, MySql, PostgreSQL Mongo, Redis, local        |
-+-------------------------------------------------------------------------------+
-| **Express-based** Compatible routes & Middleware                              |
-+-------------------------------------------------------------------------------+
-| **Socket.io** sub/pub, WebSockets, Auto Integrate Models                      |
-+-------------------------------------------------------------------------------+
-| **Passport.js** role-based security, access control, OAuth                    |
-+-------------------------------------------------------------------------------+
-| **Installable** Hooks (jbh-*), Extensible plugin framework                    |
-+-------------------------------------------------------------------------------+
-| **Grunt** Customizable asset workflow, LESS, SASS, Stylus                     |
-+-------------------------------------------------------------------------------+
-| **Front-End Agnostic** Angular, backbone, bootstrap, ember, ...               |
-+-------------------------------------------------------------------------------+
-
-Directory Layout
-================
-
-::
-
-    JBServer project
-    ├── api                             Standard sails API layout
-    ├── assets                          contains client accessible assets
-    ├── bin                             Utilities
-    ├── config                          Configuration files.
-    │   ├── globals.js                  Config file for module
-    │   └── libroutes.js                Library Routes
-    ├── data                            Contains the local database file
-    │   └── localDiskDb.db              Local database file
-    ├── docs                            Documentation
-    │   └── genapi-rst                  jsdoc generated rst files
-    ├── plugins                         Client-side Plugins
-    │   └── JBClient                    Client plugin             
-    ├── test                            Test
-    ├── views                           View pages
-    ├── Gruntfile.js                    Grunt config
-    ├── jbutil                          JBServer Utility
-    └── package.json
-
-
-
-jbutil Command
-==============
-
-``jbutil`` is a setup/configuration utility for JBServer.  jbh-hook can extend
-``jbutil`` command options. (see: :ref:`jbs-hooks-extend`)
-
-This example shows that ``jbh-jblast`` adds a number of commands to ``jbutil``
-
-::
-
-    $ ./jbutil --help
-    Usage: jbutil [OPTION]
-          --config            display merged config
-          --blastdbpath=PATH  (jblast) existing database path
-          --setupworkflows    (jblast) [install|<path>] "install" project wf, or specify .ga file 
-          --setuptools        (jblast) setup jblast tools for galaxy
-          --setupdata         (jblast) setup data and samples
-          --setupindex        (jblast) setup index.html in the jbrowse directory
-          --setuphistory      setup history
-      -h, --help              display this help
 
 
 
@@ -145,64 +93,28 @@ makes the jquery directory accessible as /jblib/jquery from the client side.
 
 
 
-Standalone Register / Login / Logout Routes
-===========================================
+.. image:: img/blast-from-feature.jpg
 
-Stand-alone routes allow for basic register/login/logout functionality free
-from the JBrowse interface.  
+.. image:: img/blast-from-region.jpg
 
-Stand-alone interfaces use `bootstrap <http://getbootstrap.com/>`_
+.. image:: img/feature-details.jpg
 
-Register: ``http://<address>:1337/register``
+.. image:: img/blast-workflow.png
 
-.. image:: img/register.jpg
+.. image:: img/filter-panel.jpg
 
-Login: ``http://<address>:1337/login``
+.. image:: img/galaxy-graph.jpg
 
-.. image:: img/login.jpg
+.. image:: img/falaxy-history.jpg
 
-Logout: ``http://<address>:1337/logout``
+.. image:: img/galaxy-blast-tools.jpg
 
-Get Login State: ``http://<address>:1337/loginstate``
+.. image:: img/galaxy-workflows.jpg
 
-
-
-.. _jbs-jbclient:
-
-Integrated JBrowse Interfaces
-=============================
-
-JBrowse GUI intetrated interfaces are available when the ``JBClient`` plugin is 
-configured on in the JBrowse client. 
-
-To enable integrated features within the JBrowse app, modify the dataset's 
-``trackList.json``, adding ``JBClient`` plugin to the configuration.
-
-*Note: the JBClient plugin is not physically in the JBrowse plugin directory.
-It is available as a route.*
-
-::
-
-  "plugins": [
-    "JBClient",                    <-----
-    "NeatHTMLFeatures",
-    "NeatCanvasFeatures",
-    "HideTrackLabels"
-  ],
+.. image:: img/select-dialog.jpg
 
 
 
-
-Login/Logout Panel
-------------------
-
-Login Panel
-
-.. image:: img/login-integrated.jpg
-
-Loguot Panel
-
-.. image:: img/logout-integrated.jpg
 
 
 
