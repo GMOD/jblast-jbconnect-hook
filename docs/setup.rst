@@ -84,19 +84,15 @@ This example shows that ``jbh-jblast`` adds a number of commands to ``jbutil``
 JBlast Plugin
 =============
 
-JBrowse GUI intetrated interfaces are available when the ``JBClient`` plugin is 
-configured on in the JBrowse client. 
+JBlast has integrated GUI features that must be enabled with by installing the ``JBlast`` plugin
+and the ``JBClient`` on the client side.
 
-To enable integrated features within the JBrowse app, modify the dataset's 
-``trackList.json``, adding ``JBClient`` plugin to the configuration.
-
-*Note: the JBClient plugin is not physically in the JBrowse plugin directory.
-It is available as a route.*
+In ``trackList.json``, within the dataset's path, add ``JBlast`` and ``JBClient`` plugin to the configuration.
 
 ::
 
   "plugins": [
-    "JBClient",                   
+    "JBClient",                    <-----           
     "JBlast",                      <-----
 
     "NeatHTMLFeatures",
@@ -104,15 +100,40 @@ It is available as a route.*
     "HideTrackLabels"
   ],
 
+*Note: the JBlast and JBClient plugins are not physically in the JBrowse plugin directory.
+They are made available as route by the JBServer framework and are only accessible at runtime.*
+
+See :ref:`jblast-integrated-gui` for more details.
 
 
 
-Test
-====
+Test Framework
+==============
+
+Test framework uses
+
+* Mocha for unit test
+* Nightwatch for end-to-end, supporting phantomjs, selenium and online service such as browserstack.
+* Istanbul for coverage
+
+To execute
+
+``npm test``
+
+by default nightwatch is setup for phantomjs.
+Selenium requires running an additional selenium server
+Browserstack has not been tested.
 
 
+Documentation Framework
+=======================
 
-Documentation
-=============
+For integrated documentation, `JSdoc3 <http://usejsdoc.org/>`_ is used 
+to generate API docs from code with jsdoc-sphinx, a jsdoc template that generates 
+RestructuredText (RST) and Sphinx.  This enables support for 
+`readthedocs <https://readthedocs.org/>`_.
+
+See: `RST/Sphinx Cheatsheet <http://openalea.gforge.inria.fr/doc/openalea/doc/_build/html/source/sphinx/rest_syntax.html>`_  
 
 
+``npm run gendocs``
