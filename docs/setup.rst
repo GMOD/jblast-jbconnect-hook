@@ -79,3 +79,40 @@ This example shows that ``jbh-jblast`` adds a number of commands to ``jbutil``
       -h, --help              display this help
 
 
+
+
+JBlast Plugin
+=============
+
+JBrowse GUI intetrated interfaces are available when the ``JBClient`` plugin is 
+configured on in the JBrowse client. 
+
+To enable integrated features within the JBrowse app, modify the dataset's 
+``trackList.json``, adding ``JBClient`` plugin to the configuration.
+
+*Note: the JBClient plugin is not physically in the JBrowse plugin directory.
+It is available as a route.*
+
+::
+
+  "plugins": [
+    "JBClient",                   
+    "JBlast",                      <-----
+
+    "NeatHTMLFeatures",
+    "NeatCanvasFeatures",
+    "HideTrackLabels"
+  ],
+
+
+
+
+Test
+====
+
+
+
+Documentation
+=============
+
+
