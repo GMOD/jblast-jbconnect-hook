@@ -1,3 +1,9 @@
+/**
+ * @module
+ * @description
+ * Blast feature filter functions.
+ * 
+ */
 var request = require('request');
 var requestp = require('request-promise');
 var path = require('path');

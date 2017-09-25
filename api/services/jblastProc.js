@@ -1,5 +1,7 @@
 /**
- *  
+ * @module
+ * @description
+ * This module implements the various REST APIs for JBlast.  
  */
 var request = require('request');
 var requestp = require('request-promise');

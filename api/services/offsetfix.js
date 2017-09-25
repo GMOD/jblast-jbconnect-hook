@@ -1,3 +1,9 @@
+/**
+ * @module
+ * @description
+ * This module fixes the offsets of blast search results.
+ * 
+ */
 var path = require('path');
 var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require("fs"));

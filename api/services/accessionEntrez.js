@@ -1,18 +1,30 @@
-/* 
+/**
+ * @module
+ * @description
+ * This module enables accession value lookup utilizeing Entrez API.
+ * 
+ * Ref: https://www.ncbi.nlm.nih.gov/books/NBK25499/
+ * 
  */
 var requestp = require('request-promise');
 
 module.exports = {
+    /**
+     * Initialize the module
+     * 
+     * @param {object} req
+     * @param {object} res
+     * @param {function} cb - callback function
+     */
     init: function(req,res,cb) {
         sails.log.info("Accession module:",__filename);
         cb();
     },
     /**
-     * this does an esummary lookup (using Entrez api), adding the link field into the result.
-     * @param {type} req
-     * @param {type} res
-     * @param {type} cb
-     * Ref: https://www.ncbi.nlm.nih.gov/books/NBK25499/
+     * This does an esummary lookup (using Entrez api), adding the link field into the result.
+     * @param {object} req
+     * @param {object} res
+     * @param {function} cb - callback function
      */
 
     lookup: function(req,res, cb) {

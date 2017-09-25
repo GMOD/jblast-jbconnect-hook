@@ -1,3 +1,8 @@
+/**
+ * @module
+ * @description
+ * This module implements the actions that occur after a galaxy workflow completes.
+ */
 var request = require('request');
 var requestp = require('request-promise');
 var path = require('path');

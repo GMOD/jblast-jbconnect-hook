@@ -1,3 +1,8 @@
+/**
+ * @module
+ * @desc
+ * This module manages the communication with the galaxy API.
+ */
 var request = require('request');
 //var requestp = require('request-promise');
 //var path = require('path');
@@ -7,8 +12,11 @@ var util = require('./utils');
 
 module.exports = {
     init: function(cb,cberr) {
-        sails.log.debug('galaxyUtils init');
+        console.log('galaxyUtils init');
         var g = sails.config.globals.jbrowse;
+        console.log('globals',g);
+        
+        this.debugRestFile = g.galaxy.debugRestFile;
         
         this.historyName = g.galaxy.historyName;
         
@@ -58,13 +66,26 @@ module.exports = {
         var url = gurl+api+"?key="+apikey
         
         sails.log.debug("galaxyGET",url);
+         
+        if (typeof this.debugRestFile !== 'undefined') {
+            var str = '\nGET '+url+'\n';
+            fs.appendFileSync(this.debugRestFile,str);
+        }
         
         request(url, function (err, response, body) {
             //sails.log('error',err, 'response',typeof body, response && response.statusCode,url);
 
             if (err !== null) {
+                if (typeof this.debugRestFile !== 'undefined') {
+                    var str = 'ERROR: '+err+'\n';
+                    fs.appendFileSync(this.debugRestFile,str);
+                }
                 cb(body,err);
                 return;
+            }
+            if (typeof this.debugRestFile !== 'undefined') {
+                var str = 'RESPONSE: '+body+'\n';
+                fs.appendFileSync(this.debugRestFile,str);
             }
             cb(JSON.parse(body),err);
         });
