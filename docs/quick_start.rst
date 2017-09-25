@@ -18,6 +18,7 @@ JBlast requires `redis <https://redis.io/>`_ as a pre-requisite, which is only u
 Install and run *redis*
 
 :: 
+
     yum install redis
     redis-server
 
