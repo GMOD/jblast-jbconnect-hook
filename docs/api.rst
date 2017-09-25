@@ -2,6 +2,11 @@
 API
 ***
 
+
+.. raw:: html
+
+   <hr style="border-color: black; border-width: 2px;">
+
 Module: ``controllers/AuthController``
 **************************************
 
@@ -15,129 +20,19 @@ Description
 
 Authentication Controller
 
-This is merely meant as an example of how your Authentication controller
-should look. It currently includes the minimum amount of functionality for
+It currently includes the minimum amount of functionality for
 the basics of Passport.js to work.
 
 
 
-.. _module-controllers_AuthController.AuthController:
 
-Member: ``AuthController``: 
 
-.. _module-controllers_AuthController.providers:
 
-Member: ``providers``: 
 
-.. _module-controllers_AuthController.errors:
 
-Member: ``errors``: 
+.. raw:: html
 
-.. _module-controllers_AuthController.redirectTo:
-
-Member: ``redirectTo``: 
-
-.. _module-controllers_AuthController.errors:
-
-Member: ``errors``: 
-
-.. _module-controllers_AuthController.loginstate:
-
-Member: ``loginstate``: 
-
-.. _module-controllers_AuthController.user:
-
-Member: ``user``: 
-
-.. _module-controllers_AuthController.redirectTo:
-
-Member: ``redirectTo``: 
-
-
-
-
-
-Module: ``controllers/DatasetController``
-*****************************************
-
-
-.. contents:: Local Navigation
-   :local:
-
-   
-Description
-===========
-
-DatasetController
-
-Server-side logic for managing Dataset
-
-
-
-
-
-
-
-Module: ``controllers/JobController``
-*************************************
-
-
-.. contents:: Local Navigation
-   :local:
-
-   
-Description
-===========
-
-JobController
-
-Server-side logic for managing Job
-
-
-
-
-
-
-
-Module: ``controllers/TrackController``
-***************************************
-
-
-.. contents:: Local Navigation
-   :local:
-
-   
-Description
-===========
-
-Server-side logic for managing jbtracks
-
-
-
-
-
-
-
-Module: ``controllers/UserController``
-**************************************
-
-
-.. contents:: Local Navigation
-   :local:
-
-   
-Description
-===========
-
-UserController
-
-Server-side logic for managing users
-
-
-
-
-
-
+   <hr style="border-color: black; border-width: 2px;">
 
 Module: ``models/Dataset``
 **************************
@@ -150,7 +45,13 @@ Module: ``models/Dataset``
 Description
 ===========
 
+Dataset is a model that represents the JBrowse dataset.  Generally, this includes
+path to the dataset and some of the data contained in trackList.json.
 
+Datasets known to JBServer are defined in config/globals.js
+(see: :ref:`jbs-globals-config`)
+     
+Ref: `Sails Models and ORM <http://sailsjs.org/documentation/concepts/models-and-orm/models>`_
 
 
 .. _module-models_Dataset.initialize:
@@ -159,11 +60,15 @@ Description
 Function: ``initialize``
 ========================
 
+Initializes datasets as defined in config/globals.js.
+(see: :ref:`jbs-globals-config`)
 
-
-.. js:function:: initialize()
+.. js:function:: initialize(cb)
 
     
+    :param function cb: callback function
+    :return undefined: Initializes datasets as defined in config/globals.js.
+    (see: :ref:`jbs-globals-config`)
     
 .. _module-models_Dataset.syncDatasets:
 
@@ -171,29 +76,24 @@ Function: ``initialize``
 Function: ``syncDatasets``
 ==========================
 
-sync globals globals.jbrowse.dataSet with Dataset model database
+Sync datasets, defined in globals with database.
+
+todo: need to improve, perhaps use async?
 
 .. js:function:: syncDatasets()
 
     
-    :return addTrackJson.indexAnonym$8: sync globals globals.jbrowse.dataSet with Dataset model database
+    :param syncDatasets(): cb - callback function
     
 
-.. _module-models_Dataset.attributes:
-
-Member: ``attributes``: 
-
-.. _module-models_Dataset.path:
-
-Member: ``path``: 
-
-.. _module-models_Dataset.id:
-
-Member: ``id``: 
 
 
 
 
+
+.. raw:: html
+
+   <hr style="border-color: black; border-width: 2px;">
 
 Module: ``models/Job``
 **********************
@@ -206,7 +106,25 @@ Module: ``models/Job``
 Description
 ===========
 
-TODO: You might write a short summary of how this model works and what it represents here.
+Job model is an encapsulation of the `Kue <https://automattic.github.io/kue/>`_ job framework.
+
+Kue uses `redis <https://redis.io/>`_ database.  This model synchronizes the Job database with the redis data
+through the use of Kue's API.
+ 
+Events
+
++----------------------------+
+| * queue-enqueue            |
+| * queue-start              |
+| * queue-failed             |
+| * queue-failed-attempt     |
+| * queue-progress           |
+| * queue-complete           |
+| * queue-remove             |
+| * queue-promotion          |
++----------------------------+
+
+Ref: `Sails Models and ORM <http://sailsjs.org/documentation/concepts/models-and-orm/models>`_
 
 
 .. _module-models_Job.initialize:
@@ -215,7 +133,7 @@ TODO: You might write a short summary of how this model works and what it repres
 Function: ``initialize``
 ========================
 
-
+Obsolete
 
 .. js:function:: initialize()
 
@@ -227,7 +145,7 @@ Function: ``initialize``
 Function: ``start``
 ===================
 
-
+start the monitor
 
 .. js:function:: start()
 
@@ -239,7 +157,7 @@ Function: ``start``
 Function: ``monitor``
 =====================
 
-
+monitor events from the kue framework and translate to Job events
 
 .. js:function:: monitor()
 
@@ -263,50 +181,14 @@ Sync kue[workflow] with Job model
 Function: ``processEvent``
 ==========================
 
-queue-enqueue
-queue-start
-queue-failed
-queue-failed-attempt
-queue-progress
-queue-complete
-queue-remove
-queue-promotion
+Send a Job framework event
 
 .. js:function:: processEvent(event, id, data)
 
     
-    :param type event: queue-enqueue
-    queue-start
-    queue-failed
-    queue-failed-attempt
-    queue-progress
-    queue-complete
-    queue-remove
-    queue-promotion
-    :param type id: queue-enqueue
-    queue-start
-    queue-failed
-    queue-failed-attempt
-    queue-progress
-    queue-complete
-    queue-remove
-    queue-promotion
-    :param type data: queue-enqueue
-    queue-start
-    queue-failed
-    queue-failed-attempt
-    queue-progress
-    queue-complete
-    queue-remove
-    queue-promotion
-    :return undefined: queue-enqueue
-    queue-start
-    queue-failed
-    queue-failed-attempt
-    queue-progress
-    queue-complete
-    queue-remove
-    queue-promotion
+    :param type event: Send a Job framework event
+    :param type id: Send a Job framework event
+    :param type data: Send a Job framework event
     
 .. _module-models_Job.test:
 
@@ -326,11 +208,13 @@ Function: ``test``
 Function: ``createOrUpdate``
 ============================
 
+Create or update a job in the sails framework based on kue job data
 
-
-.. js:function:: createOrUpdate()
+.. js:function:: createOrUpdate(, mJob)
 
     
+    :param createOrUpdate(, mJob): kJob - Kue framework job
+    :param object mJob: Sails framework job
     
 .. _module-models_Job.syncJobs:
 
@@ -338,76 +222,21 @@ Function: ``createOrUpdate``
 Function: ``syncJobs``
 ======================
 
-
+Synchronize Jobs with the Kue framework
 
 .. js:function:: syncJobs()
 
     
     
 
-.. _module-models_Job.request:
-
-Member: ``request``: 
-
-.. _module-models_Job.async:
-
-Member: ``async``: 
-
-.. _module-models_Job.attributes:
-
-Member: ``attributes``: 
-
-.. _module-models_Job.count:
-
-Member: ``count``: 
-
-.. _module-models_Job.lastActiveCount:
-
-Member: ``lastActiveCount``: 
-
-.. _module-models_Job.job1:
-
-Member: ``job1``: 
-
-.. _module-models_Job.title:
-
-Member: ``title``: 
-
-.. _module-models_Job.to:
-
-Member: ``to``: 
-
-.. _module-models_Job.template:
-
-Member: ``template``: 
-
-.. _module-models_Job.nextSlide:
-
-Member: ``nextSlide``: 
-
-.. _module-models_Job.id:
-
-Member: ``id``: 
-
-.. _module-models_Job.url:
-
-Member: ``url``: 
-
-.. _module-models_Job.json:
-
-Member: ``json``: 
-
-.. _module-models_Job.found:
-
-Member: ``found``: 
-
-.. _module-models_Job.id:
-
-Member: ``id``: 
 
 
 
 
+
+.. raw:: html
+
+   <hr style="border-color: black; border-width: 2px;">
 
 Module: ``models/Passport``
 ***************************
@@ -420,7 +249,16 @@ Module: ``models/Passport``
 Description
 ===========
 
+The Passport model handles associating authenticators with users. An authen-
+ticator can be either local (password) or third-party (provider). A single
+user can have multiple passports, allowing them to connect and use several
+third-party strategies in optional conjunction with a password.
 
+Since an application will only need to authenticate a user once per session,
+it makes sense to encapsulate the data specific to the authentication process
+in a model of its own. This allows us to keep the session itself as light-
+weight as possible as the application only needs to serialize and deserialize
+the user, but not the authentication data, to and from the session.
 
 
 .. _module-models_Passport.hashPassword:
@@ -438,28 +276,14 @@ Hash a passport password.
     :param function next: Hash a passport password.
     
 
-.. _module-models_Passport.bcrypt:
-
-Member: ``bcrypt``: 
-
-.. _module-models_Passport.Passport:
-
-Member: ``Passport``: Passport Model
-
-The Passport model handles associating authenticators with users. An authen-
-ticator can be either local (password) or third-party (provider). A single
-user can have multiple passports, allowing them to connect and use several
-third-party strategies in optional conjunction with a password.
-
-Since an application will only need to authenticate a user once per session,
-it makes sense to encapsulate the data specific to the authentication process
-in a model of its own. This allows us to keep the session itself as light-
-weight as possible as the application only needs to serialize and deserialize
-the user, but not the authentication data, to and from the session.
 
 
 
 
+
+.. raw:: html
+
+   <hr style="border-color: black; border-width: 2px;">
 
 Module: ``models/Track``
 ************************
@@ -472,7 +296,9 @@ Module: ``models/Track``
 Description
 ===========
 
-TODO: You might write a short summary of how this model works and what it represents here.
+Track is a model for a list of tracks that are in the ``trackList.json``'s ``[tracks]`` section.
+
+Ref: `Sails Models and ORM <http://sailsjs.org/documentation/concepts/models-and-orm/models>`_
 
 
 .. _module-models_Track.startMonitor:
@@ -481,7 +307,7 @@ TODO: You might write a short summary of how this model works and what it repres
 Function: ``startMonitor``
 ==========================
 
-
+Obsolete
 
 .. js:function:: startMonitor()
 
@@ -493,11 +319,14 @@ Function: ``startMonitor``
 Function: ``syncTracks``
 ========================
 
+Sync tracklist.json tracks with Track model (promises version)
 
+todo: dataSet should accept string or dataSet object id
 
-.. js:function:: syncTracks()
+.. js:function:: syncTracks(dataSet,)
 
     
+    :param string dataSet,: if dataset is not defined, all models are committed.
     
 .. _module-models_Track.saveTracks:
 
@@ -517,13 +346,11 @@ Function: ``saveTracks``
 Function: ``saveTracks``
 ========================
 
-Save model tracks to trackList.json
 
-.. js:function:: saveTracks(dataSet,)
+
+.. js:function:: saveTracks()
 
     
-    :param type dataSet,: if dataset is not defined, all models are committed.
-    :return undefined: Save model tracks to trackList.json
     
 .. _module-models_Track.syncTracks:
 
@@ -531,36 +358,12 @@ Save model tracks to trackList.json
 Function: ``syncTracks``
 ========================
 
-Sync tracklist.json tracks with Track model (promises version)
 
-.. js:function:: syncTracks(req, res, next)
+
+.. js:function:: syncTracks()
 
     
-    :param type req: Sync tracklist.json tracks with Track model (promises version)
-    :param type res: Sync tracklist.json tracks with Track model (promises version)
-    :param type next: Sync tracklist.json tracks with Track model (promises version)
-    :return addTrackJson.indexAnonym$8: Sync tracklist.json tracks with Track model (promises version)
     
-
-.. _module-models_Track.Promise:
-
-Member: ``Promise``: 
-
-.. _module-models_Track.fs:
-
-Member: ``fs``: 
-
-.. _module-models_Track.path:
-
-Member: ``path``: 
-
-.. _module-models_Track.deferred:
-
-Member: ``deferred``: 
-
-.. _module-models_Track.deepmerge:
-
-Member: ``deepmerge``: 
 
 .. _module-models_Track.attributes:
 
@@ -598,6 +401,11 @@ Member: ``trackData``:
 
 
 
+
+.. raw:: html
+
+   <hr style="border-color: black; border-width: 2px;">
+
 Module: ``models/User``
 ***********************
 
@@ -609,17 +417,18 @@ Module: ``models/User``
 Description
 ===========
 
+User is the data model for a user.
 
 
 
 
-.. _module-models_User.User:
-
-Member: ``User``: 
 
 
 
 
+.. raw:: html
+
+   <hr style="border-color: black; border-width: 2px;">
 
 Module: ``policies/bearerAuth``
 *******************************
@@ -642,13 +451,14 @@ accessed through a session. For example: API request from another client
 
 
 
-.. _module-policies_bearerAuth.session:
-
-Member: ``session``: 
 
 
 
 
+
+.. raw:: html
+
+   <hr style="border-color: black; border-width: 2px;">
 
 Module: ``policies/isAdmin``
 ****************************
@@ -661,21 +471,18 @@ Module: ``policies/isAdmin``
 Description
 ===========
 
-isAdmin policy
-
-
-
-.. _module-policies_isAdmin.redirectTo:
-
-Member: ``redirectTo``: 
-
-.. _module-policies_isAdmin.redirectTo:
-
-Member: ``redirectTo``: 
+isAdmin policy provides passage if the user contains the property admin: true.
 
 
 
 
+
+
+
+
+.. raw:: html
+
+   <hr style="border-color: black; border-width: 2px;">
 
 Module: ``policies/passport``
 *****************************
@@ -712,6 +519,11 @@ http://passportjs.org/guide/configure/
 
 
 
+
+.. raw:: html
+
+   <hr style="border-color: black; border-width: 2px;">
+
 Module: ``policies/sessionAuth``
 ********************************
 
@@ -723,14 +535,21 @@ Module: ``policies/sessionAuth``
 Description
 ===========
 
-Simple policy to allow any authenticated user
-                Assumes that your login action in one of your controllers sets `req.session.authenticated = true;`
+Simple policy to allow any authenticated user.
+Assumes that your login action in one of your controllers sets `req.session.authenticated = true;`
+
+Ref: `Sails Policies Concepts <http://sailsjs.org/#!/documentation/concepts/Policies>`_
 
 
 
 
 
 
+
+
+.. raw:: html
+
+   <hr style="border-color: black; border-width: 2px;">
 
 Module: ``services/jbRouteUtil``
 ********************************
@@ -759,8 +578,7 @@ handles submodules plugins too.
 .. js:function:: addPluginRoutes()
 
     
-    :return undefined: inject client-side plugins into the clinet plugin directory as routes.
-    handles submodules plugins too.
+    :param addPluginRoutes(): params
     
 .. _module-services_jbRouteUtil.addLibRoutes:
 
@@ -773,6 +591,7 @@ Add library routes
 .. js:function:: addLibRoutes()
 
     
+    :param addLibRoutes(): params
     
 .. _module-services_jbRouteUtil.addRoute:
 
@@ -785,28 +604,20 @@ Add a route
 .. js:function:: addRoute(params, module, route, target)
 
     
-    :param type params: Add a route
-    :param type module: Add a route
-    :param type route: Add a route
-    :param type target: Add a route
-    :return undefined: Add a route
+    :param object params: Add a route
+    :param string module: Add a route
+    :param string route: Add a route
+    :param string target: Add a route
     
 
-.. _module-services_jbRouteUtil.fs:
-
-Member: ``fs``: 
-
-.. _module-services_jbRouteUtil.glob:
-
-Member: ``glob``: 
-
-.. _module-services_jbRouteUtil.merge:
-
-Member: ``merge``: 
 
 
 
 
+
+.. raw:: html
+
+   <hr style="border-color: black; border-width: 2px;">
 
 Module: ``services/passport``
 *****************************
@@ -842,38 +653,6 @@ encrypting passwords and storing them in Passports, allowing you to keep your
 User model free of bloat.
 
 
-
-.. _module-services_passport.provider:
-
-Member: ``provider``: 
-
-.. _module-services_passport.provider:
-
-Member: ``provider``: 
-
-.. _module-services_passport.identifier:
-
-Member: ``identifier``: 
-
-.. _module-services_passport.usernameField:
-
-Member: ``usernameField``: 
-
-.. _module-services_passport.Strategy:
-
-Member: ``Strategy``: 
-
-.. _module-services_passport.Strategy:
-
-Member: ``Strategy``: 
-
-.. _module-services_passport.callback:
-
-Member: ``callback``: 
-
-.. _module-services_passport.Strategy:
-
-Member: ``Strategy``: 
 
 
 

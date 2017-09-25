@@ -1,3 +1,9 @@
+******
+JBlast
+******
+
+**JBlast - A BLAST analysis service for JBServer and JBrowse**
+
 
 
 Contents
@@ -5,8 +11,10 @@ Contents
 
 .. toctree::
    :maxdepth: 2
-   :caption: API
 
-   top
+   quick_start
    features
+   setup
    api
+
+
