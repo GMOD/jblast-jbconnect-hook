@@ -91,43 +91,62 @@ makes the jquery directory accessible as /jblib/jquery from the client side.
         }
     };
 
+JBlast Workflow
+===============
 
+.. image:: img/blast-workflow.png
+
+
+Selecting Feature/Region
+------------------------
 
 .. image:: img/blast-from-feature.jpg
 
 .. image:: img/blast-from-region.jpg
 
-.. image:: img/feature-details.jpg
 
-.. image:: img/blast-workflow.png
 
-.. image:: img/filter-panel.jpg
-
-.. image:: img/galaxy-graph.jpg
-
-.. image:: img/falaxy-history.jpg
-
-.. image:: img/galaxy-blast-tools.jpg
-
-.. image:: img/galaxy-workflows.jpg
+Select Workflow
+---------------
 
 .. image:: img/select-dialog.jpg
-
-
-
 
 
 
 Job Queue Panel
 ---------------
 
-JBServer uses *Kue* as the queue framework.  Since Kue requires *redis* database, 
-redis server must be running.  An integrated job panel is available when
-the JBClient plugin is active. (see: :ref:`jbs-jbclient`)
-
-Integrated Job Panel:
-
 .. image:: img/job-panel.jpg
+
+
+Filter Panel
+------------
+
+.. image:: img/filter-panel.jpg
+
+
+View Feature Details
+--------------------
+
+.. image:: img/feature-details.jpg
+
+
+Galaxy
+======
+
+.. image:: img/galaxy-graph.jpg
+
+.. image:: img/galaxy-history.jpg
+
+.. image:: img/galaxy-blast-tools.jpg
+
+.. image:: img/galaxy-workflows.jpg
+
+
+
+
+
+
 
 
 
