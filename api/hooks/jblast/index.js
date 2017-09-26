@@ -1,3 +1,8 @@
+/**
+ * @module hooks/jblast
+ * @description
+ * This module is the main subclass of a Sails Hook incorporating *Marlinspike*.
+ */
 'use strict';
 
 var mapRoutes = require('./mapRoutes');
@@ -26,7 +31,13 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var thisHook = sails.hooks.jblast;
+
+var thisHook;
+
+if (typeof sails !== 'undefined')
+    thisHook = sails.hooks.jblast;
+else
+    thisHook = global.jtest_hook;   // this handles hbh-jblast npm test case.  It's a bit hackish
 
 if (!thisHook) {
   var Hook = function (_Marlinspike) {
