@@ -4,10 +4,10 @@ Features
 
 
 
-JBlast Workflow
-===============
+JBlast Process
+==============
 
-The typical JBlast workflow starts with the JBrowse client.  
+The typical JBlast process starts with the JBrowse client.  
 
 .. image:: img/blast-workflow.png
 
@@ -178,7 +178,7 @@ each time the GFF track is redrawn, it will reread the data from the filtered GF
 Integrated GUI
 ==============
 
-JBlast extends JBrowse with a number of GUI elements
+JBlast extends JBrowse with a number of GUI elements.
 
 
 
@@ -187,7 +187,15 @@ JBlast extends JBrowse with a number of GUI elements
 Selecting Feature/Region
 ------------------------
 
+There are two way to select the region to blast.
+
+1) by selecting an existing feature.  Open the details dialog for the feature and click the Blast button.
+
 .. image:: img/blast-from-feature.jpg
+
+2) by selecting selecting an arbitrary region to blast.  This is done with the highlight feature of JBrowse.
+    the highlight button on the toolbar, when pressed, will allow you to select an arbitrary region to highlight.
+    After highlighting, right click the highlighted region (where there is no track).
 
 .. image:: img/blast-from-region.jpg
 
@@ -198,6 +206,9 @@ Selecting Feature/Region
 Select Workflow
 ---------------
 
+When a region is selected, this dialog box will appear.  Choose from the list of workflows to be executed 
+and click Submit. This will submit the selected region for processing using the selected workflow.
+
 .. image:: img/select-dialog.jpg
 
 
@@ -205,11 +216,20 @@ Select Workflow
 Job Queue Panel
 ---------------
 
+The job queue side panel is revealed by clicking the Jobs tab on the upper right of JBrowse screen.
+This contains list of executing jobs, in our case, for processing workflows.  It tells the current state
+of each job and whether completed jobs are completed or errored. 
+
 .. image:: img/job-panel.jpg
 
 
 Filter Panel
 ------------
+
+When a blast result track is selected with the track selector, the blast filter
+panel will appear when the result track is in focus.  Sliders are available for filtering 
+score, e-value, identity, and gaps.  As the slider positions are moved, the filtered result
+track will be updated reflecting the new filter settings.
 
 .. image:: img/filter-panel.jpg
 
@@ -217,19 +237,45 @@ Filter Panel
 View Feature Details
 --------------------
 
+When a blast hit feature is selected, it's feature details will contain information about 
+the blast hit and organism information, accession link, etc.
+
 .. image:: img/feature-details.jpg
 
 
 Galaxy
 ======
 
+The following show how JBlast affects the Galaxy interface.
 
+
+Workflow Graph
+--------------
+
+This screen shows a sample JBlast workflow's graph.
 
 .. image:: img/galaxy-graph.jpg
 
+History
+-------
+
+JBlast operations are processin in a specific Galaxy history.
+This history name is defined in the config file (see :ref:`jbl-globals-js`).
+
 .. image:: img/galaxy-history.jpg
 
+JBlast Tools
+------------
+
+This shows the JBlast and NCBI tools in the tools sidebar.
+
 .. image:: img/galaxy-jblast-tools.jpg
+
+JBlast Galaxy Workflows
+-----------------------
+
+JBlast has a fully functional workflow and 2 simulation workflows.
+The simulation workflows will only simulate a fixed blast result for demonstration purposes.
 
 .. image:: img/galaxy-workflows.jpg
 
