@@ -57,8 +57,8 @@ Get Galaxy API Key
 
 
 
-jbutil Command
-==============
+JBlast jbutil Command
+=====================
 
 ``jbutil`` is a setup/configuration utility for JBServer.  jbh-hook can extend
 ``jbutil`` command options. (see: :ref:`jbs-hooks-extend`)
@@ -79,6 +79,39 @@ This example shows that ``jbh-jblast`` adds a number of commands to ``jbutil``
       -h, --help              display this help
 
 
+
+--blastdbpath
+-------------
+
+This option configures the blast database location for JBlast.  After configuring,
+Galaxy will need to be restarted.
+
+--setupworkflows
+----------------
+
+This option setus up sample JBlast workflows in galaxy.
+This requires having configured the Galaxy API key in config.
+
+--setuptools
+------------
+
+This option sets up Jblast tools for Galaxy.  After this is called, Galaxy will
+need to be restarted.
+
+--setupdata
+-----------
+
+This options sets up samples and sample data for JBlast.
+
+--setupindex
+------------
+
+This writes the demo index.html file in the JBrowse directory.
+
+--setuphistory
+
+this option sets up the history name in the config file.  This option requires
+having configured the Galaxy API key in config. 
 
 
 JBlast Plugin
