@@ -11,6 +11,12 @@ var fs = Promise.promisifyAll(require("fs"));
 var util = require('./utils');
 
 module.exports = {
+    /**
+     * Initialize module
+     * @param {type} cb
+     * @param {type} cberr
+     * @returns {undefined}
+     */
     init: function(cb,cberr) {
         console.log('galaxyUtils init');
         var g = sails.config.globals.jbrowse;
@@ -54,7 +60,6 @@ module.exports = {
      * send JSON GET request to galaxy server
      * @param {type} api - i.e. '/api/histories'
      * @param {type} cb  callback i.e. function(retval)
-     * @returns {undefined}
      * 
      */
     galaxyGET: function(api,cb) {
@@ -95,8 +100,6 @@ module.exports = {
      * @param {type} api - e.g. "/api/workflows"
      * @param {type} params - json parameter i.e. {a:1,b:2}
      * @param {type} cb - callback function cb(retval)
-     * 
-     * retval return {status: x, data:y}
      */
     galaxyPOST: function(api,params,cb) {
 
@@ -129,15 +132,24 @@ module.exports = {
               cb(body,err);
         });
     },
+    /**
+     * 
+     * @returns {nm$_galaxyUtils.module.exports.historyId}
+     */
     getHistoryId: function() {
         return this.historyId;
     },
+    /**
+     * 
+     * @returns {.sails.config.globals.jbrowse.galaxy.historyName}
+     */
     getHistoryName: function() {
         return this.historyName;
     },
     /**
      * acquire history id from galaxy
-     * @returns {undefined}
+     * 
+     * @param {type} cb
      */
     initHistory: function (cb) {
         sails.log("init_history");
@@ -171,6 +183,11 @@ module.exports = {
             cb(histlist,{status:'error',msg:errmsg});
         });
     },
+    /**
+     * get workflows
+     * @param {type} cb
+     * @returns {undefined}
+     */
     getWorkflows: function(cb) {
         
         this.galaxyGET("/api/workflows",function(workflows,err) {
@@ -181,6 +198,7 @@ module.exports = {
         });
     },
     /**
+     * send file to galaxy
      * 
      * @param {type} theFile
      * @param {type} hId
@@ -214,6 +232,12 @@ module.exports = {
         });
 
     },
+    /**
+     * submit workflow.
+     * 
+     * @param {type} params
+     * @param {type} cb
+     */
     workflowSubmit: function(params,cb) {
         var thisb = this;
         var g = sails.config.globals;
