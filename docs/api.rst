@@ -2,6 +2,11 @@
 API
 ***
 
+
+.. raw:: html
+
+   <hr style="border-color: black; border-width: 2px;">
+
 Module: ``services/accessionEntrez``
 ************************************
 
@@ -49,17 +54,14 @@ This does an esummary lookup (using Entrez api), adding the link field into the 
     :param function cb: callback function
     
 
-.. _module-services_accessionEntrez.requestp:
-
-Member: ``requestp``: 
-
-.. _module-services_accessionEntrez.req:
-
-Member: ``req``: 
 
 
 
 
+
+.. raw:: html
+
+   <hr style="border-color: black; border-width: 2px;">
 
 Module: ``services/blastxml2json``
 **********************************
@@ -96,70 +98,6 @@ Function: ``convert``
     :param convert(): cb - callback function
     
 
-.. _module-services_blastxml2json.fs:
-
-Member: ``fs``: 
-
-.. _module-services_blastxml2json.path:
-
-Member: ``path``: 
-
-.. _module-services_blastxml2json.to_json:
-
-Member: ``to_json``: 
-
-.. _module-services_blastxml2json.status:
-
-Member: ``status``: 
-
-.. _module-services_blastxml2json.msg:
-
-Member: ``msg``: 
-
-.. _module-services_blastxml2json.status:
-
-Member: ``status``: 
-
-.. _module-services_blastxml2json.err:
-
-Member: ``err``: 
-
-.. _module-services_blastxml2json.Hit_num:
-
-Member: ``Hit_num``: 
-
-.. _module-services_blastxml2json.Hit_id:
-
-Member: ``Hit_id``: 
-
-.. _module-services_blastxml2json.Hit_def:
-
-Member: ``Hit_def``: 
-
-.. _module-services_blastxml2json.Hit_accession:
-
-Member: ``Hit_accession``: 
-
-.. _module-services_blastxml2json.Hit_len:
-
-Member: ``Hit_len``: 
-
-.. _module-services_blastxml2json.Hsp:
-
-Member: ``Hsp``: 
-
-.. _module-services_blastxml2json.key:
-
-Member: ``key``: 
-
-.. _module-services_blastxml2json.key:
-
-Member: ``key``: 
-
-.. _module-services_blastxml2json.status:
-
-Member: ``status``: 
-
 .. _module-services_blastxml2json.err:
 
 Member: ``err``: 
@@ -167,6 +105,11 @@ Member: ``err``:
 
 
 
+
+
+.. raw:: html
+
+   <hr style="border-color: black; border-width: 2px;">
 
 Module: ``services/filter``
 ***************************
@@ -352,157 +295,14 @@ Function: ``getHitId``
     
     
 
-.. _module-services_filter.request:
 
-Member: ``request``: 
 
-.. _module-services_filter.requestp:
 
-Member: ``requestp``: 
 
-.. _module-services_filter.path:
 
-Member: ``path``: 
+.. raw:: html
 
-.. _module-services_filter.Promise:
-
-Member: ``Promise``: 
-
-.. _module-services_filter.fs:
-
-Member: ``fs``: 
-
-.. _module-services_filter.deferred:
-
-Member: ``deferred``: 
-
-.. _module-services_filter.merge:
-
-Member: ``merge``: 
-
-.. _module-services_filter.util:
-
-Member: ``util``: 
-
-.. _module-services_filter.merged:
-
-Member: ``merged``: 
-
-.. _module-services_filter.result:
-
-Member: ``result``: 
-
-.. _module-services_filter.error:
-
-Member: ``error``: 
-
-.. _module-services_filter.selected:
-
-Member: ``selected``: 
-
-.. _module-services_filter.selected:
-
-Member: ``selected``: 
-
-.. _module-services_filter.str:
-
-Member: ``str``: 
-
-.. _module-services_filter.str:
-
-Member: ``str``: 
-
-.. _module-services_filter.str:
-
-Member: ``str``: 
-
-.. _module-services_filter.str:
-
-Member: ``str``: 
-
-.. _module-services_filter.str:
-
-Member: ``str``: 
-
-.. _module-services_filter.str:
-
-Member: ``str``: 
-
-.. _module-services_filter.str:
-
-Member: ``str``: 
-
-.. _module-services_filter.str:
-
-Member: ``str``: 
-
-.. _module-services_filter.str:
-
-Member: ``str``: 
-
-.. _module-services_filter.str:
-
-Member: ``str``: 
-
-.. _module-services_filter.str:
-
-Member: ``str``: 
-
-.. _module-services_filter.str:
-
-Member: ``str``: 
-
-.. _module-services_filter.result:
-
-Member: ``result``: 
-
-.. _module-services_filter.error:
-
-Member: ``error``: 
-
-.. _module-services_filter.key:
-
-Member: ``key``: 
-
-.. _module-services_filter.val:
-
-Member: ``val``: 
-
-.. _module-services_filter.val:
-
-Member: ``val``: 
-
-.. _module-services_filter.val:
-
-Member: ``val``: 
-
-.. _module-services_filter.minval:
-
-Member: ``minval``: 
-
-.. _module-services_filter.val:
-
-Member: ``val``: 
-
-.. _module-services_filter.val:
-
-Member: ``val``: 
-
-.. _module-services_filter.val:
-
-Member: ``val``: 
-
-.. _module-services_filter.val:
-
-Member: ``val``: 
-
-.. _module-services_filter.val:
-
-Member: ``val``: 
-
-
-
-
+   <hr style="border-color: black; border-width: 2px;">
 
 Module: ``services/galaxyUtils``
 ********************************
@@ -668,117 +468,14 @@ submit workflow.
     :param type cb: submit workflow.
     
 
-.. _module-services_galaxyUtils.request:
-
-Member: ``request``: 
-
-.. _module-services_galaxyUtils.Promise:
-
-Member: ``Promise``: 
-
-.. _module-services_galaxyUtils.fs:
-
-Member: ``fs``: 
-
-.. _module-services_galaxyUtils.util:
-
-Member: ``util``: 
-
-.. _module-services_galaxyUtils.url:
-
-Member: ``url``: 
-
-.. _module-services_galaxyUtils.method:
-
-Member: ``method``: 
-
-.. _module-services_galaxyUtils.json:
-
-Member: ``json``: 
-
-.. _module-services_galaxyUtils.body:
-
-Member: ``body``: 
-
-.. _module-services_galaxyUtils.status:
-
-Member: ``status``: 
-
-.. _module-services_galaxyUtils.msg:
-
-Member: ``msg``: 
-
-.. _module-services_galaxyUtils.err:
-
-Member: ``err``: 
-
-.. _module-services_galaxyUtils.historyName:
-
-Member: ``historyName``: 
-
-.. _module-services_galaxyUtils.historyId:
-
-Member: ``historyId``: 
-
-.. _module-services_galaxyUtils.status:
-
-Member: ``status``: 
-
-.. _module-services_galaxyUtils.msg:
-
-Member: ``msg``: 
-
-.. _module-services_galaxyUtils.ws:
-
-Member: ``ws``: 
-
-.. _module-services_galaxyUtils.status:
-
-Member: ``status``: 
-
-.. _module-services_galaxyUtils.msg:
-
-Member: ``msg``: 
-
-.. _module-services_galaxyUtils.err:
-
-Member: ``err``: 
-
-.. _module-services_galaxyUtils.status:
-
-Member: ``status``: 
-
-.. _module-services_galaxyUtils.msg:
-
-Member: ``msg``: 
-
-.. _module-services_galaxyUtils.err:
-
-Member: ``err``: 
-
-.. _module-services_galaxyUtils.status:
-
-Member: ``status``: 
-
-.. _module-services_galaxyUtils.jobId:
-
-Member: ``jobId``: 
-
-.. _module-services_galaxyUtils.file_upload:
-
-Member: ``file_upload``: 
-
-.. _module-services_galaxyUtils.file_upload:
-
-Member: ``file_upload``: 
-
-.. _module-services_galaxyUtils.start_workflow:
-
-Member: ``start_workflow``: 
 
 
 
 
+
+.. raw:: html
+
+   <hr style="border-color: black; border-width: 2px;">
 
 Module: ``services/jblastProc``
 *******************************
@@ -993,89 +690,14 @@ Function: ``rest_applyFilter``
     
     
 
-.. _module-services_jblastProc.request:
-
-Member: ``request``: 
-
-.. _module-services_jblastProc.requestp:
-
-Member: ``requestp``: 
-
-.. _module-services_jblastProc.path:
-
-Member: ``path``: 
-
-.. _module-services_jblastProc.Promise:
-
-Member: ``Promise``: 
-
-.. _module-services_jblastProc.fs:
-
-Member: ``fs``: 
-
-.. _module-services_jblastProc.deferred:
-
-Member: ``deferred``: 
-
-.. _module-services_jblastProc.postAction:
-
-Member: ``postAction``: 
-
-.. _module-services_jblastProc.filter:
-
-Member: ``filter``: 
-
-.. _module-services_jblastProc.galaxy:
-
-Member: ``galaxy``: 
-
-.. _module-services_jblastProc.util:
-
-Member: ``util``: 
-
-.. _module-services_jblastProc.historyId:
-
-Member: ``historyId``: 
-
-.. _module-services_jblastProc.status:
-
-Member: ``status``: 
-
-.. _module-services_jblastProc.msg:
-
-Member: ``msg``: 
-
-.. _module-services_jblastProc.err:
-
-Member: ``err``: 
-
-.. _module-services_jblastProc.status:
-
-Member: ``status``: 
-
-.. _module-services_jblastProc.msg:
-
-Member: ``msg``: 
-
-.. _module-services_jblastProc.err:
-
-Member: ``err``: 
-
-.. _module-services_jblastProc.accModule:
-
-Member: ``accModule``: 
-
-.. _module-services_jblastProc.status:
-
-Member: ``status``: 
-
-.. _module-services_jblastProc.err:
-
-Member: ``err``: 
 
 
 
 
+
+.. raw:: html
+
+   <hr style="border-color: black; border-width: 2px;">
 
 Module: ``services/offsetfix``
 ******************************
@@ -1104,25 +726,14 @@ Function: ``process``
     
     
 
-.. _module-services_offsetfix.path:
-
-Member: ``path``: 
-
-.. _module-services_offsetfix.Promise:
-
-Member: ``Promise``: 
-
-.. _module-services_offsetfix.fs:
-
-Member: ``fs``: 
-
-.. _module-services_offsetfix.deferred:
-
-Member: ``deferred``: 
 
 
 
 
+
+.. raw:: html
+
+   <hr style="border-color: black; border-width: 2px;">
 
 Module: ``services/postAction``
 *******************************
@@ -1264,61 +875,14 @@ Add track to track list and notify.
     :param JSON newTrackJson: Add track to track list and notify.
     
 
-.. _module-services_postAction.request:
-
-Member: ``request``: 
-
-.. _module-services_postAction.requestp:
-
-Member: ``requestp``: 
-
-.. _module-services_postAction.path:
-
-Member: ``path``: 
-
-.. _module-services_postAction.Promise:
-
-Member: ``Promise``: 
-
-.. _module-services_postAction.fs:
-
-Member: ``fs``: 
-
-.. _module-services_postAction.deferred:
-
-Member: ``deferred``: 
-
-.. _module-services_postAction.filter:
-
-Member: ``filter``: 
-
-.. _module-services_postAction.offsetfix:
-
-Member: ``offsetfix``: 
-
-.. _module-services_postAction.blast2json:
-
-Member: ``blast2json``: 
-
-.. _module-services_postAction.workflow_id:
-
-Member: ``workflow_id``: 
-
-.. _module-services_postAction.newTrackJson:
-
-Member: ``newTrackJson``: 
-
-.. _module-services_postAction.newTrackJson:
-
-Member: ``newTrackJson``: 
-
-.. _module-services_postAction.newTrack:
-
-Member: ``newTrack``: 
 
 
 
 
+
+.. raw:: html
+
+   <hr style="border-color: black; border-width: 2px;">
 
 Module: ``services/utils``
 **************************
@@ -1365,30 +929,6 @@ Get parsed sequence data from FASTA file header
     :param type str: Get parsed sequence data from FASTA file header
     :return parseSeqData(str): (JSON) sequence data
     
-
-.. _module-services_utils.seq:
-
-Member: ``seq``: 
-
-.. _module-services_utils.start:
-
-Member: ``start``: 
-
-.. _module-services_utils.end:
-
-Member: ``end``: 
-
-.. _module-services_utils.strand:
-
-Member: ``strand``: 
-
-.. _module-services_utils.class:
-
-Member: ``class``: 
-
-.. _module-services_utils.length:
-
-Member: ``length``: 
 
 
 
