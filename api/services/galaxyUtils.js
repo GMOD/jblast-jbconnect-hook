@@ -134,14 +134,14 @@ module.exports = {
     },
     /**
      * 
-     * @returns {nm$_galaxyUtils.module.exports.historyId}
+     * @returns {string} history id
      */
     getHistoryId: function() {
         return this.historyId;
     },
     /**
      * 
-     * @returns {.sails.config.globals.jbrowse.galaxy.historyName}
+     * @returns {string} history name
      */
     getHistoryName: function() {
         return this.historyName;

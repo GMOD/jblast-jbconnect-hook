@@ -222,10 +222,11 @@ function processResults(steps,kJob,trackJson,cb) {
 }
 /**
  * processResultStep
- * @param {type} stepctx
- * @param {object} kJob
- * @param {JSON object} trackJson
- * @param {function} cb - callback function
+ * 
+ * @param {object}      stepctx
+ * @param {object}      kJob
+ * @param {JSON} trackJson
+ * @param {function}    cb - callback function
  */
 function processResultStep(stepctx,kJob,trackJson,cb) {
     
@@ -364,8 +365,8 @@ function processFilter(kWorkflowJob,newTrackJson,cb) {
 /**
  * return number of hits
  * 
- * @param {type} kWorkflowJob
- * @param {type} newTrackJson
+ * @param {object} kWorkflowJob
+ * @param {JSON} newTrackJson
  * @returns {Number} hits
  */
 function getHits(kWorkflowJob,newTrackJson) {
@@ -397,7 +398,7 @@ function getHits(kWorkflowJob,newTrackJson) {
  * Add track to track list and notify.
  * 
  * @param {object} kWorkflowJob
- * @param {JSON object} newTrackJson
+ * @param {JSON} newTrackJson
  */
 function addToTrackList(kWorkflowJob,newTrackJson) {
     sails.log("addToTrackList()",newTrackJson);
