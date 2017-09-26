@@ -11,16 +11,24 @@ with JBServer as well as a client-side plugin.
 
 **JBlast provides the following functionality:**
 
-* Leverages Galaxy Server for Blast Analysis.
-* And stand-alone NCBI Blast tools is also provided.
-* Blast Workflow Execution and Monitoring
++-------------------------------------------------------------------------------+
+| Can leverage Galaxy Server for Blast Analysis or use                          |
+| stand-alone NCBI Blast tools                                                  |
++-------------------------------------------------------------------------------+
+| Blast Workflow Execution and Monitoring                                       |
++-------------------------------------------------------------------------------+
 
-**The Client-Side JBlast plugin integrates with the server component:**
+**The Client-Side JBlast plugin intgration with JBrowse:**
 
-* Submit region for blast search
-* Inject result track into trackList.json w/ dynamic track update in track selector
-* Dynamic Filter Panel
-* Blast Feature Detail Panel
++-------------------------------------------------------------------------------+
+| Submit region or existing feature for blast search                            |
++-------------------------------------------------------------------------------+
+| Inject result tracks into existing configuration with persistence.            |
++-------------------------------------------------------------------------------+
+| Dynamically filter Blast results and save results.                            |
++-------------------------------------------------------------------------------+
+| Extended feature details with blast results                                   |
++-------------------------------------------------------------------------------+
 
 
 Contents

@@ -2,243 +2,7 @@
 API
 ***
 
-
-.. raw:: html
-
-   <hr style="border-color: black; border-width: 2px;">
-
-Module: ``controllers/AuthController``
-**************************************
-
-
-.. contents:: Local Navigation
-   :local:
-
-   
-Description
-===========
-
-Authentication Controller
-
-It currently includes the minimum amount of functionality for
-the basics of Passport.js to work.
-
-
-
-
-
-
-
-
-.. raw:: html
-
-   <hr style="border-color: black; border-width: 2px;">
-
-Module: ``models/Dataset``
-**************************
-
-
-.. contents:: Local Navigation
-   :local:
-
-   
-Description
-===========
-
-Dataset is a model that represents the JBrowse dataset.  Generally, this includes
-path to the dataset and some of the data contained in trackList.json.
-
-Datasets known to JBServer are defined in config/globals.js
-(see: :ref:`jbs-globals-config`)
-     
-Ref: `Sails Models and ORM <http://sailsjs.org/documentation/concepts/models-and-orm/models>`_
-
-
-.. _module-models_Dataset.initialize:
-
-
-Function: ``initialize``
-========================
-
-Initializes datasets as defined in config/globals.js.
-(see: :ref:`jbs-globals-config`)
-
-.. js:function:: initialize(cb)
-
-    
-    :param function cb: callback function
-    :return undefined: Initializes datasets as defined in config/globals.js.
-    (see: :ref:`jbs-globals-config`)
-    
-.. _module-models_Dataset.syncDatasets:
-
-
-Function: ``syncDatasets``
-==========================
-
-Sync datasets, defined in globals with database.
-
-todo: need to improve, perhaps use async?
-
-.. js:function:: syncDatasets()
-
-    
-    :param syncDatasets(): cb - callback function
-    
-
-
-
-
-
-
-.. raw:: html
-
-   <hr style="border-color: black; border-width: 2px;">
-
-Module: ``models/Job``
-**********************
-
-
-.. contents:: Local Navigation
-   :local:
-
-   
-Description
-===========
-
-Job model is an encapsulation of the `Kue <https://automattic.github.io/kue/>`_ job framework.
-
-Kue uses `redis <https://redis.io/>`_ database.  This model synchronizes the Job database with the redis data
-through the use of Kue's API.
- 
-Events
-
-+----------------------------+
-| * queue-enqueue            |
-| * queue-start              |
-| * queue-failed             |
-| * queue-failed-attempt     |
-| * queue-progress           |
-| * queue-complete           |
-| * queue-remove             |
-| * queue-promotion          |
-+----------------------------+
-
-Ref: `Sails Models and ORM <http://sailsjs.org/documentation/concepts/models-and-orm/models>`_
-
-
-.. _module-models_Job.initialize:
-
-
-Function: ``initialize``
-========================
-
-Obsolete
-
-.. js:function:: initialize()
-
-    
-    
-.. _module-models_Job.start:
-
-
-Function: ``start``
-===================
-
-start the monitor
-
-.. js:function:: start()
-
-    
-    
-.. _module-models_Job.monitor:
-
-
-Function: ``monitor``
-=====================
-
-monitor events from the kue framework and translate to Job events
-
-.. js:function:: monitor()
-
-    
-    
-.. _module-models_Job.syncJobs:
-
-
-Function: ``syncJobs``
-======================
-
-Sync kue[workflow] with Job model
-
-.. js:function:: syncJobs()
-
-    
-    
-.. _module-models_Job.processEvent:
-
-
-Function: ``processEvent``
-==========================
-
-Send a Job framework event
-
-.. js:function:: processEvent(event, id, data)
-
-    
-    :param type event: Send a Job framework event
-    :param type id: Send a Job framework event
-    :param type data: Send a Job framework event
-    
-.. _module-models_Job.test:
-
-
-Function: ``test``
-==================
-
-
-
-.. js:function:: test()
-
-    
-    
-.. _module-models_Job.createOrUpdate:
-
-
-Function: ``createOrUpdate``
-============================
-
-Create or update a job in the sails framework based on kue job data
-
-.. js:function:: createOrUpdate(, mJob)
-
-    
-    :param createOrUpdate(, mJob): kJob - Kue framework job
-    :param object mJob: Sails framework job
-    
-.. _module-models_Job.syncJobs:
-
-
-Function: ``syncJobs``
-======================
-
-Synchronize Jobs with the Kue framework
-
-.. js:function:: syncJobs()
-
-    
-    
-
-
-
-
-
-
-.. raw:: html
-
-   <hr style="border-color: black; border-width: 2px;">
-
-Module: ``models/Passport``
+Module: ``accessionEntrez``
 ***************************
 
 
@@ -249,44 +13,56 @@ Module: ``models/Passport``
 Description
 ===========
 
-The Passport model handles associating authenticators with users. An authen-
-ticator can be either local (password) or third-party (provider). A single
-user can have multiple passports, allowing them to connect and use several
-third-party strategies in optional conjunction with a password.
+This module enables accession value lookup utilizeing Entrez API.
 
-Since an application will only need to authenticate a user once per session,
-it makes sense to encapsulate the data specific to the authentication process
-in a model of its own. This allows us to keep the session itself as light-
-weight as possible as the application only needs to serialize and deserialize
-the user, but not the authentication data, to and from the session.
+Ref: https://www.ncbi.nlm.nih.gov/books/NBK25499/
 
 
-.. _module-models_Passport.hashPassword:
+.. _module-accessionEntrez.init:
 
 
-Function: ``hashPassword``
-==========================
+Function: ``init``
+==================
 
-Hash a passport password.
+Initialize the module
 
-.. js:function:: hashPassword(password, next)
+.. js:function:: init(req, res, cb)
 
     
-    :param Object password: Hash a passport password.
-    :param function next: Hash a passport password.
+    :param object req: Initialize the module
+    :param object res: Initialize the module
+    :param function cb: callback function
+    
+.. _module-accessionEntrez.lookup:
+
+
+Function: ``lookup``
+====================
+
+This does an esummary lookup (using Entrez api), adding the link field into the result.
+
+.. js:function:: lookup(req, res, cb)
+
+    
+    :param object req: This does an esummary lookup (using Entrez api), adding the link field into the result.
+    :param object res: This does an esummary lookup (using Entrez api), adding the link field into the result.
+    :param function cb: callback function
     
 
+.. _module-accessionEntrez.requestp:
+
+Member: ``requestp``: 
+
+.. _module-accessionEntrez.req:
+
+Member: ``req``: 
 
 
 
 
 
-.. raw:: html
-
-   <hr style="border-color: black; border-width: 2px;">
-
-Module: ``models/Track``
-************************
+Module: ``blastxml2json``
+*************************
 
 
 .. contents:: Local Navigation
@@ -296,117 +72,478 @@ Module: ``models/Track``
 Description
 ===========
 
-Track is a model for a list of tracks that are in the ``trackList.json``'s ``[tracks]`` section.
+Convert BlastXML to JSON
+(not a straight conversion)
+This script not only converts the XML to json, it flattens the hits per hap where there are multiple hsp.
 
-Ref: `Sails Models and ORM <http://sailsjs.org/documentation/concepts/models-and-orm/models>`_
+Essentially, it simpifies the hit array into an associative array and makes it indexed by key,
+where key is <Hit_id>;<Hsp_num>
 
 
-.. _module-models_Track.startMonitor:
+.. _module-blastxml2json.convert:
 
 
-Function: ``startMonitor``
+Function: ``convert``
+=====================
+
+
+
+.. js:function:: convert()
+
+    
+    :param convert(): kJob - kue job object
+    :param convert(): trackJson
+    :param convert(): cb - callback function
+    
+
+.. _module-blastxml2json.fs:
+
+Member: ``fs``: 
+
+.. _module-blastxml2json.path:
+
+Member: ``path``: 
+
+.. _module-blastxml2json.to_json:
+
+Member: ``to_json``: 
+
+.. _module-blastxml2json.status:
+
+Member: ``status``: 
+
+.. _module-blastxml2json.msg:
+
+Member: ``msg``: 
+
+.. _module-blastxml2json.status:
+
+Member: ``status``: 
+
+.. _module-blastxml2json.err:
+
+Member: ``err``: 
+
+.. _module-blastxml2json.Hit_num:
+
+Member: ``Hit_num``: 
+
+.. _module-blastxml2json.Hit_id:
+
+Member: ``Hit_id``: 
+
+.. _module-blastxml2json.Hit_def:
+
+Member: ``Hit_def``: 
+
+.. _module-blastxml2json.Hit_accession:
+
+Member: ``Hit_accession``: 
+
+.. _module-blastxml2json.Hit_len:
+
+Member: ``Hit_len``: 
+
+.. _module-blastxml2json.Hsp:
+
+Member: ``Hsp``: 
+
+.. _module-blastxml2json.key:
+
+Member: ``key``: 
+
+.. _module-blastxml2json.key:
+
+Member: ``key``: 
+
+.. _module-blastxml2json.status:
+
+Member: ``status``: 
+
+.. _module-blastxml2json.err:
+
+Member: ``err``: 
+
+
+
+
+
+Module: ``controllers/WorkflowMgrController``
+*********************************************
+
+
+.. contents:: Local Navigation
+   :local:
+
+   
+Description
+===========
+
+todo: document
+
+
+.. _module-controllers_WorkflowMgrController.hello:
+
+
+Function: ``hello``
+===================
+
+
+
+.. js:function:: hello()
+
+    
+    
+
+.. _module-controllers_WorkflowMgrController.jblastProc:
+
+Member: ``jblastProc``: 
+
+.. _module-controllers_WorkflowMgrController.getWorkflows:
+
+Member: ``getWorkflows``: 
+
+
+
+
+
+Module: ``filter``
+******************
+
+
+.. contents:: Local Navigation
+   :local:
+
+   
+Description
+===========
+
+Blast feature filter functions.
+
+
+.. _module-filter.filterInit:
+
+
+Function: ``filterInit``
+========================
+
+create initial filter settings file
+
+.. js:function:: filterInit(kWorkflowJob, newTrackJson)
+
+    
+    :param type kWorkflowJob: create initial filter settings file
+    :param type newTrackJson: newTrackJson[0].filterSettings must be defined
+         newTrackJson[0].label must be defined
+    :return undefined|module.exports.filterInit.filter: create initial filter settings file
+    
+.. _module-filter.writeFilterSettings:
+
+
+Function: ``writeFilterSettings``
+=================================
+
+write new data to filter settings file, given requestData
+
+.. js:function:: writeFilterSettings(requestData, cb)
+
+    
+    :param type requestData: write new data to filter settings file, given requestData
+    :param type cb: cb(filterData)
+    :return err|Number: write new data to filter settings file, given requestData
+    
+.. _module-filter.applyFilter:
+
+
+Function: ``applyFilter``
+=========================
+
+Based on the filterData, generate a new gff3 file.
+If filterData == 0, then nothing will be filtered
+
+.. js:function:: applyFilter(filterData, requestData)
+
+    
+    :param type filterData: Based on the filterData, generate a new gff3 file.
+    If filterData == 0, then nothing will be filtered
+    :param type requestData: {
+         "asset": <the asset id>
+         "dataSet": "sample_data/json/volvox"
+    :return undefined: callback:
+     cb({
+         totalFeatures: x,               // total number of features
+         filteredFeatures: x             // filtered features.
+     })
+    
+.. _module-filter.getHitDetails:
+
+
+Function: ``getHitDetails``
+===========================
+
+return hit details given hit key, including all HSPs of the original hit.
+
+.. js:function:: getHitDetails(hitkey, cb)
+
+    
+    :param string hitkey: return hit details given hit key, including all HSPs of the original hit.
+    :param getHitDetails(hitkey, cb): dataSet
+    :param function cb: callback
+    
+    The hit key looks like this "gi-402239547-gb-JN790190-1--3"
+    Separate the hit id ==> "gi-402239547-gb-JN790190-1--" (basically remove the last number)
+    Returns multiple HSPs for each hit id: data for "gi-402239547-gb-JN790190-1--1", "gi-402239547-gb-JN790190-1--2"...
+    
+.. _module-filter.getHighest:
+
+
+Function: ``getHighest``
+========================
+
+
+
+.. js:function:: getHighest()
+
+    
+    
+.. _module-filter.getLowest:
+
+
+Function: ``getLowest``
+=======================
+
+
+
+.. js:function:: getLowest()
+
+    
+    
+.. _module-filter.getHighest10:
+
+
+Function: ``getHighest10``
 ==========================
 
-Obsolete
-
-.. js:function:: startMonitor()
-
-    
-    
-.. _module-models_Track.syncTracks:
 
 
-Function: ``syncTracks``
-========================
-
-Sync tracklist.json tracks with Track model (promises version)
-
-todo: dataSet should accept string or dataSet object id
-
-.. js:function:: syncTracks(dataSet,)
-
-    
-    :param string dataSet,: if dataset is not defined, all models are committed.
-    
-.. _module-models_Track.saveTracks:
-
-
-Function: ``saveTracks``
-========================
-
-
-
-.. js:function:: saveTracks()
+.. js:function:: getHighest10()
 
     
     
-.. _module-models_Track.saveTracks:
+.. _module-filter.getLowest10:
 
 
-Function: ``saveTracks``
-========================
-
-
-
-.. js:function:: saveTracks()
-
-    
-    
-.. _module-models_Track.syncTracks:
-
-
-Function: ``syncTracks``
-========================
+Function: ``getLowest10``
+=========================
 
 
 
-.. js:function:: syncTracks()
+.. js:function:: getLowest10()
 
     
     
+.. _module-filter.getHighestPct:
 
-.. _module-models_Track.attributes:
 
-Member: ``attributes``: 
-
-.. _module-models_Track.dataSetPath:
-
-Member: ``dataSetPath``: 
-
-.. _module-models_Track.dataSetPath:
-
-Member: ``dataSetPath``: 
-
-.. _module-models_Track.id:
-
-Member: ``id``: 
-
-.. _module-models_Track.data:
-
-Member: ``data``: 
-
-.. _module-models_Track.dataSetPath:
-
-Member: ``dataSetPath``: 
-
-.. _module-models_Track.lkey:
-
-Member: ``lkey``: 
-
-.. _module-models_Track.trackData:
-
-Member: ``trackData``: 
+Function: ``getHighestPct``
+===========================
 
 
 
+.. js:function:: getHighestPct()
+
+    
+    
+.. _module-filter.getLowestPct:
+
+
+Function: ``getLowestPct``
+==========================
 
 
 
-.. raw:: html
+.. js:function:: getLowestPct()
 
-   <hr style="border-color: black; border-width: 2px;">
+    
+    
+.. _module-filter.convert2Num:
 
-Module: ``models/User``
+
+Function: ``convert2Num``
+=========================
+
+
+
+.. js:function:: convert2Num()
+
+    
+    
+.. _module-filter.getHitId:
+
+
+Function: ``getHitId``
+======================
+
+
+
+.. js:function:: getHitId()
+
+    
+    
+
+.. _module-filter.request:
+
+Member: ``request``: 
+
+.. _module-filter.requestp:
+
+Member: ``requestp``: 
+
+.. _module-filter.path:
+
+Member: ``path``: 
+
+.. _module-filter.Promise:
+
+Member: ``Promise``: 
+
+.. _module-filter.fs:
+
+Member: ``fs``: 
+
+.. _module-filter.deferred:
+
+Member: ``deferred``: 
+
+.. _module-filter.merge:
+
+Member: ``merge``: 
+
+.. _module-filter.util:
+
+Member: ``util``: 
+
+.. _module-filter.merged:
+
+Member: ``merged``: 
+
+.. _module-filter.result:
+
+Member: ``result``: 
+
+.. _module-filter.error:
+
+Member: ``error``: 
+
+.. _module-filter.selected:
+
+Member: ``selected``: 
+
+.. _module-filter.selected:
+
+Member: ``selected``: 
+
+.. _module-filter.str:
+
+Member: ``str``: 
+
+.. _module-filter.str:
+
+Member: ``str``: 
+
+.. _module-filter.str:
+
+Member: ``str``: 
+
+.. _module-filter.str:
+
+Member: ``str``: 
+
+.. _module-filter.str:
+
+Member: ``str``: 
+
+.. _module-filter.str:
+
+Member: ``str``: 
+
+.. _module-filter.str:
+
+Member: ``str``: 
+
+.. _module-filter.str:
+
+Member: ``str``: 
+
+.. _module-filter.str:
+
+Member: ``str``: 
+
+.. _module-filter.str:
+
+Member: ``str``: 
+
+.. _module-filter.str:
+
+Member: ``str``: 
+
+.. _module-filter.str:
+
+Member: ``str``: 
+
+.. _module-filter.result:
+
+Member: ``result``: 
+
+.. _module-filter.error:
+
+Member: ``error``: 
+
+.. _module-filter.key:
+
+Member: ``key``: 
+
+.. _module-filter.val:
+
+Member: ``val``: 
+
+.. _module-filter.val:
+
+Member: ``val``: 
+
+.. _module-filter.val:
+
+Member: ``val``: 
+
+.. _module-filter.minval:
+
+Member: ``minval``: 
+
+.. _module-filter.val:
+
+Member: ``val``: 
+
+.. _module-filter.val:
+
+Member: ``val``: 
+
+.. _module-filter.val:
+
+Member: ``val``: 
+
+.. _module-filter.val:
+
+Member: ``val``: 
+
+.. _module-filter.val:
+
+Member: ``val``: 
+
+
+
+
+
+Module: ``galaxyUtils``
 ***********************
 
 
@@ -417,20 +554,1590 @@ Module: ``models/User``
 Description
 ===========
 
-User is the data model for a user.
+This module manages the communication with the galaxy API.
+
+
+.. _module-galaxyUtils.init:
+
+
+Function: ``init``
+==================
+
+Initialize module
+
+.. js:function:: init(cb, cberr)
+
+    
+    :param type cb: Initialize module
+    :param type cberr: Initialize module
+    :return undefined: Initialize module
+    
+.. _module-galaxyUtils.galaxyGetPromise:
+
+
+Function: ``galaxyGetPromise``
+==============================
+
+
+
+.. js:function:: galaxyGetPromise()
+
+    
+    
+.. _module-galaxyUtils.galaxyPostPromise:
+
+
+Function: ``galaxyPostPromise``
+===============================
+
+
+
+.. js:function:: galaxyPostPromise()
+
+    
+    
+.. _module-galaxyUtils.galaxyGET:
+
+
+Function: ``galaxyGET``
+=======================
+
+send JSON GET request to galaxy server
+
+.. js:function:: galaxyGET(api, cb)
+
+    
+    :param type api: i.e. '/api/histories'
+    :param type cb: callback i.e. function(retval)
+    
+.. _module-galaxyUtils.galaxyPOST:
+
+
+Function: ``galaxyPOST``
+========================
+
+
+
+.. js:function:: galaxyPOST()
+
+    
+    
+.. _module-galaxyUtils.getHistoryId:
+
+
+Function: ``getHistoryId``
+==========================
+
+
+
+.. js:function:: getHistoryId()
+
+    
+    :return string: history id
+    
+.. _module-galaxyUtils.getHistoryName:
+
+
+Function: ``getHistoryName``
+============================
+
+
+
+.. js:function:: getHistoryName()
+
+    
+    :return string: history name
+    
+.. _module-galaxyUtils.initHistory:
+
+
+Function: ``initHistory``
+=========================
+
+acquire history id from galaxy
+
+.. js:function:: initHistory(cb)
+
+    
+    :param type cb: acquire history id from galaxy
+    
+.. _module-galaxyUtils.getWorkflows:
+
+
+Function: ``getWorkflows``
+==========================
+
+get workflows
+
+.. js:function:: getWorkflows(cb)
+
+    
+    :param type cb: get workflows
+    :return undefined: get workflows
+    
+.. _module-galaxyUtils.sendFile:
+
+
+Function: ``sendFile``
+======================
+
+send file to galaxy
+
+.. js:function:: sendFile(theFile, hId, cb, cberr)
+
+    
+    :param type theFile: send file to galaxy
+    :param type hId: send file to galaxy
+    :param type cb: send file to galaxy
+    :param type cberr: send file to galaxy
+    :return undefined: send file to galaxy
+    
+.. _module-galaxyUtils.workflowSubmit:
+
+
+Function: ``workflowSubmit``
+============================
+
+submit workflow.
+
+.. js:function:: workflowSubmit(params, cb)
+
+    
+    :param type params: submit workflow.
+    :param type cb: submit workflow.
+    
+
+.. _module-galaxyUtils.request:
+
+Member: ``request``: 
+
+.. _module-galaxyUtils.Promise:
+
+Member: ``Promise``: 
+
+.. _module-galaxyUtils.fs:
+
+Member: ``fs``: 
+
+.. _module-galaxyUtils.util:
+
+Member: ``util``: 
+
+.. _module-galaxyUtils.url:
+
+Member: ``url``: 
+
+.. _module-galaxyUtils.method:
+
+Member: ``method``: 
+
+.. _module-galaxyUtils.json:
+
+Member: ``json``: 
+
+.. _module-galaxyUtils.body:
+
+Member: ``body``: 
+
+.. _module-galaxyUtils.status:
+
+Member: ``status``: 
+
+.. _module-galaxyUtils.msg:
+
+Member: ``msg``: 
+
+.. _module-galaxyUtils.err:
+
+Member: ``err``: 
+
+.. _module-galaxyUtils.historyName:
+
+Member: ``historyName``: 
+
+.. _module-galaxyUtils.historyId:
+
+Member: ``historyId``: 
+
+.. _module-galaxyUtils.status:
+
+Member: ``status``: 
+
+.. _module-galaxyUtils.msg:
+
+Member: ``msg``: 
+
+.. _module-galaxyUtils.ws:
+
+Member: ``ws``: 
+
+.. _module-galaxyUtils.status:
+
+Member: ``status``: 
+
+.. _module-galaxyUtils.msg:
+
+Member: ``msg``: 
+
+.. _module-galaxyUtils.err:
+
+Member: ``err``: 
+
+.. _module-galaxyUtils.status:
+
+Member: ``status``: 
+
+.. _module-galaxyUtils.msg:
+
+Member: ``msg``: 
+
+.. _module-galaxyUtils.err:
+
+Member: ``err``: 
+
+.. _module-galaxyUtils.status:
+
+Member: ``status``: 
+
+.. _module-galaxyUtils.jobId:
+
+Member: ``jobId``: 
+
+.. _module-galaxyUtils.file_upload:
+
+Member: ``file_upload``: 
+
+.. _module-galaxyUtils.file_upload:
+
+Member: ``file_upload``: 
+
+.. _module-galaxyUtils.start_workflow:
+
+Member: ``start_workflow``: 
 
 
 
 
 
+Module: ``jblastProc``
+**********************
+
+
+.. contents:: Local Navigation
+   :local:
+
+   
+Description
+===========
+
+This module implements the various REST APIs for JBlast.
+
+
+.. _module-jblastProc.initialize:
+
+
+Function: ``initialize``
+========================
+
+Initialize the service
+
+.. js:function:: initialize(cb)
+
+    
+    :param type cb: Initialize the service
+    :return undefined: Initialize the service
+    
+.. _module-jblastProc.workflowSubmit:
+
+
+Function: ``workflowSubmit``
+============================
+
+Submit a workflow
+
+REST: ``POST /jbapi/workflowsubmit``
+
+.. js:function:: workflowSubmit(req, res, next)
+
+    
+    :param type req: Submit a workflow
+    
+    REST: ``POST /jbapi/workflowsubmit``
+    :param type res: Submit a workflow
+    
+    REST: ``POST /jbapi/workflowsubmit``
+    :param type next: Submit a workflow
+    
+    REST: ``POST /jbapi/workflowsubmit``
+    
+.. _module-jblastProc.getWorkflows:
+
+
+Function: ``getWorkflows``
+==========================
+
+Get Workflows
+
+REST: ``GET /jbapi/getworkflows``
+
+.. js:function:: getWorkflows(req, res, next)
+
+    
+    :param type req: Get Workflows
+    
+    REST: ``GET /jbapi/getworkflows``
+    :param type res: Get Workflows
+    
+    REST: ``GET /jbapi/getworkflows``
+    :param type next: Get Workflows
+    
+    REST: ``GET /jbapi/getworkflows``
+    
+.. _module-jblastProc.setFilter:
+
+
+Function: ``setFilter``
+=======================
+
+post /jbapi/setfilter - send filter parameters
+
+.. js:function:: setFilter(req, res, next)
+
+    
+    :param type req: * data = req.body
+       * data.filterParams = {score:{val: 50}, evalue:{val:-2}...
+       * data.dataSet = (i.e. "sample_data/json/volvox" generally from config.dataRoot)
+       * data.asset =
+    :param type res: post /jbapi/setfilter - send filter parameters
+    :param type next: post /jbapi/setfilter - send filter parameters
+    
+.. _module-jblastProc.getBlastData:
+
+
+Function: ``getBlastData``
+==========================
+
+Get info about the given track
+
+REST: ``GET /jbapi/getblastdata``
+
+.. js:function:: getBlastData(req, res, next)
+
+    
+    :param type req: Get info about the given track
+    
+    REST: ``GET /jbapi/getblastdata``
+    :param type res: Get info about the given track
+    
+    REST: ``GET /jbapi/getblastdata``
+    :param type next: Get info about the given track
+    
+    REST: ``GET /jbapi/getblastdata``
+    
+.. _module-jblastProc.getTrackData:
+
+
+Function: ``getTrackData``
+==========================
+
+Get Track Data
+
+REST: ``GET /jbapi/gettrackdata``
+
+.. js:function:: getTrackData(req, res, next)
+
+    
+    :param type req: Get Track Data
+    
+    REST: ``GET /jbapi/gettrackdata``
+    :param type res: Get Track Data
+    
+    REST: ``GET /jbapi/gettrackdata``
+    :param type next: Get Track Data
+    
+    REST: ``GET /jbapi/gettrackdata``
+    
+.. _module-jblastProc.getHitDetails:
+
+
+Function: ``getHitDetails``
+===========================
+
+Return hits data given hit key
+
+REST: ``GET /jbapi/gethitdetails called``
+
+.. js:function:: getHitDetails(req, res, next)
+
+    
+    :param type req: Return hits data given hit key
+    
+    REST: ``GET /jbapi/gethitdetails called``
+    :param type res: Return hits data given hit key
+    
+    REST: ``GET /jbapi/gethitdetails called``
+    :param type next: Return hits data given hit key
+    
+    REST: ``GET /jbapi/gethitdetails called``
+    
+.. _module-jblastProc.lookupAccession:
+
+
+Function: ``lookupAccession``
+=============================
+
+returns accession data given accesion number.
+Utilizes Entrez service
+
+REST: ``GET /jbapi/lookupaccession``
+
+.. js:function:: lookupAccession(req, res, next)
+
+    
+    :param type req: returns accession data given accesion number.
+    Utilizes Entrez service
+    
+    REST: ``GET /jbapi/lookupaccession``
+    :param type res: returns accession data given accesion number.
+    Utilizes Entrez service
+    
+    REST: ``GET /jbapi/lookupaccession``
+    :param type next: returns accession data given accesion number.
+    Utilizes Entrez service
+    
+    REST: ``GET /jbapi/lookupaccession``
+    
+.. _module-jblastProc.rest_getHitDetails:
+
+
+Function: ``rest_getHitDetails``
+================================
 
 
 
-.. raw:: html
+.. js:function:: rest_getHitDetails()
 
-   <hr style="border-color: black; border-width: 2px;">
+    
+    
+.. _module-jblastProc.rest_applyFilter:
 
-Module: ``policies/bearerAuth``
+
+Function: ``rest_applyFilter``
+==============================
+
+
+
+.. js:function:: rest_applyFilter()
+
+    
+    
+
+.. _module-jblastProc.request:
+
+Member: ``request``: 
+
+.. _module-jblastProc.requestp:
+
+Member: ``requestp``: 
+
+.. _module-jblastProc.path:
+
+Member: ``path``: 
+
+.. _module-jblastProc.Promise:
+
+Member: ``Promise``: 
+
+.. _module-jblastProc.fs:
+
+Member: ``fs``: 
+
+.. _module-jblastProc.deferred:
+
+Member: ``deferred``: 
+
+.. _module-jblastProc.postAction:
+
+Member: ``postAction``: 
+
+.. _module-jblastProc.filter:
+
+Member: ``filter``: 
+
+.. _module-jblastProc.galaxy:
+
+Member: ``galaxy``: 
+
+.. _module-jblastProc.util:
+
+Member: ``util``: 
+
+.. _module-jblastProc.historyId:
+
+Member: ``historyId``: 
+
+.. _module-jblastProc.status:
+
+Member: ``status``: 
+
+.. _module-jblastProc.msg:
+
+Member: ``msg``: 
+
+.. _module-jblastProc.err:
+
+Member: ``err``: 
+
+.. _module-jblastProc.status:
+
+Member: ``status``: 
+
+.. _module-jblastProc.msg:
+
+Member: ``msg``: 
+
+.. _module-jblastProc.err:
+
+Member: ``err``: 
+
+.. _module-jblastProc.accModule:
+
+Member: ``accModule``: 
+
+.. _module-jblastProc.status:
+
+Member: ``status``: 
+
+.. _module-jblastProc.err:
+
+Member: ``err``: 
+
+
+
+
+
+Module: ``offsetfix``
+*********************
+
+
+.. contents:: Local Navigation
+   :local:
+
+   
+Description
+===========
+
+This module fixes the offsets of blast search results.
+
+
+.. _module-offsetfix.process:
+
+
+Function: ``process``
+=====================
+
+
+
+.. js:function:: process()
+
+    
+    
+
+.. _module-offsetfix.path:
+
+Member: ``path``: 
+
+.. _module-offsetfix.Promise:
+
+Member: ``Promise``: 
+
+.. _module-offsetfix.fs:
+
+Member: ``fs``: 
+
+.. _module-offsetfix.deferred:
+
+Member: ``deferred``: 
+
+
+
+
+
+Module: ``postAction``
+**********************
+
+
+.. contents:: Local Navigation
+   :local:
+
+   
+Description
+===========
+
+This module implements the actions that occur after a galaxy workflow completes.
+
+
+.. _module-postAction.doCompleteAction:
+
+
+Function: ``doCompleteAction``
+==============================
+
+
+
+.. js:function:: doCompleteAction()
+
+    
+    
+.. _module-postAction.monitorWorkflow:
+
+
+Function: ``monitorWorkflow``
+=============================
+
+Monitor workflow and exit upon completion of the workflow
+
+.. js:function:: monitorWorkflow(kWorkflowJob)
+
+    
+    :param object kWorkflowJob: Monitor workflow and exit upon completion of the workflow
+    
+.. _module-postAction.doCompleteAction:
+
+
+Function: ``doCompleteAction``
+==============================
+
+Read output of last generated file, copy results to /jblastdata, insert track to trackList.json.
+
+.. js:function:: doCompleteAction(kWorkflowJob, hista)
+
+    
+    :param object kWorkflowJob: Read output of last generated file, copy results to /jblastdata, insert track to trackList.json.
+    :param object hista: associative array of histories
+    
+.. _module-postAction.processResults:
+
+
+Function: ``processResults``
+============================
+
+
+
+.. js:function:: processResults()
+
+    
+    
+.. _module-postAction.processResultStep:
+
+
+Function: ``processResultStep``
+===============================
+
+processResultStep
+
+.. js:function:: processResultStep(stepctx, kJob, trackJson, cb)
+
+    
+    :param object stepctx: processResultStep
+    :param object kJob: processResultStep
+    :param JSON trackJson: processResultStep
+    :param function cb: callback function
+    
+.. _module-postAction.postMoveResultFiles:
+
+
+Function: ``postMoveResultFiles``
+=================================
+
+this generates track template
+
+.. js:function:: postMoveResultFiles(kWorkflowJob, cb)
+
+    
+    :param type kWorkflowJob: this generates track template
+    :param type cb: this generates track template
+    
+.. _module-postAction.processFilter:
+
+
+Function: ``processFilter``
+===========================
+
+Generate the GFF file
+
+.. js:function:: processFilter(kWorkflowJob, newTrackJson, cb)
+
+    
+    :param type kWorkflowJob: Generate the GFF file
+    :param type newTrackJson: Generate the GFF file
+    :param type cb: Generate the GFF file
+    
+.. _module-postAction.getHits:
+
+
+Function: ``getHits``
+=====================
+
+return number of hits
+
+.. js:function:: getHits(kWorkflowJob, newTrackJson)
+
+    
+    :param object kWorkflowJob: return number of hits
+    :param JSON newTrackJson: return number of hits
+    :return Number: hits
+    
+.. _module-postAction.addToTrackList:
+
+
+Function: ``addToTrackList``
+============================
+
+Add track to track list and notify.
+
+.. js:function:: addToTrackList(kWorkflowJob, newTrackJson)
+
+    
+    :param object kWorkflowJob: Add track to track list and notify.
+    :param JSON newTrackJson: Add track to track list and notify.
+    
+
+.. _module-postAction.request:
+
+Member: ``request``: 
+
+.. _module-postAction.requestp:
+
+Member: ``requestp``: 
+
+.. _module-postAction.path:
+
+Member: ``path``: 
+
+.. _module-postAction.Promise:
+
+Member: ``Promise``: 
+
+.. _module-postAction.fs:
+
+Member: ``fs``: 
+
+.. _module-postAction.deferred:
+
+Member: ``deferred``: 
+
+.. _module-postAction.filter:
+
+Member: ``filter``: 
+
+.. _module-postAction.offsetfix:
+
+Member: ``offsetfix``: 
+
+.. _module-postAction.blast2json:
+
+Member: ``blast2json``: 
+
+.. _module-postAction.workflow_id:
+
+Member: ``workflow_id``: 
+
+.. _module-postAction.newTrackJson:
+
+Member: ``newTrackJson``: 
+
+.. _module-postAction.newTrackJson:
+
+Member: ``newTrackJson``: 
+
+.. _module-postAction.newTrack:
+
+Member: ``newTrack``: 
+
+
+
+
+
+Module: ``services/accessionEntrez``
+************************************
+
+
+.. contents:: Local Navigation
+   :local:
+
+   
+Description
+===========
+
+This module enables accession value lookup utilizeing Entrez API.
+
+Ref: https://www.ncbi.nlm.nih.gov/books/NBK25499/
+
+
+.. _module-services_accessionEntrez.init:
+
+
+Function: ``init``
+==================
+
+Initialize the module
+
+.. js:function:: init(req, res, cb)
+
+    
+    :param object req: Initialize the module
+    :param object res: Initialize the module
+    :param function cb: callback function
+    
+.. _module-services_accessionEntrez.lookup:
+
+
+Function: ``lookup``
+====================
+
+This does an esummary lookup (using Entrez api), adding the link field into the result.
+
+.. js:function:: lookup(req, res, cb)
+
+    
+    :param object req: This does an esummary lookup (using Entrez api), adding the link field into the result.
+    :param object res: This does an esummary lookup (using Entrez api), adding the link field into the result.
+    :param function cb: callback function
+    
+
+.. _module-services_accessionEntrez.requestp:
+
+Member: ``requestp``: 
+
+.. _module-services_accessionEntrez.req:
+
+Member: ``req``: 
+
+
+
+
+
+Module: ``services/blastxml2json``
+**********************************
+
+
+.. contents:: Local Navigation
+   :local:
+
+   
+Description
+===========
+
+Convert BlastXML to JSON
+(not a straight conversion)
+This script not only converts the XML to json, it flattens the hits per hap where there are multiple hsp.
+
+Essentially, it simpifies the hit array into an associative array and makes it indexed by key,
+where key is <Hit_id>;<Hsp_num>
+
+
+.. _module-services_blastxml2json.convert:
+
+
+Function: ``convert``
+=====================
+
+
+
+.. js:function:: convert()
+
+    
+    :param convert(): kJob - kue job object
+    :param convert(): trackJson
+    :param convert(): cb - callback function
+    
+
+.. _module-services_blastxml2json.fs:
+
+Member: ``fs``: 
+
+.. _module-services_blastxml2json.path:
+
+Member: ``path``: 
+
+.. _module-services_blastxml2json.to_json:
+
+Member: ``to_json``: 
+
+.. _module-services_blastxml2json.status:
+
+Member: ``status``: 
+
+.. _module-services_blastxml2json.msg:
+
+Member: ``msg``: 
+
+.. _module-services_blastxml2json.status:
+
+Member: ``status``: 
+
+.. _module-services_blastxml2json.err:
+
+Member: ``err``: 
+
+.. _module-services_blastxml2json.Hit_num:
+
+Member: ``Hit_num``: 
+
+.. _module-services_blastxml2json.Hit_id:
+
+Member: ``Hit_id``: 
+
+.. _module-services_blastxml2json.Hit_def:
+
+Member: ``Hit_def``: 
+
+.. _module-services_blastxml2json.Hit_accession:
+
+Member: ``Hit_accession``: 
+
+.. _module-services_blastxml2json.Hit_len:
+
+Member: ``Hit_len``: 
+
+.. _module-services_blastxml2json.Hsp:
+
+Member: ``Hsp``: 
+
+.. _module-services_blastxml2json.key:
+
+Member: ``key``: 
+
+.. _module-services_blastxml2json.key:
+
+Member: ``key``: 
+
+.. _module-services_blastxml2json.status:
+
+Member: ``status``: 
+
+.. _module-services_blastxml2json.err:
+
+Member: ``err``: 
+
+
+
+
+
+Module: ``services/filter``
+***************************
+
+
+.. contents:: Local Navigation
+   :local:
+
+   
+Description
+===========
+
+Blast feature filter functions.
+
+
+.. _module-services_filter.filterInit:
+
+
+Function: ``filterInit``
+========================
+
+create initial filter settings file
+
+.. js:function:: filterInit(kWorkflowJob, newTrackJson)
+
+    
+    :param type kWorkflowJob: create initial filter settings file
+    :param type newTrackJson: newTrackJson[0].filterSettings must be defined
+         newTrackJson[0].label must be defined
+    :return undefined|module.exports.filterInit.filter: create initial filter settings file
+    
+.. _module-services_filter.writeFilterSettings:
+
+
+Function: ``writeFilterSettings``
+=================================
+
+write new data to filter settings file, given requestData
+
+.. js:function:: writeFilterSettings(requestData, cb)
+
+    
+    :param type requestData: write new data to filter settings file, given requestData
+    :param type cb: cb(filterData)
+    :return err|Number: write new data to filter settings file, given requestData
+    
+.. _module-services_filter.applyFilter:
+
+
+Function: ``applyFilter``
+=========================
+
+Based on the filterData, generate a new gff3 file.
+If filterData == 0, then nothing will be filtered
+
+.. js:function:: applyFilter(filterData, requestData)
+
+    
+    :param type filterData: Based on the filterData, generate a new gff3 file.
+    If filterData == 0, then nothing will be filtered
+    :param type requestData: {
+         "asset": <the asset id>
+         "dataSet": "sample_data/json/volvox"
+    :return undefined: callback:
+     cb({
+         totalFeatures: x,               // total number of features
+         filteredFeatures: x             // filtered features.
+     })
+    
+.. _module-services_filter.getHitDetails:
+
+
+Function: ``getHitDetails``
+===========================
+
+return hit details given hit key, including all HSPs of the original hit.
+
+.. js:function:: getHitDetails(hitkey, cb)
+
+    
+    :param string hitkey: return hit details given hit key, including all HSPs of the original hit.
+    :param getHitDetails(hitkey, cb): dataSet
+    :param function cb: callback
+    
+    The hit key looks like this "gi-402239547-gb-JN790190-1--3"
+    Separate the hit id ==> "gi-402239547-gb-JN790190-1--" (basically remove the last number)
+    Returns multiple HSPs for each hit id: data for "gi-402239547-gb-JN790190-1--1", "gi-402239547-gb-JN790190-1--2"...
+    
+.. _module-services_filter.getHighest:
+
+
+Function: ``getHighest``
+========================
+
+
+
+.. js:function:: getHighest()
+
+    
+    
+.. _module-services_filter.getLowest:
+
+
+Function: ``getLowest``
+=======================
+
+
+
+.. js:function:: getLowest()
+
+    
+    
+.. _module-services_filter.getHighest10:
+
+
+Function: ``getHighest10``
+==========================
+
+
+
+.. js:function:: getHighest10()
+
+    
+    
+.. _module-services_filter.getLowest10:
+
+
+Function: ``getLowest10``
+=========================
+
+
+
+.. js:function:: getLowest10()
+
+    
+    
+.. _module-services_filter.getHighestPct:
+
+
+Function: ``getHighestPct``
+===========================
+
+
+
+.. js:function:: getHighestPct()
+
+    
+    
+.. _module-services_filter.getLowestPct:
+
+
+Function: ``getLowestPct``
+==========================
+
+
+
+.. js:function:: getLowestPct()
+
+    
+    
+.. _module-services_filter.convert2Num:
+
+
+Function: ``convert2Num``
+=========================
+
+
+
+.. js:function:: convert2Num()
+
+    
+    
+.. _module-services_filter.getHitId:
+
+
+Function: ``getHitId``
+======================
+
+
+
+.. js:function:: getHitId()
+
+    
+    
+
+.. _module-services_filter.request:
+
+Member: ``request``: 
+
+.. _module-services_filter.requestp:
+
+Member: ``requestp``: 
+
+.. _module-services_filter.path:
+
+Member: ``path``: 
+
+.. _module-services_filter.Promise:
+
+Member: ``Promise``: 
+
+.. _module-services_filter.fs:
+
+Member: ``fs``: 
+
+.. _module-services_filter.deferred:
+
+Member: ``deferred``: 
+
+.. _module-services_filter.merge:
+
+Member: ``merge``: 
+
+.. _module-services_filter.util:
+
+Member: ``util``: 
+
+.. _module-services_filter.merged:
+
+Member: ``merged``: 
+
+.. _module-services_filter.result:
+
+Member: ``result``: 
+
+.. _module-services_filter.error:
+
+Member: ``error``: 
+
+.. _module-services_filter.selected:
+
+Member: ``selected``: 
+
+.. _module-services_filter.selected:
+
+Member: ``selected``: 
+
+.. _module-services_filter.str:
+
+Member: ``str``: 
+
+.. _module-services_filter.str:
+
+Member: ``str``: 
+
+.. _module-services_filter.str:
+
+Member: ``str``: 
+
+.. _module-services_filter.str:
+
+Member: ``str``: 
+
+.. _module-services_filter.str:
+
+Member: ``str``: 
+
+.. _module-services_filter.str:
+
+Member: ``str``: 
+
+.. _module-services_filter.str:
+
+Member: ``str``: 
+
+.. _module-services_filter.str:
+
+Member: ``str``: 
+
+.. _module-services_filter.str:
+
+Member: ``str``: 
+
+.. _module-services_filter.str:
+
+Member: ``str``: 
+
+.. _module-services_filter.str:
+
+Member: ``str``: 
+
+.. _module-services_filter.str:
+
+Member: ``str``: 
+
+.. _module-services_filter.result:
+
+Member: ``result``: 
+
+.. _module-services_filter.error:
+
+Member: ``error``: 
+
+.. _module-services_filter.key:
+
+Member: ``key``: 
+
+.. _module-services_filter.val:
+
+Member: ``val``: 
+
+.. _module-services_filter.val:
+
+Member: ``val``: 
+
+.. _module-services_filter.val:
+
+Member: ``val``: 
+
+.. _module-services_filter.minval:
+
+Member: ``minval``: 
+
+.. _module-services_filter.val:
+
+Member: ``val``: 
+
+.. _module-services_filter.val:
+
+Member: ``val``: 
+
+.. _module-services_filter.val:
+
+Member: ``val``: 
+
+.. _module-services_filter.val:
+
+Member: ``val``: 
+
+.. _module-services_filter.val:
+
+Member: ``val``: 
+
+
+
+
+
+Module: ``services/galaxyUtils``
+********************************
+
+
+.. contents:: Local Navigation
+   :local:
+
+   
+Description
+===========
+
+This module manages the communication with the galaxy API.
+
+
+.. _module-services_galaxyUtils.init:
+
+
+Function: ``init``
+==================
+
+Initialize module
+
+.. js:function:: init(cb, cberr)
+
+    
+    :param type cb: Initialize module
+    :param type cberr: Initialize module
+    :return undefined: Initialize module
+    
+.. _module-services_galaxyUtils.galaxyGetPromise:
+
+
+Function: ``galaxyGetPromise``
+==============================
+
+
+
+.. js:function:: galaxyGetPromise()
+
+    
+    
+.. _module-services_galaxyUtils.galaxyPostPromise:
+
+
+Function: ``galaxyPostPromise``
+===============================
+
+
+
+.. js:function:: galaxyPostPromise()
+
+    
+    
+.. _module-services_galaxyUtils.galaxyGET:
+
+
+Function: ``galaxyGET``
+=======================
+
+send JSON GET request to galaxy server
+
+.. js:function:: galaxyGET(api, cb)
+
+    
+    :param type api: i.e. '/api/histories'
+    :param type cb: callback i.e. function(retval)
+    
+.. _module-services_galaxyUtils.galaxyPOST:
+
+
+Function: ``galaxyPOST``
+========================
+
+
+
+.. js:function:: galaxyPOST()
+
+    
+    
+.. _module-services_galaxyUtils.getHistoryId:
+
+
+Function: ``getHistoryId``
+==========================
+
+
+
+.. js:function:: getHistoryId()
+
+    
+    :return nm$_galaxyUtils.module.exports.historyId: 
+    
+.. _module-services_galaxyUtils.getHistoryName:
+
+
+Function: ``getHistoryName``
+============================
+
+
+
+.. js:function:: getHistoryName()
+
+    
+    :return getHistoryName(): 
+    
+.. _module-services_galaxyUtils.initHistory:
+
+
+Function: ``initHistory``
+=========================
+
+acquire history id from galaxy
+
+.. js:function:: initHistory(cb)
+
+    
+    :param type cb: acquire history id from galaxy
+    
+.. _module-services_galaxyUtils.getWorkflows:
+
+
+Function: ``getWorkflows``
+==========================
+
+get workflows
+
+.. js:function:: getWorkflows(cb)
+
+    
+    :param type cb: get workflows
+    :return undefined: get workflows
+    
+.. _module-services_galaxyUtils.sendFile:
+
+
+Function: ``sendFile``
+======================
+
+send file to galaxy
+
+.. js:function:: sendFile(theFile, hId, cb, cberr)
+
+    
+    :param type theFile: send file to galaxy
+    :param type hId: send file to galaxy
+    :param type cb: send file to galaxy
+    :param type cberr: send file to galaxy
+    :return undefined: send file to galaxy
+    
+.. _module-services_galaxyUtils.workflowSubmit:
+
+
+Function: ``workflowSubmit``
+============================
+
+submit workflow.
+
+.. js:function:: workflowSubmit(params, cb)
+
+    
+    :param type params: submit workflow.
+    :param type cb: submit workflow.
+    
+
+.. _module-services_galaxyUtils.request:
+
+Member: ``request``: 
+
+.. _module-services_galaxyUtils.Promise:
+
+Member: ``Promise``: 
+
+.. _module-services_galaxyUtils.fs:
+
+Member: ``fs``: 
+
+.. _module-services_galaxyUtils.util:
+
+Member: ``util``: 
+
+.. _module-services_galaxyUtils.url:
+
+Member: ``url``: 
+
+.. _module-services_galaxyUtils.method:
+
+Member: ``method``: 
+
+.. _module-services_galaxyUtils.json:
+
+Member: ``json``: 
+
+.. _module-services_galaxyUtils.body:
+
+Member: ``body``: 
+
+.. _module-services_galaxyUtils.status:
+
+Member: ``status``: 
+
+.. _module-services_galaxyUtils.msg:
+
+Member: ``msg``: 
+
+.. _module-services_galaxyUtils.err:
+
+Member: ``err``: 
+
+.. _module-services_galaxyUtils.historyName:
+
+Member: ``historyName``: 
+
+.. _module-services_galaxyUtils.historyId:
+
+Member: ``historyId``: 
+
+.. _module-services_galaxyUtils.status:
+
+Member: ``status``: 
+
+.. _module-services_galaxyUtils.msg:
+
+Member: ``msg``: 
+
+.. _module-services_galaxyUtils.ws:
+
+Member: ``ws``: 
+
+.. _module-services_galaxyUtils.status:
+
+Member: ``status``: 
+
+.. _module-services_galaxyUtils.msg:
+
+Member: ``msg``: 
+
+.. _module-services_galaxyUtils.err:
+
+Member: ``err``: 
+
+.. _module-services_galaxyUtils.status:
+
+Member: ``status``: 
+
+.. _module-services_galaxyUtils.msg:
+
+Member: ``msg``: 
+
+.. _module-services_galaxyUtils.err:
+
+Member: ``err``: 
+
+.. _module-services_galaxyUtils.status:
+
+Member: ``status``: 
+
+.. _module-services_galaxyUtils.jobId:
+
+Member: ``jobId``: 
+
+.. _module-services_galaxyUtils.file_upload:
+
+Member: ``file_upload``: 
+
+.. _module-services_galaxyUtils.file_upload:
+
+Member: ``file_upload``: 
+
+.. _module-services_galaxyUtils.start_workflow:
+
+Member: ``start_workflow``: 
+
+
+
+
+
+Module: ``services/jblastProc``
 *******************************
 
 
@@ -441,186 +2148,294 @@ Module: ``policies/bearerAuth``
 Description
 ===========
 
-bearerAuth Policy
+This module implements the various REST APIs for JBlast.
 
-Policy for authorizing API requests. The request is authenticated if the 
-it contains the accessToken in header, body or as a query param.
-Unlike other strategies bearer doesn't require a session.
-Add this policy (in config/policies.js) to controller actions which are not
-accessed through a session. For example: API request from another client
 
+.. _module-services_jblastProc.initialize:
 
 
+Function: ``initialize``
+========================
 
+Initialize the service
 
-
-
-
-.. raw:: html
-
-   <hr style="border-color: black; border-width: 2px;">
-
-Module: ``policies/isAdmin``
-****************************
-
-
-.. contents:: Local Navigation
-   :local:
-
-   
-Description
-===========
-
-isAdmin policy provides passage if the user contains the property admin: true.
-
-
-
-
-
-
-
-
-.. raw:: html
-
-   <hr style="border-color: black; border-width: 2px;">
-
-Module: ``policies/passport``
-*****************************
-
-
-.. contents:: Local Navigation
-   :local:
-
-   
-Description
-===========
-
-Passport Middleware
-
-Policy for Sails that initializes Passport.js and as well as its built-in
-session support.
-
-In a typical web application, the credentials used to authenticate a user
-will only be transmitted during the login request. If authentication
-succeeds, a session will be established and maintained via a cookie set in
-the user's browser.
-
-Each subsequent request will not contain credentials, but rather the unique
-cookie that identifies the session. In order to support login sessions,
-Passport will serialize and deserialize user instances to and from the
-session.
-
-For more information on the Passport.js middleware, check out:
-http://passportjs.org/guide/configure/
-
-
-
-
-
-
-
-
-.. raw:: html
-
-   <hr style="border-color: black; border-width: 2px;">
-
-Module: ``policies/sessionAuth``
-********************************
-
-
-.. contents:: Local Navigation
-   :local:
-
-   
-Description
-===========
-
-Simple policy to allow any authenticated user.
-Assumes that your login action in one of your controllers sets `req.session.authenticated = true;`
-
-Ref: `Sails Policies Concepts <http://sailsjs.org/#!/documentation/concepts/Policies>`_
-
-
-
-
-
-
-
-
-.. raw:: html
-
-   <hr style="border-color: black; border-width: 2px;">
-
-Module: ``services/jbRouteUtil``
-********************************
-
-
-.. contents:: Local Navigation
-   :local:
-
-   
-Description
-===========
-
-This module provides functions to inject plugin routes and library routes
-that are accessible by the client side.
-
-
-.. _module-services_jbRouteUtil.addPluginRoutes:
-
-
-Function: ``addPluginRoutes``
-=============================
-
-inject client-side plugins into the clinet plugin directory as routes.
-handles submodules plugins too.
-
-.. js:function:: addPluginRoutes()
+.. js:function:: initialize(cb)
 
     
-    :param addPluginRoutes(): params
+    :param type cb: Initialize the service
+    :return undefined: Initialize the service
     
-.. _module-services_jbRouteUtil.addLibRoutes:
+.. _module-services_jblastProc.workflowSubmit:
 
 
-Function: ``addLibRoutes``
+Function: ``workflowSubmit``
+============================
+
+Submit a workflow
+
+REST: ``POST /jbapi/workflowsubmit``
+
+.. js:function:: workflowSubmit(req, res, next)
+
+    
+    :param type req: Submit a workflow
+    
+    REST: ``POST /jbapi/workflowsubmit``
+    :param type res: Submit a workflow
+    
+    REST: ``POST /jbapi/workflowsubmit``
+    :param type next: Submit a workflow
+    
+    REST: ``POST /jbapi/workflowsubmit``
+    
+.. _module-services_jblastProc.getWorkflows:
+
+
+Function: ``getWorkflows``
 ==========================
 
-Add library routes
+Get Workflows
 
-.. js:function:: addLibRoutes()
+REST: ``GET /jbapi/getworkflows``
 
-    
-    :param addLibRoutes(): params
-    
-.. _module-services_jbRouteUtil.addRoute:
-
-
-Function: ``addRoute``
-======================
-
-Add a route
-
-.. js:function:: addRoute(params, module, route, target)
+.. js:function:: getWorkflows(req, res, next)
 
     
-    :param object params: Add a route
-    :param string module: Add a route
-    :param string route: Add a route
-    :param string target: Add a route
+    :param type req: Get Workflows
+    
+    REST: ``GET /jbapi/getworkflows``
+    :param type res: Get Workflows
+    
+    REST: ``GET /jbapi/getworkflows``
+    :param type next: Get Workflows
+    
+    REST: ``GET /jbapi/getworkflows``
+    
+.. _module-services_jblastProc.setFilter:
+
+
+Function: ``setFilter``
+=======================
+
+post /jbapi/setfilter - send filter parameters
+
+.. js:function:: setFilter(req, res, next)
+
+    
+    :param type req: * data = req.body
+       * data.filterParams = {score:{val: 50}, evalue:{val:-2}...
+       * data.dataSet = (i.e. "sample_data/json/volvox" generally from config.dataRoot)
+       * data.asset =
+    :param type res: post /jbapi/setfilter - send filter parameters
+    :param type next: post /jbapi/setfilter - send filter parameters
+    
+.. _module-services_jblastProc.getBlastData:
+
+
+Function: ``getBlastData``
+==========================
+
+Get info about the given track
+
+REST: ``GET /jbapi/getblastdata``
+
+.. js:function:: getBlastData(req, res, next)
+
+    
+    :param type req: Get info about the given track
+    
+    REST: ``GET /jbapi/getblastdata``
+    :param type res: Get info about the given track
+    
+    REST: ``GET /jbapi/getblastdata``
+    :param type next: Get info about the given track
+    
+    REST: ``GET /jbapi/getblastdata``
+    
+.. _module-services_jblastProc.getTrackData:
+
+
+Function: ``getTrackData``
+==========================
+
+Get Track Data
+
+REST: ``GET /jbapi/gettrackdata``
+
+.. js:function:: getTrackData(req, res, next)
+
+    
+    :param type req: Get Track Data
+    
+    REST: ``GET /jbapi/gettrackdata``
+    :param type res: Get Track Data
+    
+    REST: ``GET /jbapi/gettrackdata``
+    :param type next: Get Track Data
+    
+    REST: ``GET /jbapi/gettrackdata``
+    
+.. _module-services_jblastProc.getHitDetails:
+
+
+Function: ``getHitDetails``
+===========================
+
+Return hits data given hit key
+
+REST: ``GET /jbapi/gethitdetails called``
+
+.. js:function:: getHitDetails(req, res, next)
+
+    
+    :param type req: Return hits data given hit key
+    
+    REST: ``GET /jbapi/gethitdetails called``
+    :param type res: Return hits data given hit key
+    
+    REST: ``GET /jbapi/gethitdetails called``
+    :param type next: Return hits data given hit key
+    
+    REST: ``GET /jbapi/gethitdetails called``
+    
+.. _module-services_jblastProc.lookupAccession:
+
+
+Function: ``lookupAccession``
+=============================
+
+returns accession data given accesion number.
+Utilizes Entrez service
+
+REST: ``GET /jbapi/lookupaccession``
+
+.. js:function:: lookupAccession(req, res, next)
+
+    
+    :param type req: returns accession data given accesion number.
+    Utilizes Entrez service
+    
+    REST: ``GET /jbapi/lookupaccession``
+    :param type res: returns accession data given accesion number.
+    Utilizes Entrez service
+    
+    REST: ``GET /jbapi/lookupaccession``
+    :param type next: returns accession data given accesion number.
+    Utilizes Entrez service
+    
+    REST: ``GET /jbapi/lookupaccession``
+    
+.. _module-services_jblastProc.rest_getHitDetails:
+
+
+Function: ``rest_getHitDetails``
+================================
+
+
+
+.. js:function:: rest_getHitDetails()
+
+    
+    
+.. _module-services_jblastProc.rest_applyFilter:
+
+
+Function: ``rest_applyFilter``
+==============================
+
+
+
+.. js:function:: rest_applyFilter()
+
+    
     
 
+.. _module-services_jblastProc.request:
+
+Member: ``request``: 
+
+.. _module-services_jblastProc.requestp:
+
+Member: ``requestp``: 
+
+.. _module-services_jblastProc.path:
+
+Member: ``path``: 
+
+.. _module-services_jblastProc.Promise:
+
+Member: ``Promise``: 
+
+.. _module-services_jblastProc.fs:
+
+Member: ``fs``: 
+
+.. _module-services_jblastProc.deferred:
+
+Member: ``deferred``: 
+
+.. _module-services_jblastProc.postAction:
+
+Member: ``postAction``: 
+
+.. _module-services_jblastProc.filter:
+
+Member: ``filter``: 
+
+.. _module-services_jblastProc.galaxy:
+
+Member: ``galaxy``: 
+
+.. _module-services_jblastProc.util:
+
+Member: ``util``: 
+
+.. _module-services_jblastProc.historyId:
+
+Member: ``historyId``: 
+
+.. _module-services_jblastProc.status:
+
+Member: ``status``: 
+
+.. _module-services_jblastProc.msg:
+
+Member: ``msg``: 
+
+.. _module-services_jblastProc.err:
+
+Member: ``err``: 
+
+.. _module-services_jblastProc.status:
+
+Member: ``status``: 
+
+.. _module-services_jblastProc.msg:
+
+Member: ``msg``: 
+
+.. _module-services_jblastProc.err:
+
+Member: ``err``: 
+
+.. _module-services_jblastProc.accModule:
+
+Member: ``accModule``: 
+
+.. _module-services_jblastProc.status:
+
+Member: ``status``: 
+
+.. _module-services_jblastProc.err:
+
+Member: ``err``: 
 
 
 
 
 
-.. raw:: html
-
-   <hr style="border-color: black; border-width: 2px;">
-
-Module: ``services/passport``
-*****************************
+Module: ``services/offsetfix``
+******************************
 
 
 .. contents:: Local Navigation
@@ -630,29 +2445,381 @@ Module: ``services/passport``
 Description
 ===========
 
-Passport Service
-
-A painless Passport.js service for your Sails app that is guaranteed to
-Rock Your Socks™. It takes all the hassle out of setting up Passport.js by
-encapsulating all the boring stuff in two functions:
-
-  passport.endpoint()
-  passport.callback()
-
-The former sets up an endpoint (/auth/:provider) for redirecting a user to a
-third-party provider for authentication, while the latter sets up a callback
-endpoint (/auth/:provider/callback) for receiving the response from the
-third-party provider. All you have to do is define in the configuration which
-third-party providers you'd like to support. It's that easy!
-
-Behind the scenes, the service stores all the data it needs within "Pass-
-ports". These contain all the information required to associate a local user
-with a profile from a third-party provider. This even holds true for the good
-ol' password authentication scheme – the Authentication Service takes care of
-encrypting passwords and storing them in Passports, allowing you to keep your
-User model free of bloat.
+This module fixes the offsets of blast search results.
 
 
+.. _module-services_offsetfix.process:
+
+
+Function: ``process``
+=====================
+
+
+
+.. js:function:: process()
+
+    
+    
+
+.. _module-services_offsetfix.path:
+
+Member: ``path``: 
+
+.. _module-services_offsetfix.Promise:
+
+Member: ``Promise``: 
+
+.. _module-services_offsetfix.fs:
+
+Member: ``fs``: 
+
+.. _module-services_offsetfix.deferred:
+
+Member: ``deferred``: 
+
+
+
+
+
+Module: ``services/postAction``
+*******************************
+
+
+.. contents:: Local Navigation
+   :local:
+
+   
+Description
+===========
+
+This module implements the actions that occur after a galaxy workflow completes.
+
+
+.. _module-services_postAction.doCompleteAction:
+
+
+Function: ``doCompleteAction``
+==============================
+
+
+
+.. js:function:: doCompleteAction()
+
+    
+    
+.. _module-services_postAction.monitorWorkflow:
+
+
+Function: ``monitorWorkflow``
+=============================
+
+Monitor workflow and exit upon completion of the workflow
+
+.. js:function:: monitorWorkflow(kWorkflowJob)
+
+    
+    :param object kWorkflowJob: Monitor workflow and exit upon completion of the workflow
+    
+.. _module-services_postAction.doCompleteAction:
+
+
+Function: ``doCompleteAction``
+==============================
+
+Read output of last generated file, copy results to /jblastdata, insert track to trackList.json.
+
+.. js:function:: doCompleteAction(kWorkflowJob, hista)
+
+    
+    :param object kWorkflowJob: Read output of last generated file, copy results to /jblastdata, insert track to trackList.json.
+    :param object hista: associative array of histories
+    
+.. _module-services_postAction.processResults:
+
+
+Function: ``processResults``
+============================
+
+
+
+.. js:function:: processResults()
+
+    
+    
+.. _module-services_postAction.processResultStep:
+
+
+Function: ``processResultStep``
+===============================
+
+processResultStep
+
+.. js:function:: processResultStep(stepctx, kJob, cb)
+
+    
+    :param type stepctx: processResultStep
+    :param object kJob: processResultStep
+    :param processResultStep(stepctx, kJob, cb): processResultStep
+    :param function cb: callback function
+    
+.. _module-services_postAction.postMoveResultFiles:
+
+
+Function: ``postMoveResultFiles``
+=================================
+
+this generates track template
+
+.. js:function:: postMoveResultFiles(kWorkflowJob, cb)
+
+    
+    :param type kWorkflowJob: this generates track template
+    :param type cb: this generates track template
+    
+.. _module-services_postAction.processFilter:
+
+
+Function: ``processFilter``
+===========================
+
+Generate the GFF file
+
+.. js:function:: processFilter(kWorkflowJob, newTrackJson, cb)
+
+    
+    :param type kWorkflowJob: Generate the GFF file
+    :param type newTrackJson: Generate the GFF file
+    :param type cb: Generate the GFF file
+    
+.. _module-services_postAction.getHits:
+
+
+Function: ``getHits``
+=====================
+
+return number of hits
+
+.. js:function:: getHits(kWorkflowJob, newTrackJson)
+
+    
+    :param type kWorkflowJob: return number of hits
+    :param type newTrackJson: return number of hits
+    :return Number: hits
+    
+.. _module-services_postAction.addToTrackList:
+
+
+Function: ``addToTrackList``
+============================
+
+Add track to track list and notify.
+
+.. js:function:: addToTrackList(kWorkflowJob)
+
+    
+    :param object kWorkflowJob: Add track to track list and notify.
+    :param addToTrackList(kWorkflowJob): Add track to track list and notify.
+    
+
+.. _module-services_postAction.request:
+
+Member: ``request``: 
+
+.. _module-services_postAction.requestp:
+
+Member: ``requestp``: 
+
+.. _module-services_postAction.path:
+
+Member: ``path``: 
+
+.. _module-services_postAction.Promise:
+
+Member: ``Promise``: 
+
+.. _module-services_postAction.fs:
+
+Member: ``fs``: 
+
+.. _module-services_postAction.deferred:
+
+Member: ``deferred``: 
+
+.. _module-services_postAction.filter:
+
+Member: ``filter``: 
+
+.. _module-services_postAction.offsetfix:
+
+Member: ``offsetfix``: 
+
+.. _module-services_postAction.blast2json:
+
+Member: ``blast2json``: 
+
+.. _module-services_postAction.workflow_id:
+
+Member: ``workflow_id``: 
+
+.. _module-services_postAction.newTrackJson:
+
+Member: ``newTrackJson``: 
+
+.. _module-services_postAction.newTrackJson:
+
+Member: ``newTrackJson``: 
+
+.. _module-services_postAction.newTrack:
+
+Member: ``newTrack``: 
+
+
+
+
+
+Module: ``services/utils``
+**************************
+
+
+.. contents:: Local Navigation
+   :local:
+
+   
+Description
+===========
+
+Utility Functions
+
+
+.. _module-services_utils.getRegionStart:
+
+
+Function: ``getRegionStart``
+============================
+
+return the starting coordinate
+>ctgA ctgA:3014..6130 (+ strand) class=remark length=3117
+
+.. js:function:: getRegionStart(str)
+
+    
+    :param type str: return the starting coordinate
+    >ctgA ctgA:3014..6130 (+ strand) class=remark length=3117
+    :return unresolved: return the starting coordinate
+    >ctgA ctgA:3014..6130 (+ strand) class=remark length=3117
+    
+.. _module-services_utils.parseSeqData:
+
+
+Function: ``parseSeqData``
+==========================
+
+Get parsed sequence data from FASTA file header
+
+.. js:function:: parseSeqData(str)
+
+    
+    :param type str: Get parsed sequence data from FASTA file header
+    :return parseSeqData(str): (JSON) sequence data
+    
+
+.. _module-services_utils.seq:
+
+Member: ``seq``: 
+
+.. _module-services_utils.start:
+
+Member: ``start``: 
+
+.. _module-services_utils.end:
+
+Member: ``end``: 
+
+.. _module-services_utils.strand:
+
+Member: ``strand``: 
+
+.. _module-services_utils.class:
+
+Member: ``class``: 
+
+.. _module-services_utils.length:
+
+Member: ``length``: 
+
+
+
+
+
+Module: ``utils``
+*****************
+
+
+.. contents:: Local Navigation
+   :local:
+
+   
+Description
+===========
+
+Utility Functions
+
+
+.. _module-utils.getRegionStart:
+
+
+Function: ``getRegionStart``
+============================
+
+return the starting coordinate
+>ctgA ctgA:3014..6130 (+ strand) class=remark length=3117
+
+.. js:function:: getRegionStart(str)
+
+    
+    :param type str: return the starting coordinate
+    >ctgA ctgA:3014..6130 (+ strand) class=remark length=3117
+    :return unresolved: return the starting coordinate
+    >ctgA ctgA:3014..6130 (+ strand) class=remark length=3117
+    
+.. _module-utils.parseSeqData:
+
+
+Function: ``parseSeqData``
+==========================
+
+Get parsed sequence data from FASTA file header
+
+.. js:function:: parseSeqData(str)
+
+    
+    :param type str: Get parsed sequence data from FASTA file header
+    :return parseSeqData(str): (JSON) sequence data
+    
+
+.. _module-utils.seq:
+
+Member: ``seq``: 
+
+.. _module-utils.start:
+
+Member: ``start``: 
+
+.. _module-utils.end:
+
+Member: ``end``: 
+
+.. _module-utils.strand:
+
+Member: ``strand``: 
+
+.. _module-utils.class:
+
+Member: ``class``: 
+
+.. _module-utils.length:
+
+Member: ``length``: 
 
 
 
