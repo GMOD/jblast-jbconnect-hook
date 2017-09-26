@@ -19,12 +19,83 @@ module.exports = {
     }
 }
 
+/**
+ * Monitor workflow and exit upon completion of the workflow
+ * 
+ * @param {object} kWorkflowJob
+ */
+
+function monitorWorkflow(kWorkflowJob){
+    var wId = kWorkflowJob.data.workflow.workflow_id;
+    sails.log.debug('monitorWorkflow starting, wId',wId);
+    
+    var timerloop = setInterval(function(){
+        var hId = kWorkflowJob.data.workflow.history_id;
+        
+        // TODO: if workflow fails, output will not exist.  Need to handle this.
+        var outputs = kWorkflowJob.data.workflow.outputs;    // list of workflow output history ids
+        var outputCount = outputs.length;
+        
+        sails.log.info ("history",hId);
+        
+        // get history entries
+        var url = '/api/histories/'+hId+'/contents';
+        galaxy.galaxyGET(url,function(hist,err) {
+
+            if (err !== null) {
+                var msg = wId + " monitorWorkflow: failed to get history "+hId;
+                sails.log.error(msg,err);
+                clearInterval(timerloop);
+                kWorkflowJob.kDoneFn(new Error(msg));
+                return;
+            }
+            // reorg to assoc array
+            var hista = {};
+            for(var i in hist) hista[hist[i].id] = hist[i];
+
+            // determine aggregate state
+            var okCount = 0;
+            for(var i in outputs) {
+                // if any are running or uploading, we are active
+                if(hista[outputs[i]].state==='running' || hista[outputs[i]].state==='upload')
+                    break;
+                // if something any history error, the whole workflow is in error
+                if(hista[outputs[i]].state==='error') {
+                    clearInterval(timerloop);
+                    kWorkflowJob.state('failed');
+                    kWorkflowJob.save();
+                    sails.log.debug(wId,'workflow completed in error');
+                    break;
+                }
+                if(hista[outputs[i]].state==='ok')
+                    okCount++;
+            }
+            sails.log.debug(wId,'workflow step',okCount,'of',outputCount);
+            
+            kWorkflowJob.progress(okCount,outputCount+1,{workflow_id:wId});
+
+            // complete if all states ok
+            if (outputCount === okCount) {
+                clearInterval(timerloop);
+                kWorkflowJob.state('complete');
+                kWorkflowJob.save();
+                sails.log.debug(wId,'workflow completed');
+                setTimeout(function() {
+                    postAction.doCompleteAction(kWorkflowJob,hista);            // workflow completed
+                },10);
+            }
+        });
+        
+    },3000);
+};
+
+
 
 /**
  * Read output of last generated file, copy results to /jblastdata, insert track to trackList.json.
  * 
- * @param {type} kWorkflowJob
- * @param {type} hista - associative array of histories
+ * @param {object} kWorkflowJob
+ * @param {object} hista - associative array of histories
  */
 function doCompleteAction(kWorkflowJob,hista) {
     var wId = kWorkflowJob.data.workflow.workflow_id;
@@ -134,14 +205,13 @@ function doCompleteAction(kWorkflowJob,hista) {
         },100);
     }
 }
-/**
+/*
  * 
  * 
- * @param {type} steps is list of functions i.e. ['function1','function2']
- * @param {type} kJob
- * @param {type} newTrackJson
- * @param {type} cb
- * @returns {undefined}
+ * @param {array} steps is list of functions i.e. ['function1','function2']
+ * @param {object} kJob
+ * @param {JSON object} newTrackJson
+ * @param {function} cb - callback function
  */
 function processResults(steps,kJob,trackJson,cb) {
     
@@ -150,6 +220,13 @@ function processResults(steps,kJob,trackJson,cb) {
         steps:steps
     }
 }
+/**
+ * processResultStep
+ * @param {type} stepctx
+ * @param {object} kJob
+ * @param {JSON object} trackJson
+ * @param {function} cb - callback function
+ */
 function processResultStep(stepctx,kJob,trackJson,cb) {
     
     stepctx.steps[stepctx.step](kJob,trackJson,function(stepctx) {
@@ -164,7 +241,9 @@ function processResultStep(stepctx,kJob,trackJson,cb) {
 }
 /**
  * this generates track template
- * @returns {undefined}
+ * 
+ * @param {type} kWorkflowJob
+ * @param {type} cb
  */
 function postMoveResultFiles(kWorkflowJob,cb) {
     var wId = kWorkflowJob.data.workflow.workflow_id;
@@ -253,8 +332,10 @@ function postMoveResultFiles(kWorkflowJob,cb) {
 }
 /**
  * Generate the GFF file 
+ * 
+ * @param {type} kWorkflowJob
  * @param {type} newTrackJson
- * @returns {undefined}
+ * @param {type} cb
  */
 function processFilter(kWorkflowJob,newTrackJson,cb) {
     sails.log("processFilter()");
@@ -280,6 +361,13 @@ function processFilter(kWorkflowJob,newTrackJson,cb) {
         });
     });
 }
+/**
+ * return number of hits
+ * 
+ * @param {type} kWorkflowJob
+ * @param {type} newTrackJson
+ * @returns {Number} hits
+ */
 function getHits(kWorkflowJob,newTrackJson) {
     sails.log.debug('getHits()');
     var g = sails.config.globals.jbrowse;
@@ -306,7 +394,10 @@ function getHits(kWorkflowJob,newTrackJson) {
     return hits;
 }
 /**
+ * Add track to track list and notify.
  * 
+ * @param {object} kWorkflowJob
+ * @param {JSON object} newTrackJson
  */
 function addToTrackList(kWorkflowJob,newTrackJson) {
     sails.log("addToTrackList()",newTrackJson);
@@ -392,5 +483,4 @@ function addToTrackList(kWorkflowJob,newTrackJson) {
         kWorkflowJob.kDoneFn();                                                 // kue workflow completed successfully
     });
 }
-
 

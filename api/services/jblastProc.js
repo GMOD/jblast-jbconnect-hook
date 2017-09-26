@@ -17,6 +17,11 @@ var util = require("./utils");
 
 module.exports = {
 
+    /**
+     * Initialize the service
+     * @param {type} cb
+     * @returns {undefined}
+     */
     initialize: function(cb) {
         // TODO: check that galaxy is running
 
@@ -34,7 +39,15 @@ module.exports = {
             return cb();
         });
     },
-
+    /**
+     * Submit a workflow
+     * 
+     * REST: ``POST /jbapi/workflowsubmit``
+     * 
+     * @param {type} req
+     * @param {type} res
+     * @param {type} next
+     */
     workflowSubmit: function (req, res, next) {
         sails.log.info("JBlast POST /jbapi/workflowsubmit",req.body);
         var params = {
@@ -51,7 +64,15 @@ module.exports = {
               sails.hooks['jbcore'].resSend(res,data);
           });
     },
-
+    /**
+     * Get Workflows
+     * 
+     * REST: ``GET /jbapi/getworkflows``
+     * 
+     * @param {type} req
+     * @param {type} res
+     * @param {type} next
+     */
     getWorkflows: function (req, res, next) {
           sails.log("JBlast GET /jbapi/getworkflows");
 
@@ -65,13 +86,12 @@ module.exports = {
     /** post /jbapi/setfilter - send filter parameters
      * 
      * @param {type} req
-     *    data = req.body
-     *    data.filterParams = {score:{val: 50}, evalue:{val:-2}...
-     *    data.dataSet = (i.e. "sample_data/json/volvox" generally from config.dataRoot)
-     *    data.asset = 
+     *    * data = req.body
+     *    * data.filterParams = {score:{val: 50}, evalue:{val:-2}...
+     *    * data.dataSet = (i.e. "sample_data/json/volvox" generally from config.dataRoot)
+     *    * data.asset = 
      * @param {type} res
      * @param {type} next
-     * @returns {undefined}
      */
 
     setFilter: function (req, res, next) {
@@ -80,11 +100,26 @@ module.exports = {
     },
     /**
      * Get info about the given track
+     * 
+     * REST: ``GET /jbapi/getblastdata``
+     * 
+     * @param {type} req
+     * @param {type} res
+     * @param {type} next
      */
     getBlastData: function (req, res, next) {
         sails.log.info("JBlast","/jbapi/getblastdata");
         rest_applyFilter(req,res);
     },
+    /**
+     * Get Track Data
+     * 
+     * REST: ``GET /jbapi/gettrackdata``
+     * 
+     * @param {type} req
+     * @param {type} res
+     * @param {type} next
+     */
     getTrackData: function (req, res, next) {
           sails.log("JBlast /jbapi/gettrackdata called");
           var params = req.allParams();
@@ -114,6 +149,12 @@ module.exports = {
     },
     /**
      * Return hits data given hit key
+     * 
+     * REST: ``GET /jbapi/gethitdetails called``
+     * 
+     * @param {type} req
+     * @param {type} res
+     * @param {type} next
      */
     getHitDetails: function (req, res, next) {
           sails.log("JBlast /jbapi/gethitdetails called");
@@ -125,6 +166,12 @@ module.exports = {
     /**
      * returns accession data given accesion number.
      * Utilizes Entrez service
+     * 
+     * REST: ``GET /jbapi/lookupaccession``
+     * 
+     * @param {type} req
+     * @param {type} res
+     * @param {type} next
      */
     lookupAccession: function (req, res, next) {
         sails.log("JBlast /jbapi/lookupaccession called");
@@ -156,12 +203,8 @@ module.exports = {
 
 };
 
-/**
+/*
  * Process REST /jbapi/gethitdetails
- * @param {type} req
- * @param {type} res
- * @param {type} cb
- * @returns {undefined}
  */
 
 function rest_getHitDetails(req,res, cb) {
@@ -173,6 +216,9 @@ function rest_getHitDetails(req,res, cb) {
     });
 };
 
+/*
+ * 
+ */
 function rest_applyFilter(req,res) {
     sails.log.debug("rest_applyFilter()");
     var g = sails.config.globals;
@@ -198,72 +244,3 @@ function rest_applyFilter(req,res) {
     }
 };
     
-/**
- * Monitor workflow
- * @param {type} kWorkflowJob
- * @returns {undefined}
- */
-
-function monitorWorkflow(kWorkflowJob){
-    var wId = kWorkflowJob.data.workflow.workflow_id;
-    sails.log.debug('monitorWorkflow starting, wId',wId);
-    
-    var timerloop = setInterval(function(){
-        var hId = kWorkflowJob.data.workflow.history_id;
-        
-        // TODO: if workflow fails, output will not exist.  Need to handle this.
-        var outputs = kWorkflowJob.data.workflow.outputs;    // list of workflow output history ids
-        var outputCount = outputs.length;
-        
-        sails.log.info ("history",hId);
-        
-        // get history entries
-        var url = '/api/histories/'+hId+'/contents';
-        galaxy.galaxyGET(url,function(hist,err) {
-
-            if (err !== null) {
-                var msg = wId + " monitorWorkflow: failed to get history "+hId;
-                sails.log.error(msg,err);
-                clearInterval(timerloop);
-                kWorkflowJob.kDoneFn(new Error(msg));
-                return;
-            }
-            // reorg to assoc array
-            var hista = {};
-            for(var i in hist) hista[hist[i].id] = hist[i];
-
-            // determine aggregate state
-            var okCount = 0;
-            for(var i in outputs) {
-                // if any are running or uploading, we are active
-                if(hista[outputs[i]].state==='running' || hista[outputs[i]].state==='upload')
-                    break;
-                // if something any history error, the whole workflow is in error
-                if(hista[outputs[i]].state==='error') {
-                    clearInterval(timerloop);
-                    kWorkflowJob.state('failed');
-                    kWorkflowJob.save();
-                    sails.log.debug(wId,'workflow completed in error');
-                    break;
-                }
-                if(hista[outputs[i]].state==='ok')
-                    okCount++;
-            }
-            sails.log.debug(wId,'workflow step',okCount,'of',outputCount);
-            
-            kWorkflowJob.progress(okCount,outputCount+1,{workflow_id:wId});
-
-            // complete if all states ok
-            if (outputCount === okCount) {
-                clearInterval(timerloop);
-                kWorkflowJob.state('complete');
-                kWorkflowJob.save();
-                sails.log.debug(wId,'workflow completed');
-                setTimeout(function() {
-                    postAction.doCompleteAction(kWorkflowJob,hista);            // workflow completed
-                },10);
-            }
-        });
-        
-    },3000);
-};
