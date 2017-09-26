@@ -106,34 +106,3 @@ They are made available as route by the JBServer framework and are only accessib
 See :ref:`jblast-integrated-gui` for more details.
 
 
-
-Test Framework
-==============
-
-Test framework uses
-
-* Mocha for unit test
-* Nightwatch for end-to-end, supporting phantomjs, selenium and online service such as browserstack.
-* Istanbul for coverage
-
-To execute
-
-``npm test``
-
-by default nightwatch is setup for phantomjs.
-Selenium requires running an additional selenium server
-Browserstack has not been tested.
-
-
-Documentation Framework
-=======================
-
-For integrated documentation, `JSdoc3 <http://usejsdoc.org/>`_ is used 
-to generate API docs from code with jsdoc-sphinx, a jsdoc template that generates 
-RestructuredText (RST) and Sphinx.  This enables support for 
-`readthedocs <https://readthedocs.org/>`_.
-
-See: `RST/Sphinx Cheatsheet <http://openalea.gforge.inria.fr/doc/openalea/doc/_build/html/source/sphinx/rest_syntax.html>`_  
-
-
-``npm run gendocs``
