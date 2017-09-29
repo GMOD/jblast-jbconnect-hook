@@ -271,6 +271,11 @@ This shows the JBlast and NCBI tools in the tools sidebar.
 
 .. image:: img/galaxy-jblast-tools.jpg
 
+*Note: NCBI Blast tools are not installed by the ``jbutils --setuptools`` script. 
+the user must manually install these through the Tool Shed as admin.*
+
+
+
 JBlast Galaxy Workflows
 -----------------------
 

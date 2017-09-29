@@ -98,6 +98,10 @@ This requires having configured the Galaxy API key in config.
 This option sets up Jblast tools for Galaxy.  After this is called, Galaxy will
 need to be restarted.
 
+*Note: NCBI Blast tools are not installed by the ``jbutils --setuptools`` script. 
+the user must manually install these through the Tool Shed as admin.*
+
+
 --setupdata
 -----------
 
