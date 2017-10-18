@@ -9,10 +9,6 @@ module.exports = {
     routes: function() {
         return {
             before: {
-                'get /hi': {
-                    controller: 'WorkflowMgrController',
-                    action: 'hello'
-                }
                 
             },
             after: {
