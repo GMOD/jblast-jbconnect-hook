@@ -143,9 +143,9 @@ function exec_setuptrack(params) {
     console.log("Setting up sample track...");
     var g = config;
 
-    var trackListPath = g.jbrowsePath + g.dataSet[0].dataPath + 'trackList.json';
+    var trackListPath = g.jbrowsePath + g.dataSet[0].dataPath + '/trackList.json';
     var sampleTrackFile = g.jbrowsePath + g.dataSet[0].dataPath;
-    sampleTrackFile += g.jblast.blastResultPath+'/sampleTrack.json';
+    sampleTrackFile += '/'+g.jblast.blastResultPath+'/sampleTrack.json';
     var dataSet = g.dataSet[0].dataPath;
     
     // read sampleTrack.json file
