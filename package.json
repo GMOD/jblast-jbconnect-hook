@@ -1,6 +1,6 @@
 {
   "name": "jbh-jblast",
-  "version": "0.0.251",
+  "version": "0.0.268",
   "description": "JBlast - Integrated JBrowse BLAST with Galaxy (JBrowse Server Hook)",
   "main": "api/hooks/jblast/index.js",
   "scripts": {
@@ -35,6 +35,7 @@
     "request": "^2.81.0",
     "request-promise": "^4.2.1",
     "require-all": "^2.2.0",
+    "sails-hook-update-or-create": "^0.1.4",
     "shelljs": "^0.7.8",
     "xmljson": "^0.2.0"
   },
