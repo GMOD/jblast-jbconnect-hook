@@ -23,8 +23,11 @@ module.exports = {
      * @returns {undefined}
      */
     initialize: function(cb) {
+        sails.log('>>> jblastProc.initialize');
+        
         // TODO: check that galaxy is running
 
+        
         galaxy.init(function(history) {
 
             historyId = history.historyId;
@@ -32,11 +35,27 @@ module.exports = {
         }, function(err) {
             sails.log.error("failed galaxy.init",err);
         });
-
-
+        
         sails.on('hook:orm:loaded', function() {
+        //sails.on('lifted', function() {
+            sails.log(">>> jblastProc.initialize.lifted");
             // do something after hooks are loaded
-            return cb();
+            
+            // test workflow add service
+            var service = {
+                name:   'blastgalaxy',
+                type:   'workflow',
+                module: 'jblast',
+                handler: function() {}                    
+            }
+            
+            Service.addService(service,function(result){
+            
+                return cb();
+            });
+            
+            
+            //return cb();
         });
     },
     /**
@@ -51,10 +70,10 @@ module.exports = {
     workflowSubmit: function (req, res, next) {
         sails.log.info("JBlast POST /jbapi/workflowsubmit",req.body);
         var params = {
-          region:req.body.region,
-          workflow:req.body.workflow,
-          dataSetPath:req.body.dataSetPath,
-          monitorFn:monitorWorkflow
+          region:           req.body.region,
+          workflow:         req.body.workflow,
+          dataSetPath:      req.body.dataSetPath,
+          monitorFn:        postAction.monitorWorkflow
         };
         galaxy.workflowSubmit(params,
           function(data,err) {
