@@ -43,14 +43,14 @@ module.exports = {
             
             // test workflow add service
             var service = {
-                name:   'blastgalaxy',
+                name:   'galaxy_blast',
                 type:   'workflow',
                 module: 'jblast',
-                handler: function() {}                    
+                handler: galaxyService                    
             }
             
             Service.addService(service,function(result){
-            
+
                 return cb();
             });
             
