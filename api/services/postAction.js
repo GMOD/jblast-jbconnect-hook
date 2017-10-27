@@ -17,76 +17,7 @@ var galaxy = require("./galaxyUtils");
 module.exports = {
     doCompleteAction: function(kWorkflowJob,hista) {
         doCompleteAction(kWorkflowJob,hista);
-    },
-    /**
-     * Monitor workflow and exit upon completion of the workflow
-     * 
-     * @param {object} kWorkflowJob
-     */
-    monitorWorkflow: function(kWorkflowJob){
-        var wId = kWorkflowJob.data.workflow.workflow_id;
-        sails.log.debug('monitorWorkflow starting, wId',wId);
-
-        var timerloop = setInterval(function(){
-            var hId = kWorkflowJob.data.workflow.history_id;
-
-            // TODO: if workflow fails, output will not exist.  Need to handle this.
-            var outputs = kWorkflowJob.data.workflow.outputs;    // list of workflow output history ids
-            var outputCount = outputs.length;
-
-            sails.log.info ("history",hId);
-
-            // get history entries
-            var url = '/api/histories/'+hId+'/contents';
-            galaxy.galaxyGET(url,function(hist,err) {
-
-                if (err !== null) {
-                    var msg = wId + " monitorWorkflow: failed to get history "+hId;
-                    sails.log.error(msg,err);
-                    clearInterval(timerloop);
-                    kWorkflowJob.kDoneFn(new Error(msg));
-                    return;
-                }
-                // reorg to assoc array
-                var hista = {};
-                for(var i in hist) hista[hist[i].id] = hist[i];
-
-                // determine aggregate state
-                var okCount = 0;
-                for(var i in outputs) {
-                    // if any are running or uploading, we are active
-                    if(hista[outputs[i]].state==='running' || hista[outputs[i]].state==='upload')
-                        break;
-                    // if something any history error, the whole workflow is in error
-                    if(hista[outputs[i]].state==='error') {
-                        clearInterval(timerloop);
-                        kWorkflowJob.state('failed');
-                        kWorkflowJob.save();
-                        sails.log.debug(wId,'workflow completed in error');
-                        break;
-                    }
-                    if(hista[outputs[i]].state==='ok')
-                        okCount++;
-                }
-                sails.log.debug(wId,'workflow step',okCount,'of',outputCount);
-
-                kWorkflowJob.progress(okCount,outputCount+1,{workflow_id:wId});
-
-                // complete if all states ok
-                if (outputCount === okCount) {
-                    clearInterval(timerloop);
-                    kWorkflowJob.state('complete');
-                    kWorkflowJob.save();
-                    sails.log.debug(wId,'workflow completed');
-                    setTimeout(function() {
-                        postAction.doCompleteAction(kWorkflowJob,hista);            // workflow completed
-                    },10);
-                }
-            });
-
-        },3000);
-    }
-    
+    }    
 }
 
 
@@ -316,7 +247,8 @@ function postMoveResultFiles(kWorkflowJob,cb) {
         var dataset = replaceAll(kWorkflowJob.data.jbrowseDataPath,'/','%2F');   //g.dataSet[0].dataPath
         
         newTrackJson[0].baseUrl = '/';
-        newTrackJson[0].urlTemplate = '/jbapi/gettrackdata/' +kWorkflowJob.data.blastData.outputs.blastxml + '/' + dataset;
+        //newTrackJson[0].urlTemplate = '/jbapi/gettrackdata/' +kWorkflowJob.data.blastData.outputs.blastxml + '/' + dataset;  // old way
+        newTrackJson[0].urlTemplate = '/service/exec/get_trackdata/?asset=' +kWorkflowJob.data.blastData.outputs.blastxml + '&dataset=' + dataset;
         newTrackJson[0].storeCache = false;
         newTrackJson[0].filterSettings = g.jblast.blastResultPath+"/"+fileBlastFilter;
         newTrackJson[0].jblast = 1;     // indicate this is a jblast generated track
