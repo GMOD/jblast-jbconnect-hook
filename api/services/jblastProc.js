@@ -15,6 +15,8 @@ var galaxy = require("./galaxyUtils");
 var util = require("./utils");
 //var prettyjson = require('prettyjson');   // for debugging
 
+// test
+
 module.exports = {
 
     /**
@@ -27,7 +29,7 @@ module.exports = {
         
         // TODO: check that galaxy is running
 
-        
+        /*
         galaxy.init(function(history) {
 
             historyId = history.historyId;
@@ -35,7 +37,7 @@ module.exports = {
         }, function(err) {
             sails.log.error("failed galaxy.init",err);
         });
-        
+        */
         sails.on('hook:orm:loaded', function() {
         //sails.on('lifted', function() {
             sails.log(">>> jblastProc.initialize.lifted");
@@ -43,11 +45,38 @@ module.exports = {
             
             // test workflow add service
             var service = {
+                name:   'entrez_service',
+                type:   'service',
+                module: 'jblast',
+                handler: entrezService                    
+            };
+            
+            Service.addService(service,function(result){
+
+                return cb();
+            });
+            // test workflow add service
+            /*
+            var service = {
                 name:   'galaxy_blast',
                 type:   'workflow',
                 module: 'jblast',
                 handler: galaxyService                    
             }
+            
+            Service.addService(service,function(result){
+
+                return cb();
+            });
+            */
+           
+            // test workflow add service
+            var service = {
+                name:   'ncbi_blast',
+                type:   'workflow',
+                module: 'jblast',
+                handler: basicWorkflowService                    
+            };
             
             Service.addService(service,function(result){
 
