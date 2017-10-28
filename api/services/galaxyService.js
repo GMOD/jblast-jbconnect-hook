@@ -10,8 +10,7 @@ module.exports = {
         set_filter:         'post',
         get_blastdata:      'get',
         get_trackdata:      'get',
-        get_hit_details:    'get',
-        lookup_accession:   'get',
+        get_hit_details:    'get'
     },
     init: function(params,cb) {
         galaxyProc.init(params,cb);
@@ -130,16 +129,5 @@ module.exports = {
      */
     get_hit_details: function(req, res) {
         galaxyProc.getHitDetails(req,res);
-    },
-    /**
-     * REST Request:
-     *      GET /service/exec/lookup_accession?accession=<lookup string>
-     * 
-     * @param {type} req - request object
-     * @param {type} res - response object
-     * @returns {undefined}
-     */
-    loookup_accession: function(req,res) {
-        galaxyProc.lookupAccession(req,res);
-    }    
+    }
 };
