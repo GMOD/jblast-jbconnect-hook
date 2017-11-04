@@ -18,7 +18,15 @@ module.exports.globals = {
             blastResultPath: "jblastdata",
             blastResultCategory: "JBlast Results",
             insertTrackTemplate: "inMemTemplate.json",
-            import: ["blastxml"]
+            import: ["blastxml"],
+            
+            // list of services that will get registered.
+            services: [
+                'basicWorkflowService',
+                //'galaxyService',
+                'filterService',
+                'entrezService'
+            ]
         }
     }
 };
