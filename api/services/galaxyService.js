@@ -7,9 +7,9 @@ module.exports = {
     fmap: {
         workflow_submit:    'post',
         get_workflows:      'get',
-        set_filter:         'post',
-        get_blastdata:      'get',
-        get_trackdata:      'get',
+        //set_filter:         'post',
+        //get_blastdata:      'get',
+        //get_trackdata:      'get',
         get_hit_details:    'get'
     },
     init: function(params,cb) {
