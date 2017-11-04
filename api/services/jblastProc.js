@@ -42,56 +42,22 @@ module.exports = {
         //sails.on('lifted', function() {
             sails.log(">>> jblastProc.initialize.lifted");
             // do something after hooks are loaded
-            
-            // test workflow add service
-            var service = {
-                name:   'entrez_service',
-                type:   'service',
-                module: 'jblast',
-                handler: entrezService                    
-            };
-            
-            Service.addService(service,function(result){
-            });
-            
-            var service = {
-                name:   'filter_service',
-                type:   'service',
-                module: 'jblast',
-                handler: filterService                    
-            };
-            Service.addService(service,function(result){
-            });
-            // test workflow add service
-            /*
-            var service = {
-                name:   'galaxy_blast',
-                type:   'workflow',
-                module: 'jblast',
-                handler: galaxyService                    
-            }
-            
-            Service.addService(service,function(result){
 
-                return cb();
-            });
-            */
-           
-            // test workflow add service
-            var service = {
-                name:   'basic_workflow',
-                type:   'workflow',
-                module: 'jblast',
-                handler: basicWorkflowService                    
-            };
-            
-            Service.addService(service,function(result){
+            var g = sails.config.globals.jbrowse;
+            var services = g.jblast.services;
 
-                return cb();
+            // load services
+            services.forEach(function(service) {
+                var params = {
+                    name:   service.name,
+                    type:   service.type,
+                    module: 'jblast',
+                    handler: require('./'+service.name)                    
+                };
+                Service.addService(params,function(result){});
             });
             
-            
-            //return cb();
+            return cb();
         });
     },
     /**
