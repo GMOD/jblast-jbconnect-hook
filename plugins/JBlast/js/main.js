@@ -339,7 +339,7 @@ return declare( JBrowsePlugin,
                     var asset = track.config.label;
                     var dataset = encodeURIComponent(track.browser.config.dataRoot);
                     var hitkey = blastKey;
-                    var url = '/jbapi/gethitdetails/'+asset+'/'+dataset+'/'+hitkey;
+                    var url = '/service/exec/get_hit_details/?asset='+asset+'&dataset='+dataset+'&hitkey'+hitkey;
                     $.get( url, function(hitData) {
                         console.log("gethitdetails data",hitData);
                         
@@ -351,7 +351,7 @@ return declare( JBrowsePlugin,
                             // do only on first iteration because other iteratons have same data
                             if (count===0) {
                                 blastContent += thisB.blastRenderHitCommon(hit);
-                                $.get('/jbapi/lookupaccession/'+hit.Hit_accession,function(data) {
+                                $.get('/service/exec/lookup_accession/?accession='+hit.Hit_accession,function(data) {
                                     
                                     var count = 0;
                                     for(var i in data.result) {
@@ -504,7 +504,7 @@ return declare( JBrowsePlugin,
                     $('.blast-group-descript').attr('title',task.trackConfig.metadata.description);
                     $('.blast-group-descript').attr('alt',task.trackConfig.metadata.description);
 
-                    $.get("/jbapi/getblastdata/"+JBrowse.jblast.asset+'/'+encodeURIComponent(JBrowse.config.dataRoot), function(data){
+                    $.get("/service/exec/get_blastdata/?asset="+JBrowse.jblast.asset+'&dataset='+encodeURIComponent(JBrowse.config.dataRoot), function(data){
                         console.log( data );
                         $('.blast-hit-data').html("Hits: ("+data.filteredHits+'/'+data.hits+")");
                     });
@@ -715,7 +715,7 @@ return declare( JBrowsePlugin,
               dataSet: this.browser.config.dataRoot
         }
         //console.log("postData",postData);
-        $.post( "/jbapi/setfilter", postData , function( data) {
+        $.post( "/service/exec/set_filter", postData , function( data) {
             console.log( data );
             $('.blast-hit-data').html("Hits: ("+data.filteredHits+'/'+data.hits+")");
         }, "json");
@@ -909,10 +909,10 @@ return declare( JBrowsePlugin,
                     var postData = {
                           region: regionB,
                           workflow: selWorkflow,
-                          dataSetPath: thisB.config.dataRoot
+                          dataSet: thisB.config.dataRoot
                       };
                     //var deferred = dojo.xhrPost(xhrArgs);
-                    $.post( "/jbapi/workflowsubmit", postData , function( result ) {
+                    $.post( "/service/exec/workflow_submit", postData , function( result ) {
                         console.log( result );
                     }, "json");
 
@@ -970,11 +970,12 @@ function getWorkflows(cb) {
 
     // Call the asynchronous xhrGet
     //var deferred = dojo.xhrGet(xhrArgs);
-    $.get( "/jbapi/getworkflows", function( data ) {
+    $.get( "/service/exec/get_workflows", function( data ) {
         console.log("get workflows result", data);
         cb(data);
     });
 }
+
 // overwrite a string with another string at the given location
 function overwriteStr(subjStr, at, withStr) {
       var partL = subjStr;
