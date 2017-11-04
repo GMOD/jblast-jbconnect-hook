@@ -16,19 +16,19 @@ var galaxy = require("./galaxyUtils");
 
 module.exports = {
     doCompleteAction: function(kWorkflowJob,hista) {
-        doCompleteAction(kWorkflowJob,hista);
+        return doCompleteAction(kWorkflowJob,hista);
     },
     postMoveResultFiles: function(kWorkflowJob,cb) {
-        postMoveResultFiles(kWorkflowJob,cb);
+        return postMoveResultFiles(kWorkflowJob,cb);
     },
     getHits: function(kWorkflowJob,newTrackJson) {
-        getHits(kWorkflowJob,newTrackJson);
+        return getHits(kWorkflowJob,newTrackJson);
     },
     processFilter: function(kWorkflowJob,newTrackJson,cb) {
-        processFilter(kWorkflowJob,newTrackJson,cb);
+        return processFilter(kWorkflowJob,newTrackJson,cb);
     },
     addToTrackList: function(kWorkflowJob,newTrackJson) {
-        addToTrackList(kWorkflowJob,newTrackJson);
+        return addToTrackList(kWorkflowJob,newTrackJson);
     }
 };
 
@@ -336,7 +336,7 @@ function getHits(kWorkflowJob,newTrackJson) {
     for(var x in blastData) {
         hits ++;
     }
-    
+    sails.log('>>> getHits return',hits, typeof hits);
     return hits;
 }
 /**
