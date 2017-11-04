@@ -52,8 +52,15 @@ module.exports = {
             };
             
             Service.addService(service,function(result){
-
-                return cb();
+            });
+            
+            var service = {
+                name:   'filter_service',
+                type:   'service',
+                module: 'jblast',
+                handler: filterService                    
+            };
+            Service.addService(service,function(result){
             });
             // test workflow add service
             /*
@@ -72,7 +79,7 @@ module.exports = {
            
             // test workflow add service
             var service = {
-                name:   'ncbi_blast',
+                name:   'basic_workflow',
                 type:   'workflow',
                 module: 'jblast',
                 handler: basicWorkflowService                    
