@@ -62,6 +62,6 @@ blast.blast(options, function(err, results) {
         console.log('workflowResults:',ret);
         return err;
     }
-    console.log('workflowResults:',results);
+    console.log('workflowResults:',JSON.stringify(results,null,4));
     return;
 });
