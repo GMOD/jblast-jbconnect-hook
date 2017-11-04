@@ -17,8 +17,20 @@ var galaxy = require("./galaxyUtils");
 module.exports = {
     doCompleteAction: function(kWorkflowJob,hista) {
         doCompleteAction(kWorkflowJob,hista);
-    }    
-}
+    },
+    postMoveResultFiles: function(kWorkflowJob,cb) {
+        postMoveResultFiles(kWorkflowJob,cb);
+    },
+    getHits: function(kWorkflowJob,newTrackJson) {
+        getHits(kWorkflowJob,newTrackJson);
+    },
+    processFilter: function(kWorkflowJob,newTrackJson,cb) {
+        processFilter(kWorkflowJob,newTrackJson,cb);
+    },
+    addToTrackList: function(kWorkflowJob,newTrackJson) {
+        addToTrackList(kWorkflowJob,newTrackJson);
+    }
+};
 
 
 /**
@@ -177,8 +189,8 @@ function processResultStep(stepctx,kJob,trackJson,cb) {
  * @param {type} cb
  */
 function postMoveResultFiles(kWorkflowJob,cb) {
-    var wId = kWorkflowJob.data.workflow.workflow_id;
-    sails.log.debug(wId,'moveResultFiles()');
+    //var wId = kWorkflowJob.data.workflow.workflow_id;
+    //sails.log.debug(wId,'moveResultFiles()');
 
     function escapeRegExp(str) {
         return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
@@ -220,10 +232,11 @@ function postMoveResultFiles(kWorkflowJob,cb) {
         // galaxy history id
         //var galaxyHistId = kWorkflowJob.data.blastData.outputs.json.split("_")[0];
         
-        var trackLabel = 'blast '+kWorkflowJob.id+' ('+kWorkflowJob.data.sequence.start+'..'+kWorkflowJob.data.sequence.end+')'
-            +' '+kWorkflowJob.data.blastData.hits + ' hits';
+        //var trackLabel = 'blast '+kWorkflowJob.id+' ('+kWorkflowJob.data.sequence.start+'..'+kWorkflowJob.data.sequence.end+')'
+        //    +' '+kWorkflowJob.data.blastData.hits + ' hits';
+        //var trackLabel = newTrackJson[0].key;
     
-        sails.log.info('trackLabel',trackLabel);
+        //sails.log.info('trackLabel',trackLabel);
 
         var fileGffOnly = kWorkflowJob.data.blastData.outputs.gff3 +'.gff3';
         var fileJsonOnly = kWorkflowJob.data.blastData.outputs.json + '.json';
@@ -236,7 +249,7 @@ function postMoveResultFiles(kWorkflowJob,cb) {
         
         // todo: should not be outputs.blastxml (too specific to filetype);  should be something like assetId
         newTrackJson[0].label = kWorkflowJob.data.blastData.outputs.blastxml; //"jblast-"+ (new Date().getTime());
-        newTrackJson[0].key = trackLabel;
+        //newTrackJson[0].key = trackLabel;     // the track label is determined after the filter process, bc we need the hit count.
         newTrackJson[0].metadata = {
                 description: 'Workflow: '+kWorkflowJob.data.workflow.name
             }
@@ -286,6 +299,7 @@ function processFilter(kWorkflowJob,newTrackJson,cb) {
             
             var trackLabel = 'blast '+kWorkflowJob.id+' ('+kWorkflowJob.data.sequence.start+'..'+kWorkflowJob.data.sequence.end+')'
                 +' '+hitdata.hits + ' hits';
+            
             newTrackJson[0].key = trackLabel;
             
             kWorkflowJob.save();
