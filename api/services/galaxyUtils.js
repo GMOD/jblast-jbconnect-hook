@@ -20,7 +20,7 @@ module.exports = {
     init: function(cb,cberr) {
         console.log('galaxyUtils init');
         var g = sails.config.globals.jbrowse;
-        console.log('globals',g);
+        //console.log('globals',g);
         
         this.debugRestFile = g.galaxy.debugRestFile;
         
