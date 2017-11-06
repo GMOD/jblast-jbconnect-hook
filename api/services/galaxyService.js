@@ -13,7 +13,8 @@ module.exports = {
         get_hit_details:    'get'
     },
     init: function(params,cb) {
-        galaxyProc.init(params,cb);
+        sails.log(">>> galaxyService.init",typeof cb);
+        galaxyProc.init(cb);
     },
     /**
      * submit a sequence and workflow for processing.
@@ -69,52 +70,6 @@ module.exports = {
      */
     get_workflows: function(req, res) {
         galaxyProc.getWorkflows(req,res);
-    },
-    /**
-     * 
-     * REST Request:
-     *      POST /service/exec/set_filter
-     *      
-     * @param {object} req
-     *    req.body = {
-     *      filterParams: {score:{val: 50}, evalue:{val:-2}...
-     *      dataSet: (i.e. "sample_data/json/volvox" generally from config.dataRoot)
-     *      asset: asset id
-     *    } 
-     * @param {type} res
-     * @returns {undefined}
-     */
-    set_filter: function(req, res) {
-        galaxyProc.setFilter(req,res);
-    },
-    /**
-     * REST Request:
-     *      GET /service/exec/get_blastdata
-     *          ?asset=<asset id>
-     *          &dataset=<dataset string>
-     * 
-     * @param {object} req
-     * @param {object} res
-     * @returns {}
-     * 
-     */
-    get_blastdata: function(req, res) {
-        galaxyProc.getBlastData(req,res);
-    },
-    /**
-     * This function gets a track via REST method (as opposed to file access)
-     * 
-     * REST Request:
-     *      GET /service/exec/get_trackdata
-     *          ?asset=<asset id>
-     *          &dataset=<dataset string>
-     * 
-     * @param {type} req
-     * @param {type} res
-     * @returns {undefined}
-     */
-    get_trackdata: function(req, res) {
-        galaxyProc.getTrackData(req,res);
     },
     /**
      * REST Request:
