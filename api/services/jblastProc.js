@@ -29,34 +29,10 @@ module.exports = {
         
         // TODO: check that galaxy is running
 
-        /*
-        galaxy.init(function(history) {
-
-            historyId = history.historyId;
-
-        }, function(err) {
-            sails.log.error("failed galaxy.init",err);
-        });
-        */
         sails.on('hook:orm:loaded', function() {
         //sails.on('lifted', function() {
             sails.log(">>> jblastProc.initialize.lifted");
             // do something after hooks are loaded
-
-            var g = sails.config.globals.jbrowse;
-            var services = g.jblast.services;
-
-            // load services
-            services.forEach(function(service) {
-                var params = {
-                    name:   service.name,
-                    type:   service.type,
-                    module: 'jblast',
-                    handler: require('./'+service.name)                    
-                };
-                Service.addService(params,function(result){});
-            });
-            
             return cb();
         });
     },
@@ -103,70 +79,6 @@ module.exports = {
               }
               return res.send(workflows);
           });
-    },
-    /** post /jbapi/setfilter - send filter parameters
-     * 
-     * @param {type} req
-     *    * data = req.body
-     *    * data.filterParams = {score:{val: 50}, evalue:{val:-2}...
-     *    * data.dataSet = (i.e. "sample_data/json/volvox" generally from config.dataRoot)
-     *    * data.asset = 
-     * @param {type} res
-     * @param {type} next
-     */
-
-    setFilter: function (req, res, next) {
-        sails.log.info("JBlast","POST /jbapi/setfilter",req.body);
-        rest_applyFilter(req,res);
-    },
-    /**
-     * Get info about the given track
-     * 
-     * REST: ``GET /jbapi/getblastdata``
-     * 
-     * @param {type} req
-     * @param {type} res
-     * @param {type} next
-     */
-    getBlastData: function (req, res, next) {
-        sails.log.info("JBlast","/jbapi/getblastdata");
-        rest_applyFilter(req,res);
-    },
-    /**
-     * Get Track Data
-     * 
-     * REST: ``GET /jbapi/gettrackdata``
-     * 
-     * @param {type} req
-     * @param {type} res
-     * @param {type} next
-     */
-    getTrackData: function (req, res, next) {
-          sails.log("JBlast /jbapi/gettrackdata called");
-          var params = req.allParams();
-          sails.log('asset',req.param('asset'));
-          sails.log('dataset',req.param('dataset'));
-          //sails.log('req.allParams()',req.allParams());
-
-          var asset = req.param('asset');
-          var dataset = req.param('dataset');
-
-          var g = sails.config.globals.jbrowse;
-
-          //var gfffile = g.jbrowsePath + dataset +'/'+ g.jblast.blastResultPath + '/' + 'sampleResult.gff3';
-          var gfffile = g.jbrowsePath + dataset + '/'+ g.jblast.blastResultPath + '/' + asset +'.gff3';
-
-          try {
-              var content = fs.readFileSync(gfffile);
-          }
-          catch (err) {
-              var str = JSON.stringify(err);
-              //var str = str.split("\n");
-              sails.log.error("failed to retrieve gff3 file",str);
-              return sails.hooks['jbcore'].resSend(res,{status: 'error', msg: str, err:err});
-          };
-
-          return res.send(content);
     },
     /**
      * Return hits data given hit key
@@ -237,31 +149,3 @@ function rest_getHitDetails(req,res, cb) {
     });
 };
 
-/*
- * 
- */
-function rest_applyFilter(req,res) {
-    sails.log.debug("rest_applyFilter()");
-    var g = sails.config.globals;
-    var requestData = req.body;
-
-    // get /jbapi/getdata is used then the asset and dataset will be in th params, so extract them.
-    var asset = req.param('asset');
-    var dataSet = req.param('dataset');
-
-    if (typeof asset !== 'undefined') requestData.asset = asset;
-    if (typeof dataSet !== 'undefined') requestData.dataSet = dataSet;
-    
-    sails.log.debug("requestData",requestData);
-
-    var err = filter.writeFilterSettings(requestData,function(filterData) {
-        filter.applyFilter(filterData,requestData,function(data) {
-    
-            return res.send(data);
-        });
-    });
-    if (err) {
-        return res.send({status:'error',err:err});
-    }
-};
-    
