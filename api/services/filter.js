@@ -86,7 +86,7 @@ module.exports = {
     writeFilterSettings: function(requestData,cb) {
         sails.log.debug('writeFilterSettings()');
         var asset = requestData.asset;
-        var dataSet = requestData.dataSet;
+        var dataSet = requestData.dataset;
         
         var filterData = requestData.filterParams;
         
@@ -140,10 +140,10 @@ module.exports = {
      *  })
      */
     applyFilter: function(filterData,requestData,cb) {
-        sails.log.debug('applyFilter()');
+        sails.log.debug('applyFilter()',requestData);
         var g = sails.config.globals.jbrowse;
         var asset = requestData.asset;
-        var dataSet = requestData.dataSet;
+        var dataSet = requestData.dataset;
         //var filterData = requestData.filterParams;
         
         var resultFile = g.jbrowsePath + dataSet +'/'+ g.jblast.blastResultPath+'/'+asset+'.json';
