@@ -4,8 +4,6 @@
  * This module manages the communication with the galaxy API.
  */
 var request = require('request');
-//var requestp = require('request-promise');
-//var path = require('path');
 var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require("fs"));
 var util = require('./utils');
@@ -18,7 +16,6 @@ module.exports = {
      * @returns {undefined}
      */
     init: function(cb,cberr) {
-        console.log('galaxyUtils init');
         var g = sails.config.globals.jbrowse;
         //console.log('globals',g);
         
