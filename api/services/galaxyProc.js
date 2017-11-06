@@ -24,21 +24,22 @@ module.exports = {
      */
     init: function(cb) {
         
+        var cb2 = cb;
         // TODO: check that galaxy is running
 
         galaxy.init(function(history) {
 
             historyId = history.historyId;
-            cb('success');
+            cb2('success');
 
         }, function(err) {
             sails.log.error("failed galaxy.init",err);
-            cb(err);
+            cb2(err);
         });
     },
     workflowSubmit: function (req, res) {
         var params = req.allParams();
-        params.dataSetPath = params.dataSet;
+        params.dataSetPath = params.dataset;
         params.monitorFn = this.monitorWorkflow;
         
         galaxy.workflowSubmit(params,
@@ -56,65 +57,6 @@ module.exports = {
               }
               return res.send(workflows);
           });
-    },
-    /**
-     * 
-     * @param {type} req
-     *    * data = req.body
-     *    * data.filterParams = {score:{val: 50}, evalue:{val:-2}...
-     *    * data.dataSet = (i.e. "sample_data/json/volvox" generally from config.dataRoot)
-     *    * data.asset = 
-     * @param {type} res
-     * @param {type} next
-     */
-
-    setFilter: function (req, res, next) {
-        rest_applyFilter(req,res);
-    },
-    /**
-     * Get info about the given track
-     * 
-     * REST: ``GET /jbapi/getblastdata``
-     * 
-     * @param {type} req
-     * @param {type} res
-     * @param {type} next
-     */
-    getBlastData: function (req, res, next) {
-        rest_applyFilter(req,res);
-    },
-    /**
-     * Get Track Data
-     * 
-     * REST: ``GET /jbapi/gettrackdata``
-     * 
-     * @param {type} req
-     * @param {type} res
-     * @param {type} next
-     */
-    getTrackData: function (req, res, next) {
-
-        var params = req.allParams();
-
-        var asset = params.asset;
-        var dataset = params.dataset;
-
-        var g = sails.config.globals.jbrowse;
-
-        //var gfffile = g.jbrowsePath + dataset +'/'+ g.jblast.blastResultPath + '/' + 'sampleResult.gff3';
-        var gfffile = g.jbrowsePath + dataset + '/'+ g.jblast.blastResultPath + '/' + asset +'.gff3';
-
-        try {
-            var content = fs.readFileSync(gfffile);
-        }
-        catch (err) {
-            var str = JSON.stringify(err);
-            //var str = str.split("\n");
-            sails.log.error("failed to retrieve gff3 file",str);
-            return sails.hooks['jbcore'].resSend(res,{status: 'error', msg: str, err:err});
-        };
-
-        return res.send(content);
     },
     /**
      * Return hits data given hit key
@@ -256,21 +198,3 @@ function rest_getHitDetails(req,res,cb) {
     });
 };
 
-/*
- * 
- */
-function rest_applyFilter(req,res) {
-    var g = sails.config.globals;
-    var requestData = req.allParams();
-
-    var err = filter.writeFilterSettings(requestData,function(filterData) {
-        filter.applyFilter(filterData,requestData,function(data) {
-    
-            return res.send(data);
-        });
-    });
-    if (err) {
-        return res.send({status:'error',err:err});
-    }
-};
-    
