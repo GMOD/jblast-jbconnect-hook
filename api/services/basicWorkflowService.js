@@ -18,7 +18,7 @@ module.exports = {
         get_hit_details:    'get'
     },
     init: function(params,cb) {
-        
+        return cb();
     },
     workflow_submit: function(req, res) {
         var params = req.allParams();
@@ -74,7 +74,7 @@ module.exports = {
         var g = sails.config.globals;
         var region = params.region;
         var workflow = params.workflow;
-        var dataSetPath = params.dataSet;
+        var dataSetPath = params.dataset;
         var monitorFn = this._monitorWorkflow;
 
         // get starting coord of region
