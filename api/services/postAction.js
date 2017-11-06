@@ -292,7 +292,7 @@ function processFilter(kWorkflowJob,newTrackJson,cb) {
     filter.filterInit(kWorkflowJob, function(filtered){
         var asset = {
             "asset": kWorkflowJob.data.blastData.outputs.blastxml, //newTrackJson[0].label,
-            "dataSet": kWorkflowJob.data.jbrowseDataPath   //g.dataSet[0].dataPath
+            "dataset": kWorkflowJob.data.jbrowseDataPath   //g.dataSet[0].dataPath
         };
         filter.applyFilter(0,asset,function(hitdata) {
             kWorkflowJob.data.blastData.hits = hitdata.hits;
