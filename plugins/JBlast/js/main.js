@@ -712,7 +712,7 @@ return declare( JBrowsePlugin,
         var postData = {
               filterParams: data,
               asset: this.browser.jblast.asset,
-              dataSet: this.browser.config.dataRoot
+              dataset: this.browser.config.dataRoot
         }
         //console.log("postData",postData);
         $.post( "/service/exec/set_filter", postData , function( data) {
@@ -909,7 +909,7 @@ return declare( JBrowsePlugin,
                     var postData = {
                           region: regionB,
                           workflow: selWorkflow,
-                          dataSet: thisB.config.dataRoot
+                          dataset: thisB.config.dataRoot
                       };
                     //var deferred = dojo.xhrPost(xhrArgs);
                     $.post( "/service/exec/workflow_submit", postData , function( result ) {
