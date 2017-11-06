@@ -19,9 +19,8 @@ module.exports = {
      * @param {object} res
      * @param {function} cb - callback function
      */
-    init: function(req,res,cb) {
-        sails.log.info("entrezService init");
-        cb();
+    init: function(params,cb) {
+        return cb();
     },
     /**
      * returns accession data given accesion number.
