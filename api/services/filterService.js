@@ -7,11 +7,10 @@ module.exports = {
     fmap: {
         set_filter:         'post',
         get_blastdata:      'get',
-        get_trackdata:      'get',
-        get_hit_details:    'get'
+        get_trackdata:      'get'
     },
     init: function(params,cb) {
-        galaxyProc.init(params,cb);
+        return cb();
     },
     /**
      * 
