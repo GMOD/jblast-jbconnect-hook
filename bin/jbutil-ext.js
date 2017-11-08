@@ -177,9 +177,13 @@ function exec_setuptrack(params) {
     var conf = JSON.parse(trackListData);
 
     console.log("Adding plugins JBClient & JBlast in trackList.json");
+    
+    
     // add the JBlast & JBClient plugin, if they don't already exist  
     if (conf.plugins.indexOf('JBClient') === -1) conf.plugins.push("JBClient");
     if (conf.plugins.indexOf('JBlast') === -1) conf.plugins.push("JBlast");
+    if (conf.plugins.indexOf('ServerSearchSeq') === -1) conf.plugins.push("ServerSearchSeq");
+
 
     // check if sample track exists in trackList.json (by checking for the label)
     var hasLabel = 0;
