@@ -26,7 +26,8 @@ module.exports.globals = {
             {name: 'basicWorkflowService',  type: 'workflow'},
             //{name: 'galaxyService',         type: 'workflow'},
             {name: 'filterService',         type: 'service'},
-            {name: 'entrezService',         type: 'service'}
+            {name: 'entrezService',         type: 'service'},
+            {name: 'seqSearchService',      type: 'service'}
         ]
     }
 };
