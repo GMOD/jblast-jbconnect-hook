@@ -20,13 +20,13 @@ module.exports.globals = {
             insertTrackTemplate: "inMemTemplate.json",
             import: ["blastxml"],
             
-            // list of services that will get registered.
-            services: [
-                {name: 'basicWorkflowService',  type: 'workflow'},
-                //{name: 'galaxyService',         type: 'workflow'},
-                {name: 'filterService',         type: 'service'},
-                {name: 'entrezService',         type: 'service'}
-            ]
-        }
+        },
+        // list of services that will get registered.
+        services: [
+            {name: 'basicWorkflowService',  type: 'workflow'},
+            //{name: 'galaxyService',         type: 'workflow'},
+            {name: 'filterService',         type: 'service'},
+            {name: 'entrezService',         type: 'service'}
+        ]
     }
 };
