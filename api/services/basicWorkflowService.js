@@ -37,7 +37,7 @@ module.exports = {
         wflist = [];
         
         fs.readdirSync(wfpath).forEach(function(file) {
-            if (file.indexOf('.workflow.') !== -1) {
+            if (file.indexOf('.blast.workflow.') !== -1) {
                 
                 var name = file.split('.workflow.');
                 
