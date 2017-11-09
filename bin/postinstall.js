@@ -52,3 +52,8 @@ async.each(dirList,
     }
 );
 
+// copy workflows/SearchProcess.html to jbrowse directory
+// currently, we assume jbrowse has already been installed as a module in the 
+// TODO: needs better handling (ie. in case JBrowse is installed elsewhere).
+console.log("copying SearchProcessing file...");
+shelljs.cp(modPath+'/workflows/SearchProcess.html',appPath+'/node_modules/jbrowse');
