@@ -3,6 +3,7 @@ define([
            'dojo/_base/lang',
            'dojo/Deferred',
             'dijit/MenuItem',
+            'dijit/Dialog',
            'JBrowse/Plugin',
            './View/SearchSeqDialog'
        ],
@@ -11,6 +12,7 @@ define([
            lang,
            Deferred,
            dijitMenuItem,
+           Dialog,
            JBrowsePlugin,
            SearchSeqDialog
        ) {
@@ -49,37 +51,21 @@ return declare( JBrowsePlugin,
                 }, confirmBox.containerNode );
                 confirmBox.show();
 
+                var postData = {
+                    searchParams: searchParams,
+                    dataset: thisB.browser.config.dataRoot
+                };
+
+                $.post( "/service/exec/submit_search", postData , function( data) {
+                    console.log( 'submit_search result',data );
+                    //$('.blast-hit-data').html("Hits: ("+data.filteredHits+'/'+data.hits+")");
+                }, "json");
+
+
                 setTimeout(function(){
                     confirmBox.destroyRecursive();
                 }, 2000);
 
-                
-                /*
-                var storeConf = {
-                    browser: thisB.browser,
-                    refSeq: thisB.browser.refSeq,
-                    type: 'RegexSequenceSearch/Store/SeqFeature/RegexSearch',
-                    searchParams: searchParams
-                };
-                var storeName = thisB.browser.addStoreConfig( undefined, storeConf );
-                storeConf.name = storeName;
-                var searchTrackConfig = {
-                    type: 'JBrowse/View/Track/CanvasFeatures',
-                    label: 'search_track_' + (thisB._searchTrackCount++),
-                    key: "Search reference sequence for '" + searchParams.expr + "'",
-                    metadata: {
-                        category: 'Local tracks',
-                        Description: "Contains all matches of the text string/regular expression '" + storeConf.searchExpr + "'"
-                    },
-                    store: storeName
-                };
-
-                // send out a message about how the user wants to create the new track
-                thisB.browser.publish( '/jbrowse/v1/v/tracks/new', [searchTrackConfig] );
-
-                // Open the track immediately
-                thisB.browser.publish( '/jbrowse/v1/v/tracks/show', [searchTrackConfig] );
-                */
             });
 }
 
