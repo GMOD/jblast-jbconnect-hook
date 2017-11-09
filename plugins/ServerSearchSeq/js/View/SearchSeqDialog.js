@@ -38,7 +38,7 @@ return declare( ActionBarDialog, {
 
         var introdiv = dom.create('div', {
             className: 'search-dialog intro',
-            innerHTML: 'This tool creates tracks showing regions of the reference sequence (or its translations) that match a given DNA or amino acid sequence.'
+            innerHTML: 'Queue a server-side DNA sequence search on the refseq.  The result appears a new track under "Search Results" in the track selector.'
         }, container );
 
         // Render text box
