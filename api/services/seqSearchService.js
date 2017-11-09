@@ -1,7 +1,6 @@
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/*
+ * seqSearchService
+ * service to handle  
  */
 
 var path = require('path');
@@ -22,6 +21,21 @@ module.exports = {
     init: function(params,cb) {
         return cb();
     },
+    /**
+     * 
+     * @param {object} req
+     *      searchParams - search parameters
+     *           expr": "tgac"          - search sequence or regex string
+     *           "regex": false/true    - 
+     *           "caseIgnore": false/true
+     *           "translate": false/true,
+     *           "fwdStrand": false/true,
+     *           "revStrand": false/true,
+     *           "maxLen": 100,     
+     *      dataset - the dataset path i.e. "sample_data/json/volvox" 
+     * @param {object} res
+     * @returns {undefined}
+     */
     submit_search: function(req, res) {
         var params = req.allParams();
         this._searchSubmit(params,function(result) {
@@ -29,7 +43,7 @@ module.exports = {
         });
     },
     
-    /**
+    /*
      * submit workflow.
      * 
      * @param {object} params
@@ -39,23 +53,25 @@ module.exports = {
      */
     _searchSubmit: function(params,cb) {
         var thisb = this;
-        var g = sails.config.globals;
+        var g = sails.config.globals.jbrowse;
+        var gg = sails.config.globals;
         
         var searchParams = params.searchParams;
         var dataset = params.dataset;
         var workflow = params.workflow;
 
-        searchParams = this._fixParams(searchParams);
-        console.log("searchParams fixed:",searchParams);
+        searchParams = this._fixParams(searchParams);  // necessary?
+        //console.log("searchParams fixed:",searchParams);
 
         // create the kue job entry
         var jobdata = {
-            name: "workflow",
+            name: searchParams.expr+' search',
             workflow: workflow,
             searchParams: searchParams, 
-            dataset: dataset
+            dataset: dataset,
+            jbrowseDataPath: dataset        // cleanup later (postAction uses this)
         };
-        var job = g.kue_queue.create('workflow', jobdata)
+        var job = gg.kue_queue.create('workflow', jobdata)
         .save(function(err){
             if (err) {
                 return cb(null,{status:'error',msg: "error create kue workflow",err:err});
@@ -64,18 +80,18 @@ module.exports = {
             
             job.data.asset = job.id+"_search_"+d.getTime();
             job.data.searchParamFile = job.data.asset+".json";
-            job.data.path = g.jbrowse.jbrowsePath + '/' + dataset +'/'+ g.jbrowse.jblast.blastResultPath;
+            job.data.path = g.jbrowsePath + '/' + dataset +'/'+ g.jblast.blastResultPath;
             job.data.outfile = job.data.asset+".gff";
             job.save();
             
             cb({status:'success',jobId: job.id},null);
 
             // process job
-            g.kue_queue.process('workflow', function(kJob, kDone){
+            gg.kue_queue.process('workflow', function(kJob, kDone){
                 kJob.kDoneFn = kDone;
                 sails.log.info("workflow job id = "+kJob.id);
 
-                thisb._createFile(job);
+                thisb._createSearchParamFile(job);
                 thisb._runWorkflow(kJob);
             });
         });
@@ -92,7 +108,7 @@ module.exports = {
         _s.test = false;
         return _s;
     },
-    _createFile: function(job) {
+    _createSearchParamFile: function(job) {
         // if direcgtory doesn't exist, create it
         var filePath = job.data.path+'/'+job.data.searchParamFile;
         
@@ -107,11 +123,9 @@ module.exports = {
         }
         catch (e) {
             sails.log.error(e,filePath);
-            job.kDoneFn();
+            job.kDoneFn(new Error('failed to create search param file'));
             error = true;
         }
-        //if (error)
-        //    return cb(null,{status: 'error', msg: "failed to write",err:e});
     },
     _runWorkflow: function(kWorkflowJob) {
 
@@ -124,8 +138,6 @@ module.exports = {
         
         var wf = process.cwd()+'/workflows/'+workflowFile;
         var outPath = g.jbrowsePath + kWorkflowJob.data.jbrowseDataPath + '/' + g.jblast.blastResultPath;
-
-        //var cmd = binPath+"/phantomjs "+wf;
 
         sails.log('>>> Executing workflow',wf);
         
@@ -140,46 +152,89 @@ module.exports = {
         program.on('exit', function(code) {
           // do something on end
           sails.log(">>> workflow completed",code);
+          
+          if (code !== 0) {
+              kWorkflowJob.kDoneFn(new Error('Workflow script completion error: '+code));
+              return;
+          }
+          thisb._postProcess(kWorkflowJob);
+          
         });        
     },
     _postProcess: function(kWorkflowJob) {
         var blast2json = require("./blastxml2json");
         var postAction = require("./postAction");
         
-        
         // insert track into trackList.json
-        postAction.postMoveResultFiles(kWorkflowJob,function(newTrackJson) {
-
-            // convert xml to json
-            blast2json.convert(kWorkflowJob,newTrackJson,function(err) {
-                if (err) {
-                    sails.log.error(err.msg);
-                    kWorkflowJob.kDoneFn(new Error(err.msg));
-                    return;
-                }
-                sails.log.debug("post convert newTrackJson",newTrackJson);
-
-                // check if there were any hits.
-                if (postAction.getHits(kWorkflowJob,newTrackJson)===0) {
-                    var msg = "No Blast Hits";
-                    sails.log.error(msg);
-                    //kWorkflowJob.data.errorMsg = msg;
-                    //kWorkflowJob.state('failed');
-                    //kWorkflowJob.save();
-                    kWorkflowJob.kDoneFn(new Error(msg));
-                }
-                else {
-                    offsetfix.process(kWorkflowJob,newTrackJson,function() {
-                        postAction.processFilter(kWorkflowJob,newTrackJson,function(hitdata) {
-                            postAction.addToTrackList(kWorkflowJob,newTrackJson);
-                        });
-                    });
-                }
-
-            });
+        this.postMoveResultFiles(kWorkflowJob,function(newTrackJson) {
+            postAction.addToTrackList(kWorkflowJob,newTrackJson);
         });
     },
-    
+    /**
+     * this generates track template
+     * 
+     * @param {type} kWorkflowJob
+     * @param {type} cb
+     */
+    postMoveResultFiles:function(kWorkflowJob,cb) {
+
+        var g = sails.config.globals.jbrowse;
+        var newTrackPath = kWorkflowJob.data.path+'/'+g.jblast.insertTrackTemplate; //"inMemTemplate.json"
+
+        var newTrackData = fs.readFileSync(newTrackPath);
+        newTrackJson = JSON.parse(newTrackData);
+
+        //if it's a single definition, coerce to an array
+        if (Object.prototype.toString.call(newTrackJson) !== '[object Array]') {
+            newTrackJson = [ newTrackJson ];
+        }
+
+        // validate the new track JSON structures
+        newTrackJson.forEach (function (track) {
+            if (!track.label) {
+                var msg = "Invalid track JSON: missing a label element";
+                sails.error(msg);
+                kWorkflowJob.kDoneFn(new Error(msg));
+                return;
+            }
+        });
+        
+        var trackLabel = kWorkflowJob.data.searchParams.expr+' results';
+        
+        // replace some track info
+        //if (typeof newTrackJson[0].baseUrl !== 'undefined') delete newTrackJson[0].baseUrl;
+        /*
+         *  TODO: if we don't add the baseUrl, then the the track will get a 404 error b/c
+         *  the client track insertion does not yet determine the baseUrl on its own, yet.
+         */
+        
+        newTrackJson[0].baseUrl = g.jbrowseRest+'/'+g.routePrefix+'/'+kWorkflowJob.data.dataset+'/';
+        
+        newTrackJson[0].urlTemplate = g.jblast.blastResultPath+"/"+kWorkflowJob.data.outfile;  // gff, TODO (should not be blast result path)
+
+        newTrackJson[0].label = kWorkflowJob.data.asset; 
+        newTrackJson[0].key = trackLabel;     
+        
+        newTrackJson[0].metadata = {
+                description: 'Search result job: '+kWorkflowJob.id
+            }
+        newTrackJson[0].category = "Search Results";
+        //newTrackJson[0].storeCache = false;
+
+        newTrackJson[0].sequenceSearch = true;     
+        kWorkflowJob.data.track = newTrackJson[0];
+        kWorkflowJob.save();
+
+        cb(newTrackJson);
+        
+        // some utility functions
+        function escapeRegExp(str) {
+            return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+        }
+        function replaceAll(str, find, replace) {
+            return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
+        }
+    }
     
 };
 
