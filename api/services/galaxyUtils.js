@@ -1,14 +1,25 @@
+/**
+ * @module
+ * @desc
+ * This module manages the communication with the galaxy API.
+ */
 var request = require('request');
-//var requestp = require('request-promise');
-//var path = require('path');
 var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require("fs"));
 var util = require('./utils');
 
 module.exports = {
+    /**
+     * Initialize module
+     * @param {type} cb
+     * @param {type} cberr
+     * @returns {undefined}
+     */
     init: function(cb,cberr) {
-        sails.log.debug('galaxyUtils init');
         var g = sails.config.globals.jbrowse;
+        //console.log('globals',g);
+        
+        this.debugRestFile = g.galaxy.debugRestFile;
         
         this.historyName = g.galaxy.historyName;
         
@@ -46,7 +57,6 @@ module.exports = {
      * send JSON GET request to galaxy server
      * @param {type} api - i.e. '/api/histories'
      * @param {type} cb  callback i.e. function(retval)
-     * @returns {undefined}
      * 
      */
     galaxyGET: function(api,cb) {
@@ -58,13 +68,26 @@ module.exports = {
         var url = gurl+api+"?key="+apikey
         
         sails.log.debug("galaxyGET",url);
+         
+        if (typeof this.debugRestFile !== 'undefined') {
+            var str = '\nGET '+url+'\n';
+            fs.appendFileSync(this.debugRestFile,str);
+        }
         
         request(url, function (err, response, body) {
             //sails.log('error',err, 'response',typeof body, response && response.statusCode,url);
 
             if (err !== null) {
+                if (typeof this.debugRestFile !== 'undefined') {
+                    var str = 'ERROR: '+err+'\n';
+                    fs.appendFileSync(this.debugRestFile,str);
+                }
                 cb(body,err);
                 return;
+            }
+            if (typeof this.debugRestFile !== 'undefined') {
+                var str = 'RESPONSE: '+body+'\n';
+                fs.appendFileSync(this.debugRestFile,str);
             }
             cb(JSON.parse(body),err);
         });
@@ -74,8 +97,6 @@ module.exports = {
      * @param {type} api - e.g. "/api/workflows"
      * @param {type} params - json parameter i.e. {a:1,b:2}
      * @param {type} cb - callback function cb(retval)
-     * 
-     * retval return {status: x, data:y}
      */
     galaxyPOST: function(api,params,cb) {
 
@@ -108,15 +129,24 @@ module.exports = {
               cb(body,err);
         });
     },
+    /**
+     * 
+     * @returns {string} history id
+     */
     getHistoryId: function() {
         return this.historyId;
     },
+    /**
+     * 
+     * @returns {string} history name
+     */
     getHistoryName: function() {
         return this.historyName;
     },
     /**
      * acquire history id from galaxy
-     * @returns {undefined}
+     * 
+     * @param {type} cb
      */
     initHistory: function (cb) {
         sails.log("init_history");
@@ -150,6 +180,11 @@ module.exports = {
             cb(histlist,{status:'error',msg:errmsg});
         });
     },
+    /**
+     * get workflows
+     * @param {type} cb
+     * @returns {undefined}
+     */
     getWorkflows: function(cb) {
         
         this.galaxyGET("/api/workflows",function(workflows,err) {
@@ -160,6 +195,7 @@ module.exports = {
         });
     },
     /**
+     * send file to galaxy
      * 
      * @param {type} theFile
      * @param {type} hId
@@ -193,6 +229,12 @@ module.exports = {
         });
 
     },
+    /**
+     * submit workflow.
+     * 
+     * @param {type} params
+     * @param {type} cb
+     */
     workflowSubmit: function(params,cb) {
         var thisb = this;
         var g = sails.config.globals;
@@ -244,7 +286,7 @@ module.exports = {
 
         // create the kue job entry
         var jobdata = {
-            name: "Galaxy workflow",
+            name: "workflow",
             requestParams: params, 
             jbrowseDataPath: dataSetPath,
             sequence: seq,
@@ -254,18 +296,18 @@ module.exports = {
                 file: theFile
             }
         };
-        var job = g.kue_queue.create('galaxy-workflow-watch', jobdata)
+        var job = g.kue_queue.create('workflow', jobdata)
         .save(function(err){
             if (err) {
-                cb(null,{status:'error',msg: "error create kue galaxy-workflow-watch",err:err});
+                cb(null,{status:'error',msg: "error create kue workflow",err:err});
                 return;
             }
             cb({status:'success',jobId: job.id},null);
 
             // process job
-            g.kue_queue.process('galaxy-workflow-watch', function(kJob, kDone){
+            g.kue_queue.process('workflow', function(kJob, kDone){
                 kJob.kDoneFn = kDone;
-                sails.log.info("galaxy-workflow-watch job id = "+kJob.id);
+                sails.log.info("workflow job id = "+kJob.id);
 
                 kJob.progress(0,10,{file_upload:0});
 

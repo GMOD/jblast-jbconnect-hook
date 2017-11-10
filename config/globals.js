@@ -18,7 +18,20 @@ module.exports.globals = {
             blastResultPath: "jblastdata",
             blastResultCategory: "JBlast Results",
             insertTrackTemplate: "inMemTemplate.json",
-            import: ["blastxml"]
-        }
+            import: ["blastxml"],
+            
+        },
+        searchSeq: {
+            workflowScript: "ServerSearch.workflow.js",
+            processScript:   'http://localhost:1337/jbrowse/SearchProcess.html'
+        },
+        // list of services that will get registered.
+        services: [
+            {name: 'basicWorkflowService',  type: 'workflow'},
+            //{name: 'galaxyService',         type: 'workflow'},
+            {name: 'filterService',         type: 'service'},
+            {name: 'entrezService',         type: 'service'},
+            {name: 'seqSearchService',      type: 'service'}
+        ]
     }
 };

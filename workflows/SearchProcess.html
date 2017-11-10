@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Export Regex Search results - JBrowse</title>
+<meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+<link rel="stylesheet" type="text/css" href="css/genome.css">
+<script type="text/javascript" src="src/dojo/dojo.js" data-dojo-config="async: 1, baseUrl: './src'"></script>
+<script type="text/javascript" src="src/JBrowse/init.js"></script>
+<style>
+pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+</style>
+
+<script>
+/*
+ * part of the JBlast seqSearchService
+ * Utilizes RegexSequenceSearch plugin) as provided in the JBrowse plugin directory.
+ * Works in conjunction with ServerSearch.workflow.js (phantomjs script)
+ * Derived from https://gist.github.com/enuggetry/f9fa7895ba807c2363db115f3a2bb791
+ * by: @enuggetry
+ */
+
+require([
+    'JBrowse/Browser',
+    'JBrowse/Store/SeqFeature/GFF3Tabix',
+    'JBrowse/Store/SeqFeature/NCList',
+    'JBrowse/Model/SimpleFeature',
+    'JBrowse/Store/Sequence/StaticChunked',
+    'JBrowse/View/Export',
+    'JBrowse/View/Export/GFF3',
+    'JBrowse/View/Export/FASTA',
+	
+    'JBrowse/Store/SeqFeature/GFF3',
+    'plugins/RegexSequenceSearch/js/Store/SeqFeature/RegexSearch'
+
+],
+function(
+    Browser,
+    GFF3Tabix,
+    NCList,
+    SimpleFeature,
+    StaticChunkedSequence,
+    ExportMixin,
+    GFF3Mixin,
+    FastaMixin,
+
+    GFF3,
+    RegexSeqSearch
+) {
+    console.log("Start processing...");
+
+    var params = getUrlParams();
+    
+    var prefix = "";
+    if (typeof params['prefix'] !== 'undefined')
+        prefix = params['prefix']+'/';
+
+    var searchParams = JSON.parse(params['searchParams']);
+    var jobid = params['jobid'];
+
+    console.log('html params',searchParams);
+        
+        
+    // Initialize jbrowse instance in unittestmode so that it doesn't actually draw the browser to screen
+    var browser = new Browser({unitTestMode: true});
+    //JBrowse = browser;
+
+    // hack the refseq
+    var refseq = { start: 0, end: 50001, length: 50001,name: 'ctgA',seqChunkSize:20000 };
+
+    //search region
+    var region = { start: 1, end: 3000, refseq: 'ctgA' };
+    var region = { start: 1, end: 50000, refseq: 'ctgA' };
+
+    //todo: automatically determin length
+
+    browser.addRefseqs([refseq]);	// search
+	
+    var getSequence = function(conf, region, callback) {
+        var conf = dojo.mixin({
+            storeClass: 'JBrowse/Store/Sequence/StaticChunked',
+            type: 'JBrowse/Store/Sequence/StaticChunked',	// needed by regexsearch
+            chunkSize: 20000,
+        }, conf);
+
+        var store = new StaticChunkedSequence(conf);
+        store.refSeq = { name: region.refseq };
+
+        var storeName = browser.addStoreConfig( 'refseqs', conf );	// needed by regexsearch
+
+        var exp = new dojo.declare([ExportMixin, FastaMixin])({ store: store });
+        exp.refSeq = store.refSeq;
+
+        exp.exportRegion({ ref: region.refseq, start: region.start, end: region.end }, callback);
+    };
+	
+    var getSearchGFF = function(conf, region, callback) {
+        var conf = dojo.mixin({
+            storeClass: 'RegexSequenceSearch/Store/SeqFeature/RegexSearch'
+        }, conf);
+        var store = new RegexSeqSearch(conf);
+        store.refSeq = {};
+        store.refSeq.name = region.refseq;
+        var storeName = browser.addStoreConfig( undefined, conf );
+        var exp = new dojo.declare([ExportMixin, GFF3Mixin])({ refSeq: refseq,store: store });
+
+        exp.exportRegion({ ref: region.refseq, start: region.start, end: region.end }, callback);
+    };
+	
+	getSequence({
+		urlTemplate: prefix+'sample_data/json/volvox/seq/{refseq_dirpath}/{refseq}-',
+		label: 'DNA',
+		browser: browser
+	}, region, function(seq) {
+		//document.getElementById('sequence').innerHTML = seq;
+		//console.log('sequence:',seq);
+	});
+	
+	if (1) {
+		getSearchGFF({
+                        searchParams: searchParams,
+/*			searchParams: {
+				caseIgnore: true,
+				expr: "AAA",
+				fwdStrand:true,
+				maxLen:100,
+				regex:false,
+				revStrand:true,
+				translate:false
+			},*/
+			label: 'SearchGenes',
+			browser: browser
+		}, region, function(features) {
+			document.getElementById('searchgff').innerHTML = features;
+                        console.log('>>>>>BEGIN');      // trigger ServerSearch.workflow.js to begin capture/save
+			console.log(features);
+		});
+	}
+
+});
+
+function getUrlParams() {
+
+  var paramMap = {};
+  if (location.search.length == 0) {
+    return paramMap;
+  }
+  var parts = location.search.substring(1).split("&");
+
+  for (var i = 0; i < parts.length; i ++) {
+    var component = parts[i].split("=");
+    paramMap [decodeURIComponent(component[0])] = decodeURIComponent(component[1]);
+  }
+  return paramMap;
+}
+
+</script>
+
+</head>
+<body>
+<pre id="searchgff"></pre>
+</body>
+</html>

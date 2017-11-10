@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
-/*
+/**
+ * @module
+ * @desc
  * Convert BlastXML to JSON
  * (not a straight conversion)
  * This script not only converts the XML to json, it flattens the hits per hap where there are multiple hsp.
@@ -10,17 +12,20 @@
  * 
  */
 
-//var request = require('request'),
 var fs = require('fs');
 var path = require('path');
-    //getopt = require('node-getopt'),
-    //util = require('./util');
 var to_json = require('xmljson').to_json;
 
 module.exports = {
 
+    /**
+     * @param (object) kJob - kue job object
+     * @param (JSON) trackJson
+     * @param (function) cb - callback function
+     * 
+     */
     convert: function (kJob,trackJson,cb) {
-
+        sails.log('converting blast to json');
         var g = sails.config.globals.jbrowse;
         // i.e. /var/www/html/jbrowse/sample_data/json/volvox/jblastdata
         var jblastDataPath = g.jbrowsePath + kJob.data.requestParams.dataSetPath + '/' + g.jblast.blastResultPath + '/';

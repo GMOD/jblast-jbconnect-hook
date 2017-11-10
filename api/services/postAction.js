@@ -1,3 +1,8 @@
+/**
+ * @module
+ * @description
+ * This module implements the actions that occur after a galaxy workflow completes.
+ */
 var request = require('request');
 var requestp = require('request-promise');
 var path = require('path');
@@ -7,19 +12,32 @@ var deferred = require('deferred');
 var filter = require("./filter");   // filter processing
 var offsetfix = require("./offsetfix");
 var blast2json = require("./blastxml2json");
+var galaxy = require("./galaxyUtils");
 
 module.exports = {
     doCompleteAction: function(kWorkflowJob,hista) {
-        doCompleteAction(kWorkflowJob,hista);
+        return doCompleteAction(kWorkflowJob,hista);
+    },
+    postMoveResultFiles: function(kWorkflowJob,cb) {
+        return postMoveResultFiles(kWorkflowJob,cb);
+    },
+    getHits: function(kWorkflowJob,newTrackJson) {
+        return getHits(kWorkflowJob,newTrackJson);
+    },
+    processFilter: function(kWorkflowJob,newTrackJson,cb) {
+        return processFilter(kWorkflowJob,newTrackJson,cb);
+    },
+    addToTrackList: function(kWorkflowJob,newTrackJson) {
+        return addToTrackList(kWorkflowJob,newTrackJson);
     }
-}
+};
 
 
 /**
  * Read output of last generated file, copy results to /jblastdata, insert track to trackList.json.
  * 
- * @param {type} kWorkflowJob
- * @param {type} hista - associative array of histories
+ * @param {object} kWorkflowJob
+ * @param {object} hista - associative array of histories
  */
 function doCompleteAction(kWorkflowJob,hista) {
     var wId = kWorkflowJob.data.workflow.workflow_id;
@@ -92,8 +110,8 @@ function doCompleteAction(kWorkflowJob,hista) {
                 sails.log.debug("done moving files");
                 kWorkflowJob.save();
 
-                // insert track into trackList.json
-                postMoveResultFiles(kWorkflowJob,function(newTrackJson){
+                    // insert track into trackList.json
+                    postMoveResultFiles(kWorkflowJob,function(newTrackJson){
 
                     // convert xml to json
                     blast2json.convert(kWorkflowJob,newTrackJson,function(err) {
@@ -103,7 +121,7 @@ function doCompleteAction(kWorkflowJob,hista) {
                             return;
                         }
                         sails.log.debug("post convert newTrackJson",newTrackJson);
-                        
+
                         // check if there were any hits.
                         if (getHits(kWorkflowJob,newTrackJson)===0) {
                             var msg = "No Blast Hits";
@@ -115,12 +133,12 @@ function doCompleteAction(kWorkflowJob,hista) {
                         }
                         else {
                             offsetfix.process(kWorkflowJob,newTrackJson,function() {
-                                processFilter(kWorkflowJob,newTrackJson,function() {
+                                processFilter(kWorkflowJob,newTrackJson,function(hitdata) {
                                     addToTrackList(kWorkflowJob,newTrackJson);
                                 });
                             });
                         }
-                        
+
                     });
 
                 });
@@ -129,14 +147,13 @@ function doCompleteAction(kWorkflowJob,hista) {
         },100);
     }
 }
-/**
+/*
  * 
  * 
- * @param {type} steps is list of functions i.e. ['function1','function2']
- * @param {type} kJob
- * @param {type} newTrackJson
- * @param {type} cb
- * @returns {undefined}
+ * @param {array} steps is list of functions i.e. ['function1','function2']
+ * @param {object} kJob
+ * @param {JSON object} newTrackJson
+ * @param {function} cb - callback function
  */
 function processResults(steps,kJob,trackJson,cb) {
     
@@ -145,6 +162,14 @@ function processResults(steps,kJob,trackJson,cb) {
         steps:steps
     }
 }
+/**
+ * processResultStep
+ * 
+ * @param {object}      stepctx
+ * @param {object}      kJob
+ * @param {JSON} trackJson
+ * @param {function}    cb - callback function
+ */
 function processResultStep(stepctx,kJob,trackJson,cb) {
     
     stepctx.steps[stepctx.step](kJob,trackJson,function(stepctx) {
@@ -159,11 +184,13 @@ function processResultStep(stepctx,kJob,trackJson,cb) {
 }
 /**
  * this generates track template
- * @returns {undefined}
+ * 
+ * @param {type} kWorkflowJob
+ * @param {type} cb
  */
 function postMoveResultFiles(kWorkflowJob,cb) {
-    var wId = kWorkflowJob.data.workflow.workflow_id;
-    sails.log.debug(wId,'moveResultFiles()');
+    //var wId = kWorkflowJob.data.workflow.workflow_id;
+    //sails.log.debug(wId,'moveResultFiles()');
 
     function escapeRegExp(str) {
         return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
@@ -205,10 +232,11 @@ function postMoveResultFiles(kWorkflowJob,cb) {
         // galaxy history id
         //var galaxyHistId = kWorkflowJob.data.blastData.outputs.json.split("_")[0];
         
-        var trackLabel = 'blast '+kWorkflowJob.id+' '+kWorkflowJob.data.sequence.seq+':('+kWorkflowJob.data.sequence.start+'..'+kWorkflowJob.data.sequence.end+')'
-            + kWorkflowJob.data.sequence.strand+' len '+kWorkflowJob.data.sequence.length;
+        //var trackLabel = 'blast '+kWorkflowJob.id+' ('+kWorkflowJob.data.sequence.start+'..'+kWorkflowJob.data.sequence.end+')'
+        //    +' '+kWorkflowJob.data.blastData.hits + ' hits';
+        //var trackLabel = newTrackJson[0].key;
     
-        sails.log.info('trackLabel',trackLabel);
+        //sails.log.info('trackLabel',trackLabel);
 
         var fileGffOnly = kWorkflowJob.data.blastData.outputs.gff3 +'.gff3';
         var fileJsonOnly = kWorkflowJob.data.blastData.outputs.json + '.json';
@@ -221,7 +249,7 @@ function postMoveResultFiles(kWorkflowJob,cb) {
         
         // todo: should not be outputs.blastxml (too specific to filetype);  should be something like assetId
         newTrackJson[0].label = kWorkflowJob.data.blastData.outputs.blastxml; //"jblast-"+ (new Date().getTime());
-        newTrackJson[0].key = trackLabel;
+        //newTrackJson[0].key = trackLabel;     // the track label is determined after the filter process, bc we need the hit count.
         newTrackJson[0].metadata = {
                 description: 'Workflow: '+kWorkflowJob.data.workflow.name
             }
@@ -232,7 +260,8 @@ function postMoveResultFiles(kWorkflowJob,cb) {
         var dataset = replaceAll(kWorkflowJob.data.jbrowseDataPath,'/','%2F');   //g.dataSet[0].dataPath
         
         newTrackJson[0].baseUrl = '/';
-        newTrackJson[0].urlTemplate = '/jbapi/gettrackdata/' +kWorkflowJob.data.blastData.outputs.blastxml + '/' + dataset;
+        //newTrackJson[0].urlTemplate = '/jbapi/gettrackdata/' +kWorkflowJob.data.blastData.outputs.blastxml + '/' + dataset;  // old way
+        newTrackJson[0].urlTemplate = '/service/exec/get_trackdata/?asset=' +kWorkflowJob.data.blastData.outputs.blastxml + '&dataset=' + dataset;
         newTrackJson[0].storeCache = false;
         newTrackJson[0].filterSettings = g.jblast.blastResultPath+"/"+fileBlastFilter;
         newTrackJson[0].jblast = 1;     // indicate this is a jblast generated track
@@ -248,23 +277,43 @@ function postMoveResultFiles(kWorkflowJob,cb) {
 }
 /**
  * Generate the GFF file 
+ * 
+ * @param {type} kWorkflowJob
  * @param {type} newTrackJson
- * @returns {undefined}
+ * @param {type} cb
  */
 function processFilter(kWorkflowJob,newTrackJson,cb) {
     sails.log("processFilter()");
-    //var g = sails.config.globals.jbrowse;
-    
-    filter.filterInit(kWorkflowJob,newTrackJson, function(filtered){
+    var g = sails.config.globals.jbrowse;
+    var fileBlastFilter = kWorkflowJob.data.blastData.outputs.blastxml + '_filtersettings.json';
+    kWorkflowJob.data.blastData.filterSettings = g.jblast.blastResultPath+"/"+fileBlastFilter;
+    kWorkflowJob.save();
+
+    filter.filterInit(kWorkflowJob, function(filtered){
         var asset = {
-            "asset": newTrackJson[0].label,
-            "dataSet": kWorkflowJob.data.jbrowseDataPath   //g.dataSet[0].dataPath
+            "asset": kWorkflowJob.data.blastData.outputs.blastxml, //newTrackJson[0].label,
+            "dataset": kWorkflowJob.data.jbrowseDataPath   //g.dataSet[0].dataPath
         };
-        filter.applyFilter(0,asset,function() {
-            cb();
+        filter.applyFilter(0,asset,function(hitdata) {
+            kWorkflowJob.data.blastData.hits = hitdata.hits;
+            
+            var trackLabel = 'blast '+kWorkflowJob.id+' ('+kWorkflowJob.data.sequence.start+'..'+kWorkflowJob.data.sequence.end+')'
+                +' '+hitdata.hits + ' hits';
+            
+            newTrackJson[0].key = trackLabel;
+            
+            kWorkflowJob.save();
+            cb(hitdata);
         });
     });
 }
+/**
+ * return number of hits
+ * 
+ * @param {object} kWorkflowJob
+ * @param {JSON} newTrackJson
+ * @returns {Number} hits
+ */
 function getHits(kWorkflowJob,newTrackJson) {
     sails.log.debug('getHits()');
     var g = sails.config.globals.jbrowse;
@@ -287,14 +336,17 @@ function getHits(kWorkflowJob,newTrackJson) {
     for(var x in blastData) {
         hits ++;
     }
-    
+    sails.log('>>> getHits return',hits, typeof hits);
     return hits;
 }
 /**
+ * Add track to track list and notify.
  * 
+ * @param {object} kWorkflowJob
+ * @param {JSON} newTrackJson
  */
 function addToTrackList(kWorkflowJob,newTrackJson) {
-    sails.log("addToTrackList()");
+    sails.log("addToTrackList()",newTrackJson);
     var g = sails.config.globals.jbrowse;
     
     //todo: make this configurable later
@@ -377,5 +429,4 @@ function addToTrackList(kWorkflowJob,newTrackJson) {
         kWorkflowJob.kDoneFn();                                                 // kue workflow completed successfully
     });
 }
-
 
