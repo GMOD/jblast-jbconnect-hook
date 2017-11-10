@@ -19,6 +19,7 @@ define([
 return declare( JBrowsePlugin,
 {
     constructor: function( args ) {
+        console.log("plugin: ServerSearchSeq");
         this._searchTrackCount = 0;
 
         var thisB = this;
@@ -55,16 +56,19 @@ return declare( JBrowsePlugin,
                     searchParams: searchParams,
                     dataset: thisB.browser.config.dataRoot
                 };
-
-                $.post( "/service/exec/submit_search", postData , function( data) {
+                $.post( "/service/exec/submit_search", postData, function(data) {
                     console.log( 'submit_search result',data );
-                    //$('.blast-hit-data').html("Hits: ("+data.filteredHits+'/'+data.hits+")");
-                }, "json");
-
-
-                setTimeout(function(){
+                    
+                    // close confirm box after 2 sec
+                    setTimeout(function(){
+                        confirmBox.destroyRecursive();
+                    }, 2000);
+                },'json')
+                .fail(function(err) {
                     confirmBox.destroyRecursive();
-                }, 2000);
+                    alert( "Failed to submit search.  Check network.",err.statusText);
+                });
+
 
             });
 }
