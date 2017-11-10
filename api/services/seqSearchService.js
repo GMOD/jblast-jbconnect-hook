@@ -16,7 +16,8 @@ var binPath = phantomjs.path;
 module.exports = {
 
     fmap: {
-        submit_search:    'post'
+        submit_search:          'post',
+        send_search_result:     'post'
     },
     init: function(params,cb) {
         return cb();
@@ -34,13 +35,34 @@ module.exports = {
      *           "maxLen": 100,     
      *      dataset - the dataset path i.e. "sample_data/json/volvox" 
      * @param {object} res
-     * @returns {undefined}
      */
     submit_search: function(req, res) {
         var params = req.allParams();
         this._searchSubmit(params,function(result) {
             res.ok(result);
         });
+    },
+    /**
+     * This is used to send result data from the phantomjs component
+     * @param {object} req
+     *      jobid           job that is managing this session
+     *      end             true if this is the end of the series
+     *      ...             other fields
+     *      data            data returned.
+     * @param {object} res
+     */
+    send_search_result: function(req, res) {
+        
+        // (not functional yet.)
+        
+        var params = req.allParams();
+        
+        // lookup job kJob = ...
+        
+        // setup kJob.kDonefn
+        
+        this._postProcess(kJob);
+        
     },
     
     /*
@@ -132,7 +154,7 @@ module.exports = {
         var thisb = this;
         var g = sails.config.globals.jbrowse;
         
-        var workflowFile = "ServerSearch.workflow.js";
+        var workflowFile = g.searchSeq.workflowScript;              //"ServerSearch.workflow.js";
         if (typeof kWorkflowJob.data.workflow !== 'undefined')
             workflowFile = kWorkflowJob.data.workflow;
         
@@ -141,11 +163,14 @@ module.exports = {
 
         sails.log('>>> Executing workflow',wf);
         
-        var program = phantomjs.exec(wf,'jbrowse',
-            'http://localhost:1337/jbrowse/SearchProcess.html',
-            kWorkflowJob.data.path+'/'+kWorkflowJob.data.outfile,
-            //'/var/www/html/3jbserver/node_modules/jbrowse/sample_data/json/volvox/jblastdata/test.gff',
-            JSON.stringify(kWorkflowJob.data.searchParams));
+        // pass to workflow script
+        var program = phantomjs.exec(wf,
+            g.routePrefix,                                                      // prefix
+            g.searchSeq.processScript,                                          // 'http://localhost:1337/jbrowse/SearchProcess.html',
+            kWorkflowJob.data.path+'/'+kWorkflowJob.data.outfile,               // output file (full path)
+            JSON.stringify(kWorkflowJob.data.searchParams),                     // search parameters
+            kWorkflowJob.id                                                     // job id
+        );
             
         program.stdout.pipe(process.stdout);
         program.stderr.pipe(process.stderr);

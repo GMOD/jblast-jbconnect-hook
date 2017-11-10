@@ -52,13 +52,13 @@ function(
     console.log("Start processing...");
 
     var params = getUrlParams();
+    
     var prefix = "";
     if (typeof params['prefix'] !== 'undefined')
         prefix = params['prefix']+'/';
 
-    //console.log('html params',params['searchParams']);
-
     var searchParams = JSON.parse(params['searchParams']);
+    var jobid = params['jobid'];
 
     console.log('html params',searchParams);
         

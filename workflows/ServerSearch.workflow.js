@@ -13,11 +13,13 @@ var prefix          = system.args[1];
 var url             = system.args[2];
 var outfile         = system.args[3];
 var searchParams    = system.args[4];
+var jobid           = system.args[5];
 
 console.log("args",prefix,url,outfile,searchParams);
 
 var thePage = url;
 thePage += '?prefix='+prefix;
+thePage += '&jobid='+jobid;
 thePage += '&searchParams='+searchParams;
 
 console.log("Search URL",thePage);

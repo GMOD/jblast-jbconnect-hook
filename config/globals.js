@@ -21,6 +21,10 @@ module.exports.globals = {
             import: ["blastxml"],
             
         },
+        searchSeq: {
+            workflowScript: "ServerSearch.workflow.js",
+            processScript:   'http://localhost:1337/jbrowse/SearchProcess.html'
+        },
         // list of services that will get registered.
         services: [
             {name: 'basicWorkflowService',  type: 'workflow'},
