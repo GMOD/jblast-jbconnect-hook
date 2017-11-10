@@ -158,7 +158,9 @@ return declare( JBrowsePlugin,
         
         // event handlers for server events
         var newTrackHandler = function (eventType,data) {
-            console.log("trackhandler "+eventType);
+            
+            console.log("trackhandler "+eventType,data);
+            data.baseUrl = browser.config.baseUrl+browser.config.dataRoot+'/';
             var notifyStoreConf = dojo.clone (data);
             var notifyTrackConf = dojo.clone (data);
             notifyStoreConf.browser = browser;
@@ -167,6 +169,7 @@ return declare( JBrowsePlugin,
             browser.publish ('/jbrowse/v1/v/tracks/' + eventType, [notifyTrackConf]);
         };
 
+        //TODO: move this into JBClient plugin
         
         dojo.subscribe("/jbrowse/jbclient_ready", function(){
             console.log("ready to receive events");
