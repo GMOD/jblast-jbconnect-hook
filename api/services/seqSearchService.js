@@ -84,7 +84,7 @@ module.exports = {
             job.data.outfile = job.data.asset+".gff";
             job.save();
             
-            cb({status:'success',jobId: job.id},null);
+            cb({status:'success',jobId: job.id,asset:job.data.asset},null);
 
             // process job
             gg.kue_queue.process('workflow', function(kJob, kDone){
