@@ -56,5 +56,5 @@ page.onConsoleMessage = function(msg, lineNum, sourceId) {
     }
     if (msg==='>>>>>BEGIN') dataReady = true;
 
-    console.log('CONSOLE ('+msg.lengh+'): ' + msg + ' (from line #' + lineNum + ' in "' + sourceId + '")');
+    console.log('CONSOLE ('+msg.length+'): ' + msg + ' (from line #' + lineNum + ' in "' + sourceId + '")');
 };	  
