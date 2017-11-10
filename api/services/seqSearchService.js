@@ -226,14 +226,10 @@ module.exports = {
         
         var trackLabel = kWorkflowJob.data.searchParams.expr+' results';
         
-        // replace some track info
-        //if (typeof newTrackJson[0].baseUrl !== 'undefined') delete newTrackJson[0].baseUrl;
-        /*
-         *  TODO: if we don't add the baseUrl, then the the track will get a 404 error b/c
-         *  the client track insertion does not yet determine the baseUrl on its own, yet.
-         */
+        // remove baseUrl
+        if (typeof newTrackJson[0].baseUrl !== 'undefined') delete newTrackJson[0].baseUrl;
         
-        newTrackJson[0].baseUrl = g.jbrowseRest+'/'+g.routePrefix+'/'+kWorkflowJob.data.dataset+'/';
+        //newTrackJson[0].baseUrl = g.jbrowseRest+'/'+g.routePrefix+'/'+kWorkflowJob.data.dataset+'/';
         
         newTrackJson[0].urlTemplate = g.jblast.blastResultPath+"/"+kWorkflowJob.data.outfile;  // gff, TODO (should not be blast result path)
 
