@@ -87,36 +87,46 @@ module.exports = {
 
         // create the kue job entry
         var jobdata = {
-            name: searchParams.expr+' search',
+            service: "seqSearchService",
             workflow: workflow,
+            name: searchParams.expr+' search',
             searchParams: searchParams, 
             dataset: dataset,
             jbrowseDataPath: dataset        // cleanup later (postAction uses this)
         };
-        var job = gg.kue_queue.create('workflow', jobdata)
-        .save(function(err){
+        var kJob = gg.kue_queue.create('workflow', jobdata);
+        
+        kJob.data.asset = kJob.id+"_search_"+ new Date().getTime();
+        searchParamFile = kJob.data.asset+".json";
+        kJob.data.path = g.jbrowsePath + '/' + kJob.data.dataset +'/'+ g.jblast.blastResultPath;
+        kJob.data.outfile = kJob.data.asset+".gff";
+        
+        kJob.save(function(err){
             if (err) {
                 return cb(null,{status:'error',msg: "error create kue workflow",err:err});
             }
-            var d = new Date();
             
-            job.data.asset = job.id+"_search_"+d.getTime();
-            job.data.searchParamFile = job.data.asset+".json";
-            job.data.path = g.jbrowsePath + '/' + dataset +'/'+ g.jblast.blastResultPath;
-            job.data.outfile = job.data.asset+".gff";
-            job.save();
-            
-            cb({status:'success',jobId: job.id,asset:job.data.asset},null);
+            cb({status:'success',jobId: kJob.id,asset:kJob.data.asset},null);
 
             // process job
-            gg.kue_queue.process('workflow', function(kJob, kDone){
-                kJob.kDoneFn = kDone;
-                sails.log.info("workflow job id = "+kJob.id);
+            //gg.kue_queue.process('workflow', function(kJob, kDone){
+                //kJob = job;
+            //    kJob.kDoneFn = kDone;
+            //    sails.log.info("workflow job id = "+kJob.id);
 
-                thisb._createSearchParamFile(job);
-                thisb._runWorkflow(kJob);
-            });
+                //thisb._createSearchParamFile(job);
+                //thisb._runWorkflow(kJob);
+            //});
         });
+    },
+    beginProcessing(kJob) {
+        var g = sails.config.globals.jbrowse;
+        var thisb = this;
+        
+        sails.log.info("seqSearchService beginProcessing"+kJob.id);
+
+        thisb._createSearchParamFile(kJob);
+        thisb._runWorkflow(kJob);
     },
     _fixParams(s) {
         var _s={};

@@ -297,7 +297,7 @@ module.exports = {
             }
         };
         var job = g.kue_queue.create('workflow', jobdata)
-        .save(function(err){
+        job.save(function(err){
             if (err) {
                 cb(null,{status:'error',msg: "error create kue workflow",err:err});
                 return;
@@ -309,80 +309,85 @@ module.exports = {
                 kJob.kDoneFn = kDone;
                 sails.log.info("workflow job id = "+kJob.id);
 
-                kJob.progress(0,10,{file_upload:0});
+            });
+        });
+    },
+    beginProcessing: function(kJob) {
+        var thisb = this;
+        
+        kJob.progress(0,10,{file_upload:0});
 
-                // send the file
-                sails.log.info("uploading file to galaxy",theFile)
+        // send the file
+        sails.log.info("uploading file to galaxy",theFile)
 
-                //process.exit(1);    // short circuit for testing
+        //process.exit(1);    // short circuit for testing
 
-                thisb.sendFile(theFile,thisb.historyId, function(data,err) {
+        thisb.sendFile(theFile,thisb.historyId, function(data,err) {
 
-                    if (err !== null) {
-                        var msg = "Error sendFile";
-                        sails.log.error(msg,err);
-                        return kDone(new Error(msg));;
+            if (err !== null) {
+                var msg = "Error sendFile";
+                sails.log.error(msg,err);
+                return kDone(new Error(msg));;
+            }
+
+            //sails.log.debug("sendFile complete data,err",data,err);
+            kJob.data.dataset = data;
+            kJob.save();
+
+            kJob.progress(1,10,{file_upload:'done'});
+
+
+            var fileId = data.outputs[0].id;
+
+            var params = {
+                workflow_id: kJob.data.requestParams.workflow,
+                history: 'hist_id='+thisb.historyId,
+                ds_map: {
+                    "0": {
+                        src: 'hda',
+                        id: fileId
                     }
+                }
+            };
+            // submit the workflow
+            thisb.galaxyPOST('/api/workflows',params,function(data,err) {
 
-                    //sails.log.debug("sendFile complete data,err",data,err);
-                    kJob.data.dataset = data;
-                    kJob.save();
+                if (err !== null) {
+                    var msg = "Error run workflow";
+                    sails.log.error(msg,err);
+                    return kDone(new Error(msg));
+                }
 
-                    kJob.progress(1,10,{file_upload:'done'});
+                //sails.log.debug('POST /api/workflows completed',data,err);
 
+                kJob.data.workflow = data;
+                kJob.save();
 
-                    var fileId = data.outputs[0].id;
+                thisb.galaxyGET('/api/workflows',function(data,err){
+                    //sails.log.debug('GET /api/workflows',data,err);
 
-                    var params = {
-                        workflow_id: kJob.data.requestParams.workflow,
-                        history: 'hist_id='+thisb.historyId,
-                        ds_map: {
-                            "0": {
-                                src: 'hda',
-                                id: fileId
-                            }
+                    for(var i in data) {
+                        var wf = data[i];
+                        if (wf.id === kJob.data.requestParams.workflow) {
+                            sails.log.info("Workflow starting: "+wf.name+' - '+wf.id);
+                            kJob.data.workflow.name = wf.name;
+                            kJob.data.name = "Galaxy workflow: "+wf.name;
+                            kJob.save();
+
+                            kJob.progress(2,10,{start_workflow:'done'});
+
+                            // start monitoring the workflow, kDone is called within.
+                            monitorFn(kJob);
+                            return;
                         }
-                    };
-                    // submit the workflow
-                    thisb.galaxyPOST('/api/workflows',params,function(data,err) {
-
-                        if (err !== null) {
-                            var msg = "Error run workflow";
-                            sails.log.error(msg,err);
-                            return kDone(new Error(msg));
-                        }
-
-                        //sails.log.debug('POST /api/workflows completed',data,err);
-
-                        kJob.data.workflow = data;
-                        kJob.save();
-
-                        thisb.galaxyGET('/api/workflows',function(data,err){
-                            //sails.log.debug('GET /api/workflows',data,err);
-
-                            for(var i in data) {
-                                var wf = data[i];
-                                if (wf.id === kJob.data.requestParams.workflow) {
-                                    sails.log.info("Workflow starting: "+wf.name+' - '+wf.id);
-                                    kJob.data.workflow.name = wf.name;
-                                    kJob.data.name = "Galaxy workflow: "+wf.name;
-                                    kJob.save();
-
-                                    kJob.progress(2,10,{start_workflow:'done'});
-
-                                    // start monitoring the workflow, kDone is called within.
-                                    monitorFn(kJob);
-                                    return;
-                                }
-                            }
-                            // if we get here, somethings wrong
-                            var errmsg = 'failed to match workflow id '+kJob.data.requestParams.workflow;
-                            sails.log.error(errmsg);
-                            return kDone(new Error(msg));
-                        });
-                    });
+                    }
+                    // if we get here, somethings wrong
+                    var errmsg = 'failed to match workflow id '+kJob.data.requestParams.workflow;
+                    sails.log.error(errmsg);
+                    return kDone(new Error(msg));
                 });
             });
         });
+        
     }
 };

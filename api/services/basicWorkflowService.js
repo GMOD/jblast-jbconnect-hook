@@ -135,7 +135,7 @@ module.exports = {
             
         };
         var job = g.kue_queue.create('workflow', jobdata)
-        .save(function(err){
+        job.save(function(err){
             if (err) {
                 cb(null,{status:'error',msg: "error create kue workflow",err:err});
                 return;
@@ -143,6 +143,7 @@ module.exports = {
             cb({status:'success',jobId: job.id},null);
 
             // process job
+            /*
             g.kue_queue.process('workflow', function(kJob, kDone){
                 kJob.kDoneFn = kDone;
                 sails.log.info("workflow job id = "+kJob.id);
@@ -151,7 +152,18 @@ module.exports = {
 
                 thisb._runWorkflow(kJob);
             });
+            */
         });
+    },
+    beginProcessing(kJob) {
+        var g = sails.config.globals.jbrowse;
+        var thisb = this;
+        
+        sails.log.info("basicWorkflowService beginProcessing"+kJob.id);
+
+        kJob.progress(0,10,{file_upload:0});
+
+        thisb._runWorkflow(kJob);
     },
     _runWorkflow: function(kWorkflowJob) {
 
