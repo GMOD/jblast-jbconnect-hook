@@ -74,43 +74,6 @@ module.exports = {
           });
     },
     /**
-     * returns accession data given accesion number.
-     * Utilizes Entrez service
-     * 
-     * REST: ``GET /jbapi/lookupaccession``
-     * 
-     * @param {type} req
-     * @param {type} res
-     * @param {type} next
-     */
-    lookupAccession: function (req, res) {
-        sails.log("JBlast /jbapi/lookupaccession called");
-
-        function accessionLookup(req,res) {
-            this.accession.lookup(req,res,function(data,err) {
-                res.send(data);
-            });
-            
-        }
-        // load accession module only on first time call
-        if (typeof this.accession === 'undefined') {
-            
-            var g = sails.config.globals.jbrowse;
-            var accModule = g.accessionModule;
-
-            if (typeof accModule === 'undefined') accModule = "./accessionEntrez";
-
-            this.accession = require(accModule);
-            
-            this.accession.init(req,res,function() {
-                accessionLookup(req,res);
-            });
-        }
-        else {
-            accessionLookup(req,res);
-        }
-    },
-    /**
      * Monitor workflow and exit upon completion of the workflow
      * 
      * @param {object} kWorkflowJob
