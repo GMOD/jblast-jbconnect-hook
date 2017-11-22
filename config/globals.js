@@ -26,12 +26,12 @@ module.exports.globals = {
             processScript:   'http://localhost:1337/jbrowse/SearchProcess.html'
         },
         // list of services that will get registered.
-        services: [
-            {name: 'basicWorkflowService',  type: 'workflow'},
-            //{name: 'galaxyService',         type: 'workflow'},
-            {name: 'filterService',         type: 'service'},
-            {name: 'entrezService',         type: 'service'},
-            {name: 'seqSearchService',      type: 'service'}
-        ]
+        services: {
+            'basicWorkflowService':     {name: 'basicWorkflowService',  type: 'workflow'},
+            //'galaxyService':          {name: 'galaxyService',         type: 'workflow'},
+            'filterService':            {name: 'filterService',         type: 'service'},
+            'entrezService':            {name: 'entrezService',         type: 'service'},
+            'seqSearchService':         {name: 'seqSearchService',      type: 'service'}
+        }
     }
 };
