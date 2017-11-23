@@ -1,7 +1,47 @@
 function initQueue() {
+    
+    // subscribe to all job objects including new
+    io.socket.get('/job', function(resData, jwres) {console.log(resData);});
+    io.socket.get('/jobactive', function(resData, jwres) {console.log(resData);});
+
+    // trigger on events
+    io.socket.on('job', function(event){
+        console.log('event job',event);
+        var data = event.data;
+        switch(event.verb) {
+            case 'created':
+                console.log('event job create',event.data.id,data);
+                $('#j-hist-grid #head').after(
+                        "<tr id='"+data.id+"'>"
+                        +"<td>"+data.id+"</td>"
+                        +"<td class='state' questate='"+getQueState(data.state)+"'></td>"
+                        +"<td class='progress'>"+data.progress+"</td>"
+                        +"<td class='name'>"+data.data.name+"</td>"
+                        +"</tr>");                
+                        break;
+            case 'updated':
+                console.log('event update',data.id,data);
+                $('#j-hist-grid #'+data.id+" .state").attr('questate',getQueState(data.state));
+                $('#j-hist-grid #'+data.id+" .name").html(data.data.name);
+                break;
+            case 'destroyed':
+                console.log('event remove',data.id,data);
+                $("#j-hist-grid tr#"+data.id).remove();
+                break;
+                }
+    });
+    
+    io.socket.on('jobactive', function(event){
+        console.log('event jobactive',event);
+        if (event.data.active===0) $("div.flapEx").removeClass("cogwheel");
+        else $("div.flapEx").addClass("cogwheel");
+    });    
+    
+    
     /*
      * queue events
      */
+    /*
     io.socket.on('queue-active', function (data){
         console.log('event','queue-active',data);
         if (data.count===0) $("div.flapEx").removeClass("cogwheel");
@@ -60,18 +100,20 @@ function doGetQueue() {
     var typeToWatch = 'workflow';
     
     getJobs(function(data){
-        jdata = $.parseJSON(data);
-
-        //console.log(jdata.length, jdata);
+        //jdata = $.parseJSON(data);
+        jdata = JSON.parse(data);
+        //console.log('jobs', jdata.length, jdata);
 
         // filter type: galaxy-job
         //console.log("jdata len",jdata.length);
+        /*
         var i = jdata.length;
         while(i--) {
             if (jdata[i].type!==typeToWatch)
                 jdata.splice(i, 1);    
         }
-        console.log("jdata len",jdata.length,jdata);
+        */
+        console.log("jobs ",jdata.length,jdata);
 
         jdata.sort(function(a,b) {
             if (a.id > b.id) return -1;
@@ -81,7 +123,7 @@ function doGetQueue() {
 
         for (var x in jdata) {
             // filter out non galaxy-job type
-            if (jdata[x].type === typeToWatch) {
+            //if (jdata[x].type === typeToWatch) {
                 
                 $("#j-hist-grid table").append(
                     "<tr id='"+jdata[x].id+"'>"
@@ -91,16 +133,17 @@ function doGetQueue() {
                     +"<td>"+jdata[x].progress+"</td>"
                     +"<td>"+jdata[x].data.name+"</td>"
                     +"</tr>");
-            }
+            //}
         }
 
     });
 }
 function getJobs(callback) {
 
-    console.log("Load History");
+    //console.log("Load History");
     $.ajax({
-        url: "/api/jobs/0..10000",
+        //url: "/api/jobs/0..10000",
+        url: "/job",
         dataType: "text",
         success: function (data) {
           callback(data);
