@@ -120,6 +120,7 @@ module.exports = {
 
         // create the kue job entry
         var jobdata = {
+            service: "basicWorkflowService",
             name: "workflow",
             requestParams: params, 
             jbrowseDataPath: dataSetPath,
