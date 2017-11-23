@@ -15,7 +15,7 @@ function initQueue() {
                         "<tr id='"+data.id+"'>"
                         +"<td>"+data.id+"</td>"
                         +"<td class='state' questate='"+getQueState(data.state)+"'></td>"
-                        +"<td class='progress'>"+data.progress+"</td>"
+                        //+"<td class='progress'>"+data.progress+"</td>"
                         +"<td class='name'>"+data.data.name+"</td>"
                         +"</tr>");                
                         break;
@@ -130,7 +130,7 @@ function doGetQueue() {
                     +"<td>"+jdata[x].id+"</td>"
                     //+"<td class='state'>"+getQueState(jdata[x].state,jdata[x])+"</td><td>"
                     +"<td class='state' questate='"+getQueState(jdata[x].state)+"'></td>"
-                    +"<td>"+jdata[x].progress+"</td>"
+                    //+"<td>"+jdata[x].progress+"</td>"
                     +"<td>"+jdata[x].data.name+"</td>"
                     +"</tr>");
             //}
