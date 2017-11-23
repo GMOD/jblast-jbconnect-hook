@@ -118,10 +118,12 @@ module.exports = {
 
         params.dataSetPath = dataSetPath;
 
+        var name = workflow.split('.workflow.');
+        
         // create the kue job entry
         var jobdata = {
             service: "basicWorkflowService",
-            name: "workflow",
+            name: name[0],
             requestParams: params, 
             jbrowseDataPath: dataSetPath,
             sequence: seq,
