@@ -251,7 +251,7 @@ module.exports = {
                 else {
                     offsetfix.process(kWorkflowJob,newTrackJson,function() {
                         postAction.processFilter(kWorkflowJob,newTrackJson,function(hitdata) {
-                            postAction.addToTrackList(kWorkflowJob,newTrackJson);
+                            postAction.addToTrackList2(kWorkflowJob,newTrackJson);
                         });
                     });
                 }

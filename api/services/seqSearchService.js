@@ -202,7 +202,7 @@ module.exports = {
         
         // insert track into trackList.json
         this.postMoveResultFiles(kWorkflowJob,function(newTrackJson) {
-            postAction.addToTrackList(kWorkflowJob,newTrackJson);
+            postAction.addToTrackList2(kWorkflowJob,newTrackJson);
         });
     },
     /**

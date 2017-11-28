@@ -29,6 +29,9 @@ module.exports = {
     },
     addToTrackList: function(kWorkflowJob,newTrackJson) {
         return addToTrackList(kWorkflowJob,newTrackJson);
+    },
+    addToTrackList2: function(kWorkflowJob,newTrackJson) {
+        return addToTrackList2(kWorkflowJob,newTrackJson);
     }
 };
 
@@ -348,7 +351,7 @@ function getHits(kWorkflowJob,newTrackJson) {
 function addToTrackList(kWorkflowJob,newTrackJson) {
     sails.log("addToTrackList()",newTrackJson);
     var g = sails.config.globals.jbrowse;
-    
+
     //todo: make this configurable later
     var trackListPath = g.jbrowsePath + kWorkflowJob.data.jbrowseDataPath + '/trackList.json';   //g.dataSet[0].dataPath
 
@@ -428,5 +431,32 @@ function addToTrackList(kWorkflowJob,newTrackJson) {
         
         kWorkflowJob.kDoneFn();                                                 // kue workflow completed successfully
     });
+}
+
+function addToTrackList2(kWorkflowJob,newTrack) {
+    sails.log("addToTrackList2()",newTrack);
+    var g = sails.config.globals.jbrowse;
+
+    var track = newTrack[0];
+
+    var dataset = kWorkflowJob.data.jbrowseDataPath;
+    var trackname = track.label;
+    
+    Track.addTrack(dataset,track,function(err,added) {
+        if (err) {
+            sails.log('failed to add track',trackname);
+            return kWorkflowJob.kDoneFn(new Error("failed to add track"));
+        }
+        var track = added.trackData;
+        
+        //sails.log ("Old Announced new track ",track.label);
+        //sails.hooks['jbcore'].sendEvent("track-new",track);
+
+        kWorkflowJob.progress(100,100);
+        
+        kWorkflowJob.kDoneFn();                                                 // kue workflow completed successfully
+    });
+    
+        
 }
 
