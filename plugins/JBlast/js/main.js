@@ -174,11 +174,28 @@ return declare( JBrowsePlugin,
         dojo.subscribe("/jbrowse/jbclient_ready", function(){
             console.log("ready to receive events");
             
-            // handle track events
+            // new track event handlers
+            
+            io.socket.on('track', function(event){
+                console.log('event track',event);
+                switch(event.verb) {
+                    case 'created':
+                        newTrackHandler ('new',event.data.trackData);
+                        break;
+                    case 'updated':
+                        newTrackHandler ('replace',event.data.trackData);
+                        break;
+                    default: 
+                        console.log('unhandled event');
+                }
+            });    
+
+            
+            // handle track events (old)
             io.socket.on('track-new', function (data){
                 console.log('event','track-new',data);
                 newTrackHandler ('new',data);
-            });		
+            });
             io.socket.on('track-update', function (data){
                 console.log('event','track-update',data);
                 var track = thisB.findTrackConfig(data);
