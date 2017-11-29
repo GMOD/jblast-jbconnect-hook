@@ -15,7 +15,7 @@ module.exports = {
         
         sails.log.debug("offsetfix.process()");
         
-        var blastfile = g.jbrowsePath + kWorkflowJob.data.jbrowseDataPath + '/' + g.jblast.blastResultPath +'/'+ newTrackJson[0].label + ".json";
+        var blastfile = g.jbrowsePath + kWorkflowJob.data.dataset.path + '/' + g.jblast.blastResultPath +'/'+ newTrackJson[0].label + ".json";
         // attempt to read the file
         try {
             var content = fs.readFileSync(blastfile, 'utf8');
