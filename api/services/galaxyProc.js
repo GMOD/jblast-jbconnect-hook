@@ -37,6 +37,20 @@ module.exports = {
             cb2(err);
         });
     },
+    /**
+     * submit a sequence and workflow for processing.
+     *
+     * REST request: 
+     *      POST /service/exec/workflow_submit
+     * 
+     * @param {object} req - request object
+     *      req.body = {
+     *          region:           (string) region in fasta format,
+     *          workflow:         (string) workflow,
+     *          dataSet:          (string) dataset path,
+     *      };
+     * @param {object} res - response object
+     */
     workflowSubmit: function (req, res) {
         var params = req.allParams();
         params.dataSetPath = params.dataset;
@@ -59,13 +73,15 @@ module.exports = {
           });
     },
     /**
-     * Return hits data given hit key
+     * REST Request:
+     *      GET /service/exec/get_hit_details
+     *          ?asset=<asset id>
+     *          ?dataset=<dataset string>
+     *          ?hitkey=<hit key>
      * 
-     * REST: ``GET /jbapi/gethitdetails called``
-     * 
-     * @param {type} req
-     * @param {type} res
-     * @param {type} next
+     * @param {type} req - request object
+     * @param {type} res - response object
+     * @returns {undefined}
      */
     getHitDetails: function (req, res) {
           
@@ -116,7 +132,7 @@ module.exports = {
                     if(hista[outputs[i]].state==='error') {
                         clearInterval(timerloop);
                         kWorkflowJob.state('failed');
-                        kWorkflowJob.save();
+                        kWorkflowJob.update(function() {});
                         sails.log.debug(wId,'workflow completed in error');
                         break;
                     }
@@ -131,7 +147,7 @@ module.exports = {
                 if (outputCount === okCount) {
                     clearInterval(timerloop);
                     kWorkflowJob.state('complete');
-                    kWorkflowJob.save();
+                    kWorkflowJob.update(function() {});
                     sails.log.debug(wId,'workflow completed');
                     setTimeout(function() {
                         postAction.doCompleteAction(kWorkflowJob,hista);            // workflow completed
