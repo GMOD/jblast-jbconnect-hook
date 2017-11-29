@@ -29,9 +29,6 @@ module.exports = {
     },
     addToTrackList: function(kWorkflowJob,newTrackJson) {
         return addToTrackList(kWorkflowJob,newTrackJson);
-    },
-    addToTrackList2: function(kWorkflowJob,newTrackJson) {
-        return addToTrackList2(kWorkflowJob,newTrackJson);
     }
 };
 
@@ -348,93 +345,8 @@ function getHits(kWorkflowJob,newTrackJson) {
  * @param {object} kWorkflowJob
  * @param {JSON} newTrackJson
  */
-function addToTrackList(kWorkflowJob,newTrackJson) {
-    sails.log("addToTrackList()",newTrackJson);
-    var g = sails.config.globals.jbrowse;
-
-    //todo: make this configurable later
-    var trackListPath = g.jbrowsePath + kWorkflowJob.data.dataset.path + '/trackList.json';   //g.dataSet[0].dataPath
-
-    sails.log("trackListPath = "+trackListPath);
-    sails.log("newTrackJson",newTrackJson.key);
-    
-    var p = fs.readFileAsync(trackListPath)
-    .then(function (trackListData) {
-        var trackListJson = JSON.parse(trackListData);
-        //trackListJson.tracks = trackListJson.tracks || [];
-        
-        sails.log("read "+trackListJson.tracks.length + " tracks");
-
-        // if it's a single definition, coerce to an array
-        if (Object.prototype.toString.call(newTrackJson) !== '[object Array]') {
-            newTrackJson = [ newTrackJson ];
-        }
-        else {
-            sails.log("is array of tracks");
-        }
-
-        // validate the new track JSON structures
-        sails.log("validating...");
-        newTrackJson.forEach (function (track) {
-            if (!track.label) {
-                sails.log.error ("Invalid track JSON: missing a label element");
-            }
-        });
-
-        // insert/replace the tracks (merge)
-        sails.log("insert/replace...");
-        var addedTracks = [], replacedTracks = [];
-
-        sails.log("start track count "+trackListJson.tracks.length);
-
-        newTrackJson.forEach (function (newTrack) {
-            var newTracks = [];
-            trackListJson.tracks.forEach (function (oldTrack) {
-                if (oldTrack.label === newTrack.label) {
-                    newTracks.push (newTrack);
-                    replacedTracks.push (newTrack);
-                    newTrack = {};
-                } else {
-                    newTracks.push (oldTrack);
-                }
-            });
-            if (newTrack.label) {
-                newTracks.push (newTrack);
-                addedTracks.push (newTrack);
-                sails.log("newtrack",newTrack.label);
-            }
-            trackListJson.tracks = newTracks;
-        });
-
-
-        //return;
-        
-
-        // write the new track list
-        sails.log("start track count "+trackListJson.tracks.length);
-        sails.log("writing new tracklist...");
-
-        var trackListOutputData = JSON.stringify (trackListJson, null, 2);
-        fs.writeFileSync (trackListPath, trackListOutputData);
-
-        // publish notifications
-        deferred.map (addedTracks, function (track) {
-            sails.hooks['jbcore'].sendEvent("track-new",track);
-            sails.log ("Announced new track ",track.label);
-        });
-        //deferred.map (replacedTracks, function (track) {
-        //    sails.hooks['jbcore'].sendEvent("track-replace",track);
-        //    sails.log ("Announced replacement track ",track.label);
-        //});
-        
-        kWorkflowJob.progress(100,100);
-        
-        kWorkflowJob.kDoneFn();                                                 // kue workflow completed successfully
-    });
-}
-
-function addToTrackList2(kWorkflowJob,newTrack) {
-    sails.log("addToTrackList2()",newTrack);
+function addToTrackList(kWorkflowJob,newTrack) {
+    sails.log("addToTrackList",newTrack);
     var g = sails.config.globals.jbrowse;
 
     var track = newTrack[0];
