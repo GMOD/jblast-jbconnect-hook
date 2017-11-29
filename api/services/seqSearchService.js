@@ -91,32 +91,17 @@ module.exports = {
             workflow: workflow,
             name: searchParams.expr+' search',
             searchParams: searchParams, 
-            dataset: dataset,
-            jbrowseDataPath: dataset        // cleanup later (postAction uses this)
+            dataset: {
+                path: dataset
+            }
         };
         var kJob = gg.kue_queue.create('workflow', jobdata);
-        
-        kJob.data.asset = kJob.id+"_search_"+ new Date().getTime();
-        searchParamFile = kJob.data.asset+".json";
-        kJob.data.path = g.jbrowsePath + '/' + kJob.data.dataset +'/'+ g.jblast.blastResultPath;
-        kJob.data.outfile = kJob.data.asset+".gff";
         
         kJob.save(function(err){
             if (err) {
                 return cb(null,{status:'error',msg: "error create kue workflow",err:err});
             }
-            
             cb({status:'success',jobId: kJob.id,asset:kJob.data.asset},null);
-
-            // process job
-            //gg.kue_queue.process('workflow', function(kJob, kDone){
-                //kJob = job;
-            //    kJob.kDoneFn = kDone;
-            //    sails.log.info("workflow job id = "+kJob.id);
-
-                //thisb._createSearchParamFile(job);
-                //thisb._runWorkflow(kJob);
-            //});
         });
     },
     beginProcessing(kJob) {
@@ -125,8 +110,19 @@ module.exports = {
         
         sails.log.info("seqSearchService beginProcessing"+kJob.id);
 
+        kJob.data.asset = kJob.id+"_search_"+ new Date().getTime();
+        searchParamFile = kJob.data.asset+".json";
+        kJob.data.path = g.jbrowsePath + '/' + kJob.data.dataset.path +'/'+ g.jblast.blastResultPath;
+        kJob.data.outfile = kJob.data.asset+".gff";
+
+        kJob.update(function() {});
+
         thisb._createSearchParamFile(kJob);
-        thisb._runWorkflow(kJob);
+
+        // delay 5 seconds for nothing, really (just so it sits in the queue for longer)
+        setTimeout(function() {
+            thisb._runWorkflow(kJob);
+        },5000);
     },
     _fixParams(s) {
         var _s={};
@@ -169,7 +165,7 @@ module.exports = {
             workflowFile = kWorkflowJob.data.workflow;
         
         var wf = process.cwd()+'/workflows/'+workflowFile;
-        var outPath = g.jbrowsePath + kWorkflowJob.data.jbrowseDataPath + '/' + g.jblast.blastResultPath;
+        var outPath = g.jbrowsePath + kWorkflowJob.data.dataset.path + '/' + g.jblast.blastResultPath;
 
         sails.log('>>> Executing workflow',wf);
         
@@ -254,7 +250,7 @@ module.exports = {
 
         newTrackJson[0].sequenceSearch = true;     
         kWorkflowJob.data.track = newTrackJson[0];
-        kWorkflowJob.save();
+        kWorkflowJob.update(function() {});
 
         cb(newTrackJson);
         
