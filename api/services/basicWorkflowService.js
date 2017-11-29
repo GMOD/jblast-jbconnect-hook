@@ -125,10 +125,11 @@ module.exports = {
             service: "basicWorkflowService",
             name: name[0],
             requestParams: params, 
-            jbrowseDataPath: dataSetPath,
+            //jbrowseDataPath: dataSetPath,
             sequence: seq,
             blastData: blastData,
             dataset: {
+                path: dataSetPath,
                 workflow: workflow,
                 file: theFile
             },
@@ -143,19 +144,8 @@ module.exports = {
                 cb(null,{status:'error',msg: "error create kue workflow",err:err});
                 return;
             }
-            cb({status:'success',jobId: job.id},null);
+            cb({status:'success',jobId: job.id},null);  // rest call return
 
-            // process job
-            /*
-            g.kue_queue.process('workflow', function(kJob, kDone){
-                kJob.kDoneFn = kDone;
-                sails.log.info("workflow job id = "+kJob.id);
-
-                kJob.progress(0,10,{file_upload:0});
-
-                thisb._runWorkflow(kJob);
-            });
-            */
         });
     },
     beginProcessing(kJob) {
@@ -166,7 +156,10 @@ module.exports = {
 
         kJob.progress(0,10,{file_upload:0});
 
-        thisb._runWorkflow(kJob);
+        // delay 5 seconds for nothing, really. (just so it sits in the queue for longer)
+        setTimeout(function() {
+            thisb._runWorkflow(kJob);
+        },5000);
     },
     _runWorkflow: function(kWorkflowJob) {
 
@@ -174,7 +167,7 @@ module.exports = {
         var g = sails.config.globals.jbrowse;
 
         var wf = process.cwd()+'/workflows/'+kWorkflowJob.data.requestParams.workflow;
-        var outPath = g.jbrowsePath + kWorkflowJob.data.jbrowseDataPath + '/' + g.jblast.blastResultPath;
+        var outPath = g.jbrowsePath + kWorkflowJob.data.dataset.path + '/' + g.jblast.blastResultPath;
 
         sails.log('>>> Executing workflow',wf);
 
@@ -194,7 +187,7 @@ module.exports = {
                 
                 kWorkflowJob.data.workflow.workflowResult = results;
                 kWorkflowJob.data.blastData.outputs = { blastxml: kWorkflowJob.id+"_" + Date.now() };
-                kWorkflowJob.save();
+                kWorkflowJob.update(function() {});
                 
                 // rename the generated file to be the asset id 
                 // this is a clunky should be improved.
