@@ -31,7 +31,6 @@
     "grunt-publish": "^1.0.0",
     "jQuery-ui-Slider-Pips": "github:simeydotme/jQuery-ui-Slider-Pips#v1.11.4",
     "jquery-ui-dist": "^1.12.1",
-    "jquery.mb.extruder": "^2.6.0",
     "lodash": "^4.16",
     "marlinspike": "^1.0.0",
     "mock-require": "^2.0.2",
