@@ -144,81 +144,11 @@ return declare( JBrowsePlugin,
                     dojo.stopEvent(event);
                 })
             }, dojo.create('button',{},navBox));   //thisB.browser.navBox));
-/* 
-            if(queryParams.tracklabels == 0 || thisB.browser.config.show_tracklabels == 0) {
-                query('.track-label').style('visibility', 'hidden')
-                dojo.attr(dom.byId("hidetitles-btn"),"hidden-titles","");       // if shown, hide
-            }
-*/
         });
         
         // save the reference to the blast plugin in browser
         browser.jblastPlugin = this;
         
-/*        
-        // event handlers for server events
-        var newTrackHandler = function (eventType,data) {
-            
-            console.log("trackhandler "+eventType,data);
-            data.baseUrl = browser.config.baseUrl+browser.config.dataRoot+'/';
-            var notifyStoreConf = dojo.clone (data);
-            var notifyTrackConf = dojo.clone (data);
-            notifyStoreConf.browser = browser;
-            notifyStoreConf.type = notifyStoreConf.storeClass;
-            notifyTrackConf.store = browser.addStoreConfig(undefined, notifyStoreConf);
-            browser.publish ('/jbrowse/v1/v/tracks/' + eventType, [notifyTrackConf]);
-        };
-*/
-        //TODO: move this into JBClient plugin
-/*        
-        dojo.subscribe("/jbrowse/jbclient_ready", function(){
-            console.log("ready to receive events");
-            
-            // new track event handlers
-            
-            io.socket.on('track', function(event){
-                console.log('event track',event);
-                switch(event.verb) {
-                    case 'created':
-                        newTrackHandler ('new',event.data.trackData);
-                        break;
-                    case 'updated':
-                        newTrackHandler ('replace',event.data.trackData);
-                        break;
-                    default: 
-                        console.log('unhandled event');
-                }
-            });    
-
-            
-            // handle track events (old)
-            io.socket.on('track-new', function (data){
-                console.log('event','track-new',data);
-                newTrackHandler ('new',data);
-            });
-            io.socket.on('track-update', function (data){
-                console.log('event','track-update',data);
-                var track = thisB.findTrackConfig(data);
-                if (track)
-                    thisB.browser.view.replaceTracks([track]);
-                else
-                    console.log("track not found");
-            });
-            io.socket.on('track-replace', function (data){
-                console.log('event','track-replace',data);
-                newTrackHandler ('replace',data);
-            });		
-            io.socket.on('track-test', function (data){
-                console.log('event','track-test',data);
-                console.log("event track-test "+data.value);
-                alert("event track-test value = "+data.value)
-            });
-
-            setTimeout(function() {
-                initQueue();
-            },1000);
-        });
-*/        
         /*
          * JBrowse event handlers
          */
@@ -905,27 +835,6 @@ return declare( JBrowsePlugin,
                     }
                     console.log('Selected workflow',selWorkflow);
                     
-                    // do http post
-                    /*
-                    var xhrArgs = {
-                      //url: jbServer + '/jbapi/blastregion',
-                      url: '/jbapi/workflowsubmit',
-                      postData: {
-                          region: regionB,
-                          //workflow: 'f2db41e1fa331b3e'
-                          workflow: selWorkflow,
-                          dataSetPath: thisB.config.dataRoot
-                      },
-                      handleAs: "json",
-                      load: function(data){
-                        console.log("POST result");
-                        console.dir(data);
-                      },
-                      error: function(error){
-                          alert(error);
-                      }
-                    };
-                    */
                     var postData = {
                           service: "basicWorkflowService",
                           dataset: thisB.config.dataRoot,
@@ -1026,26 +935,3 @@ function repeatChar(count, ch) {
       }
       return result + result.substring(0, count - result.length);
 }
-/*
-function jobPanelInit() {              
-    console.log("jobPanelInit()");
-    
-    // fix position of flap
-    $("#extruderRight div.flap").addClass("flapEx");
-
-    // add gear icon (activity indicator)
-    //$("#extruderRight div.flap").prepend("<img class='cogwheel hidden' src='plugins/JBlast/img/st_active.gif' />");
-    $("#extruderRight div.flap").attr('title','Workflow queue');
-
-    $("#extruderRight .extruder-content").css('height','300px');
-    $("#extruderRight .extruder-content").css('border-bottom-left-radius','5px');
-
-
-
-    //adjust grid height
-    setInterval(function() {
-        var h = $("#extruderRight div.extruder-content").height();
-        $("#j-hist-grid").height(h-3);
-    },1000);
-}
-*/
