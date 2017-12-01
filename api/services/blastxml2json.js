@@ -28,7 +28,7 @@ module.exports = {
         sails.log('converting blast to json');
         var g = sails.config.globals.jbrowse;
         // i.e. /var/www/html/jbrowse/sample_data/json/volvox/jblastdata
-        var jblastDataPath = g.jbrowsePath + kJob.data.requestParams.dataSetPath + '/' + g.jblast.blastResultPath + '/';
+        var jblastDataPath = g.jbrowsePath + kJob.data.dataset + '/' + g.jblast.blastResultPath + '/';
         var assetId = kJob.data.blastData.outputs['blastxml'];
         if (typeof assetId === 'undefined') {
             cb({status:'error',msg:'error in blastxml to json - assetId undefined'});

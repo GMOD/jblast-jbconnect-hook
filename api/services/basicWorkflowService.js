@@ -13,12 +13,20 @@ var shelljs = require('shelljs');
 module.exports = {
 
     fmap: {
-        workflow_submit:    'post',
+//        workflow_submit:    'post',
         get_workflows:      'get',
         get_hit_details:    'get'
     },
     init: function(params,cb) {
         return cb();
+    },
+    validateParams: function(params) {
+        if (typeof params.workflow === 'undefined') return "workflow not defined";
+        if (typeof params.region === 'undefined') return "region not undefined";
+        return 0;   // success
+    },
+    generateName(params) {
+        return params.workflow;
     },
     workflow_submit: function(req, res) {
         var params = req.allParams();
@@ -69,12 +77,16 @@ module.exports = {
      * @param {type} params
      * @param {type} cb
      */
-    _workflowSubmit: function(params,cb) {
+    beginProcessing: function(kJob) {
+        sails.log.info("basicWorkflowService beginProcessing"+kJob.data);
+        var params = kJob.data;
+        
         var thisb = this;
         var g = sails.config.globals;
+
         var region = params.region;
         var workflow = params.workflow;
-        var dataSetPath = params.dataset;
+        //var dataSetPath = params.dataset;
         var monitorFn = this._monitorWorkflow;
 
         // get starting coord of region
@@ -87,9 +99,10 @@ module.exports = {
 
         // write the BLAST region file (.fasta)
         var theBlastFile = "blast_region"+d.getTime()+".fa";
-        var blastPath = g.jbrowse.jbrowsePath + '/' + dataSetPath +'/'+ g.jbrowse.jblast.blastResultPath;
+        var blastPath = g.jbrowse.jbrowsePath + '/' + params.dataset +'/'+ g.jbrowse.jblast.blastResultPath;
         var theFullBlastFilePath = blastPath+'/'+theBlastFile; 
 
+        console.log("blastPath",blastPath);
         // if direcgtory doesn't exist, create it
         if (!fs.existsSync(blastPath)){
             fs.mkdirSync(blastPath);
@@ -114,13 +127,23 @@ module.exports = {
 
         //sails.log.debug('>>> jbrowse globals',g.jbrowse);
 
-        var theFile = g.jbrowse.jbrowseRest+'/'+g.jbrowse.routePrefix+'/'+ dataSetPath+'/' + g.jbrowse.jblast.blastResultPath+'/'+theBlastFile;
+        var theFile = g.jbrowse.jbrowseRest+'/'+g.jbrowse.routePrefix+'/'+ params.dataset+'/' + g.jbrowse.jblast.blastResultPath+'/'+theBlastFile;
 
-        params.dataSetPath = dataSetPath;
+        params.dataSetPath = params.dataset;
 
         var name = workflow.split('.workflow.');
         
+        
+        kJob.data.requestParams = params
+        kJob.data.sequence = seq;
+        kJob.data.blastData = blastData;
+        kJob.data.seqFile = theFile;
+
+        kJob.update(function() {});
+        
+        this.beginProcessing2(kJob);
         // create the kue job entry
+        /*
         var jobdata = {
             service: "basicWorkflowService",
             name: name[0],
@@ -138,6 +161,7 @@ module.exports = {
             }
             
         };
+        
         var job = g.kue_queue.create('workflow', jobdata)
         job.save(function(err){
             if (err) {
@@ -147,12 +171,12 @@ module.exports = {
             cb({status:'success',jobId: job.id},null);  // rest call return
 
         });
+        */
     },
-    beginProcessing(kJob) {
+    beginProcessing2(kJob) {
         var g = sails.config.globals.jbrowse;
         var thisb = this;
         
-        sails.log.info("basicWorkflowService beginProcessing"+kJob.id);
 
         kJob.progress(0,10,{file_upload:0});
 
@@ -161,18 +185,18 @@ module.exports = {
             thisb._runWorkflow(kJob);
         },5000);
     },
-    _runWorkflow: function(kWorkflowJob) {
+    _runWorkflow: function(kJob) {
 
         var thisb = this;
         var g = sails.config.globals.jbrowse;
 
-        var wf = process.cwd()+'/workflows/'+kWorkflowJob.data.requestParams.workflow;
-        var outPath = g.jbrowsePath + kWorkflowJob.data.dataset.path + '/' + g.jblast.blastResultPath;
+        var wf = process.cwd()+'/workflows/'+kJob.data.workflow;
+        var outPath = g.jbrowsePath + kJob.data.dataset + '/' + g.jblast.blastResultPath;
 
         sails.log('>>> Executing workflow',wf);
 
         var child = shelljs.exec(
-            'node '+ wf + ' --in '+kWorkflowJob.data.blastData.blastSeq + ' --ext blastxml --out '+outPath,{async:true},
+            'node '+ wf + ' --in '+kJob.data.blastData.blastSeq + ' --ext blastxml --out '+outPath,{async:true},
             function(code, stdout, stderr) {
                 if (code !== 0) {    // completed in error
                     console.log('Script Exit code:', code, typeof code);
@@ -185,16 +209,16 @@ module.exports = {
                 
                 // the script may generate any number of files so we rely on the script results to tell us the generated file
                 
-                kWorkflowJob.data.workflow.workflowResult = results;
-                kWorkflowJob.data.blastData.outputs = { blastxml: kWorkflowJob.id+"_" + Date.now() };
-                kWorkflowJob.update(function() {});
+                kJob.data.workflowResult = results;
+                kJob.data.blastData.outputs = { blastxml: kJob.id+"_" + Date.now() };
+                kJob.update(function() {});
                 
                 // rename the generated file to be the asset id 
                 // this is a clunky should be improved.
                 renamefile(results.out);
                 
                 // start post processing.
-                thisb._postProcess(kWorkflowJob);
+                thisb._postProcess(kJob);
                 
                 // extract the json from the result string
                 function extractjson(str) {
@@ -205,7 +229,7 @@ module.exports = {
                 function renamefile(theFile) {
                     var dir = path.dirname(theFile);
                     var ext = path.extname(theFile);
-                    var assetid = kWorkflowJob.data.blastData.outputs.blastxml;
+                    var assetid = kJob.data.blastData.outputs.blastxml;
                     var cmd = "mv "+theFile+" "+dir+"/"+assetid+ext;
                     sails.log(cmd);
                     shelljs.exec(cmd);
@@ -215,36 +239,35 @@ module.exports = {
         //sails.log('>>> Workflow complete');
         
     },
-    _postProcess: function(kWorkflowJob) {
+    _postProcess: function(kJob) {
         var blast2json = require("./blastxml2json");
-        var postAction = require("./postAction");
+        //var postAction = require("./postAction");
         
         
         // insert track into trackList.json
-        postAction.postMoveResultFiles(kWorkflowJob,function(newTrackJson) {
+        jblastPostAction.postMoveResultFiles(kJob,function(newTrackJson) {
 
             // convert xml to json
-            blast2json.convert(kWorkflowJob,newTrackJson,function(err) {
+            blast2json.convert(kJob,newTrackJson,function(err) {
                 if (err) {
                     sails.log.error(err.msg);
-                    kWorkflowJob.kDoneFn(new Error(err.msg));
+                    kJob.kDoneFn(new Error(err.msg));
                     return;
                 }
                 sails.log.debug("post convert newTrackJson",newTrackJson);
 
                 // check if there were any hits.
-                if (postAction.getHits(kWorkflowJob,newTrackJson)===0) {
+                if (jblastPostAction.getHits(kJob,newTrackJson)===0) {
                     var msg = "No Blast Hits";
                     sails.log.error(msg);
-                    //kWorkflowJob.data.errorMsg = msg;
-                    //kWorkflowJob.state('failed');
-                    //kWorkflowJob.save();
-                    kWorkflowJob.kDoneFn(new Error(msg));
+                    kJob.kDoneFn(new Error(msg));
                 }
                 else {
-                    offsetfix.process(kWorkflowJob,newTrackJson,function() {
-                        postAction.processFilter(kWorkflowJob,newTrackJson,function(hitdata) {
-                            postAction.addToTrackList(kWorkflowJob,newTrackJson);
+                    offsetfix.process(kJob,newTrackJson,function() {
+                        jblastPostAction.processFilter(kJob,newTrackJson,function(hitdata) {
+                            
+                            // postAction service is in JBServer 
+                            postAction.addToTrackList(kJob,newTrackJson);
                         });
                     });
                 }

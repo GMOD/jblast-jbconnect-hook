@@ -16,21 +16,21 @@ module.exports = {
 
     /**
      * create initial filter settings file
-     * @param {type} kWorkflowJob
+     * @param {type} kJob
      * @param {type} newTrackJson
      *      newTrackJson[0].filterSettings must be defined
      *      newTrackJson[0].label must be defined
      * @returns {undefined|module.exports.filterInit.filter}
      */
-    filterInit: function(kWorkflowJob,cb) {
+    filterInit: function(kJob,cb) {
         sails.log("filterInit()");
         var g = sails.config.globals.jbrowse;
 
         // read blast json file
-        //var blastfile = g.jbrowsePath + kWorkflowJob.data.jbrowseDataPath +'/' + g.jblast.blastResultPath +"/"+ newTrackJson[0].label + ".json";
-        //var blastFilterFile = g.jbrowsePath + kWorkflowJob.data.jbrowseDataPath + '/' + newTrackJson[0].filterSettings;
-        var blastfile = g.jbrowsePath + kWorkflowJob.data.dataset.path +'/' + g.jblast.blastResultPath +"/"+ kWorkflowJob.data.blastData.outputs.blastxml + ".json";
-        var blastFilterFile = g.jbrowsePath + kWorkflowJob.data.dataset.path + '/' + kWorkflowJob.data.blastData.filterSettings;
+        //var blastfile = g.jbrowsePath + kJob.data.dataset +'/' + g.jblast.blastResultPath +"/"+ newTrackJson[0].label + ".json";
+        //var blastFilterFile = g.jbrowsePath + kJob.data.dataset + '/' + newTrackJson[0].filterSettings;
+        var blastfile = g.jbrowsePath + kJob.data.dataset +'/' + g.jblast.blastResultPath +"/"+ kJob.data.blastData.outputs.blastxml + ".json";
+        var blastFilterFile = g.jbrowsePath + kJob.data.dataset + '/' + kJob.data.blastData.filterSettings;
         
         sails.log('blastfile',blastfile);
         try {

@@ -10,12 +10,12 @@ var fs = Promise.promisifyAll(require("fs"));
 var deferred = require('deferred');
 
 module.exports = {
-    process: function(kWorkflowJob,newTrackJson,cb) {
+    process: function(kJob,newTrackJson,cb) {
         var g = sails.config.globals.jbrowse;
         
         sails.log.debug("offsetfix.process()");
         
-        var blastfile = g.jbrowsePath + kWorkflowJob.data.dataset.path + '/' + g.jblast.blastResultPath +'/'+ newTrackJson[0].label + ".json";
+        var blastfile = g.jbrowsePath + kJob.data.dataset + '/' + g.jblast.blastResultPath +'/'+ newTrackJson[0].label + ".json";
         // attempt to read the file
         try {
             var content = fs.readFileSync(blastfile, 'utf8');
@@ -28,7 +28,7 @@ module.exports = {
         var hits = data.BlastOutput.BlastOutput_iterations.Iteration.Hit;
 
         
-        var offset = parseInt(kWorkflowJob.data.blastData.offset);
+        var offset = parseInt(kJob.data.blastData.offset);
         
         // add offset to HSP query from/to
         var fixHsp = function(hsp) {
