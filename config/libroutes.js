@@ -11,7 +11,6 @@
 
 module.exports = {
     lib: {
-            'jQuery-ui-Slider-Pips':    '/jblib/slider-pips',
-            'jquery-ui-dist':           '/jblib/jquery-ui'
+            'jQuery-ui-Slider-Pips':    '/jblib/slider-pips'
     }
 };
