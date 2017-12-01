@@ -2,9 +2,9 @@
     Created on : Mar 31, 2016, 6:38:33 PM
     Author     : ey
 */
-
+/*
 @import url("CSSTableGenerator.css");
-
+*/
 /* toolbar blast button */
 
 #jblast-toolbtn {
@@ -14,37 +14,6 @@
 	display: none;      /* default state */
 }
 
-/* job queue panel */
-/*
-div.flapEx {
-    padding-top:35px !important;
-    background-repeat: no-repeat !important;
-    background-position: center center !important;
-    background-size: 30px 30px !important;
-    background-image: url("../img/stack200w.png") !important;
-    top:55px !important;
-}
-div.ext_wrapper div.cogwheel {
-    background-image: url("../img/st_active.gif") !important;
-}
-
-div.hidden {
-    display:none;
-}
-img.cogwheel {
-    position: absolute;
-    top: 5px;
-    left: 5px;
-    width: 22px;
-    height: 22px;
-}
-*/
-/* hide title text of job panel - hack */
-/*
-div#extruderRight object.flip_label {
-	display:none;
-}
-*/
 .blastQtip {
     max-width: 1000px !important;
     min-width: 400px !important;
@@ -185,72 +154,4 @@ div.blastSummary td.blastSummaryItem {
     border-collapse: separate;
     border-spacing: 2px;
 }
-/*
-    history panel
-*/
-/*
-        #j-hist-grid {
-            position: absolute;
-            background-color:#eee;
-            overflow-y:auto;
-            overflow-x:hidden;
-            width: 300px;
-            height:500px;
-        }
-        #j-blast {
-            position:absolute;
-            background-color:#eee;
-            overflow-x:hidden;
-            overflow-y:auto;
-            width: 100%;
-            padding:10px;
-            white-space:nowrap;
-        }
-        .xxextruder.right div.flap {
-            left: -29px;
-        }
-        xxspan.flapLabel {
-            left: -7px;
-        }
-        
-        #xx_j-hist-grid {
-            position: absolute;
-            background-color:#eee;
-            overflow:auto;
-            width: 100%;
-            height:100%;
-        }
-        .xx_extruder.right div.flap {
-            left: -38px;
-        }
-        span.flapLabel {
-            left: -7px;
-        }
-        
-        /* table
-        */
-        .tg  {border-collapse:collapse;border-spacing:0;}
-        .tg td{font-family:Arial, sans-serif;font-size:14px;padding:0px 0px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;}
-        .tg .tg-yw4l{vertical-align:top}
-
-
-td.state {
-    background-repeat: no-repeat;
-    background-position: center center;
-    background-size: 20px 20px;
-
-}
-
-td[questate*='complete'] {
-    background-image: url("../img/st_complete.png");
-}
-td[questate*='failed'] {
-    background-image: url("../img/st_failed.png");
-}
-td[questate*='active'] {
-    background-image: url("../img/st_active.gif");
-}
-td[questate*='unknown'] {
-    background-image: url("../img/st_unknown.png");
-}
-*/        
+       
