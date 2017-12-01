@@ -927,12 +927,14 @@ return declare( JBrowsePlugin,
                     };
                     */
                     var postData = {
+                          service: "basicWorkflowService",
+                          dataset: thisB.config.dataRoot,
                           region: regionB,
-                          workflow: selWorkflow,
-                          dataset: thisB.config.dataRoot
+                          workflow: selWorkflow
                       };
                     //var deferred = dojo.xhrPost(xhrArgs);
-                    $.post( "/service/exec/workflow_submit", postData , function( result ) {
+                    //$.post( "/service/exec/workflow_submit", postData , function( result ) {
+                    $.post( "/job/submit", postData , function( result ) {
                         console.log( result );
                     }, "json");
 
