@@ -15,6 +15,7 @@
 }
 
 /* job queue panel */
+/*
 div.flapEx {
     padding-top:35px !important;
     background-repeat: no-repeat !important;
@@ -37,11 +38,13 @@ img.cogwheel {
     width: 22px;
     height: 22px;
 }
+*/
 /* hide title text of job panel - hack */
+/*
 div#extruderRight object.flip_label {
 	display:none;
 }
-
+*/
 .blastQtip {
     max-width: 1000px !important;
     min-width: 400px !important;
@@ -185,6 +188,7 @@ div.blastSummary td.blastSummaryItem {
 /*
     history panel
 */
+/*
         #j-hist-grid {
             position: absolute;
             background-color:#eee;
@@ -249,4 +253,4 @@ td[questate*='active'] {
 td[questate*='unknown'] {
     background-image: url("../img/st_unknown.png");
 }
-        
+*/        
