@@ -142,11 +142,18 @@ function exec_setuptrack(params) {
     var config = params.config;
     console.log("Setting up sample track...");
     var g = config;
-
-    var trackListPath = g.jbrowsePath + g.dataSet[0].dataPath + '/trackList.json';
-    var sampleTrackFile = g.jbrowsePath + g.dataSet[0].dataPath;
+    
+    // get dataSet
+    var dataSet = "-----";
+    for(var i in g.dataSet) {
+        dataSet = g.dataSet[i].path;
+        break;  // only take the first one
+    }
+    
+    var trackListPath = g.jbrowsePath + dataSet + '/trackList.json';
+    var sampleTrackFile = g.jbrowsePath + dataSet;
     sampleTrackFile += '/'+g.jblast.blastResultPath+'/sampleTrack.json';
-    var dataSet = g.dataSet[0].dataPath;
+    //var dataSet = g.dataSet.dataPath;
     
     // read sampleTrack.json file
     var error = 0;
@@ -182,7 +189,7 @@ function exec_setuptrack(params) {
     // add the JBlast & JBClient plugin, if they don't already exist  
     if (conf.plugins.indexOf('JBClient') === -1) conf.plugins.push("JBClient");
     if (conf.plugins.indexOf('JBlast') === -1) conf.plugins.push("JBlast");
-    if (conf.plugins.indexOf('ServerSearchSeq') === -1) conf.plugins.push("ServerSearchSeq");
+    //if (conf.plugins.indexOf('ServerSearchSeq') === -1) conf.plugins.push("ServerSearchSeq");
 
 
     // check if sample track exists in trackList.json (by checking for the label)
@@ -213,10 +220,18 @@ function exec_setupdata(params) {
     
     var config = params.config;
     var srcpath = params.srcpath;
+    var g = config;
 
     console.log("Setting up data directory...");
     
-    var targetdir = config.jbrowsePath+config.dataSet[0].dataPath;
+    // get dataSet
+    var dataSet = "-----";
+    for(var i in g.dataSet) {
+        dataSet = g.dataSet[i].path;
+        break;  // only take the first one
+    }
+    
+    var targetdir = config.jbrowsePath + dataSet;
     
     util.checkDir(targetdir+config.jblast.blastResultPath);
     
