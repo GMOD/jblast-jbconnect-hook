@@ -41,7 +41,7 @@ return declare( JBrowsePlugin,
         var browser = this.browser;
 
         var sliders = new slidersMixin(this,browser);
-        
+/*        
         $.get("plugins/JBlast/BlastPanel.html", function(data){
             console.log("loaded BlastPanel.html");
             $('body').append(data);
@@ -59,7 +59,7 @@ return declare( JBrowsePlugin,
                 onExtClose:function(){}
             });
         });            
-        
+*/        
         browser.jblast = {
             asset: null,
             focusQueue: [],
@@ -155,7 +155,7 @@ return declare( JBrowsePlugin,
         // save the reference to the blast plugin in browser
         browser.jblastPlugin = this;
         
-        
+/*        
         // event handlers for server events
         var newTrackHandler = function (eventType,data) {
             
@@ -168,9 +168,9 @@ return declare( JBrowsePlugin,
             notifyTrackConf.store = browser.addStoreConfig(undefined, notifyStoreConf);
             browser.publish ('/jbrowse/v1/v/tracks/' + eventType, [notifyTrackConf]);
         };
-
+*/
         //TODO: move this into JBClient plugin
-        
+/*        
         dojo.subscribe("/jbrowse/jbclient_ready", function(){
             console.log("ready to receive events");
             
@@ -218,7 +218,7 @@ return declare( JBrowsePlugin,
                 initQueue();
             },1000);
         });
-        
+*/        
         /*
          * JBrowse event handlers
          */
@@ -1024,6 +1024,7 @@ function repeatChar(count, ch) {
       }
       return result + result.substring(0, count - result.length);
 }
+/*
 function jobPanelInit() {              
     console.log("jobPanelInit()");
     
@@ -1045,4 +1046,4 @@ function jobPanelInit() {
         $("#j-hist-grid").height(h-3);
     },1000);
 }
-
+*/
