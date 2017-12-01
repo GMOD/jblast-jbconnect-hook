@@ -15,7 +15,7 @@ module.exports.globals = {
         jblast: {
             blastResultPath: "jblastdata",
             blastResultCategory: "JBlast Results",
-            insertTrackTemplate: "inMemTemplate.json",
+            trackTemplate: "jblastTrackTemplate.json",
             import: ["blastxml"],
             
         },
@@ -24,8 +24,7 @@ module.exports.globals = {
             'basicWorkflowService':     {name: 'basicWorkflowService',  type: 'workflow'},
             //'galaxyService':          {name: 'galaxyService',         type: 'workflow'},
             'filterService':            {name: 'filterService',         type: 'service'},
-            'entrezService':            {name: 'entrezService',         type: 'service'},
-            'seqSearchService':         {name: 'seqSearchService',      type: 'service'}
+            'entrezService':            {name: 'entrezService',         type: 'service'}
         }
     }
 };
