@@ -21,8 +21,8 @@ module.exports.globals = {
         },
         // list of services that will get registered.
         services: {
-            'basicWorkflowService':     {name: 'basicWorkflowService',  type: 'workflow'},
-            //'galaxyService':          {name: 'galaxyService',         type: 'workflow'},
+            'basicWorkflowService':     {name: 'basicWorkflowService',  type: 'workflow', alias: "jblast"},
+            //'galaxyService':          {name: 'galaxyService',         type: 'workflow', alias: "jblast"},
             'filterService':            {name: 'filterService',         type: 'service'},
             'entrezService':            {name: 'entrezService',         type: 'service'}
         }
