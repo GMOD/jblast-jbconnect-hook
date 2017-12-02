@@ -286,12 +286,14 @@ module.exports = {
 
         // create the kue job entry
         var jobdata = {
+            service: "galaxyService",
             name: "workflow",
             requestParams: params, 
-            jbrowseDataPath: dataSetPath,
+            //jbrowseDataPath: dataSetPath,
             sequence: seq,
             blastData: blastData,
             dataset: {
+                path: dataSetPath,
                 workflow: workflow,
                 file: theFile
             }
@@ -304,15 +306,10 @@ module.exports = {
             }
             cb({status:'success',jobId: job.id},null);
 
-            // process job
-            g.kue_queue.process('workflow', function(kJob, kDone){
-                kJob.kDoneFn = kDone;
-                sails.log.info("workflow job id = "+kJob.id);
-
-            });
         });
     },
     beginProcessing: function(kJob) {
+        
         var thisb = this;
         
         kJob.progress(0,10,{file_upload:0});
@@ -323,7 +320,7 @@ module.exports = {
         //process.exit(1);    // short circuit for testing
 
         thisb.sendFile(theFile,thisb.historyId, function(data,err) {
-
+            
             if (err !== null) {
                 var msg = "Error sendFile";
                 sails.log.error(msg,err);
@@ -332,7 +329,7 @@ module.exports = {
 
             //sails.log.debug("sendFile complete data,err",data,err);
             kJob.data.dataset = data;
-            kJob.save();
+            kJob.update(function() {});
 
             kJob.progress(1,10,{file_upload:'done'});
 
@@ -361,7 +358,7 @@ module.exports = {
                 //sails.log.debug('POST /api/workflows completed',data,err);
 
                 kJob.data.workflow = data;
-                kJob.save();
+                kJob.update(function() {});
 
                 thisb.galaxyGET('/api/workflows',function(data,err){
                     //sails.log.debug('GET /api/workflows',data,err);
@@ -372,7 +369,7 @@ module.exports = {
                             sails.log.info("Workflow starting: "+wf.name+' - '+wf.id);
                             kJob.data.workflow.name = wf.name;
                             kJob.data.name = "Galaxy workflow: "+wf.name;
-                            kJob.save();
+                            kJob.update(function() {});
 
                             kJob.progress(2,10,{start_workflow:'done'});
 
