@@ -818,7 +818,6 @@ return declare( JBrowsePlugin,
                 id: 'blast-box',
                 style: {'margin-top': '20px'},
                 innerHTML: 'This will process a BLAST search against the selected database.<br/><button id="submit-btn" type="button">Submit</button> <button id="cancel-btn" type="button">Cancel</button>'
-                //innerHTML: 'This will process a BLAST search against the selected database.<br/>'
             }, dialog.containerNode);
 
             var submitBtn = new Button({
@@ -836,13 +835,11 @@ return declare( JBrowsePlugin,
                     console.log('Selected workflow',selWorkflow);
                     
                     var postData = {
-                          service: "basicWorkflowService",
+                          service: "jblast",
                           dataset: thisB.config.dataRoot,
                           region: regionB,
                           workflow: selWorkflow
                       };
-                    //var deferred = dojo.xhrPost(xhrArgs);
-                    //$.post( "/service/exec/workflow_submit", postData , function( result ) {
                     $.post( "/job/submit", postData , function( result ) {
                         console.log( result );
                     }, "json");
