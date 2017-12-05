@@ -11,12 +11,12 @@ var Finder = require('fs-finder');
 module.exports = {
     getOptions: function() {
         return [
-            ['' , 'blastdbpath=PATH' , '(jblast) existing database path'],
-            ['' , 'setupworkflows'   , '(jblast) [install|<path>] "install" project wf, or specify .ga file '],
-            ['' , 'setuptools'       , '(jblast) setup jblast tools for galaxy'],
-            ['' , 'setupdata'        , '(jblast) setup data and samples'],
-            ['' , 'setupindex'       , '(jblast) setup index.html in the jbrowse directory'],
-            ['' , 'setuphistory'     , 'setup history']
+            ['' , 'blastdbpath=PATH' , '(jblast - galaxy) existing database path'],
+            ['' , 'setupworkflows'   , '(jblast - galaxy) [install|<path>] "install" project wf, or specify .ga file '],
+            ['' , 'setuptools'       , '(jblast - galaxy) setup jblast tools for galaxy'],
+            ['' , 'setuphistory'     , '(jblast - galaxy) setup history'],
+            ['' , 'setupdata'        , '(jblast) setup jblast demo data and samples (JBrowse Volvox must exist)'],
+            ['' , 'setupindex'       , '(jblast) setup index.html in the jbrowse directory']
         ];        
     },
     getHelpText: function() {
