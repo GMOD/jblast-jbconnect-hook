@@ -28,12 +28,14 @@ module.exports = {
     generateName(params) {
         return params.workflow;
     },
+    /*
     workflow_submit: function(req, res) {
         var params = req.allParams();
         this._workflowSubmit(params,function(result) {
             res.ok(result);
         });
     },
+    */
     get_workflows: function(req, res) {
         
         var wfpath = './workflows/';
@@ -129,12 +131,12 @@ module.exports = {
 
         var theFile = g.jbrowse.jbrowseRest+'/'+g.jbrowse.routePrefix+'/'+ params.dataset+'/' + g.jbrowse.jblast.blastResultPath+'/'+theBlastFile;
 
-        params.dataSetPath = params.dataset;
+        //params.dataSetPath = params.dataset;
 
         var name = workflow.split('.workflow.');
         
         
-        kJob.data.requestParams = params
+        //kJob.data.requestParams = params;
         kJob.data.sequence = seq;
         kJob.data.blastData = blastData;
         kJob.data.seqFile = theFile;
@@ -142,36 +144,6 @@ module.exports = {
         kJob.update(function() {});
         
         this.beginProcessing2(kJob);
-        // create the kue job entry
-        /*
-        var jobdata = {
-            service: "basicWorkflowService",
-            name: name[0],
-            requestParams: params, 
-            //jbrowseDataPath: dataSetPath,
-            sequence: seq,
-            blastData: blastData,
-            dataset: {
-                path: dataSetPath,
-                workflow: workflow,
-                file: theFile
-            },
-            workflow: {
-                name: workflow
-            }
-            
-        };
-        
-        var job = g.kue_queue.create('workflow', jobdata)
-        job.save(function(err){
-            if (err) {
-                cb(null,{status:'error',msg: "error create kue workflow",err:err});
-                return;
-            }
-            cb({status:'success',jobId: job.id},null);  // rest call return
-
-        });
-        */
     },
     beginProcessing2(kJob) {
         var g = sails.config.globals.jbrowse;
