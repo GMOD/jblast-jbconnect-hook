@@ -37,10 +37,10 @@ module.exports = {
  * @param {object} hista - associative array of histories
  */
 function doCompleteAction(kJob,hista) {
-    var wId = kJob.data.workflow.workflow_id;
+    var wId = kJob.data.workflow;
     sails.log.debug(wId,'doCompleteAction()');
     
-    var steps = kJob.data.workflow.steps;
+    var steps = kJob.data.workflowData.steps;
     var g = sails.config.globals.jbrowse;
     var dataSetPath = g.jbrowsePath + kJob.data.dataset + '/';    //g.dataSet[0].dataPath;
     var targetDir = dataSetPath + g.jblast.blastResultPath;
@@ -80,24 +80,26 @@ function doCompleteAction(kJob,hista) {
             kJob.data.blastData.outputs[ext] = assetId; 
             //kJob.data.blastData.assetId = assetId; 
             
-            
+            sails.log("id ")
             sails.log.info(wId,'writing',filepath);
             filecount++;
             
             // move the files to the destination folder
-            var stream = request(url).pipe(fs.createWriteStream(filepath));
-            stream.on('finish', function () {     // detect file finished copying
-                sails.log.debug("finished file");
-                filecount--;
-            });
+            try {
+                var stream = request(url).pipe(fs.createWriteStream(filepath));
+                stream.on('finish', function () {     // detect file finished copying
+                    sails.log.debug("finished file");
+                    filecount--;
+                });
+            }
+            catch(err) {
+                sails.log.error("Failed to write",filepath)
+            }
         }
     }
     if (filesToMove==0) {
         var msg = "No files to export.  Is the label: export [type] defined in the workflow?";
         sails.log.error(msg);
-        //kJob.data.errorMsg = msg;
-        //kJob.state('failed');
-        //kJob.save();
         kJob.kDoneFn(new Error(msg));
     }
     else {
@@ -105,7 +107,7 @@ function doCompleteAction(kJob,hista) {
         var t = setInterval(function() {
             if (filecount === 0) {
                 sails.log.debug("done moving files");
-                kJob.update(function() {});
+                //kJob.update(function() {});
 
                     // insert track into trackList.json
                     postMoveResultFiles(kJob,function(newTrackJson){
@@ -123,15 +125,13 @@ function doCompleteAction(kJob,hista) {
                         if (getHits(kJob,newTrackJson)===0) {
                             var msg = "No Blast Hits";
                             sails.log.error(msg);
-                            //kJob.data.errorMsg = msg;
-                            //kJob.state('failed');
-                            //kJob.save();
                             kJob.kDoneFn(new Error(msg));
                         }
                         else {
                             offsetfix.process(kJob,newTrackJson,function() {
                                 processFilter(kJob,newTrackJson,function(hitdata) {
-                                    addToTrackList(kJob,newTrackJson);
+                                    // postAction is a service in JBServer
+                                    postAction.addToTrackList(kJob,newTrackJson);
                                 });
                             });
                         }
@@ -186,8 +186,6 @@ function processResultStep(stepctx,kJob,trackJson,cb) {
  * @param {type} cb
  */
 function postMoveResultFiles(kJob,cb) {
-    //var wId = kJob.data.workflow.workflow_id;
-    //sails.log.debug(wId,'moveResultFiles()');
 
     function escapeRegExp(str) {
         return str.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
@@ -248,8 +246,8 @@ function postMoveResultFiles(kJob,cb) {
         newTrackJson[0].label = kJob.data.blastData.outputs.blastxml; //"jblast-"+ (new Date().getTime());
         //newTrackJson[0].key = trackLabel;     // the track label is determined after the filter process, bc we need the hit count.
         newTrackJson[0].metadata = {
-                description: 'Workflow: '+kJob.data.workflow.name
-            }
+                description: 'Workflow: '+kJob.data.name
+            };
         newTrackJson[0].category = g.jblast.blastResultCategory;
         newTrackJson[0].storeCache = false;
         
