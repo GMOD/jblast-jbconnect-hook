@@ -309,26 +309,87 @@ module.exports = {
         });
     },
     beginProcessing: function(kJob) {
+        sails.log.info("galaxyService beginProcessing"+kJob.data);
+       
+        var params = kJob.data;
+        var thisb = this;
+        var g = sails.config.globals;
+
+        var region = params.region;
+        var workflow = params.workflow;
+        //var dataSetPath = params.dataSetPath;
+        //var monitorFn = params.monitorFn;
+
+        //sails.log.debug("1 workflow",workflow);
+
+        // get starting coord of region
+        var startCoord = util.getRegionStart(region);
+        var seq = util.parseSeqData(region);
+
+        var d = new Date();
+
+        // write the BLAST region file
+        var theBlastFile = kJob.id+"_blast_region"+d.getTime()+".fa";
+        var blastPath = g.jbrowse.jbrowsePath + '/' + params.dataset +'/'+ g.jbrowse.jblast.blastResultPath;
+        var theFullBlastFilePath = blastPath+'/'+theBlastFile; 
+
+        // if direcgtory doesn't exist, create it
+        console.log("blastPath",blastPath);
+        if (!fs.existsSync(blastPath)){
+            fs.mkdirSync(blastPath);
+        }  
+
+        try {
+            ws = fs.createWriteStream(theFullBlastFilePath);
+            ws.write(region);
+            ws.end();
+        }
+        catch (e) {
+            sails.log.error(e,theFullBlastFilePath);
+            cb(null,{status: 'error', msg: "failed to write",err:e});
+            return;
+        }
+
+        var blastData = {
+                "name": "JBlast", 
+                "blastSeq": theFullBlastFilePath,
+                "offset": startCoord
+        };
+
+        //sails.log.debug('>>> jbrowse globals',g.jbrowse);
+
+        var theFile = g.jbrowse.jbrowseRest+'/'+g.jbrowse.routePrefix+'/'+ params.dataset+'/' + g.jbrowse.jblast.blastResultPath+'/'+theBlastFile;
+
+        //var name = workflow.split('.workflow.');
+        
+        //kJob.data.requestParams = params
+        kJob.data.sequence = seq;
+        kJob.data.blastData = blastData;
+        kJob.data.seqFile = theFile;
+
+        kJob.update(function() {});
+ 
+        this.beginProcessing2(kJob);
+    },
+    beginProcessing2: function(kJob) {
         
         var thisb = this;
         
         kJob.progress(0,10,{file_upload:0});
 
         // send the file
-        sails.log.info("uploading file to galaxy",theFile)
+        sails.log.info("uploading file to galaxy",kJob.data.seqFile);
 
-        //process.exit(1);    // short circuit for testing
-
-        thisb.sendFile(theFile,thisb.historyId, function(data,err) {
+        thisb.sendFile(kJob.data.seqFile,thisb.historyId, function(data,err) {
             
             if (err !== null) {
                 var msg = "Error sendFile";
                 sails.log.error(msg,err);
-                return kDone(new Error(msg));;
+                return kJob.kDoneFn(new Error(msg));;
             }
 
             //sails.log.debug("sendFile complete data,err",data,err);
-            kJob.data.dataset = data;
+            kJob.data.sendResult = data;
             kJob.update(function() {});
 
             kJob.progress(1,10,{file_upload:'done'});
@@ -337,7 +398,7 @@ module.exports = {
             var fileId = data.outputs[0].id;
 
             var params = {
-                workflow_id: kJob.data.requestParams.workflow,
+                workflow_id: kJob.data.workflow,
                 history: 'hist_id='+thisb.historyId,
                 ds_map: {
                     "0": {
@@ -352,39 +413,110 @@ module.exports = {
                 if (err !== null) {
                     var msg = "Error run workflow";
                     sails.log.error(msg,err);
-                    return kDone(new Error(msg));
+                    return kJob.kDoneFn(new Error(msg));
                 }
 
                 //sails.log.debug('POST /api/workflows completed',data,err);
 
-                kJob.data.workflow = data;
+                kJob.data.workflowData = data;
                 kJob.update(function() {});
-
+                
                 thisb.galaxyGET('/api/workflows',function(data,err){
                     //sails.log.debug('GET /api/workflows',data,err);
 
                     for(var i in data) {
                         var wf = data[i];
-                        if (wf.id === kJob.data.requestParams.workflow) {
+                        if (wf.id === kJob.data.workflow) {
                             sails.log.info("Workflow starting: "+wf.name+' - '+wf.id);
-                            kJob.data.workflow.name = wf.name;
+                            //kJob.data.name = wf.name;
+                            //kJob.data.workflowData = wf;
                             kJob.data.name = "Galaxy workflow: "+wf.name;
                             kJob.update(function() {});
 
                             kJob.progress(2,10,{start_workflow:'done'});
 
                             // start monitoring the workflow, kDone is called within.
-                            monitorFn(kJob);
+                            thisb.monitorWorkflow(kJob);
                             return;
                         }
                     }
                     // if we get here, somethings wrong
-                    var errmsg = 'failed to match workflow id '+kJob.data.requestParams.workflow;
+                    var errmsg = 'failed to match workflow id '+kJob.data.workflow;
                     sails.log.error(errmsg);
-                    return kDone(new Error(msg));
+                    return kJob.kDoneFn(new Error(msg));
                 });
             });
         });
         
+    },
+    /**
+     * Monitor workflow and exit upon completion of the workflow
+     * 
+     * @param {object} kJob
+     */
+    monitorWorkflow: function(kJob){
+        var thisb = this;
+        var wId = kJob.data.workflow;
+        sails.log.debug('monitorWorkflow starting, wId',wId);
+
+        var timerloop = setInterval(function(){
+            var hId = kJob.data.workflowData.history_id;
+
+            // TODO: if workflow fails, output will not exist.  Need to handle this.
+            var outputs = kJob.data.workflowData.outputs;    // list of workflow output history ids
+            var outputCount = outputs.length;
+
+            sails.log.info ("history",hId);
+
+            // get history entries
+            var url = '/api/histories/'+hId+'/contents';
+            thisb.galaxyGET(url,function(hist,err) {
+
+                if (err !== null) {
+                    var msg = wId + " monitorWorkflow: failed to get history "+hId;
+                    sails.log.error(msg,err);
+                    clearInterval(timerloop);
+                    kJob.kDoneFn(new Error(msg));
+                    return;
+                }
+                // reorg to assoc array
+                var hista = {};
+                for(var i in hist) hista[hist[i].id] = hist[i];
+
+                // determine aggregate state
+                var okCount = 0;
+                for(var i in outputs) {
+                    // if any are running or uploading, we are active
+                    if(hista[outputs[i]].state==='running' || hista[outputs[i]].state==='upload')
+                        break;
+                    // if something any history error, the whole workflow is in error
+                    if(hista[outputs[i]].state==='error') {
+                        clearInterval(timerloop);
+                        //kJob.update(function() {});
+                        var msg = wId+' workflow completed in error';
+                        sails.log.debug(msg);
+                        kJob.kDoneFn(new Error(msg));
+                        break;
+                    }
+                    if(hista[outputs[i]].state==='ok')
+                        okCount++;
+                }
+                sails.log.debug(wId,'workflow step',okCount,'of',outputCount);
+
+                kJob.progress(okCount,outputCount+1,{workflow_id:wId});
+
+                // complete if all states ok
+                if (outputCount === okCount) {
+                    clearInterval(timerloop);
+                    //kJob.state('complete');
+                    //kJob.update(function() {});
+                    sails.log.debug(wId,'workflow completed');
+                    setTimeout(function() {
+                        jblastPostAction.doCompleteAction(kJob,hista);            // workflow completed
+                    },10);
+                }
+            });
+
+        },3000);
     }
 };
