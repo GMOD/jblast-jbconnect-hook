@@ -358,7 +358,8 @@ module.exports = {
 
         //sails.log.debug('>>> jbrowse globals',g.jbrowse);
 
-        var theFile = g.jbrowse.jbrowseRest+'/'+g.jbrowse.routePrefix+'/'+ params.dataset+'/' + g.jbrowse.jblast.blastResultPath+'/'+theBlastFile;
+        //var theFile = g.jbrowse.jbrowseRest+'/'+g.jbrowse.routePrefix+'/'+ params.dataset+'/' + g.jbrowse.jblast.blastResultPath+'/'+theBlastFile;
+        var theFile = 'file://' + g.jbrowse.jbrowsePath + params.dataset+'/' + g.jbrowse.jblast.blastResultPath+'/'+theBlastFile;
 
         //var name = workflow.split('.workflow.');
         
