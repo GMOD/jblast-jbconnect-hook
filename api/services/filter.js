@@ -141,13 +141,16 @@ module.exports = {
      */
     applyFilter: function(filterData,requestData,cb) {
         sails.log.debug('applyFilter()',requestData);
+        var thisb = this;
         var g = sails.config.globals.jbrowse;
         var asset = requestData.asset;
-        var dataSet = requestData.dataset;
+        var dataSet = Dataset.Resolve(requestData.dataset);
         //var filterData = requestData.filterParams;
         
-        var resultFile = g.jbrowsePath + dataSet +'/'+ g.jblast.blastResultPath+'/'+asset+'.json';
-        var blastGffFile = g.jbrowsePath + dataSet + '/' + g.jblast.blastResultPath+'/'+asset+'.gff3';
+        sails.log('dataSet',dataSet);
+        
+        var resultFile = g.jbrowsePath + dataSet.path +'/'+ g.jblast.blastResultPath+'/'+asset+'.json';
+        var blastGffFile = g.jbrowsePath + dataSet.path + '/' + g.jblast.blastResultPath+'/'+asset+'.gff3';
 
         try {
             var content = fs.readFileSync(resultFile, 'utf8');
@@ -224,8 +227,8 @@ module.exports = {
             
         if (typeof requestData.filterParams !== 'undefined') {
             // track change notification
-            sails.hooks['jbcore'].sendEvent("track-update",requestData.asset);
-            sails.log ("Announced track update",requestData,requestData.asset);
+            //sails.hooks['jbcore'].sendEvent("track-update",requestData.asset);
+            thisb._announceTrack(dataSet.id,asset);
         }
         var retdata = {
             result:'success',
@@ -234,6 +237,28 @@ module.exports = {
         };
         sails.log.debug(retdata);
         cb(retdata);
+    },
+    /*
+     * Announce change in track
+     * @param {int} dataset id
+     * @param {string} key
+     * @returns {undefined}
+     */
+    _announceTrack: function(dataset,key) {
+        //var dataSet = Dataset.Resolve(dataset);
+        var srch = {dataset:dataset,lkey:key};
+        sails.log('_announceTrack',srch);
+        
+        Track.findOne(srch).then(function(found) {
+            if (typeof found === 'undefined') {
+                sails.log.error('_announceTrack not found',key);
+                return;
+            }
+            sails.log("Announced track update",found.id,found.lkey);
+            return Track.publishUpdate(found.id,found);
+        }).catch(function(err) {
+            sails.log.error("_announceTrack failed",err);
+        });
     },
     /**
      * return hit details given hit key, including all HSPs of the original hit.
