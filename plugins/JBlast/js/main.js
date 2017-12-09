@@ -41,25 +41,12 @@ return declare( JBrowsePlugin,
         var browser = this.browser;
 
         var sliders = new slidersMixin(this,browser);
-/*        
+        
         $.get("plugins/JBlast/BlastPanel.html", function(data){
             console.log("loaded BlastPanel.html");
             $('body').append(data);
-
-            $("#extruderRight").buildMbExtruder({
-                position:"right",
-                width:300,
-                extruderOpacity:.8,
-                hidePanelsOnClose:true,
-                accordionPanels:true,
-                onExtOpen:function(){},
-                onExtContentLoad:function(){
-                    jobPanelInit();
-                },
-                onExtClose:function(){}
-            });
         });            
-*/        
+        
         browser.jblast = {
             asset: null,
             focusQueue: [],
