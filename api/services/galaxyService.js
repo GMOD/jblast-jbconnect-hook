@@ -5,7 +5,7 @@
 module.exports = {
 
     fmap: {
-        workflow_submit:    'post',
+        //workflow_submit:    'post',
         get_workflows:      'get',
         get_hit_details:    'get'
     },
