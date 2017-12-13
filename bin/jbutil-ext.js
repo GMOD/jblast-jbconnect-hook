@@ -11,12 +11,13 @@ var Finder = require('fs-finder');
 module.exports = {
     getOptions: function() {
         return [
-            ['' , 'blastdbpath=PATH' , '(jblast - galaxy) existing database path'],
-            ['' , 'setupworkflows'   , '(jblast - galaxy) [install|<path>] "install" project wf, or specify .ga file '],
+            //['' , 'blastdbpath=PATH' , '(jblast - galaxy) existing database path'],
+            ['' , 'setupblastdemo'   , '(jblast - setup blast demo db'],
+            ['' , 'setupworkflows'   , '(jblast - galaxy) installs sample galaxy workflows (must have API key configured'],
             ['' , 'setuptools'       , '(jblast - galaxy) setup jblast tools for galaxy'],
             ['' , 'setuphistory'     , '(jblast - galaxy) setup history'],
-            ['' , 'setupdata'        , '(jblast) setup jblast demo data and samples (JBrowse Volvox must exist)'],
-            ['' , 'setupindex'       , '(jblast) setup index.html in the jbrowse directory']
+            ['' , 'setupdata'        , '(jblast) setup jblast demo data and samples (JBrowse Volvox must exist)']
+            //['' , 'setupindex'       , '(jblast) setup index.html in the jbrowse directory']
         ];        
     },
     getHelpText: function() {
@@ -34,10 +35,10 @@ module.exports = {
             return;
         }
         
-        var tool = opt.options['setupindex'];
-        if (typeof tool !== 'undefined') {
-            exec_setupindex(this);
-        }
+        //var tool = opt.options['setupindex'];
+        //if (typeof tool !== 'undefined') {
+        //    exec_setupindex(this);
+        //}
         
         var setuptools = opt.options['setuptools'];
         if (typeof setuptools !== 'undefined') {
@@ -61,6 +62,10 @@ module.exports = {
             exec_setupdata(this);
             exec_setuptrack(this);
         }
+        //var setupdata = opt.options['setupblastdemodb'];
+        //if (typeof setupdata !== 'undefined') {
+        //    exec_setupblastdemo(this);
+        //}
     },
     init: function(config) {
         //console.log("config",config);
@@ -412,3 +417,13 @@ function exec_setuptools(params) {
     
     console.log("Restart Galaxy server for changes to take effect.");
 }
+function exec_setupblastdemodb(params) {
+    var srcpath = params.srcpath;
+    var gdatapath = params.gdatapath;
+    var gdataroot = params.gdataroot;
+    
+    util.cmd('node blast_downloadDb htgs.05');
+    
+    
+}
+    
