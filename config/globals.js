@@ -25,6 +25,13 @@ module.exports.globals = {
             //'galaxyService':          {name: 'galaxyService',         type: 'workflow', alias: "jblast"},
             'filterService':            {name: 'filterService',         type: 'service'},
             'entrezService':            {name: 'entrezService',         type: 'service'}
+        },
+        libRoutes: {
+                'SliderPips':    {module:'jQuery-ui-Slider-Pips', vroute:'/jblib/slider-pips'}
+        },
+        webIncludes: {
+            "SliderPips":        {lib: "/jblib/slider-pips/dist/jquery-ui-slider-pips.min.js" }
         }
+        
     }
 };
