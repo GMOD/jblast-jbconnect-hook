@@ -30,7 +30,8 @@ module.exports.globals = {
                 'SliderPips':    {module:'jQuery-ui-Slider-Pips', vroute:'/jblib/slider-pips'}
         },
         webIncludes: {
-            "SliderPips":        {lib: "/jblib/slider-pips/dist/jquery-ui-slider-pips.min.js" }
+            "jblast-css-SliderPips":    {lib: "/jblib/slider-pips/dist/jquery-ui-slider-pips.min.css" },
+            "jblast-js-SliderPips":     {lib: "/jblib/slider-pips/dist/jquery-ui-slider-pips.min.js" }
         }
         
     }
