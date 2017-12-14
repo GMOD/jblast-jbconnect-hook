@@ -5,7 +5,7 @@
  */
 'use strict';
 
-var mapRoutes = require('./mapRoutes');
+//var mapRoutes = require('./mapRoutes');
 var jblastProc = require('../../services/jblastProc');
 
 Object.defineProperty(exports, "__esModule", {
@@ -70,32 +70,9 @@ if (!thisHook) {
     }, {
       key: 'routes',
       value: function routes() {
-        sails.log('>>> setup jbh-jblast routes');
-        return mapRoutes.routes();
-        /*
-        return {
-            // http://sailsjs.org/documentation/concepts/extending-sails/hooks/hook-specification/routes
-            
-             after: {
-                'get /hello': function (req, res, next) {
-                    return res.send('hello');
-                },
-                'get /hi': {
-                    controller: 'JblastController',
-                    action: 'hello'
-                },
-                'post /jbapi/workflowsubmit': 'jblastProc.workflowSubmit',
-                'get /jbapi/getworkflows': 'jblastProc.getWorkflows',
-                'post /jbapi/setfilter': 'jblastProc.setFilter',
-                'get /jbapi/getblastdata/:asset/:dataset': 'jblastProc.getBlastData',
-                'get /jbapi/gettrackdata/:asset/:dataset': 'jblastProc.getTrackData',
-                'get /jbapi/gethitdetails/:asset/:dataset/:hitkey': 'jblastProc.getHitDetails',
-                'get /jbapi/lookupaccession/:accession': 'jblastProc.lookupAccession'
-            }
-
-        };
-        */
-
+        //sails.log('>>> setup jbh-jblast routes');
+        //return mapRoutes.routes();
+        //return {};
       }
     }]);
 
@@ -108,39 +85,3 @@ if (!thisHook) {
 exports.default = thisHook;
 module.exports = exports['default'];
 
-/*
-let thisHook = sails.hooks.jblast;
-
-import _ from 'lodash'
-import Marlinspike from 'marlinspike'
-
-if (!thisHook) {
-  class Hook extends Marlinspike {
-
-    constructor(sails) {
-      super(sails, module)
-    }
-
-    defaults (overrides) {
-      // http://sailsjs.org/documentation/concepts/extending-sails/hooks/hook-specification/defaults#?using-defaults-as-a-function
-    }
-
-    configure () {
-      // this.sails = sails
-      // http://sailsjs.org/documentation/concepts/extending-sails/hooks/hook-specification/configure
-    }
-
-    initialize (next) {
-      // http://sailsjs.org/documentation/concepts/extending-sails/hooks/hook-specification/initialize
-      return next();
-    }
-
-    routes () {
-    }
-  }
-
-  thisHook = Marlinspike.createSailsHook(Hook)
-}
-
-export default thisHook;
-*/
