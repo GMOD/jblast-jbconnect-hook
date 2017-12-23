@@ -1,6 +1,6 @@
 {
   "name": "jbh-jblast",
-  "version": "0.0.478",
+  "version": "0.0.593",
   "description": "JBlast - Integrated JBrowse BLAST with Galaxy (JBrowse Server Hook)",
   "main": "api/hooks/jblast/index.js",
   "scripts": {
@@ -19,6 +19,7 @@
   "author": "enuggetry",
   "license": "MIT",
   "dependencies": {
+    "app-root-path": "^2.0.1",
     "blastjs": "github:enuggetry/blastjs",
     "bluebird": "^3.5.0",
     "deepmerge": "^1.5.0",
@@ -31,12 +32,14 @@
     "grunt-publish": "^1.0.0",
     "jQuery-ui-Slider-Pips": "github:simeydotme/jQuery-ui-Slider-Pips#v1.11.4",
     "jquery-ui-dist": "^1.12.1",
+    "jquery.mb.extruder": "^2.6.0",
     "lodash": "^4.16",
     "marlinspike": "^1.0.0",
     "mock-require": "^2.0.2",
     "path": "^0.12.7",
     "replaceall": "^0.1.6",
     "request": "^2.81.0",
+    "request-json": "^0.6.2",
     "request-promise": "^4.2.1",
     "require-all": "^2.2.0",
     "resolve-path": "^1.3.3",
@@ -62,7 +65,7 @@
     "node-pre-gyp": "^0.6.36",
     "nyc": "^11.0.3",
     "phantomjs-prebuilt": "^2.1.14",
-    "sails": "^0.12.13",
+    "sails": "^0.12.14",
     "selenium-webdriver": "^3.4.0",
     "supertest": "^3.0.0"
   },
