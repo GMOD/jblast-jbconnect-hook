@@ -6,16 +6,17 @@ var path = require('path');
 //var getopt = require('node-getopt');
 var util = require('./util.js');
 var Finder = require('fs-finder');
-
+var approot = require('app-root-path');
+var shelljs = require('shelljs');
 
 module.exports = {
     getOptions: function() {
         return [
             //['' , 'blastdbpath=PATH' , '(jblast - galaxy) existing database path'],
-            ['' , 'setupblastdemo'   , '(jblast - setup blast demo db'],
-            ['' , 'setupworkflows'   , '(jblast - galaxy) installs sample galaxy workflows (must have API key configured'],
+            ['' , 'setupblastdemodb' , '(jblast - setup blast demo database'],
+            ['' , 'setupworkflows'   , '(jblast - galaxy) installs demo galaxy workflows (must have API key configured'],
             ['' , 'setuptools'       , '(jblast - galaxy) setup jblast tools for galaxy'],
-            ['' , 'setuphistory'     , '(jblast - galaxy) setup history'],
+            //['' , 'setuphistory'     , '(jblast - galaxy) setup history'],
             ['' , 'setupdata'        , '(jblast) setup jblast demo data and samples (JBrowse Volvox must exist)']
             //['' , 'setupindex'       , '(jblast) setup index.html in the jbrowse directory']
         ];        
@@ -40,6 +41,10 @@ module.exports = {
         //    exec_setupindex(this);
         //}
         
+        var setupblastdemodb = opt.options['setupblastdemodb'];
+        if (typeof setupblastdemodb !== 'undefined') {
+            exec_setupblastdemodb(this);
+        }
         var setuptools = opt.options['setuptools'];
         if (typeof setuptools !== 'undefined') {
             exec_setuptools(this);
@@ -124,6 +129,11 @@ module.exports = {
 /**********************************************
  * process commands arguments - implementation
  **********************************************/
+
+function exec_setupblastdemodb (params) {
+    var g = params.config;
+    shelljs.exec(approot+'/blast_downloadDb.js htgs.05');
+}
 
 /**
  * 
