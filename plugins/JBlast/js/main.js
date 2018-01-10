@@ -276,7 +276,7 @@ return declare( JBrowsePlugin,
                     var asset = track.config.label;
                     var dataset = encodeURIComponent(track.browser.config.dataRoot);
                     var hitkey = blastKey;
-                    var url = '/service/exec/get_hit_details/?asset='+asset+'&dataset='+dataset+'&hitkey'+hitkey;
+                    var url = '/service/exec/get_hit_details/?asset='+asset+'&dataset='+dataset+'&hitkey='+hitkey;
                     $.get( url, function(hitData) {
                         console.log("gethitdetails data",hitData);
                         
