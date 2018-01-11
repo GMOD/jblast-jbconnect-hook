@@ -278,7 +278,7 @@ return declare( JBrowsePlugin,
                     var hitkey = blastKey;
                     var url = '/service/exec/get_hit_details/?asset='+asset+'&dataset='+dataset+'&hitkey='+hitkey;
                     $.get( url, function(hitData) {
-                        console.log("gethitdetails data",hitData);
+                        //console.log("gethitdetails data",hitData);
                         
                         var blastContent = "";
                         var count = 0;
@@ -288,15 +288,20 @@ return declare( JBrowsePlugin,
                             // do only on first iteration because other iteratons have same data
                             if (count===0) {
                                 blastContent += thisB.blastRenderHitCommon(hit);
+                                //console.log("lookup_accession get");
                                 $.get('/service/exec/lookup_accession/?accession='+hit.Hit_accession,function(data) {
                                     
+                                    console.log("lookup_access result",data);
                                     var count = 0;
-                                    for(var i in data.result) {
-                                        if (count++ === 0) {
-                                            var link = data.result[i].link;
-                                            $('#details_accession').attr('href',link);
-                                            $('#details_accession').html(data.result[i].caption);
-                                        }
+                                    
+                                    if (typeof data.result.uids[0] !== 'undefined') {
+                                        var idx = data.result.uids[0];
+                                        var link = data.result[idx].link;
+                                        $('#details_accession').attr('href',link);
+                                        $('#details_accession').html(data.result[idx].caption);
+                                    }
+                                    else {
+                                        console.log("lookup accession failed -", hit.Hit_accession);
                                     }
                                 });
                             }

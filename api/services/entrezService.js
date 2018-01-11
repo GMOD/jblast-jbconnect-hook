@@ -10,7 +10,7 @@ var requestp = require('request-promise');
 
 module.exports = {
     fmap: {
-        entrez_lookup:   'get',
+        lookup_accession:   'get',
     },
     /**
      * Initialize the module
@@ -23,48 +23,11 @@ module.exports = {
         return cb();
     },
     /**
-     * returns accession data given accesion number.
-     * Utilizes Entrez service
-     * 
-     * REST: ``GET /jbapi/lookupaccession``
-     * 
-     * @param {type} req
-     * @param {type} res
-     */
-    entrez_lookup: function (req, res) {
-
-        function accessionLookup(req,res) {
-            this.accession.lookup(req,res,function(data,err) {
-                res.send(data);
-            });
-            
-        }
-        // load accession module only on first time call
-        if (typeof this.accession === 'undefined') {
-            
-            var g = sails.config.globals.jbrowse;
-            var accModule = g.accessionModule;
-
-            if (typeof accModule === 'undefined') accModule = "./accessionEntrez";
-
-            this.accession = require(accModule);
-            
-            this.accession.init(req,res,function() {
-                accessionLookup(req,res);
-            });
-        }
-        else {
-            accessionLookup(req,res);
-        }
-    },
-    /**
      * This does an esummary lookup (using Entrez api), adding the link field into the result.
      * @param {object} req
      * @param {object} res
-     * @param {function} cb - callback function
      */
-
-    lookup: function(req,res, cb) {
+    lookup_accession: function(req,res) {
         var accession = req.param('accession');
 
         var req = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=nucleotide&id=[[accession]]&retmode=json";
@@ -80,18 +43,19 @@ module.exports = {
             json: true
         };
 
-        //sails.log.debug("options",options,accession,typeof accession);
+        sails.log.debug("options",options,accession,typeof accession);
 
         requestp(options)
             .then(function (data) {
-                for (var i in data.result) {
-                    var link = linkout.replace("[[linkout]]",data.result[i].uid);
-                    data.result[i].link = link;
+                if (typeof data.result.uids[0] !== 'undefined') {
+                    var idx = data.result.uids[0];
+                    var link = linkout.replace("[[linkout]]",data.result.uids[0]);
+                    data.result[idx].link = link;
                 }
-                cb(data);
+                return res.ok(data);
             })
             .catch(function (err) {
-                cb(err);
+                res.serverError(err);
             });    
     }
   
