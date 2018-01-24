@@ -1,3 +1,4 @@
-# JBlast BLAST/Galaxy JBrowse Server Hook
+# JBlast BLAST/Galaxy - JBrowse Server Hook
 
-[Installation & Demo Setup](https://github.com/GMOD/jblast/wiki/Installation-&-Setup-of-Demo)
+[Installation & Demo Setup](http://jblast.readthedocs.io/en/latest/)
+
