@@ -30,15 +30,19 @@ Install the JBServer and JBrowse.  jb_setup.js ensures the sample data is loaded
 
 ::
 
+    # install jbserver
     git clone http://github.com/gmod/jbserver
     cd jbserver
     npm install
-    npm install jbrowse
+
+    # install jbrowse & setup jbrowse demo
     npm install jbrowse or npm install gmod/jbrowse
     ./jb_setup.js
-    npm install jbh-jblast
-    node blast_getBlast.js    (installs the NCBI BLAST commands)
-    todo: node blast_getSample.js   (setup sample database)
+
+    # install jblast
+    npm install enuggetry/jblast
+    ./bin/blast_getBlast.js             (installs the NCBI BLAST commands)
+    ./bin/blast_downloadDb.js htgs.05   (setup sample database)
 
 Run
 ===
@@ -47,7 +51,7 @@ Launch the server.
 
 ``sails lift``
 
-From a web browser, access the application.
+From a web browser, access the application (default login: juser/password).
 
 ``http://localhost:1337/jbrowse``
 
