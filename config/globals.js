@@ -9,14 +9,16 @@ module.exports.globals = {
             galaxyPath: "/var/www/html/galaxy",
             galaxyAPIKey: "c7be32db9329841598b1a5705655f633",
 
-            // jblast will use this Galaxy history
-            historyName: "Unnamed history"
+            // jblast will use this Galaxy history when galaxyService is installed
+            historyName: "Unnamed history",
+            setupDemos: true
         },
         jblast: {
             blastResultPath: "jblastdata",
             blastResultCategory: "JBlast Results",
             trackTemplate: "jblastTrackTemplate.json",
             import: ["blastxml"],
+            demoDb: 'htgs'
             
         },
         // list of services that will get registered.
