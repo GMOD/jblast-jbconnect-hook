@@ -18,8 +18,19 @@ module.exports.globals = {
             blastResultCategory: "JBlast Results",
             trackTemplate: "jblastTrackTemplate.json",
             import: ["blastxml"],
-            demoDb: 'htgs'
-            
+            defaultBlastProfile: 'htgs',
+            blastProfiles: {
+                // blast profiles are parameter lists that translate to blastn cli parameters sets
+                // (i.e. for "remote_htgs" would translate to "blastn -db htgs -remote")
+                // These will override any default parameters defined in blastjs
+                'htgs': {
+                    'db': 'htgs'
+                },
+                'remote_htgs': {
+                    'db': 'htgs',
+                    'remote': ""
+                }
+            }
         },
         // list of services that will get registered.
         services: {
