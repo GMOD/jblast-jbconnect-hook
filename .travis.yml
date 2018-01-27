@@ -4,6 +4,8 @@ before_install:
 install:
   - npm install
 before_script:
+  - ./bin/blast_getBlast.js
+  - ./bin/blast_downloadDb.js htgs.05 
 script:
   - npm test
 after_failure:
