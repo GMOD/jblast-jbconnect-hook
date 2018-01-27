@@ -1,0 +1,255 @@
+{
+  "data": {
+    "dataset": [],
+    "job": [],
+    "passport": [
+      {
+        "protocol": "local",
+        "password": "$2a$10$3jajKqV/rgWyFyRJ9WP1wey03DFB10W.pS.5/nUwBgIhnXe9MC75C",
+        "user": 1,
+        "accessToken": "k0V6BggfBp7m4uOUluQrmUrwETvbXG/P1Hd15PgOqTRJ/tur8hw2/LW8k3g2SYoY",
+        "createdAt": "2017-10-21T20:57:09.095Z",
+        "updatedAt": "2017-10-21T20:57:09.095Z",
+        "id": 1
+      }
+    ],
+    "service": [
+      {
+        "name": "galaxy_blast",
+        "type": "workflow",
+        "module": "jblast",
+        "handler": {
+          "fmap": {
+            "workflow_submit": "post",
+            "get_workflows": "get",
+            "set_filter": "post",
+            "get_blastdata": "get",
+            "get_trackdata": "get",
+            "get_hit_details": "get"
+          },
+          "globalId": "galaxyService",
+          "identity": "galaxyservice"
+        },
+        "createdAt": "2017-10-21T20:54:22.548Z",
+        "updatedAt": "2017-10-21T20:56:02.867Z",
+        "id": 1
+      }
+    ],
+    "track": [],
+    "user": [
+      {
+        "username": "meuser",
+        "email": "meuser@jbrowse.org",
+        "createdAt": "2017-10-21T20:57:08.934Z",
+        "updatedAt": "2017-10-21T20:57:08.934Z",
+        "id": 1
+      }
+    ],
+    "workflow": [],
+    "dataset_tracks__track_id": []
+  },
+  "schema": {
+    "dataset": {
+      "path": {
+        "type": "string",
+        "unique": true
+      },
+      "id": {
+        "type": "integer",
+        "autoIncrement": true,
+        "primaryKey": true,
+        "unique": true
+      },
+      "createdAt": {
+        "type": "datetime"
+      },
+      "updatedAt": {
+        "type": "datetime"
+      }
+    },
+    "job": {
+      "id": {
+        "type": "integer",
+        "autoIncrement": false,
+        "unique": true,
+        "primaryKey": true
+      },
+      "createdAt": {
+        "type": "datetime"
+      },
+      "updatedAt": {
+        "type": "datetime"
+      }
+    },
+    "passport": {
+      "protocol": {
+        "type": "string"
+      },
+      "password": {
+        "type": "string"
+      },
+      "accessToken": {
+        "type": "string"
+      },
+      "provider": {
+        "type": "string"
+      },
+      "identifier": {
+        "type": "string"
+      },
+      "tokens": {
+        "type": "json"
+      },
+      "user": {
+        "type": "integer",
+        "model": "user",
+        "foreignKey": true,
+        "alias": "user"
+      },
+      "id": {
+        "type": "integer",
+        "autoIncrement": true,
+        "primaryKey": true,
+        "unique": true
+      },
+      "createdAt": {
+        "type": "datetime"
+      },
+      "updatedAt": {
+        "type": "datetime"
+      }
+    },
+    "service": {
+      "name": {
+        "type": "string",
+        "unique": true
+      },
+      "type": {
+        "type": "string",
+        "enum": [
+          "service",
+          "workflow"
+        ],
+        "defaultsTo": "service"
+      },
+      "module": {
+        "type": "string"
+      },
+      "id": {
+        "type": "integer",
+        "autoIncrement": true,
+        "primaryKey": true,
+        "unique": true
+      },
+      "createdAt": {
+        "type": "datetime"
+      },
+      "updatedAt": {
+        "type": "datetime"
+      }
+    },
+    "track": {
+      "dataset": {
+        "type": "integer",
+        "model": "dataset",
+        "foreignKey": true,
+        "alias": "dataset"
+      },
+      "dataSetPath": {
+        "type": "string"
+      },
+      "lkey": {
+        "type": "string"
+      },
+      "id": {
+        "type": "integer",
+        "autoIncrement": true,
+        "primaryKey": true,
+        "unique": true
+      },
+      "createdAt": {
+        "type": "datetime"
+      },
+      "updatedAt": {
+        "type": "datetime"
+      }
+    },
+    "user": {
+      "username": {
+        "type": "string",
+        "unique": true
+      },
+      "email": {
+        "type": "string",
+        "unique": true
+      },
+      "id": {
+        "type": "integer",
+        "autoIncrement": true,
+        "primaryKey": true,
+        "unique": true
+      },
+      "createdAt": {
+        "type": "datetime"
+      },
+      "updatedAt": {
+        "type": "datetime"
+      }
+    },
+    "workflow": {
+      "serviceName": {
+        "type": "string"
+      },
+      "id": {
+        "type": "integer",
+        "autoIncrement": true,
+        "primaryKey": true,
+        "unique": true
+      },
+      "createdAt": {
+        "type": "datetime"
+      },
+      "updatedAt": {
+        "type": "datetime"
+      }
+    },
+    "dataset_tracks__track_id": {
+      "id": {
+        "primaryKey": true,
+        "unique": true,
+        "autoIncrement": true,
+        "type": "integer"
+      },
+      "dataset_tracks": {
+        "type": "integer",
+        "foreignKey": true,
+        "references": "dataset",
+        "on": "id",
+        "via": "track_id"
+      },
+      "track_id": {
+        "type": "integer",
+        "foreignKey": true,
+        "references": "track",
+        "on": "id",
+        "via": "dataset_tracks"
+      }
+    }
+  },
+  "counters": {
+    "dataset": {},
+    "job": {},
+    "passport": {
+      "id": 1
+    },
+    "service": {
+      "id": 1
+    },
+    "track": {},
+    "user": {
+      "id": 1
+    },
+    "workflow": {},
+    "dataset_tracks__track_id": {}
+  }
+}
