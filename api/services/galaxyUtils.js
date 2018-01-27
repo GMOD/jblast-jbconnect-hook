@@ -23,6 +23,16 @@ module.exports = {
         
         this.historyName = g.galaxy.historyName;
         
+        // todo: create history if it does not exist
+        
+        // todo: detect galaxy directory
+        
+        // todo: detect galaxy API (galaxy is running)
+        
+        // todo: detect galaxy API KEY is initialized.
+        
+        // todo: detect blast database installed.
+        
         this.initHistory(
             function(data) {
                 cb(data);
