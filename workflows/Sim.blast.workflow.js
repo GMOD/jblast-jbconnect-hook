@@ -18,6 +18,7 @@ if (fs.pathExistsSync(thisPath+"/node_modules/jbrowse/utils")) {
 // command line options
 var getopt = new getopt([
     ['i' , 'in=NUMBER'          , 'input .fasta file'],
+    ['p' , 'profile'            , 'value for compatibility; ignored'],
     ['e' , 'ext=<extension>'    , 'output extension'],
     ['o' , 'out=<path>'         , 'output path'],
     ['h' , 'help'               , 'display this help']
