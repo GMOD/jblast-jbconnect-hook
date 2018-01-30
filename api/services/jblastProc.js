@@ -9,7 +9,6 @@ var path = require('path');
 var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require("fs"));
 var deferred = require('deferred');
-var postAction = require('./postAction');
 var filter = require("./filter");   // filter processing
 var galaxy = require("./galaxyUtils");
 var util = require("./utils");
