@@ -41,6 +41,7 @@ module.exports = function(grunt) {
           tasks: ['jshint']
         }
 */
+/*
         bump: {
           options: {
             files:         ['package.json','jblast-simtool/package.json'],
@@ -48,10 +49,11 @@ module.exports = function(grunt) {
             push: false
           }
         }
+*/
   });
 
   grunt.loadNpmTasks('grunt-contrib-jshint');
-  grunt.loadNpmTasks('grunt-bump');
+  //grunt.loadNpmTasks('grunt-bump');
   //grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-publish');
   grunt.registerTask('default', ['jshint']);
