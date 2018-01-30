@@ -10,7 +10,7 @@
   "category": "JBlast Results",
   "key": "Sample result track @ loc 2000",
   "label": "jblast_sample",
-  "urlTemplate": "/jbapi/gettrackdata/jblast_sample/sample_data%2Fjson%2Fvolvox%2F",
+  "urlTemplate": "/service/exec/get_trackdata/?asset=jblast_sample&dataset=sample_data%2Fjson%2Fvolvox",
   "baseUrl": "/",
   "filterSettings": "[[blastResultPath]]/jblast_sample_filtersettings.json",
   "storeCache":false
