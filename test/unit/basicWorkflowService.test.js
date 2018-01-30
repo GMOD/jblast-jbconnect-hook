@@ -12,7 +12,7 @@ var assert = chai.assert;
 if (typeof sails === 'undefined') {
     sails = {
         config: 
-            require('./data/testGlobals')
+            require('../data/testGlobals')
 
     };
 }
@@ -20,14 +20,17 @@ if (typeof sails === 'undefined') {
 describe('basicWorkflowService', function() {
 
     describe("# determineBlastProfile() function", () => {
-        let basicWorkflowService = require('../api/services/basicWorkflowService');
+        let basicWorkflowService = require('../../api/services/basicWorkflowService');
         let g = sails.config.globals.jbrowse;
         //console.log("config",sails.config);
         
         it('determineBlastProfile - no blastProfile defined', (done) => {
             // dummy data
             let kJob = {
-                data: {}
+                data: {},
+                kDoneFn (val) {
+                    return;
+                }
             };
             basicWorkflowService.determineBlastProfile(kJob);
             //console.log("kJob result",kJob);
@@ -37,7 +40,10 @@ describe('basicWorkflowService', function() {
         it('determineBlastProfile - no blastProfile = htgs', (done) => {
             // dummy data
             let kJob = {
-                data: { blastProfile: 'htgs' }
+                data: { blastProfile: 'htgs' },
+                kDoneFn (val) {
+                    return;
+                }
             };
             basicWorkflowService.determineBlastProfile(kJob);
             //console.log("kJob result",kJob);
@@ -47,12 +53,17 @@ describe('basicWorkflowService', function() {
         it('determineBlastProfile - no blastProfile = user supplied profile', (done) => {
             // dummy data
             let kJob = {
-                data: { blastProfile: {
-                    db: "/123/1bc",
-                    lnpm: "x",
-                    xxaabb: 23,
-                    x21: -2
-                }}
+                data: { 
+                    blastProfile: {
+                        db: "/123/1bc",
+                        lnpm: "x",
+                        xxaabb: 23,
+                        x21: -2
+                    }
+                },
+                kDoneFn (val) {
+                    return;
+                }
             };
             basicWorkflowService.determineBlastProfile(kJob);
             //console.log("kJob result",kJob);
