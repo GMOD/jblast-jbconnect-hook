@@ -1,1 +1,1 @@
-{"score":{"type":"abs","min":58,"max":593,"val":58},"evalue":{"type":"exp","min":-164.2246437232114,"max":-3.535684861138325,"val":-3.535684861138325},"identity":{"type":"pct","min":78,"max":100,"val":78},"gaps":{"type":"pct","min":0,"max":13,"val":13}}
+{"score":{"type":"abs","min":58,"max":593,"val":58},"evalue":{"type":"exp","min":5.96151e-165,"max":0.000291283,"val":0.000291283},"identity":{"type":"pct","min":78,"max":100,"val":78},"gaps":{"type":"pct","min":0,"max":13,"val":13}}
