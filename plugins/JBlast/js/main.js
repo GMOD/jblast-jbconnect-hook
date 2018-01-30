@@ -45,32 +45,13 @@ return declare( JBrowsePlugin,
         $.get("plugins/JBlast/BlastPanel.html", function(data){
             console.log("loaded BlastPanel.html");
             $('body').append(data);
-
-            $("#extruderRight").buildMbExtruder({
-                position:"right",
-                width:300,
-                extruderOpacity:.8,
-                hidePanelsOnClose:true,
-                accordionPanels:true,
-                onExtOpen:function(){},
-                onExtContentLoad:function(){
-                    jobPanelInit();
-                },
-                onExtClose:function(){}
-            });
         });            
         
         browser.jblast = {
             asset: null,
             focusQueue: [],
             focusQueueProc: 0,
-            panelDelayTimer: null,
-            filterSliders: {
-                score: 0,
-                evalue: 0,
-                identity: 0,
-                gaps: 0
-            }
+            panelDelayTimer: null
         };
         
         /*
@@ -104,6 +85,20 @@ return declare( JBrowsePlugin,
                     addButtons: thisB.FASTA_addButtons
                 });
             });
+            // override Browser
+            require(["dojo/_base/lang", "JBrowse/Browser"], function(lang, Browser){
+                lang.extend(Browser, {
+					// handle highlight off 
+                    clearHighlight: function() {
+                        if( this._highlight ) {
+                            $("[widgetid='jblast-toolbtn']").hide();
+                            //domStyle.set(thisB.browser.jblast.blastButton, 'display', 'none');  // don't work, why?
+                            delete this._highlight;
+                            this.publish( '/jbrowse/v1/n/globalHighlightChanged', [] );
+                        }
+                    }
+                });
+            });
             browser.jblastDialog = thisB.Browser_jblastDialog;
             
             
@@ -117,53 +112,29 @@ return declare( JBrowsePlugin,
             thisB.startFocusQueue();
 
         });
+        // create the blast button on the toolbar
+        this.browser.afterMilestone( 'initView', function() {
+
+            var navBox = dojo.byId("navbox");
+
+            thisB.browser.jblast.blastButton = new Button(
+            {
+                title: "BLAST highlighted region",
+                id: "jblast-toolbtn",
+                //width: "24px",
+				//height: "17px",
+				label: "Blast",
+                onClick: dojo.hitch( thisB, function(event) {
+                    //thisB.browser.showTrackLabels("toggle");
+					//console.log("blast click");
+					thisB.startBlast();
+                    dojo.stopEvent(event);
+                })
+            }, dojo.create('button',{},navBox));   //thisB.browser.navBox));
+        });
         
         // save the reference to the blast plugin in browser
         browser.jblastPlugin = this;
-        
-        
-        // event handlers for server events
-        var newTrackHandler = function (eventType,data) {
-            console.log("trackhandler "+eventType);
-            var notifyStoreConf = dojo.clone (data);
-            var notifyTrackConf = dojo.clone (data);
-            notifyStoreConf.browser = browser;
-            notifyStoreConf.type = notifyStoreConf.storeClass;
-            notifyTrackConf.store = browser.addStoreConfig(undefined, notifyStoreConf);
-            browser.publish ('/jbrowse/v1/v/tracks/' + eventType, [notifyTrackConf]);
-        };
-
-        
-        dojo.subscribe("/jbrowse/jbclient_ready", function(){
-            console.log("ready to receive events");
-            
-            // handle track events
-            io.socket.on('track-new', function (data){
-                console.log('event','track-new',data);
-                newTrackHandler ('new',data);
-            });		
-            io.socket.on('track-update', function (data){
-                console.log('event','track-update',data);
-                var track = thisB.findTrackConfig(data);
-                if (track)
-                    thisB.browser.view.replaceTracks([track]);
-                else
-                    console.log("track not found");
-            });
-            io.socket.on('track-replace', function (data){
-                console.log('event','track-replace',data);
-                newTrackHandler ('replace',data);
-            });		
-            io.socket.on('track-test', function (data){
-                console.log('event','track-test',data);
-                console.log("event track-test "+data.value);
-                alert("event track-test value = "+data.value)
-            });
-
-            setTimeout(function() {
-                initQueue();
-            },1000);
-        });
         
         /*
          * JBrowse event handlers
@@ -305,9 +276,9 @@ return declare( JBrowsePlugin,
                     var asset = track.config.label;
                     var dataset = encodeURIComponent(track.browser.config.dataRoot);
                     var hitkey = blastKey;
-                    var url = '/jbapi/gethitdetails/'+asset+'/'+dataset+'/'+hitkey;
+                    var url = '/service/exec/get_hit_details/?asset='+asset+'&dataset='+dataset+'&hitkey='+hitkey;
                     $.get( url, function(hitData) {
-                        console.log("gethitdetails data",hitData);
+                        //console.log("gethitdetails data",hitData);
                         
                         var blastContent = "";
                         var count = 0;
@@ -317,15 +288,20 @@ return declare( JBrowsePlugin,
                             // do only on first iteration because other iteratons have same data
                             if (count===0) {
                                 blastContent += thisB.blastRenderHitCommon(hit);
-                                $.get('/jbapi/lookupaccession/'+hit.Hit_accession,function(data) {
+                                //console.log("lookup_accession get");
+                                $.get('/service/exec/lookup_accession/?accession='+hit.Hit_accession,function(data) {
                                     
+                                    console.log("lookup_access result",data);
                                     var count = 0;
-                                    for(var i in data.result) {
-                                        if (count++ === 0) {
-                                            var link = data.result[i].link;
-                                            $('#details_accession').attr('href',link);
-                                            $('#details_accession').html(data.result[i].caption);
-                                        }
+                                    
+                                    if (typeof data.result.uids[0] !== 'undefined') {
+                                        var idx = data.result.uids[0];
+                                        var link = data.result[idx].link;
+                                        $('#details_accession').attr('href',link);
+                                        $('#details_accession').html(data.result[idx].caption);
+                                    }
+                                    else {
+                                        console.log("lookup accession failed -", hit.Hit_accession);
                                     }
                                 });
                             }
@@ -470,7 +446,7 @@ return declare( JBrowsePlugin,
                     $('.blast-group-descript').attr('title',task.trackConfig.metadata.description);
                     $('.blast-group-descript').attr('alt',task.trackConfig.metadata.description);
 
-                    $.get("/jbapi/getblastdata/"+JBrowse.jblast.asset+'/'+encodeURIComponent(JBrowse.config.dataRoot), function(data){
+                    $.get("/service/exec/get_blastdata/?asset="+JBrowse.jblast.asset+'&dataset='+encodeURIComponent(JBrowse.config.dataRoot), function(data){
                         console.log( data );
                         $('.blast-hit-data').html("Hits: ("+data.filteredHits+'/'+data.hits+")");
                     });
@@ -509,175 +485,167 @@ return declare( JBrowsePlugin,
         var thisB = this;
         var config = this.browser.config;
         var url = config.dataRoot + '/' + trackConfig.filterSettings;
-        var filterSlider = this.browser.jblast.filterSliders;
+        //var filterSlider = this.browser.jblast.filterSliders;
         
         console.log('url',url);
         var jqxhr = $.getJSON( url, function(data) {
-            console.log( "success", data);
+            console.log( "filter data read success", data);
+			
+			setup_score_slider();
+			setup_evalue_slider();
+			setup_identity_slider();
+			setup_gap_slider();
+			
+			
+            // setup score slider****************************
+			function setup_score_slider() {
+				var lo = data.score.min;
+				var hi = data.score.max;
+				var step = Math.round((hi-lo) / 4);
 
-            // score ****************************
-            
-            var lo = data.score.min;
-            var hi = data.score.max;
-            var step = Math.round((hi-lo) / 4);
+				$("#slider-score").slider({
+					min: lo,
+					max: hi,
+					values: [data.score.val],
+					slide: function(event,ui) {
+						var v = ui.value;
+						$('#slider-score-data').html(v);
+					},
+					change: function(event,ui) {
+						var v = ui.value;
+						var data = {score:{val:v}};
+						thisB.sendChange(data,trackConfig);
+					}
+				})
+				.slider('pips', {
+					rest:'label',
+					step: step
+				});
+				setTimeout(function() {	// initial render
+					$('#slider-score-data').html(data.score.val);
+				},100);
+			}
+            // setup evalue slider *******************************
+			function setup_evalue_slider() {
+				var hi = Math.log10(data.evalue.max);
+				var lo = Math.log10(data.evalue.min);
+				var nstep = 99;
+				var step = (hi - lo) / nstep;
 
-            // setup sliders
-            $("#slider-score").slider({
-                min: lo,
-                max: hi,
-                values: [data.score.val],
-                slide: function(event,ui) {
-                    var v = ui.value;
-                    $('#slider-score-data').html(v);
-                    filterSlider.score = parseInt(v);            
-                },
-                change: function(event,ui) {
-                    var data = {score:{val:filterSlider.score}};
-                    thisB.sendChange(data,trackConfig);
-                }
-            })
-            .slider('pips', {
-                rest:'label',
-                step: step
-            });
+				// setup labels
+				var pstep = 5;
+				var labels = [];
+				for(var i=0;i < 99;i++) {
+					var v = lo + i*step;
+					labels.push(Math.pow(10,v).toExponential(1));
+				}
+				labels.push(Math.pow(10,hi).toExponential(1));
+				labels.push(""+99);
+				//console.log("evalue labels",labels);
 
-            filterSlider.score = data.score.val;
+				// map evalue into 0-99 space
+				var initVal = Math.round((Math.log10(data.evalue.val)-lo) / (hi - lo)*100);
+				$("#slider-evalue").slider({
+					min: 0,
+					max: 99,
+					step: 1, //step,
+					values: [initVal],
+					slide: function(event,ui) {
+						var i = +ui.value;
+						var ev = i*step + lo;
+						$('#slider-evalue-data').html(Math.pow(10,ev).toExponential(1));
+					},
+					change: function(event,ui) {
+						var i = +ui.value;
+						var val = Math.pow(10,i*step + lo);
+						var data = {evalue:{val:val}};
+						thisB.sendChange(data,trackConfig);
+					}
+				}).slider("pips",{
+					rest:'label',
+					labels: labels,
+					step: 25
+				});
+				setTimeout(function() {	// initial render value
+					$('#slider-evalue-data').html(data.evalue.val.toExponential(1));
+				},100);
+			}
+            // setup identity slider ************************
+			function setup_identity_slider() {
+				var hi = data.identity.max;
+				var lo = data.identity.min;
+				var step = (hi - lo) / 20;
 
-            // evalue slider *******************************
+				// pip setup
+				var pstep = 5;
+				var labels = [];
+				for(var i=lo;i <= hi; i += pstep*step) {
+					labels.push(""+Math.round(i));
+				}
 
-            //var offset = Math.abs(data.evalue.max)*2 + Math.abs(data.evalue.min-data.evalue.max);
-            var hi = data.evalue.max;
-            var lo = data.evalue.min;
-            var nstep = 100;
-            var step = (hi - lo) / nstep;
-            console.log("lo,hi,val,step",lo,hi,data.evalue.val,step);
+				$("#slider-identity").slider({
+					min: lo,
+					max: hi,
+					step: step,
+					values: [data.identity.val],
+					slide: function(event,ui) {
+						var v = ui.value + '%';
+						$('#slider-identity-data').html(v);
+						//filterSlider.identity = parseInt(v);
+					},
+					change: function(event,ui) {
+						var v = ui.value;
+						var data = {identity:{val:v}};
+						thisB.sendChange(data,trackConfig);
+					}
+				}).slider("pips",{
+					rest:'label',
+					first:'label',
+					last:'label',
+					step: pstep,
+					suffix: '%'
+				});
+				setTimeout(function() {	// initial render value
+					$('#slider-identity-data').html(data.identity.val + '%');
+				},100);
+			}
+            // setup gap slider ********************
+			function setup_gap_slider() {
+				var hi = data.gaps.max;
+				var lo = data.gaps.min;
+				var step = (hi - lo) / 20;
 
-            var pstep = 5;
-            var labels = [];
-
-            for(var i=lo;i <= hi; i += step) {
-                var v = Math.pow(10,i);
-                labels.push(v.toExponential(1));
-            }
-            labels.push(Math.pow(10,hi).toExponential(1));
-            console.log("labels",labels);
-            
-            $("#slider-evalue").slider({
-                min: lo,
-                max: hi,
-                step:step,
-                values: [data.evalue.val],
-                slide: function(event,ui) {
-                    //console.log('evalue',ui.value,ui.value);
-                    var ev = +ui.value;
-                    $('#slider-evalue-data').html(Math.pow(10,ev).toExponential(1));
-                    filterSlider.evalue = ev;
-                },
-                change: function(event,ui) {
-                    var data = {evalue:{val:filterSlider.evalue}};
-                    thisB.sendChange(data,trackConfig);
-                }
-            }).slider("pips",{
-                rest:'label',
-                //first:'label',
-                //last:'label',
-                labels: labels,
-                step: 25
-            });
-            filterSlider.evalue = data.evalue.val;
-
-            // identity slider
-
-            var hi = data.identity.max;
-            var lo = data.identity.min;
-            var step = (hi - lo) / 20;
-
-            // pip setup
-            var pstep = 5;
-            var labels = [];
-            for(var i=lo;i <= hi; i += pstep*step) {
-                labels.push(""+Math.round(i));
-            }
-
-            $("#slider-identity").slider({
-                min: lo,
-                max: hi,
-                step: step,
-                values: [data.identity.val],
-                slide: function(event,ui) {
-                    var v = ui.value + '%';
-                    $('#slider-identity-data').html(v);
-                    filterSlider.identity = parseInt(v);
-                },
-                change: function(event,ui) {
-                    var data = {identity:{val:filterSlider.identity}};
-                    thisB.sendChange(data,trackConfig);
-                }
-            }).slider("pips",{
-                rest:'label',
-                first:'label',
-                last:'label',
-                step: pstep,
-                //labels: labels,
-                suffix: '%'
-            });
-            filterSlider.identity = data.identity.val;
-
-            // gap slider
-
-            var hi = data.gaps.max;
-            var lo = data.gaps.min;
-            var step = (hi - lo) / 20;
-            //step = parseFloat(step.toFixed(2));
-
-            var pstep = 5;
-            //pstep = parseFloat(pstep.toFixed(2));
-            var labels = [];
-            for(var i=lo;i <= hi; i += pstep*step) {
-                labels.push(i);
-            }
-            $("#slider-gap").slider({
-                min: lo,
-                max: hi,
-                step: step,
-                values: [data.gaps.val],
-                slide: function(event,ui) {
-                    var v = ui.value + '%';
-                    $('#slider-gap-data').html(v);
-                    filterSlider.gaps = parseFloat(ui.value);
-                },
-                change: function(event,ui) {
-                    var data = {gaps:{val:filterSlider.gaps}};
-                    thisB.sendChange(data,trackConfig);
-                }
-                
-            }).slider("pips",{
-                rest: 'label',
-                first: 'label',
-                last: 'label',
-                step: pstep,
-                //labels: labels,
-                suffix: '%'
-            });
-            filterSlider.gaps = data.gaps.val;
-            
-            // do stuff once after sliders are initialized
-            setTimeout(function() {
-                var val = filterSlider.score;
-                $('#slider-score-data').html(val);
-
-                var val = filterSlider.evalue;
-                //val = Math.pow(10,val);
-                $('#slider-evalue-data').html(Math.pow(10,val).toExponential(1));
-
-                var v = filterSlider.identity + '%';
-                $('#slider-identity-data').html(v);
-
-                var v = filterSlider.gaps + '%';
-                $('#slider-gap-data').html(v);
-
-            },100);
-
+				var pstep = 5;
+				var labels = [];
+				for(var i=lo;i <= hi; i += pstep*step) {
+					labels.push(i);
+				}
+				$("#slider-gap").slider({
+					min: lo,
+					max: hi,
+					step: step,
+					values: [data.gaps.val],
+					slide: function(event,ui) {
+						var v = ui.value + '%';
+						$('#slider-gap-data').html(v);
+					},
+					change: function(event,ui) {
+						var v = ui.value;
+						var data = {gaps:{val:v}};
+						thisB.sendChange(data,trackConfig);
+					}
+					
+				}).slider("pips",{
+					rest: 'label',
+					first: 'label',
+					last: 'label',
+					step: pstep,
+					suffix: '%'
+				});
+				setTimeout(function() {	// initial render value
+					$('#slider-gap-data').html(data.gaps.val+'%');
+				},100);
+			}
         });
         
     },
@@ -686,10 +654,10 @@ return declare( JBrowsePlugin,
         var postData = {
               filterParams: data,
               asset: this.browser.jblast.asset,
-              dataSet: this.browser.config.dataRoot
+              dataset: this.browser.config.dataRoot
         }
         //console.log("postData",postData);
-        $.post( "/jbapi/setfilter", postData , function( data) {
+        $.post( "/service/exec/set_filter", postData , function( data) {
             console.log( data );
             $('.blast-hit-data').html("Hits: ("+data.filteredHits+'/'+data.hits+")");
         }, "json");
@@ -723,25 +691,7 @@ return declare( JBrowsePlugin,
             onTaskItemClick: function(event) {
                 //browser.jblastDialog();
                 // get sequence store and ac
-                browser.getStore('refseqs', dojo.hitch(this,function( refSeqStore ) {
-                    if( refSeqStore ) {
-                        var hilite = browser._highlight;
-                        refSeqStore.getReferenceSequence(
-                            hilite,
-                            dojo.hitch( this, function( seq ) {
-                                //console.log('found sequence',hilite,seq);
-                                require(["JBrowse/View/FASTA"], function(FASTA){
-                                    var fasta = new FASTA();
-                                    var fastaData = fasta.renderText(hilite,seq);
-                                    console.log('FASTA',fastaData);
-                                    delete fasta;
-                                    browser.jblastDialog(fastaData);
-                                });                                
-                                
-                            })
-                        );
-                    }
-                }));             
+		thisB.startBlast();
             }
         };
         // create task menu as context menu for task nodes.
@@ -760,6 +710,33 @@ return declare( JBrowsePlugin,
         browser.jblastHiliteMenu = menu;
     },
     /**
+     * Display blast dialog box
+     * @returns {undefined}
+     */
+    startBlast: function() {
+        var thisB = this;
+        var browser = this.browser;
+        browser.getStore('refseqs', dojo.hitch(this,function( refSeqStore ) {
+            if( refSeqStore ) {
+                var hilite = browser._highlight;
+                refSeqStore.getReferenceSequence(
+                    hilite,
+                    dojo.hitch( this, function( seq ) {
+                        //console.log('found sequence',hilite,seq);
+                        require(["JBrowse/View/FASTA"], function(FASTA){
+                            var fasta = new FASTA();
+                            var fastaData = fasta.renderText(hilite,seq);
+                            console.log('FASTA',fastaData);
+                            delete fasta;
+                            browser.jblastDialog(fastaData);
+                        });                                
+
+                    })
+                );
+            }
+        }));             
+    },
+    /**
      * called when highlight region is created
      * @param {type} node - DOM Node of highlight region (yellow region)
      * @returns nothing significant
@@ -768,8 +745,11 @@ return declare( JBrowsePlugin,
         console.log('postRenderHighlight');
         
         // add hilight menu to node
-        if (typeof JBrowse.jblastHiliteMenu !== 'undefined')
+        if (typeof JBrowse.jblastHiliteMenu !== 'undefined') {
             JBrowse.jblastHiliteMenu.bindDomNode(node);
+            $("[widgetid='jblast-toolbtn']").show();
+            //domStyle.set(thisB.browser.jblast.blastButton, 'display', 'inline'); // dont work, why??
+        }
     },
     // display blast dialog
     Browser_jblastDialog: function (region) {
@@ -830,7 +810,6 @@ return declare( JBrowsePlugin,
                 id: 'blast-box',
                 style: {'margin-top': '20px'},
                 innerHTML: 'This will process a BLAST search against the selected database.<br/><button id="submit-btn" type="button">Submit</button> <button id="cancel-btn" type="button">Cancel</button>'
-                //innerHTML: 'This will process a BLAST search against the selected database.<br/>'
             }, dialog.containerNode);
 
             var submitBtn = new Button({
@@ -847,34 +826,13 @@ return declare( JBrowsePlugin,
                     }
                     console.log('Selected workflow',selWorkflow);
                     
-                    // do http post
-                    /*
-                    var xhrArgs = {
-                      //url: jbServer + '/jbapi/blastregion',
-                      url: '/jbapi/workflowsubmit',
-                      postData: {
-                          region: regionB,
-                          //workflow: 'f2db41e1fa331b3e'
-                          workflow: selWorkflow,
-                          dataSetPath: thisB.config.dataRoot
-                      },
-                      handleAs: "json",
-                      load: function(data){
-                        console.log("POST result");
-                        console.dir(data);
-                      },
-                      error: function(error){
-                          alert(error);
-                      }
-                    };
-                    */
                     var postData = {
+                          service: "jblast",
+                          dataset: thisB.config.dataRoot,
                           region: regionB,
-                          workflow: selWorkflow,
-                          dataSetPath: thisB.config.dataRoot
+                          workflow: selWorkflow
                       };
-                    //var deferred = dojo.xhrPost(xhrArgs);
-                    $.post( "/jbapi/workflowsubmit", postData , function( result ) {
+                    $.post( "/job/submit", postData , function( result ) {
                         console.log( result );
                     }, "json");
 
@@ -932,11 +890,12 @@ function getWorkflows(cb) {
 
     // Call the asynchronous xhrGet
     //var deferred = dojo.xhrGet(xhrArgs);
-    $.get( "/jbapi/getworkflows", function( data ) {
+    $.get( "/service/exec/get_workflows", function( data ) {
         console.log("get workflows result", data);
         cb(data);
     });
 }
+
 // overwrite a string with another string at the given location
 function overwriteStr(subjStr, at, withStr) {
       var partL = subjStr;
@@ -965,24 +924,3 @@ function repeatChar(count, ch) {
       }
       return result + result.substring(0, count - result.length);
 }
-function jobPanelInit() {              
-    console.log("jobPanelInit()");
-    
-    // fix position of flap
-    $("#extruderRight div.flap").addClass("flapEx");
-
-    // add gear icon (activity indicator)
-    $("#extruderRight div.flap").prepend("<img class='cogwheel hidden' src='plugins/JBlast/img/st_active.gif' />");
-
-    $("#extruderRight .extruder-content").css('height','300px');
-    $("#extruderRight .extruder-content").css('border-bottom-left-radius','5px');
-
-
-
-    //adjust grid height
-    setInterval(function() {
-        var h = $("#extruderRight div.extruder-content").height();
-        $("#j-hist-grid").height(h-3);
-    },1000);
-}
-

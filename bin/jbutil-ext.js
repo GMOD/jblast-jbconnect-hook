@@ -6,17 +6,19 @@ var path = require('path');
 //var getopt = require('node-getopt');
 var util = require('./util.js');
 var Finder = require('fs-finder');
-
+var approot = require('app-root-path');
+var shelljs = require('shelljs');
 
 module.exports = {
     getOptions: function() {
         return [
-            ['' , 'blastdbpath=PATH' , '(jblast) existing database path'],
-            ['' , 'setupworkflows'   , '(jblast) [install|<path>] "install" project wf, or specify .ga file '],
-            ['' , 'setuptools'       , '(jblast) setup jblast tools for galaxy'],
-            ['' , 'setupdata'        , '(jblast) setup data and samples'],
-            ['' , 'setupindex'       , '(jblast) setup index.html in the jbrowse directory'],
-            ['' , 'setuphistory'     , 'setup history']
+            //['' , 'blastdbpath=PATH' , '(jblast - galaxy) existing database path'],
+            ['' , 'setupblastdemodb' , '(jblast - setup blast demo database'],
+            ['' , 'setupworkflows'   , '(jblast - galaxy) installs demo galaxy workflows (must have API key configured'],
+            ['' , 'setuptools'       , '(jblast - galaxy) setup jblast tools for galaxy'],
+            //['' , 'setuphistory'     , '(jblast - galaxy) setup history'],
+            ['' , 'setupdata'        , '(jblast) setup jblast demo data and samples (JBrowse Volvox must exist)']
+            //['' , 'setupindex'       , '(jblast) setup index.html in the jbrowse directory']
         ];        
     },
     getHelpText: function() {
@@ -34,11 +36,15 @@ module.exports = {
             return;
         }
         
-        var tool = opt.options['setupindex'];
-        if (typeof tool !== 'undefined') {
-            exec_setupindex(this);
-        }
+        //var tool = opt.options['setupindex'];
+        //if (typeof tool !== 'undefined') {
+        //    exec_setupindex(this);
+        //}
         
+        var setupblastdemodb = opt.options['setupblastdemodb'];
+        if (typeof setupblastdemodb !== 'undefined') {
+            exec_setupblastdemodb(this);
+        }
         var setuptools = opt.options['setuptools'];
         if (typeof setuptools !== 'undefined') {
             exec_setuptools(this);
@@ -61,6 +67,10 @@ module.exports = {
             exec_setupdata(this);
             exec_setuptrack(this);
         }
+        //var setupdata = opt.options['setupblastdemodb'];
+        //if (typeof setupdata !== 'undefined') {
+        //    exec_setupblastdemo(this);
+        //}
     },
     init: function(config) {
         //console.log("config",config);
@@ -120,6 +130,11 @@ module.exports = {
  * process commands arguments - implementation
  **********************************************/
 
+function exec_setupblastdemodb (params) {
+    var g = params.config;
+    shelljs.exec(approot+'/blast_downloadDb.js htgs.05');
+}
+
 /**
  * 
  * @param {type} params 
@@ -142,11 +157,18 @@ function exec_setuptrack(params) {
     var config = params.config;
     console.log("Setting up sample track...");
     var g = config;
-
-    var trackListPath = g.jbrowsePath + g.dataSet[0].dataPath + 'trackList.json';
-    var sampleTrackFile = g.jbrowsePath + g.dataSet[0].dataPath;
-    sampleTrackFile += g.jblast.blastResultPath+'/sampleTrack.json';
-    var dataSet = g.dataSet[0].dataPath;
+    
+    // get dataSet
+    var dataSet = "-----";
+    for(var i in g.dataSet) {
+        dataSet = g.dataSet[i].path;
+        break;  // only take the first one
+    }
+    
+    var trackListPath = g.jbrowsePath + dataSet + '/trackList.json';
+    var sampleTrackFile = g.jbrowsePath + dataSet;
+    sampleTrackFile += '/'+g.jblast.blastResultPath+'/sampleTrack.json';
+    //var dataSet = g.dataSet.dataPath;
     
     // read sampleTrack.json file
     var error = 0;
@@ -177,9 +199,13 @@ function exec_setuptrack(params) {
     var conf = JSON.parse(trackListData);
 
     console.log("Adding plugins JBClient & JBlast in trackList.json");
+    
+    
     // add the JBlast & JBClient plugin, if they don't already exist  
     if (conf.plugins.indexOf('JBClient') === -1) conf.plugins.push("JBClient");
     if (conf.plugins.indexOf('JBlast') === -1) conf.plugins.push("JBlast");
+    //if (conf.plugins.indexOf('ServerSearchSeq') === -1) conf.plugins.push("ServerSearchSeq");
+
 
     // check if sample track exists in trackList.json (by checking for the label)
     var hasLabel = 0;
@@ -209,10 +235,18 @@ function exec_setupdata(params) {
     
     var config = params.config;
     var srcpath = params.srcpath;
+    var g = config;
 
     console.log("Setting up data directory...");
     
-    var targetdir = config.jbrowsePath+config.dataSet[0].dataPath;
+    // get dataSet
+    var dataSet = "-----";
+    for(var i in g.dataSet) {
+        dataSet = g.dataSet[i].path;
+        break;  // only take the first one
+    }
+    
+    var targetdir = config.jbrowsePath + dataSet;
     
     util.checkDir(targetdir+config.jblast.blastResultPath);
     
@@ -393,3 +427,13 @@ function exec_setuptools(params) {
     
     console.log("Restart Galaxy server for changes to take effect.");
 }
+function exec_setupblastdemodb(params) {
+    var srcpath = params.srcpath;
+    var gdatapath = params.gdatapath;
+    var gdataroot = params.gdataroot;
+    
+    util.cmd('node blast_downloadDb htgs.05');
+    
+    
+}
+    

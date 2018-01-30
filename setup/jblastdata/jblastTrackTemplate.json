@@ -1,5 +1,8 @@
 {
   "maxFeatureScreenDensity": 16,
+  "style": {
+    "showLabels":false        
+  },
   "displayMode": "normal",
   "storeClass": "JBrowse/Store/SeqFeature/GFF3",
   "type": "JBrowse/View/Track/HTMLFeatures",

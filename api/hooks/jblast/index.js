@@ -1,6 +1,11 @@
+/*
+ * @module hooks/jblast
+ * @description
+ * This module is the main subclass of a Sails Hook incorporating *Marlinspike*.
+ */
 'use strict';
 
-var mapRoutes = require('./mapRoutes');
+//var mapRoutes = require('./mapRoutes');
 var jblastProc = require('../../services/jblastProc');
 
 Object.defineProperty(exports, "__esModule", {
@@ -26,7 +31,13 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var thisHook = sails.hooks.jblast;
+
+var thisHook;
+
+if (typeof sails !== 'undefined')
+    thisHook = sails.hooks.jblast;
+else
+    thisHook = global.jtest_hook;   // this handles hbh-jblast npm test case.  It's a bit hackish
 
 if (!thisHook) {
   var Hook = function (_Marlinspike) {
@@ -59,32 +70,9 @@ if (!thisHook) {
     }, {
       key: 'routes',
       value: function routes() {
-        sails.log('>>> setup jbh-jblast routes');
-        return mapRoutes.routes();
-        /*
-        return {
-            // http://sailsjs.org/documentation/concepts/extending-sails/hooks/hook-specification/routes
-            
-             after: {
-                'get /hello': function (req, res, next) {
-                    return res.send('hello');
-                },
-                'get /hi': {
-                    controller: 'JblastController',
-                    action: 'hello'
-                },
-                'post /jbapi/workflowsubmit': 'jblastProc.workflowSubmit',
-                'get /jbapi/getworkflows': 'jblastProc.getWorkflows',
-                'post /jbapi/setfilter': 'jblastProc.setFilter',
-                'get /jbapi/getblastdata/:asset/:dataset': 'jblastProc.getBlastData',
-                'get /jbapi/gettrackdata/:asset/:dataset': 'jblastProc.getTrackData',
-                'get /jbapi/gethitdetails/:asset/:dataset/:hitkey': 'jblastProc.getHitDetails',
-                'get /jbapi/lookupaccession/:accession': 'jblastProc.lookupAccession'
-            }
-
-        };
-        */
-
+        //sails.log('>>> setup jbh-jblast routes');
+        //return mapRoutes.routes();
+        //return {};
       }
     }]);
 
@@ -97,39 +85,3 @@ if (!thisHook) {
 exports.default = thisHook;
 module.exports = exports['default'];
 
-/*
-let thisHook = sails.hooks.jblast;
-
-import _ from 'lodash'
-import Marlinspike from 'marlinspike'
-
-if (!thisHook) {
-  class Hook extends Marlinspike {
-
-    constructor(sails) {
-      super(sails, module)
-    }
-
-    defaults (overrides) {
-      // http://sailsjs.org/documentation/concepts/extending-sails/hooks/hook-specification/defaults#?using-defaults-as-a-function
-    }
-
-    configure () {
-      // this.sails = sails
-      // http://sailsjs.org/documentation/concepts/extending-sails/hooks/hook-specification/configure
-    }
-
-    initialize (next) {
-      // http://sailsjs.org/documentation/concepts/extending-sails/hooks/hook-specification/initialize
-      return next();
-    }
-
-    routes () {
-    }
-  }
-
-  thisHook = Marlinspike.createSailsHook(Hook)
-}
-
-export default thisHook;
-*/

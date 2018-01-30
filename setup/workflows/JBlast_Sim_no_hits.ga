@@ -1,0 +1,72 @@
+{
+    "a_galaxy_workflow": "true", 
+    "annotation": "", 
+    "format-version": "0.1", 
+    "name": "JBlast Sim No Hits", 
+    "steps": {
+        "0": {
+            "annotation": "", 
+            "content_id": null, 
+            "id": 0, 
+            "input_connections": {}, 
+            "inputs": [
+                {
+                    "description": "", 
+                    "name": "Input fasta"
+                }
+            ], 
+            "label": null, 
+            "name": "Input dataset", 
+            "outputs": [], 
+            "position": {
+                "left": 194, 
+                "top": 149
+            }, 
+            "tool_errors": null, 
+            "tool_id": null, 
+            "tool_state": "{\"name\": \"Input fasta\"}", 
+            "tool_version": null, 
+            "type": "data_input", 
+            "uuid": "aeebb08f-9c75-4058-a0fa-787df3dbc718", 
+            "workflow_outputs": []
+        }, 
+        "1": {
+            "annotation": "", 
+            "content_id": "jb_simblast_nohits", 
+            "id": 1, 
+            "input_connections": {
+                "input1": {
+                    "id": 0, 
+                    "output_name": "output"
+                }
+            }, 
+            "inputs": [
+                {
+                    "description": "runtime parameter for tool Sim Blastn No Hits", 
+                    "name": "input1"
+                }
+            ], 
+            "label": null, 
+            "name": "Sim Blastn No Hits", 
+            "outputs": [
+                {
+                    "name": "output", 
+                    "type": "blastxml"
+                }
+            ], 
+            "position": {
+                "left": 453.25, 
+                "top": 162.25
+            }, 
+            "post_job_actions": {}, 
+            "tool_errors": null, 
+            "tool_id": "jb_simblast_nohits", 
+            "tool_state": "{\"__page__\": 0, \"__rerun_remap_job_id__\": null, \"input1\": \"{\\\"__class__\\\": \\\"RuntimeValue\\\"}\"}", 
+            "tool_version": "1.0.0", 
+            "type": "tool", 
+            "uuid": "5a6393b3-fee1-4889-a299-421b336fc300", 
+            "workflow_outputs": []
+        }
+    }, 
+    "uuid": "a91ebd20-1d88-4364-80be-cdc9816e8ef7"
+}

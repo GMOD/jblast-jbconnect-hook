@@ -1,3 +1,9 @@
+/**
+ * @module
+ * @description
+ * Blast feature filter functions.
+ * 
+ */
 var request = require('request');
 var requestp = require('request-promise');
 var path = require('path');
@@ -5,24 +11,26 @@ var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require("fs"));
 var deferred = require('deferred');
 var merge = require('deepmerge');
-
+var util = require("./utils");
 module.exports = {
 
     /**
      * create initial filter settings file
-     * @param {type} kWorkflowJob
+     * @param {type} kJob
      * @param {type} newTrackJson
      *      newTrackJson[0].filterSettings must be defined
      *      newTrackJson[0].label must be defined
      * @returns {undefined|module.exports.filterInit.filter}
      */
-    filterInit: function(kWorkflowJob,newTrackJson,cb) {
+    filterInit: function(kJob,cb) {
         sails.log("filterInit()");
         var g = sails.config.globals.jbrowse;
 
         // read blast json file
-        var blastfile = g.jbrowsePath + kWorkflowJob.data.jbrowseDataPath +'/' + g.jblast.blastResultPath +"/"+ newTrackJson[0].label + ".json";
-        var blastFilterFile = g.jbrowsePath + kWorkflowJob.data.jbrowseDataPath + '/' + newTrackJson[0].filterSettings;
+        //var blastfile = g.jbrowsePath + kJob.data.dataset +'/' + g.jblast.blastResultPath +"/"+ newTrackJson[0].label + ".json";
+        //var blastFilterFile = g.jbrowsePath + kJob.data.dataset + '/' + newTrackJson[0].filterSettings;
+        var blastfile = g.jbrowsePath + kJob.data.dataset +'/' + g.jblast.blastResultPath +"/"+ kJob.data.blastData.outputs.blastxml + ".json";
+        var blastFilterFile = g.jbrowsePath + kJob.data.dataset + '/' + kJob.data.blastData.filterSettings;
         
         sails.log('blastfile',blastfile);
         try {
@@ -78,7 +86,7 @@ module.exports = {
     writeFilterSettings: function(requestData,cb) {
         sails.log.debug('writeFilterSettings()');
         var asset = requestData.asset;
-        var dataSet = requestData.dataSet;
+        var dataSet = requestData.dataset;
         
         var filterData = requestData.filterParams;
         
@@ -132,14 +140,17 @@ module.exports = {
      *  })
      */
     applyFilter: function(filterData,requestData,cb) {
-        sails.log.debug('applyFilter()');
+        sails.log.debug('applyFilter()',requestData);
+        var thisb = this;
         var g = sails.config.globals.jbrowse;
         var asset = requestData.asset;
-        var dataSet = requestData.dataSet;
+        var dataSet = Dataset.Resolve(requestData.dataset);
         //var filterData = requestData.filterParams;
         
-        var resultFile = g.jbrowsePath + dataSet +'/'+ g.jblast.blastResultPath+'/'+asset+'.json';
-        var blastGffFile = g.jbrowsePath + dataSet + '/' + g.jblast.blastResultPath+'/'+asset+'.gff3';
+        sails.log('dataSet',dataSet);
+        
+        var resultFile = g.jbrowsePath + dataSet.path +'/'+ g.jblast.blastResultPath+'/'+asset+'.json';
+        var blastGffFile = g.jbrowsePath + dataSet.path + '/' + g.jblast.blastResultPath+'/'+asset+'.gff3';
 
         try {
             var content = fs.readFileSync(resultFile, 'utf8');
@@ -155,7 +166,7 @@ module.exports = {
 
         // determine the sequence (i.e. "ctgA")
         var seqstr = blastJSON.BlastOutput['BlastOutput_query-def'];
-        var seqdata = parseFastaHead(seqstr);
+        var seqdata = util.parseSeqData('>'+seqstr);
         var sequence = seqdata.seq;
 
         var hitCount = 0;
@@ -168,11 +179,13 @@ module.exports = {
             
             var selected = 0;
             if (filterData===0) selected = 1;
-            else if (parseFloat(blastData[x].Hsp['Hsp_bit-score']) > filterData.score.val &&
-               +blastData[x].Hsp['Hsp_evalue'] < Math.pow(10,filterData.evalue.val) &&     
-               ((parseFloat(blastData[x].Hsp['Hsp_identity']) / parseFloat(blastData[x].Hsp['Hsp_align-len'])) * 100) > filterData.identity.val &&    
-               ((parseFloat(blastData[x].Hsp['Hsp_gaps']) / parseFloat(blastData[x].Hsp['Hsp_align-len'])) * 100) < filterData.gaps.val   &&  
-               1 ) selected = 1;
+            else if (
+                parseFloat(
+                    blastData[x].Hsp['Hsp_bit-score']) >= filterData.score.val &&
+                    +blastData[x].Hsp['Hsp_evalue'] <= filterData.evalue.val &&     
+                    ((parseFloat(blastData[x].Hsp['Hsp_identity']) / parseFloat(blastData[x].Hsp['Hsp_align-len'])) * 100) >= filterData.identity.val &&    
+                    ((parseFloat(blastData[x].Hsp['Hsp_gaps']) / parseFloat(blastData[x].Hsp['Hsp_align-len'])) * 100) <= filterData.gaps.val   &&  
+                1 ) selected = 1;
        
             if (selected) {
                 filteredHits++;
@@ -214,8 +227,8 @@ module.exports = {
             
         if (typeof requestData.filterParams !== 'undefined') {
             // track change notification
-            sails.hooks['jbcore'].sendEvent("track-update",requestData.asset);
-            sails.log ("Announced track update",requestData,requestData.asset);
+            //sails.hooks['jbcore'].sendEvent("track-update",requestData.asset);
+            thisb._announceTrack(dataSet.id,asset);
         }
         var retdata = {
             result:'success',
@@ -224,6 +237,28 @@ module.exports = {
         };
         sails.log.debug(retdata);
         cb(retdata);
+    },
+    /*
+     * Announce change in track
+     * @param {int} dataset id
+     * @param {string} key
+     * @returns {undefined}
+     */
+    _announceTrack: function(dataset,key) {
+        //var dataSet = Dataset.Resolve(dataset);
+        var srch = {dataset:dataset,lkey:key};
+        sails.log('_announceTrack',srch);
+        
+        Track.findOne(srch).then(function(found) {
+            if (typeof found === 'undefined') {
+                sails.log.error('_announceTrack not found',key);
+                return;
+            }
+            sails.log("Announced track update",found.id,found.lkey);
+            return Track.publishUpdate(found.id,found);
+        }).catch(function(err) {
+            sails.log.error("_announceTrack failed",err);
+        });
     },
     /**
      * return hit details given hit key, including all HSPs of the original hit.
@@ -294,19 +329,22 @@ module.exports = {
     // get the hightest value of the blast data variable
     getHighest10: function(variable) {
         var blastData = this.blastData.BlastOutput.BlastOutput_iterations.Iteration.Hit;
-        var val = Math.log10(Number.MIN_VALUE);
+        //var val = Math.log10(Number.MIN_VALUE);
+        var minval = Number.MIN_VALUE;
         for(var x in blastData) {
-            var v = Math.log10(+blastData[x].Hsp[variable]);
-            if (v > val) val = v;
+            //var v = Math.log10(+blastData[x].Hsp[variable]);
+            var v = +blastData[x].Hsp[variable];
+            if (v > minval) minval = v;
         }
-        return val;
+        return minval;
     },
     // get the lowest value of the blast data variable.
     getLowest10: function(variable) {
         var blastData = this.blastData.BlastOutput.BlastOutput_iterations.Iteration.Hit;
         var val = -1;
         for(var x in blastData) {
-            var v = Math.log10(+blastData[x].Hsp[variable]);
+            //var v = Math.log10(+blastData[x].Hsp[variable]);
+            var v = +blastData[x].Hsp[variable];
             if (val === -1) val = v;
             if (v < val)  val = v;
         }
@@ -334,7 +372,7 @@ module.exports = {
         return val;
     }
 };
-
+/*
 function parseFastaHead(str) {
     var line = str.split("\n")[0];
     return {
@@ -346,7 +384,7 @@ function parseFastaHead(str) {
         length: line.split("length=")[1]
     };
 }
-
+*/
 function convert2Num(obj) {
     for(var x in obj) {
         if (typeof obj[x].val === 'string')
