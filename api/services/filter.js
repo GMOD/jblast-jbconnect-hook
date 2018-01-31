@@ -158,16 +158,16 @@ module.exports = {
      *      filteredFeatures: x             // filtered features.
      *  })
      */
-    applyFilter: function(filterData,requestData,cb) {
+    applyFilter(filterData,requestData,cb) {
         sails.log.debug('applyFilter()',requestData);
-        var thisb = this;
+        let thisb = this;
         
         this.getHitDataFiltered(filterData,requestData,function(filterSummary,filteredGffStr) {
 
             var g = sails.config.globals.jbrowse;
             var asset = requestData.asset;
-            var dataSet = Dataset.Resolve(requestData.dataset);
-            var blastGffFile = g.jbrowsePath + dataSet.path + '/' + g.jblast.blastResultPath+'/'+asset+'.gff3';
+            var dataSet = typeof Dataset !== 'undefined' ? Dataset.Resolve(requestData.dataset).path : requestData.dataset;
+            var blastGffFile = g.jbrowsePath + dataSet + '/' + g.jblast.blastResultPath+'/'+asset+'.gff3';
             
             // write filtered gff
             var error = false;
@@ -182,7 +182,8 @@ module.exports = {
             }
             sails.log("file written",blastGffFile);
             
-            thisb._announceTrack(dataSet.id,asset);
+            if (!requestData.noAnnounce)
+                thisb._announceTrack(Dataset.Resolve(requestData.dataset).id,asset);
             
             cb(filterSummary);
         });
@@ -204,13 +205,13 @@ module.exports = {
         var thisb = this;
         var g = sails.config.globals.jbrowse;
         var asset = requestData.asset;
-        var dataSet = Dataset.Resolve(requestData.dataset);
+        var dataSet = requestData.dataset; //typeof dataSet !== 'string' ? Dataset.Resolve(requestData.dataset) : dataSet;
         //var filterData = requestData.filterParams;
         
-        sails.log('dataSet',dataSet);
+        //sails.log('dataSet',dataSet);
         
-        var resultFile = g.jbrowsePath + dataSet.path +'/'+ g.jblast.blastResultPath+'/'+asset+'.json';
-        var blastGffFile = g.jbrowsePath + dataSet.path + '/' + g.jblast.blastResultPath+'/'+asset+'.gff3';
+        var resultFile = g.jbrowsePath + dataSet +'/'+ g.jblast.blastResultPath+'/'+asset+'.json';
+        //var blastGffFile = g.jbrowsePath + dataSet + '/' + g.jblast.blastResultPath+'/'+asset+'.gff3';
 
         try {
             var content = fs.readFileSync(resultFile, 'utf8');
