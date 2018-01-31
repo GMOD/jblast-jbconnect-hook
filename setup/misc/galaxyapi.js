@@ -97,7 +97,7 @@ function executeWorkflow(dsmap) {
         //qs: params,
         headers: {
             //'Content-Type': 'application/json',
-            //'Accept':'application/json, text/javascript, */*; q=0.01',
+            //'Accept':'application/json, text/javascript, ; q=0.01',
             'Accept-Encoding' : 'gzip, deflate',
             'Accept-Language' : 'en-US,en;q=0.5',
             'Content-Length' : jsonstr.length
@@ -145,7 +145,7 @@ function importFiles(postFn) {
         //qs: params,
         headers: {
             //'Content-Type': 'application/json',
-            //'Accept':'application/json, text/javascript, */*; q=0.01',
+            //'Accept':'application/json, text/javascript, *; q=0.01',
             'Accept-Encoding' : 'gzip, deflate',
             'Accept-Language' : 'en-US,en;q=0.5',
             'Content-Length' : jsonstr.length
