@@ -9,22 +9,12 @@ chai.use(require('chai-shallow-deep-equal'));
 const assert = chai.assert;
 const fs = require('fs-extra');
 const shelljs = require('shelljs');
+const appPath = require("app-root-path").path;
 
 const dataSet = "sample_data/json/volvox";
 
 describe('filterService', function() {
-    // if sails is not defined we are outside of sails environment
-    /*
-    if (typeof sails === 'undefined') {
-        console.log('creating mock global sails variable');
-        sails = {
-            config: 
-                require('../data/testGlobals')
-
-        };
-    }
-    */
-    //console.log("config",sails.config.globals.jbrowse);
+    
     
     // copy sample files to the target directory
     let g = sails.config.globals.jbrowse;
@@ -34,9 +24,13 @@ describe('filterService', function() {
     console.log("copying jblast_sample*.* to",targetDir);
     shelljs.cp('./setup/jblastdata/jblast_sample*.*',targetDir);
 
+
     describe("# get() function", () => {
+        
         it('getFilterSettings() should return content of jblast_sample_filtersettings.json', (done) => {
             
+            sails.config.globals.jbrowse.jbrowsePath = appPath+'/node_modules/jbrowse';
+
             filter.getFilterSettings({asset: 'jblast_sample', dataset: 'sample_data/json/volvox'},function(data) {
                 
                 let tfile = targetDir+'/jblast_sample_filtersettings.json';
@@ -47,6 +41,8 @@ describe('filterService', function() {
         });
         it('getHitDataFiltered() test', (done) => {
             
+            sails.config.globals.jbrowse.jbrowsePath = appPath+'/node_modules/jbrowse';
+
             let req = {asset: 'jblast_sample', dataset: 'sample_data/json/volvox'};
             filter.getFilterSettings(req,function(filterData) {
                 
@@ -59,6 +55,8 @@ describe('filterService', function() {
         });
         it('writeFilterSettings() & applyFilter() test', (done) => {
             
+            sails.config.globals.jbrowse.jbrowsePath = appPath+'/node_modules/jbrowse';
+
             let req = {
                 asset: 'jblast_sample', 
                 dataset: 'sample_data/json/volvox',
@@ -81,7 +79,7 @@ describe('filterService', function() {
                 
                 filter.applyFilter(filterData,req,function(data) {
                     assert.shallowDeepEqual({ result: 'success', hits: 792, filteredHits: 515 },data);
-                    console.log('data',data);
+                    //console.log('data',data);
                     return done();
                 });
                 
