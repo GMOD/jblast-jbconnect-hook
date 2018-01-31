@@ -40,7 +40,7 @@ Install the JBServer and JBrowse.  jb_setup.js ensures the sample data is loaded
     ./jb_setup.js
 
     # install jblast
-    npm install enuggetry/jblast
+    npm install gmod/jblast
     ./bin/blast_getBlast.js             (installs the NCBI BLAST commands)
     ./bin/blast_downloadDb.js htgs.05   (setup sample database)
 
