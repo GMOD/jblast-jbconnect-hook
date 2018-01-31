@@ -1,8 +1,14 @@
 /*
  * jblast tools configuration
  */
+var jbPath = process.cwd() + "/node_modules/jbrowse/";
+
 module.exports.globals = {
     jbrowse: {
+        jbrowseRest: "http://localhost:1337",
+        jbrowsePath: jbPath,                        // or "/var/www/jbrowse/"
+        routePrefix: "jbrowse",                     // jbrowse is accessed with http://<addr>/jbrowse
+
         galaxy: {
             galaxyUrl: "http://localhost:8080",
 
