@@ -78,59 +78,78 @@ module.exports = {
         cb(filter);
     },
     /**
-     * write new data to filter settings file, given requestData
-     * @param {type} requestData
-     * @param {type} cb cb(filterData)
-     * @returns {err|Number}
+     * get filterData
+     * @param {object} requestData - eg. { asset: 'jblast_sample', dataset: 'sample_data/json/volvox' }
+     * @param {object} cb - function(filterData)
+            eg. filterData: { 
+                score: {type: 'abs', min: 58, max: 593, val: 421 },
+                evalue: { type: 'exp', min: 5.96151e-165, max: 0.000291283, val: 0.000291283 },
+                identity: { type: 'pct', min: 78, max: 100, val: 78 },
+                gaps: { type: 'pct', min: 0, max: 13, val: 13 } 
+            }
      */
-    writeFilterSettings: function(requestData,cb) {
-        sails.log.debug('writeFilterSettings()');
+    getFilterSettings(requestData,cb) {
+        sails.log.debug('getFilterSettings()');
         var asset = requestData.asset;
         var dataSet = requestData.dataset;
         
-        var filterData = requestData.filterParams;
-        
-        //sails.log.debug('fitlerData',filterData);
-        
         var g = sails.config.globals.jbrowse;
         var filterfile = g.jbrowsePath + dataSet +'/'+ g.jblast.blastResultPath+'/'+asset+'_filtersettings.json';
-        
+        var fsettings = {};
         try {
-            var f = JSON.parse(fs.readFileSync(filterfile));
+            fsettings = JSON.parse(fs.readFileSync(filterfile));
             
         }catch (err) {
-            sails.log.error('failed to read',filterfile);
+            sails.log.error('getFilterSettings failed to read',filterfile);
             return err;
         }
+
+        cb(fsettings);
+    },
+    /**
+     * write new data to filter settings file, given requestData
+     * @param {type} requestData - eg. { asset: 'jblast_sample', dataset: 'sample_data/json/volvox', filterParams: filterData }
+     * @param {type} cb - updated filterData function(filterData)
+            eg. filterData: { 
+                score: {type: 'abs', min: 58, max: 593, val: 421 },
+                evalue: { type: 'exp', min: 5.96151e-165, max: 0.000291283, val: 0.000291283 },
+                identity: { type: 'pct', min: 78, max: 100, val: 78 },
+                gaps: { type: 'pct', min: 0, max: 13, val: 13 } 
+            }
+     */
+    writeFilterSettings(requestData,cb) {
+        sails.log.debug('writeFilterSettings()');
         
-        var merged = f;
-        
-        // special case if no filter data, then don't merge
-        if (typeof filterData !== 'undefined')
-            merged = merge(f,filterData);
-        
-        convert2Num(merged);
-        
-        //sails.log.debug("merged",JSON.stringify(merged, null, 4));
-        
-        try {
-            fs.writeFileSync(filterfile,JSON.stringify(merged));
-        } catch (err) {
-            sails.log.error('failed to write',filterfile);
-            return err;
-        }
-        cb(merged);
-        return 0;
-        
+        this.getFilterSettings(requestData,function(fsettings) {
+            try {
+                var filterData = requestData.filterParams;
+                //sails.log.debug('fitlerData',filterData);
+                var asset = requestData.asset;
+                var dataSet = requestData.dataset;
+                var g = sails.config.globals.jbrowse;
+                var filterfile = g.jbrowsePath + dataSet +'/'+ g.jblast.blastResultPath+'/'+asset+'_filtersettings.json';
+                
+                fs.writeFileSync(filterfile,JSON.stringify(fsettings));
+            } catch (err) {
+                sails.log.error('writeFilterSettings failed to write',filterfile,err);
+                return cb();
+            }
+            var merged = fsettings;
+
+            // special case if no filter data, then don't merge
+            if (typeof filterData !== 'undefined')
+                merged = merge(fsettings,filterData);
+
+            convert2Num(merged);
+            cb(merged);
+
+        });
     },
     /**
      * Based on the filterData, generate a new gff3 file.
-     * If filterData == 0, then nothing will be filtered
-     * @param {type} filterData 
-     * @param {type} requestData
-     *    {
-     *      "asset": <the asset id>
-     *      "dataSet": "sample_data/json/volvox"
+     * Also announces the track to subscribed clients.
+     * @param {type} filterData - the output of writeFilterSettings or getFilterSettings.
+     * @param {type} requestData - eg. { asset: 'jblast_sample', dataset: 'sample_data/json/volvox' }
      * @returns {undefined}
      * 
      * callback:
@@ -141,6 +160,47 @@ module.exports = {
      */
     applyFilter: function(filterData,requestData,cb) {
         sails.log.debug('applyFilter()',requestData);
+        var thisb = this;
+        
+        this.getHitDataFiltered(filterData,requestData,function(filterSummary,filteredGffStr) {
+
+            var g = sails.config.globals.jbrowse;
+            var asset = requestData.asset;
+            var dataSet = Dataset.Resolve(requestData.dataset);
+            var blastGffFile = g.jbrowsePath + dataSet.path + '/' + g.jblast.blastResultPath+'/'+asset+'.gff3';
+            
+            // write filtered gff
+            var error = false;
+            try {
+                fs.writeFileSync(blastGffFile,filteredGffStr);
+            } catch (err) {
+                sails.log.error('applyFilter failed to write',blastGffFile);
+                error = true;
+            }
+            if (error) {
+                return cb({result:'fail', error: 'applyFilter failed to write '+blastGffFile});    
+            }
+            sails.log("file written",blastGffFile);
+            
+            thisb._announceTrack(dataSet.id,asset);
+            
+            cb(filterSummary);
+        });
+    },
+    /*
+     * Reads the filterSettings of the given asset and generates a filtered GFF string.
+     * Although, it does not write the GFF file.  (it's just a legacy artifact)
+     * applyFitler() writes the GFF file.
+     * 
+     * Todo: for larger hit results, it may not be practical to keep the results in a memory buffer (gff string).
+     * 
+     * @param {object} filterData - the output of writeFilterSettings or getFilterSettings.
+     * @param {type} requestData - eg. { asset: 'jblast_sample', dataset: 'sample_data/json/volvox' }
+     * @param {function} cb - function(filterSummary, gff string)
+     *     filterSummary (eg. { result: 'success', hits: 792, filteredHits: 24 }
+     */
+    getHitDataFiltered(filterData,requestData,cb) {
+        sails.log.debug('passiveApplyFilter()',requestData);
         var thisb = this;
         var g = sails.config.globals.jbrowse;
         var asset = requestData.asset;
@@ -212,31 +272,14 @@ module.exports = {
             }
         }
         
-        // only write and notify if this is a /setfilter call (with filterParams)
-        //if (typeof requestData.filterParams !== 'undefined') {
-            
-            // write new 
-            try {
-                fs.writeFileSync(blastGffFile,str);
-            } catch (err) {
-                sails.log.error('failed to write',blastGffFile);
-                cb({result:'fail', error: 'failed to write '+blastGffFile});
-                return;
-            }
-            sails.log("file written",blastGffFile);
-            
-        if (typeof requestData.filterParams !== 'undefined') {
-            // track change notification
-            //sails.hooks['jbcore'].sendEvent("track-update",requestData.asset);
-            thisb._announceTrack(dataSet.id,asset);
-        }
-        var retdata = {
+        var filteredGff = str;
+        
+        var filterSummary = {
             result:'success',
             hits: hitCount,
             filteredHits: filteredHits
         };
-        sails.log.debug(retdata);
-        cb(retdata);
+        cb(filterSummary,filteredGff);
     },
     /*
      * Announce change in track

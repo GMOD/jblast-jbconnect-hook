@@ -27,7 +27,20 @@ module.exports = {
      * @returns {undefined}
      */
     set_filter: function(req, res) {
-        rest_applyFilter(req,res);
+        var g = sails.config.globals;
+        var requestData = req.allParams();
+
+        var err = filter.writeFilterSettings(requestData,function(filterData) {
+            console.log(">>> filterData",filterData);
+            filter.applyFilter(filterData,requestData,function(filterSummary) {
+
+                console.log(">>> data",filterSummary);
+                return res.send(filterSummary);
+            });
+        });
+        if (err) {
+            return res.send({status:'error',err:err});
+        }
     },
     /**
      * REST Request:
@@ -39,7 +52,20 @@ module.exports = {
      * 
      */
     get_blastdata: function(req, res) {
-        rest_applyFilter(req,res);
+        var g = sails.config.globals;
+        var requestData = req.allParams();
+
+        var err = filter.getFilterSettings(requestData,function(filterData) {
+            console.log(">>> filterData",filterData);
+            filter.getHitDataFiltered(filterData,requestData,function(filterSummary) {
+
+                console.log(">>> data",filterSummary)
+                return res.send(filterSummary);
+            });
+        });
+        if (err) {
+            return res.send({status:'error',err:err});
+        }
     },
     /**
      * REST Request:
@@ -73,37 +99,4 @@ module.exports = {
         return res.send(content);
     }
 };
-/*
- * Process REST /jbapi/gethitdetails
- */
 
-function rest_getHitDetails(req,res,cb) {
-    
-    var params = req.allParams();
-    
-    var asset = params.asset;
-    var hitkey = params.hitkey;
-    var dataset = params.dataset;
-    
-    filter.getHitDetails(hitkey, dataset, asset, function(hitData) {
-       cb(hitData); 
-    });
-};
-
-/*
- * 
- */
-function rest_applyFilter(req,res) {
-    var g = sails.config.globals;
-    var requestData = req.allParams();
-
-    var err = filter.writeFilterSettings(requestData,function(filterData) {
-        filter.applyFilter(filterData,requestData,function(data) {
-    
-            return res.send(data);
-        });
-    });
-    if (err) {
-        return res.send({status:'error',err:err});
-    }
-};
