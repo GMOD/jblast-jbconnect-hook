@@ -1,11 +1,11 @@
 {
   "name": "jbh-jblast",
-  "version": "0.0.624",
+  "version": "0.0.634",
   "description": "JBlast - Integrated JBrowse BLAST with Galaxy (JBrowse Server Hook)",
   "main": "api/hooks/jblast/index.js",
   "scripts": {
     "prepublish": "grunt bump-publish --force",
-    "test": "node ./node_modules/mocha/bin/mocha test/**/*.test.js --nightwatch-test phantomjs",
+    "test": "node ./node_modules/mocha/bin/mocha test/bootstrap.test.js test/**/*.test.js --nightwatch-test phantomjs",
     "xxtest": "nyc node ./node_modules/mocha/bin/mocha test/**/*.test.js --nightwatch-test phantomjs",
     "postinstall": "node bin/postinstall.js",
     "gendocs": "node docs/gendocs_run.js"
@@ -58,7 +58,7 @@
     "grunt": "^1.0.1",
     "grunt-version-bump": "^1.0.8",
     "jbrowse": "github:gmod/jbrowse",
-    "jbserver": "github:enuggetry/jbserver",
+    "jbserver": "github:gmod/jbserver",
     "jsdoc": "^3.5.5",
     "jsdoc-sphinx": "0.0.6",
     "minimist": "^1.2.0",
