@@ -19,7 +19,7 @@ before_script:
   - cd ..
 script:
   - npm test
-  - wget http://localhost:5001/jbrowse/index.html
+  - wget http://localhost:5001/jbrowse
   - kill -9 `cat jbserver/save_pid.txt`
 after_failure:
   - cat jbserver/jbserver.log
