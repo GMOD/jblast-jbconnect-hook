@@ -57,7 +57,9 @@ return declare( JBrowsePlugin,
         /*
          * class override function intercepts
          */
-        browser.afterMilestone( 'loadConfig', function() {
+        browser.afterMilestone( 'initView', function() {
+            if (!thisB.browser.loginState) return;
+
             if (typeof browser.config.classInterceptList === 'undefined') {
                 browser.config.classInterceptList = {};
             }
@@ -102,18 +104,15 @@ return declare( JBrowsePlugin,
             browser.jblastDialog = thisB.Browser_jblastDialog;
             
             
-        }); 
-        browser.afterMilestone( 'initView', function() {
-
             // setup right click menu for highlight region - for arbitrary region selection
             thisB.jblastRightClickMenuInit();
             
             // start filter panel hide/show queue, filter panel management
             thisB.startFocusQueue();
 
-        });
-        // create the blast button on the toolbar
-        this.browser.afterMilestone( 'initView', function() {
+            /*
+             * create the blast button on the toolbar
+             */ 
 
             var navBox = dojo.byId("navbox");
 
@@ -131,48 +130,47 @@ return declare( JBrowsePlugin,
                     dojo.stopEvent(event);
                 })
             }, dojo.create('button',{},navBox));   //thisB.browser.navBox));
-        });
         
-        // save the reference to the blast plugin in browser
-        browser.jblastPlugin = this;
-        
-        /*
-         * JBrowse event handlers
-         */
-        dojo.subscribe("/jbrowse/v1/n/tracks/focus", function(track){
-            console.log("jblast plugin event: /jbrowse/v1/n/tracks/focus",track);
-            if (typeof track.config.jblast !== 'undefined') {
-                // for jblast tracks, the label is the asset and also the reference to the filterSettings of the asset
-                thisB.browser.jblast.asset = track.config.label;
-                thisB.insertBlastPanel(track.config);
-            }
-        });        
-        dojo.subscribe("/jbrowse/v1/n/tracks/unfocus", function(track){
-            console.log("jblast plugin event: /jbrowse/v1/n/tracks/unfocus",track);
-            if (typeof track.config.jblast !== 'undefined') {
-                thisB.removeBlastPanel(track.config);
-                thisB.browser.jblast.asset = null;
-            }
-        });        
-        dojo.subscribe("/jbrowse/v1/v/tracks/show", function(trackConfigs){
-            console.log("jblast plugin event: /jbrowse/v1/v/tracks/show",trackConfigs);
-            if (typeof trackConfigs[0].jblast !== 'undefined') {
-                if (browser.jblast.panelDelayTimer === null){
-                    browser.jblast.panelDelayTimer = setTimeout(function(){
-                        console.log("timeout");
-                        var track = thisB.findTrack(trackConfigs[0].label);
-                        browser.view.setTrackFocus(track,1);
-                        browser.jblast.panelDelayTimer = null;
-                    },100);     // normally 1000
+            // save the reference to the blast plugin in browser
+            browser.jblastPlugin = this;
+
+            /*
+             * JBrowse event handlers
+             */
+            dojo.subscribe("/jbrowse/v1/n/tracks/focus", function(track){
+                console.log("jblast plugin event: /jbrowse/v1/n/tracks/focus",track);
+                if (typeof track.config.jblast !== 'undefined') {
+                    // for jblast tracks, the label is the asset and also the reference to the filterSettings of the asset
+                    thisB.browser.jblast.asset = track.config.label;
+                    thisB.insertBlastPanel(track.config);
                 }
-            }
-        });        
-        dojo.subscribe("/jbrowse/v1/v/tracks/hide", function(trackConfigs){
-            console.log("jblast plugin event: /jbrowse/v1/v/tracks/hide",trackConfigs);
-            if (typeof trackConfigs[0].jblast !== 'undefined')
-                thisB.removeBlastPanel(trackConfigs[0]);
-        });        
-        
+            });        
+            dojo.subscribe("/jbrowse/v1/n/tracks/unfocus", function(track){
+                console.log("jblast plugin event: /jbrowse/v1/n/tracks/unfocus",track);
+                if (typeof track.config.jblast !== 'undefined') {
+                    thisB.removeBlastPanel(track.config);
+                    thisB.browser.jblast.asset = null;
+                }
+            });        
+            dojo.subscribe("/jbrowse/v1/v/tracks/show", function(trackConfigs){
+                console.log("jblast plugin event: /jbrowse/v1/v/tracks/show",trackConfigs);
+                if (typeof trackConfigs[0].jblast !== 'undefined') {
+                    if (browser.jblast.panelDelayTimer === null){
+                        browser.jblast.panelDelayTimer = setTimeout(function(){
+                            console.log("timeout");
+                            var track = thisB.findTrack(trackConfigs[0].label);
+                            browser.view.setTrackFocus(track,1);
+                            browser.jblast.panelDelayTimer = null;
+                        },100);     // normally 1000
+                    }
+                }
+            });        
+            dojo.subscribe("/jbrowse/v1/v/tracks/hide", function(trackConfigs){
+                console.log("jblast plugin event: /jbrowse/v1/v/tracks/hide",trackConfigs);
+                if (typeof trackConfigs[0].jblast !== 'undefined')
+                    thisB.removeBlastPanel(trackConfigs[0]);
+            });        
+        });
     },
     // look in the browser's track configuration for the track with the given label
     findTrackConfig: function( trackLabel ) {
