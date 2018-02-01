@@ -17,11 +17,11 @@ before_script:
   - nohup sails lift --port 5001 > jbserver.log 2>&1 &
   - echo $! > save_pid.txt #save last process pid
   - cd ..
+  - sleep 20
 script:
   - npm test
-  - sleep 20
   - wget http://localhost:5001/jbrowse
   - kill -9 `cat jbserver/save_pid.txt`
-after_failure:
   - cat jbserver/jbserver.log
+after_failure:
   
