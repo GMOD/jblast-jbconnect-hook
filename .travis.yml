@@ -10,8 +10,8 @@ before_script:
   - git clone http://github.com/gmod/jbserver
   - cd jbserver
   - npm install
-  - ./jbutil --setupdata
   - npm install gmod/jblast
+  - ./jbutil --setupdata
   - ./bin/blast_getBlast.js
   - ./bin/blast_downloadDb.js htgs.05
   - nohup sails lift --port 5001 > jbserver.log 2>&1 &
