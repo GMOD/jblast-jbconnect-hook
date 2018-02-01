@@ -14,9 +14,11 @@ before_script:
   - ./bin/blast_getBlast.js
   - ./bin/blast_downloadDb.js htgs.05
   - nohup sails lift > jbserver.log 2>&1 &
+  - echo $! > save_pid.txt #save last process pid
   - cd ..
 script:
   - npm test
+  - kill -9 `cat jbserver/save_pid.txt`
 after_failure:
   - cat jbserver/jbserver.log
   
