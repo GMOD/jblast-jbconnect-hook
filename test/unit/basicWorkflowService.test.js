@@ -37,7 +37,7 @@ describe('basicWorkflowService', function() {
             assert.shallowDeepEqual(g.jblast.blastProfiles[g.jblast.defaultBlastProfile],kJob.data.blastOptions);
             done();
         });
-        it('determineBlastProfile - no blastProfile = htgs', (done) => {
+        it('determineBlastProfile - blastProfile = htgs', (done) => {
             // dummy data
             let kJob = {
                 data: { blastProfile: 'htgs' },
@@ -50,7 +50,7 @@ describe('basicWorkflowService', function() {
             assert.shallowDeepEqual(g.jblast.blastProfiles['htgs'],kJob.data.blastOptions);
             done();
         });
-        it('determineBlastProfile - no blastProfile = user supplied profile', (done) => {
+        it('determineBlastProfile - blastProfile = user supplied profile', (done) => {
             // dummy data
             let kJob = {
                 data: { 
