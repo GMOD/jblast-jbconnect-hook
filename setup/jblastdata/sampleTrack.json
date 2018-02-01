@@ -1,5 +1,6 @@
 {
   "jblast":true,
+  "maxFeatureScreenDensity": 16,
   "maxHeight": 1200,
   "storeClass": "JBrowse/Store/SeqFeature/GFF3",
   "blastData": "[[blastResultPath]]/sampleResult.json",
