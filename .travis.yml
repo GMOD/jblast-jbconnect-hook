@@ -10,6 +10,7 @@ before_script:
   - git clone http://github.com/gmod/jbserver
   - cd jbserver
   - npm install
+  - ./jbutil --setupdata
   - npm install gmod/jblast
   - ./bin/blast_getBlast.js
   - ./bin/blast_downloadDb.js htgs.05
