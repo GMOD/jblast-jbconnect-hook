@@ -13,8 +13,10 @@ before_script:
   - npm install gmod/jblast
   - ./bin/blast_getBlast.js
   - ./bin/blast_downloadDb.js htgs.05
-  - nohup sails lift > /dev/null 2>&1 &
+  - nohup sails lift > jbserver.log 2>&1 &
   - cd ..
 script:
   - npm test
 after_failure:
+  - cat jbserver/jbserver.log
+  
