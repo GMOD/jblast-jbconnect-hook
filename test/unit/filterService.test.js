@@ -29,7 +29,8 @@ describe('filterService', function() {
         
         it('getFilterSettings() should return content of jblast_sample_filtersettings.json', (done) => {
             
-            sails.config.globals.jbrowse.jbrowsePath = appPath+'/node_modules/jbrowse';
+            if (typeof sails.config.globals.jbrowse.jbrowsePath === 'undefined')
+                sails.config.globals.jbrowse.jbrowsePath = appPath+'/node_modules/jbrowse/';
 
             filter.getFilterSettings({asset: 'jblast_sample', dataset: 'sample_data/json/volvox'},function(data) {
                 
@@ -41,7 +42,8 @@ describe('filterService', function() {
         });
         it('getHitDataFiltered() test', (done) => {
             
-            sails.config.globals.jbrowse.jbrowsePath = appPath+'/node_modules/jbrowse';
+            if (typeof sails.config.globals.jbrowse.jbrowsePath === 'undefined')
+                sails.config.globals.jbrowse.jbrowsePath = appPath+'/node_modules/jbrowse/';
 
             let req = {asset: 'jblast_sample', dataset: 'sample_data/json/volvox'};
             filter.getFilterSettings(req,function(filterData) {
@@ -55,7 +57,8 @@ describe('filterService', function() {
         });
         it('writeFilterSettings() & applyFilter() test', (done) => {
             
-            sails.config.globals.jbrowse.jbrowsePath = appPath+'/node_modules/jbrowse';
+            if (typeof sails.config.globals.jbrowse.jbrowsePath === 'undefined')
+                sails.config.globals.jbrowse.jbrowsePath = appPath+'/node_modules/jbrowse/';
 
             let req = {
                 asset: 'jblast_sample', 
