@@ -1,12 +1,19 @@
 sudo: false
 language: node-js
 before_install:
+services:
+  - redis-server
 install:
   - npm install
 before_script:
   - ./bin/blast_getBlast.js
   - ./bin/blast_downloadDb.js htgs.05
   - ./jb_setup.js
+  - git clone http://github.com/gmod/jbserver
+  - cd jbserver
+  - npm install
+  - npm install gmod/jblast
+  - nohup sails lift
 script:
   - npm test
 after_failure:
