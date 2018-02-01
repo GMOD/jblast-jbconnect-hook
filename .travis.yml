@@ -5,14 +5,17 @@ services:
   - redis-server
 install:
   - npm install
+  - npm install -g sails
 before_script:
-  - ./bin/blast_getBlast.js
-  - ./bin/blast_downloadDb.js htgs.05
-  - ./jb_setup.js
+#  - ./bin/blast_getBlast.js
+#  - ./bin/blast_downloadDb.js htgs.05
+#  - ./jb_setup.js
   - git clone http://github.com/gmod/jbserver
   - cd jbserver
   - npm install
   - npm install gmod/jblast
+  - ./bin/blast_getBlast.js
+  - ./bin/blast_downloadDb.js htgs.05
   - nohup sails lift
 script:
   - npm test
