@@ -21,6 +21,9 @@ before_script:
 script:
   - npm test
   - wget http://localhost:5001/jbrowse
+  - wget http://localhost:5001/login
+  - wget http://localhost:5001/register
+  - wget http://localhost:5001/loginstate
   - kill -9 `cat jbserver/save_pid.txt`
   - cat jbserver/jbserver.log
 after_failure:
