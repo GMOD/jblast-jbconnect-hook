@@ -19,7 +19,7 @@ if (typeof sails === 'undefined') {
 
 describe('basicWorkflowService', function() {
 
-    describe("# determineBlastProfile() function", () => {
+    describe("determineBlastProfile() function", () => {
         let basicWorkflowService = require('../../api/services/basicWorkflowService');
         let g = sails.config.globals.jbrowse;
         //console.log("config",sails.config);

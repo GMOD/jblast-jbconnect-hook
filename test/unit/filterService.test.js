@@ -25,7 +25,7 @@ describe('filterService', function() {
     shelljs.cp('./setup/jblastdata/jblast_sample*.*',targetDir);
 
 
-    describe("# get() function", () => {
+    //describe("# get() function", () => {
         
         it('getFilterSettings() should return content of jblast_sample_filtersettings.json', (done) => {
             
@@ -88,6 +88,6 @@ describe('filterService', function() {
                 
             });
         });
-    });
+    //});
 
 });
