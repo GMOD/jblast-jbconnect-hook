@@ -13,7 +13,7 @@ before_script:
   - npm install gmod/jblast
   - ./bin/blast_getBlast.js
   - ./bin/blast_downloadDb.js htgs.05
-  - nohup sails console --port 5001 > jbserver.log 2>&1 &
+  - nohup sails lift --port 5001 > jbserver.log 2>&1 &
   - echo $! > save_pid.txt #save last process pid
   - cd ..
 script:
