@@ -7,62 +7,6 @@ API
 
    <hr style="border-color: black; border-width: 2px;">
 
-Module: ``services/accessionEntrez``
-************************************
-
-
-.. contents:: Local Navigation
-   :local:
-
-   
-Description
-===========
-
-This module enables accession value lookup utilizeing Entrez API.
-
-Ref: https://www.ncbi.nlm.nih.gov/books/NBK25499/
-
-
-.. _module-services_accessionEntrez.init:
-
-
-Function: ``init``
-==================
-
-Initialize the module
-
-.. js:function:: init(req, res, cb)
-
-    
-    :param object req: Initialize the module
-    :param object res: Initialize the module
-    :param function cb: callback function
-    
-.. _module-services_accessionEntrez.lookup:
-
-
-Function: ``lookup``
-====================
-
-This does an esummary lookup (using Entrez api), adding the link field into the result.
-
-.. js:function:: lookup(req, res, cb)
-
-    
-    :param object req: This does an esummary lookup (using Entrez api), adding the link field into the result.
-    :param object res: This does an esummary lookup (using Entrez api), adding the link field into the result.
-    :param function cb: callback function
-    
-
-
-
-
-
-
-.. raw:: html
-
-   <hr style="border-color: black; border-width: 2px;">
-
 Module: ``services/blastxml2json``
 **********************************
 
@@ -111,6 +55,61 @@ Member: ``err``:
 
    <hr style="border-color: black; border-width: 2px;">
 
+Module: ``services/entrezService``
+**********************************
+
+
+.. contents:: Local Navigation
+   :local:
+
+   
+Description
+===========
+
+This module enables accession value lookup utilizeing Entrez API.
+
+Ref: https://www.ncbi.nlm.nih.gov/books/NBK25499/
+
+
+.. _module-services_entrezService.init:
+
+
+Function: ``init``
+==================
+
+Initialize the module
+
+.. js:function:: init(req, res, cb)
+
+    
+    :param object req: Initialize the module
+    :param object res: Initialize the module
+    :param function cb: callback function
+    
+.. _module-services_entrezService.lookup_accession:
+
+
+Function: ``lookup_accession``
+==============================
+
+This does an esummary lookup (using Entrez api), adding the link field into the result.
+
+.. js:function:: lookup_accession(req, res)
+
+    
+    :param object req: This does an esummary lookup (using Entrez api), adding the link field into the result.
+    :param object res: This does an esummary lookup (using Entrez api), adding the link field into the result.
+    
+
+
+
+
+
+
+.. raw:: html
+
+   <hr style="border-color: black; border-width: 2px;">
+
 Module: ``services/filter``
 ***************************
 
@@ -133,13 +132,33 @@ Function: ``filterInit``
 
 create initial filter settings file
 
-.. js:function:: filterInit(kWorkflowJob, newTrackJson)
+.. js:function:: filterInit(kJob, newTrackJson)
 
     
-    :param type kWorkflowJob: create initial filter settings file
+    :param type kJob: create initial filter settings file
     :param type newTrackJson: newTrackJson[0].filterSettings must be defined
          newTrackJson[0].label must be defined
     :return undefined|module.exports.filterInit.filter: create initial filter settings file
+    
+.. _module-services_filter.getFilterSettings:
+
+
+Function: ``getFilterSettings``
+===============================
+
+get filterData
+
+.. js:function:: getFilterSettings(requestData, cb)
+
+    
+    :param object requestData: eg. { asset: 'jblast_sample', dataset: 'sample_data/json/volvox' }
+    :param object cb: function(filterData)
+                eg. filterData: { 
+                    score: {type: 'abs', min: 58, max: 593, val: 421 },
+                    evalue: { type: 'exp', min: 5.96151e-165, max: 0.000291283, val: 0.000291283 },
+                    identity: { type: 'pct', min: 78, max: 100, val: 78 },
+                    gaps: { type: 'pct', min: 0, max: 13, val: 13 } 
+                }
     
 .. _module-services_filter.writeFilterSettings:
 
@@ -152,9 +171,14 @@ write new data to filter settings file, given requestData
 .. js:function:: writeFilterSettings(requestData, cb)
 
     
-    :param type requestData: write new data to filter settings file, given requestData
-    :param type cb: cb(filterData)
-    :return err|Number: write new data to filter settings file, given requestData
+    :param type requestData: eg. { asset: 'jblast_sample', dataset: 'sample_data/json/volvox', filterParams: filterData }
+    :param type cb: updated filterData function(filterData)
+                eg. filterData: { 
+                    score: {type: 'abs', min: 58, max: 593, val: 421 },
+                    evalue: { type: 'exp', min: 5.96151e-165, max: 0.000291283, val: 0.000291283 },
+                    identity: { type: 'pct', min: 78, max: 100, val: 78 },
+                    gaps: { type: 'pct', min: 0, max: 13, val: 13 } 
+                }
     
 .. _module-services_filter.applyFilter:
 
@@ -163,21 +187,42 @@ Function: ``applyFilter``
 =========================
 
 Based on the filterData, generate a new gff3 file.
-If filterData == 0, then nothing will be filtered
+Also announces the track to subscribed clients.
 
 .. js:function:: applyFilter(filterData, requestData)
 
     
-    :param type filterData: Based on the filterData, generate a new gff3 file.
-    If filterData == 0, then nothing will be filtered
-    :param type requestData: {
-         "asset": <the asset id>
-         "dataSet": "sample_data/json/volvox"
+    :param type filterData: the output of writeFilterSettings or getFilterSettings.
+    :param type requestData: eg. { asset: 'jblast_sample', dataset: 'sample_data/json/volvox' }
     :return undefined: callback:
      cb({
          totalFeatures: x,               // total number of features
          filteredFeatures: x             // filtered features.
      })
+    
+.. _module-services_filter.getHitDataFiltered:
+
+
+Function: ``getHitDataFiltered``
+================================
+
+
+
+.. js:function:: getHitDataFiltered()
+
+    
+    
+.. _module-services_filter._announceTrack:
+
+
+Function: ``_announceTrack``
+============================
+
+
+
+.. js:function:: _announceTrack()
+
+    
     
 .. _module-services_filter.getHitDetails:
 
@@ -467,6 +512,201 @@ submit workflow.
     :param type params: submit workflow.
     :param type cb: submit workflow.
     
+.. _module-services_galaxyUtils.beginProcessing:
+
+
+Function: ``beginProcessing``
+=============================
+
+
+
+.. js:function:: beginProcessing()
+
+    
+    
+.. _module-services_galaxyUtils.beginProcessing2:
+
+
+Function: ``beginProcessing2``
+==============================
+
+
+
+.. js:function:: beginProcessing2()
+
+    
+    
+.. _module-services_galaxyUtils.monitorWorkflow:
+
+
+Function: ``monitorWorkflow``
+=============================
+
+Monitor workflow and exit upon completion of the workflow
+
+.. js:function:: monitorWorkflow(kJob)
+
+    
+    :param object kJob: Monitor workflow and exit upon completion of the workflow
+    
+
+
+
+
+
+
+.. raw:: html
+
+   <hr style="border-color: black; border-width: 2px;">
+
+Module: ``services/jblastPostAction``
+*************************************
+
+
+.. contents:: Local Navigation
+   :local:
+
+   
+Description
+===========
+
+This module implements the actions that occur after a galaxy workflow completes.
+
+
+.. _module-services_jblastPostAction.doCompleteAction:
+
+
+Function: ``doCompleteAction``
+==============================
+
+
+
+.. js:function:: doCompleteAction()
+
+    
+    
+.. _module-services_jblastPostAction.postMoveResultFiles:
+
+
+Function: ``postMoveResultFiles``
+=================================
+
+
+
+.. js:function:: postMoveResultFiles()
+
+    
+    
+.. _module-services_jblastPostAction.getHits:
+
+
+Function: ``getHits``
+=====================
+
+
+
+.. js:function:: getHits()
+
+    
+    
+.. _module-services_jblastPostAction.processFilter:
+
+
+Function: ``processFilter``
+===========================
+
+
+
+.. js:function:: processFilter()
+
+    
+    
+.. _module-services_jblastPostAction.doCompleteAction:
+
+
+Function: ``doCompleteAction``
+==============================
+
+Read output of last generated file, copy results to /jblastdata, insert track to trackList.json.
+
+.. js:function:: doCompleteAction(kJob, hista)
+
+    
+    :param object kJob: Read output of last generated file, copy results to /jblastdata, insert track to trackList.json.
+    :param object hista: associative array of histories
+    
+.. _module-services_jblastPostAction.processResults:
+
+
+Function: ``processResults``
+============================
+
+
+
+.. js:function:: processResults()
+
+    
+    
+.. _module-services_jblastPostAction.processResultStep:
+
+
+Function: ``processResultStep``
+===============================
+
+processResultStep
+
+.. js:function:: processResultStep(stepctx, kJob, trackJson, cb)
+
+    
+    :param object stepctx: processResultStep
+    :param object kJob: processResultStep
+    :param JSON trackJson: processResultStep
+    :param function cb: callback function
+    
+.. _module-services_jblastPostAction.postMoveResultFiles:
+
+
+Function: ``postMoveResultFiles``
+=================================
+
+this generates track template
+
+.. js:function:: postMoveResultFiles(kJob, cb)
+
+    
+    :param type kJob: this generates track template
+    :param type cb: this generates track template
+    
+.. _module-services_jblastPostAction.processFilter:
+
+
+Function: ``processFilter``
+===========================
+
+Generate the GFF file
+
+.. js:function:: processFilter(kJob, newTrackJson, cb)
+
+    
+    :param type kJob: Generate the GFF file
+    :param type newTrackJson: Generate the GFF file
+    :param type cb: Generate the GFF file
+    
+.. _module-services_jblastPostAction.getHits:
+
+
+Function: ``getHits``
+=====================
+
+return number of hits
+
+.. js:function:: getHits(kJob, newTrackJson)
+
+    
+    :param object kJob: return number of hits
+    :param JSON newTrackJson: return number of hits
+    :return Number: hits
+    
 
 
 
@@ -551,70 +791,6 @@ REST: ``GET /jbapi/getworkflows``
     
     REST: ``GET /jbapi/getworkflows``
     
-.. _module-services_jblastProc.setFilter:
-
-
-Function: ``setFilter``
-=======================
-
-post /jbapi/setfilter - send filter parameters
-
-.. js:function:: setFilter(req, res, next)
-
-    
-    :param type req: * data = req.body
-       * data.filterParams = {score:{val: 50}, evalue:{val:-2}...
-       * data.dataSet = (i.e. "sample_data/json/volvox" generally from config.dataRoot)
-       * data.asset =
-    :param type res: post /jbapi/setfilter - send filter parameters
-    :param type next: post /jbapi/setfilter - send filter parameters
-    
-.. _module-services_jblastProc.getBlastData:
-
-
-Function: ``getBlastData``
-==========================
-
-Get info about the given track
-
-REST: ``GET /jbapi/getblastdata``
-
-.. js:function:: getBlastData(req, res, next)
-
-    
-    :param type req: Get info about the given track
-    
-    REST: ``GET /jbapi/getblastdata``
-    :param type res: Get info about the given track
-    
-    REST: ``GET /jbapi/getblastdata``
-    :param type next: Get info about the given track
-    
-    REST: ``GET /jbapi/getblastdata``
-    
-.. _module-services_jblastProc.getTrackData:
-
-
-Function: ``getTrackData``
-==========================
-
-Get Track Data
-
-REST: ``GET /jbapi/gettrackdata``
-
-.. js:function:: getTrackData(req, res, next)
-
-    
-    :param type req: Get Track Data
-    
-    REST: ``GET /jbapi/gettrackdata``
-    :param type res: Get Track Data
-    
-    REST: ``GET /jbapi/gettrackdata``
-    :param type next: Get Track Data
-    
-    REST: ``GET /jbapi/gettrackdata``
-    
 .. _module-services_jblastProc.getHitDetails:
 
 
@@ -677,18 +853,6 @@ Function: ``rest_getHitDetails``
 
     
     
-.. _module-services_jblastProc.rest_applyFilter:
-
-
-Function: ``rest_applyFilter``
-==============================
-
-
-
-.. js:function:: rest_applyFilter()
-
-    
-    
 
 
 
@@ -724,155 +888,6 @@ Function: ``process``
 .. js:function:: process()
 
     
-    
-
-
-
-
-
-
-.. raw:: html
-
-   <hr style="border-color: black; border-width: 2px;">
-
-Module: ``services/postAction``
-*******************************
-
-
-.. contents:: Local Navigation
-   :local:
-
-   
-Description
-===========
-
-This module implements the actions that occur after a galaxy workflow completes.
-
-
-.. _module-services_postAction.doCompleteAction:
-
-
-Function: ``doCompleteAction``
-==============================
-
-
-
-.. js:function:: doCompleteAction()
-
-    
-    
-.. _module-services_postAction.monitorWorkflow:
-
-
-Function: ``monitorWorkflow``
-=============================
-
-Monitor workflow and exit upon completion of the workflow
-
-.. js:function:: monitorWorkflow(kWorkflowJob)
-
-    
-    :param object kWorkflowJob: Monitor workflow and exit upon completion of the workflow
-    
-.. _module-services_postAction.doCompleteAction:
-
-
-Function: ``doCompleteAction``
-==============================
-
-Read output of last generated file, copy results to /jblastdata, insert track to trackList.json.
-
-.. js:function:: doCompleteAction(kWorkflowJob, hista)
-
-    
-    :param object kWorkflowJob: Read output of last generated file, copy results to /jblastdata, insert track to trackList.json.
-    :param object hista: associative array of histories
-    
-.. _module-services_postAction.processResults:
-
-
-Function: ``processResults``
-============================
-
-
-
-.. js:function:: processResults()
-
-    
-    
-.. _module-services_postAction.processResultStep:
-
-
-Function: ``processResultStep``
-===============================
-
-processResultStep
-
-.. js:function:: processResultStep(stepctx, kJob, trackJson, cb)
-
-    
-    :param object stepctx: processResultStep
-    :param object kJob: processResultStep
-    :param JSON trackJson: processResultStep
-    :param function cb: callback function
-    
-.. _module-services_postAction.postMoveResultFiles:
-
-
-Function: ``postMoveResultFiles``
-=================================
-
-this generates track template
-
-.. js:function:: postMoveResultFiles(kWorkflowJob, cb)
-
-    
-    :param type kWorkflowJob: this generates track template
-    :param type cb: this generates track template
-    
-.. _module-services_postAction.processFilter:
-
-
-Function: ``processFilter``
-===========================
-
-Generate the GFF file
-
-.. js:function:: processFilter(kWorkflowJob, newTrackJson, cb)
-
-    
-    :param type kWorkflowJob: Generate the GFF file
-    :param type newTrackJson: Generate the GFF file
-    :param type cb: Generate the GFF file
-    
-.. _module-services_postAction.getHits:
-
-
-Function: ``getHits``
-=====================
-
-return number of hits
-
-.. js:function:: getHits(kWorkflowJob, newTrackJson)
-
-    
-    :param object kWorkflowJob: return number of hits
-    :param JSON newTrackJson: return number of hits
-    :return Number: hits
-    
-.. _module-services_postAction.addToTrackList:
-
-
-Function: ``addToTrackList``
-============================
-
-Add track to track list and notify.
-
-.. js:function:: addToTrackList(kWorkflowJob, newTrackJson)
-
-    
-    :param object kWorkflowJob: Add track to track list and notify.
-    :param JSON newTrackJson: Add track to track list and notify.
     
 
 
