@@ -1,4 +1,8 @@
-/* 
+/**
+ * @module
+ * @description
+ * This jservice provides restful APIs for processing filter requests.
+ * 
  */
 var fs = require('fs-extra');
 
@@ -13,18 +17,24 @@ module.exports = {
         return cb();
     },
     /**
+     * Based on new filter settings provided by the caller, updates the associated
+     * filtersettings file and the resulting GFF3 file containing filtered
+     * features.
      * 
      * REST Request:
-     *      POST /service/exec/set_filter
+     *      POST `/service/exec/set_filter`
      *      
      * @param {object} req
+     * 
+     * ::
+     * 
      *    req.body = {
      *      filterParams: {score:{val: 50}, evalue:{val:-2}...
      *      dataSet: (i.e. "sample_data/json/volvox" generally from config.dataRoot)
      *      asset: asset id
-     *    } 
-     * @param {type} res
-     * @returns {undefined}
+     *    }
+     *     
+     * @param {object} res
      */
     set_filter: function(req, res) {
         var g = sails.config.globals;
@@ -43,12 +53,15 @@ module.exports = {
         }
     },
     /**
-     * REST Request:
-     *      GET /service/exec/set_filter
+     * Determine filter details, like number of hit results.
+     * REST
+     *      `GET /service/exec/set_filter`
+     *      data: eg. `{asset: '151_1517462263883', dataset: 'sample_data/json/volvox'}`
      * 
+     * Return data: eg. `{ result: 'success', hits: 792, filteredHits: 501 }`
+     *   
      * @param {object} req
      * @param {object} res
-     * @returns {}
      * 
      */
     get_blastdata: function(req, res) {
@@ -68,6 +81,7 @@ module.exports = {
         }
     },
     /**
+     * Fetch the GFF3 file of the prior filter operation
      * REST Request:
      *      GET /service/exec/set_filter
      * 

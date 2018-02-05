@@ -1,7 +1,7 @@
 /**
  * @module
  * @description
- * Blast feature filter functions.
+ * Supporting methods for the filterService jservice.
  * 
  */
 var request = require('request');

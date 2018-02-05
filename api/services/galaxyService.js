@@ -1,4 +1,10 @@
-/* 
+/**
+ * @module
+ * @description
+ * 
+ * This job service is functionally equivelant to basicWorkflowService, however,
+ * NCBI operations are sent through galaxy workflow for processing. 
+ * 
  */
 
 

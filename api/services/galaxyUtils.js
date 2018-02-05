@@ -1,7 +1,7 @@
 /**
  * @module
  * @desc
- * This module manages the communication with the galaxy API.
+ * This provides functional support to galaxyService
  */
 var request = require('request');
 var Promise = require('bluebird');

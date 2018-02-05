@@ -1,7 +1,12 @@
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * @module
+ * @desc
+ * This is a job services that executes local NCBI blast by either excuting 
+ * NCBI.blast or Sim.blast, defined by the job.
+ * 
+ * This job service is functionally equivelant to galaxyService, which
+ * does blast search through Galaxy API.
+ *  
  */
 
 var path = require('path');

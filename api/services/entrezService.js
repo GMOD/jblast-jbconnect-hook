@@ -1,7 +1,7 @@
 /**
  * @module
  * @description
- * This module enables accession value lookup utilizeing Entrez API.
+ * This job service enables accession value lookup utilizeing Entrez API.
  * 
  * Ref: https://www.ncbi.nlm.nih.gov/books/NBK25499/
  * 
