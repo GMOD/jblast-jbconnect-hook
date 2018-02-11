@@ -3,7 +3,7 @@
  * @description
  * This job service enables accession value lookup utilizeing Entrez API.
  * 
- * Ref: https://www.ncbi.nlm.nih.gov/books/NBK25499/
+ * Ref: `Entrez <https://www.ncbi.nlm.nih.gov/books/NBK25499/>`_
  * 
  */
 var requestp = require('request-promise');
@@ -15,8 +15,8 @@ module.exports = {
     /**
      * Initialize the module
      * 
-     * @param {object} req
-     * @param {object} res
+     * @param {object} req - request
+     * @param {object} res - response
      * @param {function} cb - callback function
      */
     init: function(params,cb) {
@@ -24,8 +24,10 @@ module.exports = {
     },
     /**
      * This does an esummary lookup (using Entrez api), adding the link field into the result.
-     * @param {object} req
-     * @param {object} res
+     * 
+     * @param {object} req - request
+     * @param {object} res - response
+     * 
      */
     lookup_accession: function(req,res) {
         var accession = req.param('accession');

@@ -2,6 +2,8 @@
  * @module
  * @description
  * This module implements the actions that occur after a galaxy workflow completes.
+ * It supports galaxyService job service.
+ * 
  */
 var request = require('request');
 var requestp = require('request-promise');
@@ -33,8 +35,9 @@ module.exports = {
 /**
  * Read output of last generated file, copy results to /jblastdata, insert track to trackList.json.
  * 
- * @param {object} kJob
+ * @param {object} kJob - kue job object
  * @param {object} hista - associative array of histories
+ * 
  */
 function doCompleteAction(kJob,hista) {
     var wId = kJob.data.workflow;
@@ -145,11 +148,11 @@ function doCompleteAction(kJob,hista) {
     }
 }
 /*
- * 
+ * process results
  * 
  * @param {array} steps is list of functions i.e. ['function1','function2']
- * @param {object} kJob
- * @param {JSON object} newTrackJson
+ * @param {object} kJob - kue job object
+ * @param {object} newTrackJson - working new track object
  * @param {function} cb - callback function
  */
 function processResults(steps,kJob,trackJson,cb) {
@@ -162,10 +165,11 @@ function processResults(steps,kJob,trackJson,cb) {
 /**
  * processResultStep
  * 
- * @param {object}      stepctx
- * @param {object}      kJob
- * @param {JSON} trackJson
- * @param {function}    cb - callback function
+ * @param {object} stepctx - galaxy workflow step context
+ * @param {object} kJob - kue job object
+ * @param {JSON} trackJson - working new track object
+ * @param {function} cb - callback function
+ * 
  */
 function processResultStep(stepctx,kJob,trackJson,cb) {
     
@@ -182,8 +186,9 @@ function processResultStep(stepctx,kJob,trackJson,cb) {
 /**
  * this generates track template
  * 
- * @param {type} kJob
- * @param {type} cb
+ * @param {type} kJob - kue job object
+ * @param {type} cb - callback
+ * 
  */
 function postMoveResultFiles(kJob,cb) {
 
@@ -270,9 +275,10 @@ function postMoveResultFiles(kJob,cb) {
 /**
  * Generate the GFF file 
  * 
- * @param {type} kJob
- * @param {type} newTrackJson
- * @param {type} cb
+ * @param {type} kJob = kue job object
+ * @param {type} newTrackJson - working track object
+ * @param {type} cb - callback
+ * 
  */
 function processFilter(kJob,newTrackJson,cb) {
     sails.log("processFilter()");
@@ -302,9 +308,10 @@ function processFilter(kJob,newTrackJson,cb) {
 /**
  * return number of hits
  * 
- * @param {object} kJob
- * @param {JSON} newTrackJson
- * @returns {Number} hits
+ * @param {object} kJob - kue job object
+ * @param {JSON} newTrackJson - working track object
+ * @returns {Number} number of hits
+ * 
  */
 function getHits(kJob,newTrackJson) {
     sails.log.debug('getHits()');

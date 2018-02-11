@@ -6,6 +6,102 @@
  * 
  * This job service is functionally equivelant to galaxyService, which
  * does blast search through Galaxy API.
+ * 
+ * Job submission example:
+ * ::
+ *   var postData = {
+ *         service: "jblast",
+ *         dataset: "sample_data/json/volvox",
+ *         region: ">ctgA ctgA:44705..47713 (- strand) class=remark length=3009\nacatccaatggcgaacataa...gcgagttt",
+ *         workflow: "NCBI.blast.workflow.js"
+ *     };
+ *   $.post( "/job/submit", postData , function( result ) {
+ *       console.log( result );
+ *   }, "json");
+ *
+ * Configuration:
+ * ::
+ *        jblast: {
+ *           // The subdir where blast results will be deposited (i.e. ``sample_data/json/volvox/jblastdata``)
+ *           blastResultPath: "jblastdata",
+ *           
+ *           // The category for successful blast results in the track selector
+ *           blastResultCategory: "JBlast Results",
+ *           
+ *           // Track template of the blast result track that will be inserted in trackList.json
+ *           trackTemplate: "jblastTrackTemplate.json",
+ *           
+ *           // Type of file that will be imported for processing blast.
+ *           import: ["blastxml"],
+ *           
+ *           
+ *           // BLAST profiles
+ *           // blast profiles are parameter lists that translate to blastn cli parameters sets
+ *           // (i.e. for "remote_htgs" would translate to "blastn -db htgs -remote")
+ *           // These will override any default parameters defined in ``blastjs``
+ *           // 
+ *           // Blast profiles generally apply to basicWorkflowService only
+ *           // and do no apply to galaxyService.
+ *           // 
+ *           // Our example uses a subset of htgs, an NCBI curated blast database.
+ *           // So, it is our default profile.
+ *           defaultBlastProfile: 'htgs',
+ *           blastProfiles: {
+ *               'htgs': {
+ *                   'db': 'htgs'
+ *               },
+ *               'remote_htgs': {
+ *                   'db': 'htgs',
+ *                   'remote': ""
+ *               }
+ *           }
+ *       },
+ *       // list of services that will get registered.
+ *       services: {
+ *           'basicWorkflowService':     {name: 'basicWorkflowService',  type: 'workflow', alias: "jblast"},
+ *           'filterService':            {name: 'filterService',         type: 'service'},
+ *           'entrezService':            {name: 'entrezService',         type: 'service'}
+ *       },
+ * 
+ * Job queue entry example:
+ * ::
+ *     {
+ *       "id": 145,
+ *       "type": "workflow",
+ *       "progress": "0",
+ *       "priority": 0,
+ *       "data": {
+ *         "service": "jblast",
+ *         "dataset": "sample_data/json/volvox",
+ *         "region": ">ctgA ctgA:44705..47713 (- strand) class=remark length=3009\nacatccaatggcgaacataagcgagttttgt...tggccc",
+ *         "workflow": "NCBI.blast.workflow.js",
+ *         "name": "NCBI.blast.workflow.js",
+ *         "sequence": {
+ *           "seq": "ctgA",
+ *           "start": "44705",
+ *           "end": "47713",
+ *           "strand": "-",
+ *           "class": "remark",
+ *           "length": "3009"
+ *         },
+ *         "blastData": {
+ *           "name": "JBlast",
+ *           "blastSeq": "/var/www/html/3jbserver/node_modules/jbrowse//sample_data/json/volvox/jblastdata/blast_region1517044304838.fa",
+ *           "offset": "44705"
+ *         },
+ *         "seqFile": "http://localhost:1337/jbrowse/sample_data/json/volvox/jblastdata/blast_region1517044304838.fa",
+ *         "blastOptions": {
+ *           "db": "htgs"
+ *         },
+ *         "blastOptionFile": "/tmp/blast_option1517044304843.json"
+ *       },
+ *       "state": "failed",
+ *       "promote_at": "1517044302842",
+ *       "created_at": "1517044302842",
+ *       "updated_at": "1517044310134",
+ *       "createdAt": "2018-02-01T05:38:27.406Z",
+ *       "updatedAt": "2018-02-01T05:38:27.406Z"
+ *     },
  *  
  */
 
@@ -19,29 +115,41 @@ var appPath = require("app-root-path").path;
 module.exports = {
 
     fmap: {
-//        workflow_submit:    'post',
         get_workflows:      'get',
         get_hit_details:    'get'
     },
     init: function(params,cb) {
         return cb();
     },
+    /**
+     * job service validate
+     * 
+     * @param {object} params - parameters
+     * @returns {int} 0 if successful
+     * 
+     */
     validateParams: function(params) {
         if (typeof params.workflow === 'undefined') return "workflow not defined";
         if (typeof params.region === 'undefined') return "region not undefined";
         return 0;   // success
     },
+    /**
+     * job service generate name.
+     * 
+     * @param {object} params - parameters
+     * @returns {string} string job name
+     * 
+     */
     generateName(params) {
         return params.workflow;
     },
-    /*
-    workflow_submit: function(req, res) {
-        var params = req.allParams();
-        this._workflowSubmit(params,function(result) {
-            res.ok(result);
-        });
-    },
-    */
+    /**
+     * Enumerate available workflow scripts
+     * 
+     * @param {object} req - request
+     * @param {object} res - response
+     * 
+     */
     get_workflows: function(req, res) {
         
         var wfpath = './workflows/';
@@ -80,10 +188,10 @@ module.exports = {
     },
     
     /**
-     * submit workflow.
+     * Job service - job execution entry point
      * 
-     * @param {type} params
-     * @param {type} cb
+     * @param {object} kJob - reference to the kue job object
+     * 
      */
     beginProcessing: function(kJob) {
         sails.log.info("basicWorkflowService beginProcessing"+kJob.data);

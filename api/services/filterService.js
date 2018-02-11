@@ -24,7 +24,7 @@ module.exports = {
      * REST Request:
      *      POST `/service/exec/set_filter`
      *      
-     * @param {object} req
+     * @param {object} req - request
      * 
      * ::
      * 
@@ -34,7 +34,7 @@ module.exports = {
      *      asset: asset id
      *    }
      *     
-     * @param {object} res
+     * @param {object} res - response
      */
     set_filter: function(req, res) {
         var g = sails.config.globals;
@@ -60,8 +60,8 @@ module.exports = {
      * 
      * Return data: eg. `{ result: 'success', hits: 792, filteredHits: 501 }`
      *   
-     * @param {object} req
-     * @param {object} res
+     * @param {object} req - request
+     * @param {object} res - response
      * 
      */
     get_blastdata: function(req, res) {
@@ -82,12 +82,12 @@ module.exports = {
     },
     /**
      * Fetch the GFF3 file of the prior filter operation
-     * REST Request:
-     *      GET /service/exec/set_filter
      * 
-     * @param {type} req
-     * @param {type} res
-     * @returns {undefined}
+     * ``GET /service/exec/set_filter``
+     * 
+     * @param {type} req - request
+     * @param {type} res - response
+     * 
      */
     get_trackdata: function(req, res) {
         var params = req.allParams();

@@ -1,7 +1,11 @@
 /**
  * @module
  * @description
- * This module implements the various REST APIs for JBlast.  
+ * This module implements the various Galaxy REST APIs for JBlast.
+ * It supports galaxyService job service.  
+ * 
+ * todo: remove obsolete functions.
+ * 
  */
 var request = require('request');
 var requestp = require('request-promise');
@@ -12,16 +16,14 @@ var deferred = require('deferred');
 var filter = require("./filter");   // filter processing
 var galaxy = require("./galaxyUtils");
 var util = require("./utils");
-//var prettyjson = require('prettyjson');   // for debugging
-
-// test
 
 module.exports = {
 
     /**
      * Initialize the service
-     * @param {type} cb
-     * @returns {undefined}
+     * 
+     * @param {type} cb - callback function
+     * 
      */
     initialize: function(cb) {
         sails.log('>>> jblastProc.initialize');
@@ -38,11 +40,11 @@ module.exports = {
     /**
      * Submit a workflow
      * 
-     * REST: ``POST /jbapi/workflowsubmit``
+     * ``POST /jbapi/workflowsubmit``
      * 
-     * @param {type} req
-     * @param {type} res
-     * @param {type} next
+     * @param {type} req - request
+     * @param {type} res - response
+     * 
      */
     workflowSubmit: function (req, res, next) {
         sails.log.info("JBlast POST /jbapi/workflowsubmit",req.body);
@@ -63,11 +65,11 @@ module.exports = {
     /**
      * Get Workflows
      * 
-     * REST: ``GET /jbapi/getworkflows``
+     * ``GET /jbapi/getworkflows``
      * 
-     * @param {type} req
-     * @param {type} res
-     * @param {type} next
+     * @param {type} req - request
+     * @param {type} res - response
+     * 
      */
     getWorkflows: function (req, res, next) {
           sails.log("JBlast GET /jbapi/getworkflows");
@@ -82,11 +84,11 @@ module.exports = {
     /**
      * Return hits data given hit key
      * 
-     * REST: ``GET /jbapi/gethitdetails called``
+     * ``GET /jbapi/gethitdetails called``
      * 
-     * @param {type} req
-     * @param {type} res
-     * @param {type} next
+     * @param {type} req - request
+     * @param {type} res - response
+     * 
      */
     getHitDetails: function (req, res, next) {
           sails.log("JBlast /jbapi/gethitdetails called");
@@ -99,11 +101,11 @@ module.exports = {
      * returns accession data given accesion number.
      * Utilizes Entrez service
      * 
-     * REST: ``GET /jbapi/lookupaccession``
+     * ``GET /jbapi/lookupaccession``
      * 
-     * @param {type} req
-     * @param {type} res
-     * @param {type} next
+     * @param {type} req - request
+     * @param {type} res - response
+     * 
      */
     lookupAccession: function (req, res, next) {
         sails.log("JBlast /jbapi/lookupaccession called");

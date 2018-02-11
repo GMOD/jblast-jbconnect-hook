@@ -10,6 +10,12 @@ var fs = Promise.promisifyAll(require("fs"));
 var deferred = require('deferred');
 
 module.exports = {
+    /*
+     * 
+     * @param {object} kJob - Where kJob.data.blastData.offset is the offset to fix.
+     * @param {object} newTrackJson - working new track object
+     * @param {function} cb - callback
+     */
     process: function(kJob,newTrackJson,cb) {
         var g = sails.config.globals.jbrowse;
         
@@ -21,7 +27,7 @@ module.exports = {
             var content = fs.readFileSync(blastfile, 'utf8');
         } catch(e) {
             sails.log.error("failed to read blast file",blastfile);
-            return;
+            return cb(e);
         }
         var data = JSON.parse(content);
 
@@ -29,18 +35,6 @@ module.exports = {
 
         
         var offset = parseInt(kJob.data.blastData.offset);
-        
-        // add offset to HSP query from/to
-        var fixHsp = function(hsp) {
-
-            var start = parseInt(hsp['Hsp_query-from']) + offset;
-            var end = parseInt(hsp['Hsp_query-to']) + offset;
-
-            hsp['Hsp_query-from'] = "" + start;
-            hsp['Hsp_query-to'] = "" + end;
-
-            return hsp;
-        };
         
         // fix offsets
         for(var x in hits) {
@@ -53,9 +47,22 @@ module.exports = {
             fs.writeFileSync(blastfile,JSON.stringify(data,null,2));
         } catch (err) {
             sails.log.error('failed to write',blastfile);
-            return;
+            return cb(eerr);
         }
         cb();
+        
+        // add offset to HSP query from/to
+        function fixHsp(hsp) {
+
+            var start = parseInt(hsp['Hsp_query-from']) + offset;
+            var end = parseInt(hsp['Hsp_query-to']) + offset;
+
+            hsp['Hsp_query-from'] = "" + start;
+            hsp['Hsp_query-to'] = "" + end;
+
+            return hsp;
+        };
+        
     }
 };
 

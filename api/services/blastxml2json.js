@@ -1,12 +1,11 @@
-#!/usr/bin/env node
-
 /**
  * @module
  * @desc
  * Convert BlastXML to JSON
  * (not a straight conversion)
- * This script not only converts the XML to json, it flattens the hits per hap where there are multiple hsp.
+ * This script not only converts the XML to json, it flattens the hits per hsp where there are multiple hsp.
  * 
+ * Creates an indexed list by feature ID.
  * Essentially, it simpifies the hit array into an associative array and makes it indexed by key,
  * where key is <Hit_id>;<Hsp_num>
  * 
@@ -19,6 +18,8 @@ var to_json = require('xmljson').to_json;
 module.exports = {
 
     /**
+     * Perform the conversion operation
+     * 
      * @param (object) kJob - kue job object
      * @param (JSON) trackJson
      * @param (function) cb - callback function

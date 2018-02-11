@@ -16,15 +16,12 @@ module.exports = {
 
     /**
      * create initial filter settings file
-     * @param {type} kJob
-     * @param {type} newTrackJson
-     *      newTrackJson[0].filterSettings must be defined
-     *      newTrackJson[0].label must be defined
-     * @returns {undefined|module.exports.filterInit.filter}
+     * 
+     * @param {object} kJob - kue job object
+     * @param (function) cb - callback
      */
     filterInit: function(kJob,cb) {
         sails.log("filterInit()");
-        var g = sails.config.globals.jbrowse;
 
         // read blast json file
         //var blastfile = g.jbrowsePath + kJob.data.dataset +'/' + g.jblast.blastResultPath +"/"+ newTrackJson[0].label + ".json";
@@ -79,14 +76,16 @@ module.exports = {
     },
     /**
      * get filterData
+     * 
      * @param {object} requestData - eg. { asset: 'jblast_sample', dataset: 'sample_data/json/volvox' }
      * @param {object} cb - function(filterData)
-            eg. filterData: { 
-                score: {type: 'abs', min: 58, max: 593, val: 421 },
-                evalue: { type: 'exp', min: 5.96151e-165, max: 0.000291283, val: 0.000291283 },
-                identity: { type: 'pct', min: 78, max: 100, val: 78 },
-                gaps: { type: 'pct', min: 0, max: 13, val: 13 } 
-            }
+     * ::
+     *       eg. filterData: { 
+     *           score: {type: 'abs', min: 58, max: 593, val: 421 },
+     *           evalue: { type: 'exp', min: 5.96151e-165, max: 0.000291283, val: 0.000291283 },
+     *           identity: { type: 'pct', min: 78, max: 100, val: 78 },
+     *           gaps: { type: 'pct', min: 0, max: 13, val: 13 } 
+     *       }
      */
     getFilterSettings(requestData,cb) {
         sails.log.debug('getFilterSettings()');
@@ -108,14 +107,16 @@ module.exports = {
     },
     /**
      * write new data to filter settings file, given requestData
-     * @param {type} requestData - eg. { asset: 'jblast_sample', dataset: 'sample_data/json/volvox', filterParams: filterData }
-     * @param {type} cb - updated filterData function(filterData)
-            eg. filterData: { 
-                score: {type: 'abs', min: 58, max: 593, val: 421 },
-                evalue: { type: 'exp', min: 5.96151e-165, max: 0.000291283, val: 0.000291283 },
-                identity: { type: 'pct', min: 78, max: 100, val: 78 },
-                gaps: { type: 'pct', min: 0, max: 13, val: 13 } 
-            }
+     * 
+     * @param {object} requestData - eg. { asset: 'jblast_sample', dataset: 'sample_data/json/volvox', filterParams: filterData }
+     * @param {object} cb - updated filterData function(filterData)
+     * ::
+     *       eg. filterData: { 
+     *           score: {type: 'abs', min: 58, max: 593, val: 421 },
+     *           evalue: { type: 'exp', min: 5.96151e-165, max: 0.000291283, val: 0.000291283 },
+     *           identity: { type: 'pct', min: 78, max: 100, val: 78 },
+     *           gaps: { type: 'pct', min: 0, max: 13, val: 13 } 
+     *       }
      */
     writeFilterSettings(requestData,cb) {
         sails.log.debug('writeFilterSettings()');
@@ -148,15 +149,16 @@ module.exports = {
     /**
      * Based on the filterData, generate a new gff3 file.
      * Also announces the track to subscribed clients.
-     * @param {type} filterData - the output of writeFilterSettings or getFilterSettings.
-     * @param {type} requestData - eg. { asset: 'jblast_sample', dataset: 'sample_data/json/volvox' }
-     * @returns {undefined}
+     * 
+     * @param {object} filterData - the output of writeFilterSettings or getFilterSettings.
+     * @param {object} requestData - eg. { asset: 'jblast_sample', dataset: 'sample_data/json/volvox' }
      * 
      * callback:
-     *  cb({
+     * ::
+     *   cb({
      *      totalFeatures: x,               // total number of features
      *      filteredFeatures: x             // filtered features.
-     *  })
+     *   })
      */
     applyFilter(filterData,requestData,cb) {
         sails.log.debug('applyFilter()',requestData);
@@ -284,9 +286,9 @@ module.exports = {
     },
     /*
      * Announce change in track
-     * @param {int} dataset id
-     * @param {string} key
-     * @returns {undefined}
+     * 
+     * @param {int} dataset - database id of dataset
+     * @param {string} key - this is the asset id
      */
     _announceTrack: function(dataset,key) {
         //var dataSet = Dataset.Resolve(dataset);
@@ -306,13 +308,14 @@ module.exports = {
     },
     /**
      * return hit details given hit key, including all HSPs of the original hit.
-     * @param {string} hitkey 
-     * @param (string) dataSet
-     * @param {function} cb     callback
-     * 
      * The hit key looks like this "gi-402239547-gb-JN790190-1--3"
      * Separate the hit id ==> "gi-402239547-gb-JN790190-1--" (basically remove the last number)
      * Returns multiple HSPs for each hit id: data for "gi-402239547-gb-JN790190-1--1", "gi-402239547-gb-JN790190-1--2"...
+     * 
+     * @param {string} hitkey - eg. "gi-402239547-gb-JN790190-1--3"
+     * @param (string) dataSet - eg. "sample_data/json/volvox"
+     * @param {function} cb - callback
+     * 
      */
     getHitDetails: function(hitKey,dataSet,asset,cb) {
         sails.log.debug('getHitDetails()');
@@ -416,19 +419,6 @@ module.exports = {
         return val;
     }
 };
-/*
-function parseFastaHead(str) {
-    var line = str.split("\n")[0];
-    return {
-        seq: line.split(" ")[0],
-        start: line.split(":")[1].split("..")[0],
-        end: line.split("..")[1].split(" ")[0],
-        strand: line.split("(")[1].split(" ")[0],
-        class: line.split("class=")[1].split(" ")[0],
-        length: line.split("length=")[1]
-    };
-}
-*/
 function convert2Num(obj) {
     for(var x in obj) {
         if (typeof obj[x].val === 'string')

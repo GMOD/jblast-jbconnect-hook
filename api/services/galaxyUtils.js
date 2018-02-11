@@ -1,7 +1,8 @@
 /**
  * @module
  * @desc
- * This provides functional support to galaxyService
+ * This provides functional support to galaxyService job service.
+ * 
  */
 var request = require('request');
 var Promise = require('bluebird');
@@ -240,84 +241,10 @@ module.exports = {
 
     },
     /**
-     * submit workflow.
+     * Job service, job entry point.
      * 
-     * @param {type} params
-     * @param {type} cb
+     * @param {object} kJob - reference to kue job object
      */
-    workflowSubmit: function(params,cb) {
-        var thisb = this;
-        var g = sails.config.globals;
-        var region = params.region;
-        var workflow = params.workflow;
-        var dataSetPath = params.dataSetPath;
-        var monitorFn = params.monitorFn;
-
-        sails.log.debug("1 workflow",workflow);
-
-        // get starting coord of region
-        var startCoord = util.getRegionStart(region);
-        var seq = util.parseSeqData(region);
-
-        var d = new Date();
-
-        //sails.log.debug('g.jbrowse',g.jbrowse);
-
-        // write the BLAST region file
-        var theBlastFile = "blast_region"+d.getTime()+".fa";
-        var blastPath = g.jbrowse.jbrowsePath + '/' + dataSetPath +'/'+ g.jbrowse.jblast.blastResultPath;
-        var theFullBlastFilePath = blastPath+'/'+theBlastFile; 
-
-        // if direcgtory doesn't exist, create it
-        if (!fs.existsSync(blastPath)){
-            fs.mkdirSync(blastPath);
-        }  
-
-        try {
-            ws = fs.createWriteStream(theFullBlastFilePath);
-            ws.write(region);
-            ws.end();
-        }
-        catch (e) {
-            sails.log.error(e,theFullBlastFilePath);
-            cb(null,{status: 'error', msg: "failed to write",err:e});
-            return;
-        }
-
-        var blastData = {
-                "name": "JBlast", 
-                "blastSeq": theFullBlastFilePath,
-                "offset": startCoord
-        };
-
-        //sails.log.debug('>>> jbrowse globals',g.jbrowse);
-
-        var theFile = g.jbrowse.jbrowseRest+'/'+g.jbrowse.routePrefix+'/'+ dataSetPath+'/' + g.jbrowse.jblast.blastResultPath+'/'+theBlastFile;
-
-        // create the kue job entry
-        var jobdata = {
-            service: "galaxyService",
-            name: "workflow",
-            requestParams: params, 
-            //jbrowseDataPath: dataSetPath,
-            sequence: seq,
-            blastData: blastData,
-            dataset: {
-                path: dataSetPath,
-                workflow: workflow,
-                file: theFile
-            }
-        };
-        var job = g.kue_queue.create('workflow', jobdata)
-        job.save(function(err){
-            if (err) {
-                cb(null,{status:'error',msg: "error create kue workflow",err:err});
-                return;
-            }
-            cb({status:'success',jobId: job.id},null);
-
-        });
-    },
     beginProcessing: function(kJob) {
         sails.log.info("galaxyService beginProcessing"+kJob.data);
        
@@ -327,10 +254,6 @@ module.exports = {
 
         var region = params.region;
         var workflow = params.workflow;
-        //var dataSetPath = params.dataSetPath;
-        //var monitorFn = params.monitorFn;
-
-        //sails.log.debug("1 workflow",workflow);
 
         // get starting coord of region
         var startCoord = util.getRegionStart(region);
@@ -343,21 +266,18 @@ module.exports = {
         var blastPath = g.jbrowse.jbrowsePath + '/' + params.dataset +'/'+ g.jbrowse.jblast.blastResultPath;
         var theFullBlastFilePath = blastPath+'/'+theBlastFile; 
 
-        // if direcgtory doesn't exist, create it
-        console.log("blastPath",blastPath);
-        if (!fs.existsSync(blastPath)){
-            fs.mkdirSync(blastPath);
-        }  
-
         try {
+            // if direcgtory doesn't exist, create it
+            fs.ensureDirSync(blastPath);
+            
+            
             ws = fs.createWriteStream(theFullBlastFilePath);
             ws.write(region);
             ws.end();
         }
         catch (e) {
-            sails.log.error(e,theFullBlastFilePath);
-            cb(null,{status: 'error', msg: "failed to write",err:e});
-            return;
+            sails.log.error(theFullBlastFilePath,e);
+            return kJob.kDoneFn(Error('beginProcessing() error '+theFileBlastFilePath,e));
         }
 
         var blastData = {
@@ -366,14 +286,8 @@ module.exports = {
                 "offset": startCoord
         };
 
-        //sails.log.debug('>>> jbrowse globals',g.jbrowse);
-
-        //var theFile = g.jbrowse.jbrowseRest+'/'+g.jbrowse.routePrefix+'/'+ params.dataset+'/' + g.jbrowse.jblast.blastResultPath+'/'+theBlastFile;
         var theFile = 'file://' + g.jbrowse.jbrowsePath + params.dataset+'/' + g.jbrowse.jblast.blastResultPath+'/'+theBlastFile;
 
-        //var name = workflow.split('.workflow.');
-        
-        //kJob.data.requestParams = params
         kJob.data.sequence = seq;
         kJob.data.blastData = blastData;
         kJob.data.seqFile = theFile;

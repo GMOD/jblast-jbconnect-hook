@@ -1,6 +1,5 @@
-/**
+/*
  * @module
- * @ignore
  * @description
  * Utility Functions
  */
