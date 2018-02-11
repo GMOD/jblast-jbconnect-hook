@@ -1,4 +1,4 @@
-/*
+/**
  * @module hooks/jblast
  * @description
  * This module is the main subclass of a Sails Hook incorporating *Marlinspike*.
