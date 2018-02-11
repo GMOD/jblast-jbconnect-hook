@@ -2,7 +2,7 @@
 Setup Options
 **************
 
-
+Setup Galaxy Server for Blast processing.
 
 Configuration Files
 ===================

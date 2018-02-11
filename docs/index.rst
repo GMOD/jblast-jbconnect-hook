@@ -2,7 +2,7 @@
 JBlast
 ******
 
-**JBlast - A BLAST analysis service for JBServer and JBrowse**
+**JBlast - A BLAST service for JBServer and JBrowse**
 
 JBlast is JBServer hook module (jbh).  It contains both server-side integration
 with JBServer as well as a client-side plugin.
@@ -15,7 +15,7 @@ with JBServer as well as a client-side plugin.
 | Can leverage Galaxy Server for Blast Analysis or use                          |
 | stand-alone NCBI Blast tools                                                  |
 +-------------------------------------------------------------------------------+
-| Blast Workflow Execution and Monitoring                                       |
+| Basic workflow abstraction and Monitoring                                     |
 +-------------------------------------------------------------------------------+
 
 **The Client-Side JBlast plugin intgration with JBrowse:**

@@ -56,3 +56,8 @@ From a web browser, access the application (default login: juser/password).
 ``http://localhost:1337/jbrowse``
 
 
+
+Installing Galaxy
+*****************
+
+TBD
