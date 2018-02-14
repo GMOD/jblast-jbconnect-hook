@@ -6,7 +6,8 @@
  */
 var request = require('request');
 var Promise = require('bluebird');
-var fs = Promise.promisifyAll(require("fs"));
+var fs = Promise.promisifyAll(require("fs-extra"));
+//var fs = require("fs-extra");
 var util = require('./utils');
 
 module.exports = {
@@ -259,10 +260,10 @@ module.exports = {
         var startCoord = util.getRegionStart(region);
         var seq = util.parseSeqData(region);
 
-        var d = new Date();
+        //var d = new Date();
 
         // write the BLAST region file
-        var theBlastFile = kJob.id+"_blast_region"+d.getTime()+".fa";
+        var theBlastFile = "JBlast_job_"+kJob.id+".fa";
         var blastPath = g.jbrowse.jbrowsePath + '/' + params.dataset +'/'+ g.jbrowse.jblast.blastResultPath;
         var theFullBlastFilePath = blastPath+'/'+theBlastFile; 
 
@@ -277,7 +278,7 @@ module.exports = {
         }
         catch (e) {
             sails.log.error(theFullBlastFilePath,e);
-            return kJob.kDoneFn(Error('beginProcessing() error '+theFileBlastFilePath,e));
+            return kJob.kDoneFn(Error('beginProcessing() error '+theFullBlastFilePath,e));
         }
 
         var blastData = {
@@ -345,6 +346,13 @@ module.exports = {
 
                 kJob.data.workflowData = data;
                 kJob.update(function() {});
+                
+                // handle failed workflow
+                if (typeof kJob.data.workflowData.err_msg !== 'undefined') {
+                    var msg = kJob.data.workflowData.err_msg;
+                    sails.log.error("workflow failed:",msg);
+                    return kJob.kDoneFn(new Error(msg));
+                }
                 
                 thisb.galaxyGET('/api/workflows',function(data,err){
                     //sails.log.debug('GET /api/workflows',data,err);
