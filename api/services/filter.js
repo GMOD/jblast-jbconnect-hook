@@ -22,6 +22,7 @@ module.exports = {
      */
     filterInit: function(kJob,cb) {
         sails.log("filterInit()");
+        var g = sails.config.globals.jbrowse;
 
         // read blast json file
         //var blastfile = g.jbrowsePath + kJob.data.dataset +'/' + g.jblast.blastResultPath +"/"+ newTrackJson[0].label + ".json";
@@ -159,6 +160,7 @@ module.exports = {
      *      totalFeatures: x,               // total number of features
      *      filteredFeatures: x             // filtered features.
      *   })
+     *   
      */
     applyFilter(filterData,requestData,cb) {
         sails.log.debug('applyFilter()',requestData);
