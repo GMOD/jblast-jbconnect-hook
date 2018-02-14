@@ -280,6 +280,10 @@ Add this line to the end of the file:
 
 ``htgs{tab}High Throughput Genomic Sequences (htgs){tab}/var/www/jbserver/blastdb/htgs/htgs``
 
+*It's important to get the name "htgs" correct.  The name counts in our demo workflow.
+The directory should reflect the directory of the installed BLAST database.*
+
+
 Setup Galaxy Job Service
 ************************
 
