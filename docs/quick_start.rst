@@ -1,10 +1,12 @@
-***********
-Quick Start
-***********
+******************
+JBlast Quick Start
+******************
 
-The quick start instructions for JBlast demonstrates the use of the stand-alone version
-of blast tools and the use of ``blastjs``. 
-JBlast is loaded as a an NPM module (since JBServer is generally intended to be a companion of JBrowse.  
+Instructions for installing JBlast with stand-alone NCBI Blast tools (non-Galaxy). 
+
+To setup Galaxy integration, see `Setup Galaxy Integration`_
+
+(Since JBServer is generally intended to be a companion of JBrowse.  
 JBrowse may also be installed in a separate directory.
 (See :ref:`jbs-separate-dir`.)
 
@@ -43,6 +45,8 @@ Install the JBServer and JBrowse.  jb_setup.js ensures the sample data is loaded
     npm install gmod/jblast
     ./bin/blast_getBlast.js             (installs the NCBI BLAST commands)
     ./bin/blast_downloadDb.js htgs.05   (setup sample database)
+            // you can also download the full "htgs" database, but this will
+            // take a while on slower lines. (ie. "./blast_downloadDb.js htgs" )
 
 Run
 ===
@@ -56,8 +60,3 @@ From a web browser, access the application (default login: juser/password).
 ``http://localhost:1337/jbrowse``
 
 
-
-Installing Galaxy
-*****************
-
-TBD
