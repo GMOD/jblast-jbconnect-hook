@@ -13,7 +13,7 @@ module.exports = {
     getOptions: function() {
         return [
             //['' , 'blastdbpath=PATH' , '(jblast - galaxy) existing database path'],
-            ['' , 'setupblastdemodb' , '(jblast - setup blast demo database'],
+            //['' , 'setupblastdemodb' , '(jblast - setup blast demo database'],
             ['' , 'setupworkflows'   , '(jblast - galaxy) installs demo galaxy workflows (must have API key configured'],
             ['' , 'setuptools'       , '(jblast - galaxy) setup jblast tools for galaxy'],
             //['' , 'setuphistory'     , '(jblast - galaxy) setup history'],
