@@ -2,7 +2,7 @@
     "a_galaxy_workflow": "true", 
     "annotation": "", 
     "format-version": "0.1", 
-    "name": "JBlast Sim Hits", 
+    "name": "JBlast Sim w/ Hits", 
     "steps": {
         "0": {
             "annotation": "", 

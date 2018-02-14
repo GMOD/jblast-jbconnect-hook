@@ -1,78 +1,91 @@
 {
-    "a_galaxy_workflow": "true", 
-    "annotation": "", 
-    "format-version": "0.1", 
-    "name": "JBlast Example", 
-    "steps": {
-        "0": {
-            "annotation": "", 
-            "content_id": null, 
-            "id": 0, 
-            "input_connections": {}, 
-            "inputs": [
-                {
-                    "description": "", 
-                    "name": "Input fasta"
-                }
-            ], 
-            "label": null, 
-            "name": "Input dataset", 
-            "outputs": [], 
-            "position": {
-                "left": 178, 
-                "top": 163
-            }, 
-            "tool_errors": null, 
-            "tool_id": null, 
-            "tool_state": "{\"name\": \"Input fasta\"}", 
-            "tool_version": null, 
-            "type": "data_input", 
-            "uuid": "aeebb08f-9c75-4058-a0fa-787df3dbc718", 
-            "workflow_outputs": []
-        }, 
-        "1": {
-            "annotation": "", 
-            "content_id": "toolshed.g2.bx.psu.edu/repos/devteam/ncbi_blast_plus/ncbi_blastn_wrapper/0.1.08", 
-            "id": 1, 
-            "input_connections": {
-                "query": {
-                    "id": 0, 
-                    "output_name": "output"
-                }
-            }, 
-            "inputs": [
-                {
-                    "description": "runtime parameter for tool NCBI BLAST+ blastn", 
-                    "name": "query"
-                }
-            ], 
-            "label": "export blastxml", 
-            "name": "NCBI BLAST+ blastn", 
-            "outputs": [
-                {
-                    "name": "output1", 
-                    "type": "tabular"
-                }
-            ], 
-            "position": {
-                "left": 430, 
-                "top": 162.5
-            }, 
-            "post_job_actions": {}, 
-            "tool_errors": null, 
-            "tool_id": "toolshed.g2.bx.psu.edu/repos/devteam/ncbi_blast_plus/ncbi_blastn_wrapper/0.1.08", 
-            "tool_shed_repository": {
-                "changeset_revision": "3034ce97dd33", 
-                "name": "ncbi_blast_plus", 
-                "owner": "devteam", 
-                "tool_shed": "toolshed.g2.bx.psu.edu"
-            }, 
-            "tool_state": "{\"evalue_cutoff\": \"\\\"0.001\\\"\", \"__page__\": 0, \"adv_opts\": \"{\\\"adv_opts_selector\\\": \\\"basic\\\", \\\"__current_case__\\\": 0}\", \"__rerun_remap_job_id__\": null, \"blast_type\": \"\\\"blastn\\\"\", \"db_opts\": \"{\\\"db_opts_selector\\\": \\\"db\\\", \\\"subject\\\": \\\"\\\", \\\"histdb\\\": \\\"\\\", \\\"__current_case__\\\": 0, \\\"database\\\": [\\\"13apr2014-htgs\\\"]}\", \"output\": \"{\\\"out_format\\\": \\\"5\\\", \\\"__current_case__\\\": 3}\", \"query\": \"{\\\"__class__\\\": \\\"RuntimeValue\\\"}\"}", 
-            "tool_version": "0.1.08", 
-            "type": "tool", 
-            "uuid": "30f68292-67ed-4299-8ba5-2bc5b8e8c525", 
-            "workflow_outputs": []
-        }
-    }, 
-    "uuid": "a267f0cf-27cd-4f0d-a80a-19ef72f95dec"
+   "uuid":"7f30fbd6-71fb-41ed-a643-4d77872a0978",
+   "tags":[
+
+   ],
+   "format-version":"0.1",
+   "name":"JBlast Demo w/ hits",
+   "steps":{
+      "0":{
+         "tool_id":null,
+         "tool_version":null,
+         "outputs":[
+
+         ],
+         "workflow_outputs":[
+
+         ],
+         "input_connections":{
+
+         },
+         "tool_state":"{\"name\": \"Input fasta\"}",
+         "id":0,
+         "uuid":"aeebb08f-9c75-4058-a0fa-787df3dbc718",
+         "errors":null,
+         "name":"Input dataset",
+         "label":"Input fasta",
+         "inputs":[
+            {
+               "name":"Input fasta",
+               "description":""
+            }
+         ],
+         "position":{
+            "top":163,
+            "left":178
+         },
+         "annotation":"",
+         "content_id":null,
+         "type":"data_input"
+      },
+      "1":{
+         "tool_id":"toolshed.g2.bx.psu.edu/repos/devteam/ncbi_blast_plus/ncbi_blastn_wrapper/0.2.01",
+         "tool_version":"0.2.01",
+         "outputs":[
+            {
+               "type":"tabular",
+               "name":"output1"
+            }
+         ],
+         "workflow_outputs":[
+
+         ],
+         "input_connections":{
+            "query":{
+               "output_name":"output",
+               "id":0
+            }
+         },
+         "tool_state":"{\"evalue_cutoff\": \"\\\"0.001\\\"\", \"__page__\": null, \"adv_opts\": \"{\\\"adv_opts_selector\\\": \\\"basic\\\", \\\"__current_case__\\\": 0}\", \"__rerun_remap_job_id__\": null, \"db_opts\": \"{\\\"db_opts_selector\\\": \\\"db\\\", \\\"subject\\\": \\\"\\\", \\\"histdb\\\": \\\"\\\", \\\"__current_case__\\\": 0, \\\"database\\\": [\\\"htgs\\\"]}\", \"query\": \"{\\\"__class__\\\": \\\"RuntimeValue\\\"}\", \"blast_type\": \"\\\"blastn\\\"\", \"output\": \"{\\\"out_format\\\": \\\"5\\\", \\\"__current_case__\\\": 3}\"}",
+         "id":1,
+         "tool_shed_repository":{
+            "owner":"devteam",
+            "changeset_revision":"6f386c5dc4fb",
+            "name":"ncbi_blast_plus",
+            "tool_shed":"toolshed.g2.bx.psu.edu"
+         },
+         "uuid":"30f68292-67ed-4299-8ba5-2bc5b8e8c525",
+         "errors":null,
+         "name":"NCBI BLAST+ blastn",
+         "post_job_actions":{
+
+         },
+         "label":"export blastxml",
+         "inputs":[
+            {
+               "name":"query",
+               "description":"runtime parameter for tool NCBI BLAST+ blastn"
+            }
+         ],
+         "position":{
+            "top":162.5,
+            "left":430
+         },
+         "annotation":"",
+         "content_id":"toolshed.g2.bx.psu.edu/repos/devteam/ncbi_blast_plus/ncbi_blastn_wrapper/0.2.01",
+         "type":"tool"
+      }
+   },
+   "annotation":"",
+   "a_galaxy_workflow":"true"
 }
