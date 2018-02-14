@@ -280,6 +280,21 @@ Add this line to the end of the file:
 
 ``htgs{tab}High Throughput Genomic Sequences (htgs){tab}/var/www/jbserver/blastdb/htgs/htgs``
 
+Setup Galaxy Job Service
+************************
+
+In ``jbserver`` directory, edit ``node_modules/jbh-jblast/config/globals.js`` and add the galaxy job service.
+
+::
+
+        services: {
+            //'basicWorkflowService':     {name: 'basicWorkflowService',  type: 'workflow', alias: "jblast"},
+            'galaxyService':          {name: 'galaxyService',         type: 'workflow', alias: "jblast"},
+            'filterService':            {name: 'filterService',         type: 'service'},
+            'entrezService':            {name: 'entrezService',         type: 'service'}
+        },
+
+
 Restart Galaxy: ``sh run.sh``
 
 Lift sails: ``sails lift``
