@@ -131,7 +131,6 @@ function doCompleteAction(kJob,hista) {
                             kJob.kDoneFn(new Error(msg));
                         }
                         else {
-                            console.log(">>>>>>>>>>>> checkpoint 1");
                             offsetfix.process(kJob,newTrackJson,function() {
                                 processFilter(kJob,newTrackJson,function(hitdata) {
                                     // postAction is a service in JBServer
