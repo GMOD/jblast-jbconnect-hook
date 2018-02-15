@@ -131,6 +131,7 @@ function doCompleteAction(kJob,hista) {
                             kJob.kDoneFn(new Error(msg));
                         }
                         else {
+                            console.log(">>>>>>>>>>>> checkpoint 1");
                             offsetfix.process(kJob,newTrackJson,function() {
                                 processFilter(kJob,newTrackJson,function(hitdata) {
                                     // postAction is a service in JBServer
@@ -290,7 +291,8 @@ function processFilter(kJob,newTrackJson,cb) {
     filter.filterInit(kJob, function(filtered){
         var asset = {
             "asset": kJob.data.blastData.outputs.blastxml, //newTrackJson[0].label,
-            "dataset": kJob.data.dataset   //g.dataSet[0].dataPath
+            "dataset": kJob.data.dataset,   //g.dataSet[0].dataPath
+            "noAnnounce": true
         };
         filter.applyFilter(0,asset,function(hitdata) {
             kJob.data.blastData.hits = hitdata.hits;
