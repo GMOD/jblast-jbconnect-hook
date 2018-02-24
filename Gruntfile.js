@@ -1,32 +1,32 @@
 module.exports = function(grunt) {
 
   grunt.initConfig({
-        publish: {
-          jbh_jblast: {  
-            options: {
-                ignore: ['node_modules','jblast-simtool']
-            },
-            main: {
-                src: [
-                    './','jblast-simtool'
-                ]
-            },
-            regex: {
-                src: ['./**/*']
-            }
-          },
-          jblast_simtool: {
-            options: {
-                ignore: ['node_modules']
-            },
-            main: {
-                src: ['jblast-simtool']
-            },
-            regex: {
-                src: ['./**/*']
-            }
-          }
-        },
+//        publish: {
+//          jbh_jblast: {  
+//            options: {
+//                ignore: ['node_modules','jblast-simtool']
+//            },
+//            main: {
+//                src: [
+//                    './','jblast-simtool'
+//                ]
+//            },
+//            regex: {
+//                src: ['./**/*']
+//            }
+//          }//,
+//          jblast_simtool: {
+//            options: {
+//                ignore: ['node_modules']
+//            },
+//            main: {
+//                src: ['jblast-simtool']
+//            },
+//            regex: {
+//                src: ['./**/*']
+//            }
+//          }
+//        },
         jshint: {
           files: ['Gruntfile.js', 'src/**/*.js', 'test/**/*.js'],
           options: {
@@ -55,8 +55,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   //grunt.loadNpmTasks('grunt-bump');
   //grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-publish');
+  //grunt.loadNpmTasks('grunt-publish');
   grunt.registerTask('default', ['jshint']);
   
-  grunt.registerTask('bump-publish',['bump','publish:jbh_jblast','publish:jblast_simtool']);
+  //grunt.registerTask('bump-publish',['bump','publish:jbh_jblast','publish:jblast_simtool']);
 };
