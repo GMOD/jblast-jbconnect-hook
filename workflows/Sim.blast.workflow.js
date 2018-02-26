@@ -3,16 +3,14 @@ var fs = require("fs-extra");
 var shelljs = require("shelljs");
 var blast = require('blastjs');
 
-var thisPath = process.cwd();
-var jbrowsePath = "./";
-
-var appPath = require('app-root-path');
+var appPath = require("app-root-path").path;
+var jbrowsePath = appPath;
 
 console.log('Starting Sim_Blast.workflow');
 
 // check if jbrowse is a module
-if (fs.pathExistsSync(thisPath+"/node_modules/jbrowse/utils")) {
-    jbrowsePath = "./node_modules/jbrowse";
+if (fs.pathExistsSync(appPath+"/node_modules/jbrowse/utils")) {
+    jbrowsePath = appPath+"/node_modules/jbrowse";
 }
 
 // command line options
@@ -33,7 +31,8 @@ var outPath     = opt.options['out']
 
 blast.outputString(true); //optional, provides string output instead of JSON
 
-var dbPath = '/var/www/html/blastdb/htgs/13apr2014/htgs';
+//var dbPath = '/var/www/html/blastdb/htgs/13apr2014/htgs';
+var dbPath = 'nnn';
 
 var options = {
         db: dbPath,
@@ -51,17 +50,18 @@ fs.ensureDir(options.outputDirectory);
 //read the file that the result will be compared against.
 //var buffer = fs.readFileSync('./test/blastresult.xml');
 
-var outDir = '/var/www/html/3jbserver/node_modules/jbrowse/sample_data/json/volvox/jblastdata';
+//var outDir = '/var/www/html/3jbserver/node_modules/jbrowse/sample_data/json/volvox/jblastdata';
+//var outDir = jbrowsePath
 
 var fakeParams = { 
     type: 'blastn',
-    outputDirectory: outDir,
+    outputDirectory: outPath,
     rawOutput: false,
     db: '/var/www/html/blastdb/htgs/13apr2014/htgs',
     outfmt: 5,
     outFileExt: 'blastxml',
     returnParams: true,
-    out: outDir +'/'+ Date.now() + '.blastxml'
+    out: outPath +'/'+ Date.now() + '.blastxml'
 };
 
 // copy the example file
