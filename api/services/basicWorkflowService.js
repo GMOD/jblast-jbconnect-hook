@@ -215,7 +215,7 @@ module.exports = {
 
         // write the BLAST region file (.fasta)
         var theBlastFile = "blast_region"+d.getTime()+".fa";
-        var blastPath = g.jbrowse.jbrowsePath + '/' + params.dataset +'/'+ g.jbrowse.jblast.blastResultPath;
+        var blastPath = g.jbrowse.jbrowsePath + params.dataset +'/'+ g.jbrowse.jblast.blastResultPath;
         var theFullBlastFilePath = blastPath+'/'+theBlastFile; 
 
         console.log("blastPath",blastPath);
@@ -230,6 +230,7 @@ module.exports = {
         }
         
         try {
+            //fs.writeFileSync(theFullBlastFilePath,region);
             ws = fs.createWriteStream(theFullBlastFilePath);
             ws.write(region);
             ws.end();
@@ -299,6 +300,16 @@ module.exports = {
                 //type not supported.
             }
         }
+        
+        // ensure tmp directory
+        let tmpdir = appPath+"/tmp";
+        try {
+            fs.ensureDirSync(tmpdir);            
+        } catch (err) {
+            let msg = 'failed to create tmp dir: '+tmpdir+", err: "+err;
+            return kJob.kDoneFn(Error(msg));
+        }
+        
         // create blastOptionFile
         if (typeof kJob.data.blastOptions !== "undefined") {
             // create file blastOption file
@@ -311,11 +322,14 @@ module.exports = {
             try {
                 fs.writeFileSync(optionFile,JSON.stringify(kJob.data.blastOptions,null,4));
             } catch (err) {
-                return kJob.kDoneFn(Error('faild to write blastOptionFile',optionFile));
+                return kJob.kDoneFn(Error('failed to write blastOptionFile:',optionFile));
             }
         }
         else {
-            sails.log.error("blastProfile is not defiled");
+            
+            sails.log.error("blastProfile is not defined");
+            return kJob.kDoneFn(Error('blastProfile is not defined'));
+            
         }
     },
     beginProcessing2(kJob) {
@@ -335,7 +349,7 @@ module.exports = {
         var thisb = this;
         var g = sails.config.globals.jbrowse;
 
-        var wf = process.cwd()+'/workflows/'+kJob.data.workflow;
+        var wf = appPath+'/workflows/'+kJob.data.workflow;
         var outPath = g.jbrowsePath + kJob.data.dataset + '/' + g.jblast.blastResultPath;
 
         sails.log('>>> Executing workflow',wf);
@@ -370,6 +384,7 @@ module.exports = {
                 
                 // rename the generated file to be the asset id 
                 // this is a clunky should be improved.
+                //console.log(">>>>> renaming file asset",results.out);
                 renamefile(results.out);
                 
                 // start post processing.
