@@ -158,7 +158,7 @@ Create a user with admin privilage
 
 Register a new user (**User** Menu --> Register).
 
-.. image:: img/blast-newuser.png
+.. image:: img/galaxy-newuser.png
 
 
 Configure JBServer with Galaxy Info
@@ -186,6 +186,7 @@ This will copy some JBlast specific Galaxy tools into the ``galaxy`` directory a
 In ``galaxy`` directory, add the following line to ``congfig/galaxy.ini`` add the user email for the user you created as an admin:
 
 ::
+
     admin_users = me-user@gmail.com
 
 Start Galaxy again from the galaxy directory (``sh run.sh``)
