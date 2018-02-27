@@ -31,7 +31,7 @@ module.exports = {
         this.config = config;
         util.init(config);
         
-        if (!this.init(config)) {
+        if (!this.init(opt,path,config)) {
             console.log("jblast - failed to initialize");
             return;
         }
@@ -41,27 +41,27 @@ module.exports = {
         //    exec_setupindex(this);
         //}
         
-        var setupblastdemodb = opt.options['setupblastdemodb'];
-        if (typeof setupblastdemodb !== 'undefined') {
-            exec_setupblastdemodb(this);
-        }
+//        var setupblastdemodb = opt.options['setupblastdemodb'];
+//        if (typeof setupblastdemodb !== 'undefined') {
+//            exec_setupblastdemodb(this);
+//        }
         var setuptools = opt.options['setuptools'];
         if (typeof setuptools !== 'undefined') {
             exec_setuptools(this);
         }
-        var blastdbpath = opt.options['blastdbpath'];
-        if (typeof blastdbpath !== 'undefined') {
-            this.blastdbpath = blastdbpath
-            exec_blastdbpath(this);
-        }
+//        var blastdbpath = opt.options['blastdbpath'];
+//        if (typeof blastdbpath !== 'undefined') {
+//            this.blastdbpath = blastdbpath
+//            exec_blastdbpath(this);
+//        }
         var setupworkflows = opt.options['setupworkflows'];
         if (typeof setupworkflows !== 'undefined') {
             exec_setupworkflows(this);
         }
-        var setuphistory = opt.options['setuphistory'];
-        if (typeof setuphistory !== 'undefined') {
-            exec_setuphistory(this);
-        }
+//        var setuphistory = opt.options['setuphistory'];
+//        if (typeof setuphistory !== 'undefined') {
+//            exec_setuphistory(this);
+//        }
         var setupdata = opt.options['setupdata'];
         if (typeof setupdata !== 'undefined') {
             exec_setupdata(this);
@@ -72,8 +72,23 @@ module.exports = {
         //    exec_setupblastdemo(this);
         //}
     },
-    init: function(config) {
-        //console.log("config",config);
+    init: function(opt,path,config) {
+        console.log("config",config); 
+        /*
+         * figure source path of setup 
+         */
+        this.srcpath = __dirname+"/../setup";
+        //console.log("srcpath",srcpath);
+        try {
+            fs.accessSync(this.srcpath, fs.F_OK);
+        }
+        catch(err) {
+            console.log(this.srcpath,'source path does not exist');
+            return 0;   // failed init
+        }
+        if (typeof opt.options['setupdata'] !== 'undefined') 
+            return 1;
+
         /*
          * get values for --gpath, apikey and gurl; grab from saved globals if necessary
          */
@@ -108,18 +123,6 @@ module.exports = {
         }
         if (this.gdatapath != this.gpath) {
             console.log("Using Galaxy Docker");
-        }
-        /*
-         * figure source path of setup 
-         */
-        this.srcpath = __dirname+"/../setup";
-        //console.log("srcpath",srcpath);
-        try {
-            fs.accessSync(this.srcpath, fs.F_OK);
-        }
-        catch(err) {
-            console.log(this.srcpath,'source path does not exist');
-            return 0;   // failed init
         }
         return 1; // successful init
     }
@@ -248,7 +251,7 @@ function exec_setupdata(params) {
     
     var targetdir = config.jbrowsePath + dataSet;
     
-    util.checkDir(targetdir+config.jblast.blastResultPath);
+    fs.ensureDirSync(targetdir+"/"+config.jblast.blastResultPath);
     
     util.cmd('cp -R -v "'+srcpath+'/jblastdata" "'+targetdir+'"');
 
