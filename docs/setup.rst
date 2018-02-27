@@ -99,15 +99,6 @@ the user must manually install these through the Tool Shed as admin.*
 
 This options sets up samples and sample data for JBlast.
 
---setupindex
-------------
-
-This writes the demo index.html file in the JBrowse directory.
-
---setuphistory
-
-this option sets up the history name in the config file.  This option requires
-having configured the Galaxy API key in config. 
 
 
 JBlast Plugin
