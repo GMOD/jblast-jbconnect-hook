@@ -132,7 +132,7 @@ return declare( JBrowsePlugin,
             }, dojo.create('button',{},navBox));   //thisB.browser.navBox));
         
             // save the reference to the blast plugin in browser
-            browser.jblastPlugin = this;
+            browser.jblastPlugin = thisB;
 
             /*
              * JBrowse event handlers
