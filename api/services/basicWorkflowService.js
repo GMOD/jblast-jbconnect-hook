@@ -428,6 +428,10 @@ module.exports = {
 
                 // check if there were any hits.
                 if (jblastPostAction.getHits(kJob,newTrackJson)===0) {
+                    
+                    kJob.data.name = kJob.data.name+' No Hits';
+                    kJob.update();
+                    
                     var msg = "No Blast Hits";
                     sails.log.error(msg);
                     kJob.kDoneFn(new Error(msg));
