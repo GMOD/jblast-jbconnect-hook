@@ -427,7 +427,7 @@ module.exports = {
                         clearInterval(timerloop);
                         //kJob.update(function() {});
                         var msg = wId+' workflow completed in error';
-                        sails.log.debug(msg);
+                        sails.log.error(msg);
                         kJob.kDoneFn(new Error(msg));
                         break;
                     }
