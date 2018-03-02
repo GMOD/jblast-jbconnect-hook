@@ -220,7 +220,7 @@ The job queue side panel is revealed by clicking the Jobs tab on the upper right
 This contains list of executing jobs, in our case, for processing workflows.  It tells the current state
 of each job and whether completed jobs are completed or errored. 
 
-.. image:: img/job-panel.jpg
+.. image:: img/job-panel.png
 
 
 Filter Panel
