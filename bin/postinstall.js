@@ -14,6 +14,12 @@ var async = require("async");
 console.log(">>> jblast postinstall");
 console.log("appPath",appPath,"modPath",modPath);
 
+// install jblast-simtools globally (access by galaxy simulation tool
+//process.chdir('node_modules/jbh-jblast/jblast-simtool');
+//shelljs.exec("sudo npm install -g");
+//process.chdir('../../..');
+
+
 //exit if modPath == appPath, don't need to copy anything.
 if (modPath === appPath)
     process.exit(0);
