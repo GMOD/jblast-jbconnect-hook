@@ -73,7 +73,7 @@ module.exports = {
         //}
     },
     init: function(opt,path,config) {
-        console.log("config",config); 
+        //console.log("config",config); 
         /*
          * figure source path of setup 
          */
