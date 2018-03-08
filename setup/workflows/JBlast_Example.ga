@@ -4,7 +4,7 @@
 
    ],
    "format-version":"0.1",
-   "name":"JBlast Demo w/ hits",
+   "name":"JBlast Example",
    "steps":{
       "0":{
          "tool_id":null,
