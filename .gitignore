@@ -35,3 +35,6 @@ node_modules
 
 # jbconnect directory used by npm test
 jbconnect
+
+nbproject
+
