@@ -77,7 +77,7 @@ In the ``jbrowse`` directory, edit ``config/globals.js`` and create a ``galaxy:`
       }
     }
 
-These settings will override any settings in ``node_modules/jbh-jblast/config/globals.js`` and ``jbconnect/config/globals.js``. 
+These settings will override any settings in ``node_modules/jbconnect-hook-jblast/config/globals.js`` and ``jbconnect/config/globals.js``. 
 
 From the JBrowse directory, type ``./jbutil --setuptools``
 
@@ -180,7 +180,7 @@ The directory should reflect the directory of the installed BLAST database.*
 Setup Galaxy Job Service
 ************************
 
-In ``jbconnect`` directory, edit ``node_modules/jbh-jblast/config/globals.js`` and add the galaxy job service.
+In ``jbconnect`` directory, edit ``node_modules/jbconnect-hook-jblast/config/globals.js`` and add the galaxy job service.
 
 ::
 

@@ -1,7 +1,7 @@
 {
-  "name": "jbh-jblast",
+  "name": "jbconnect-hook-jblast",
   "version": "0.0.634",
-  "description": "JBlast - Integrated JBrowse BLAST with Galaxy (JBrowse Server Hook)",
+  "description": "JBlast - Integrated JBrowse BLAST with Galaxy (JBConnect Hook)",
   "main": "api/hooks/jblast/index.js",
   "scripts": {
     "prepublish": "grunt bump-publish --force",

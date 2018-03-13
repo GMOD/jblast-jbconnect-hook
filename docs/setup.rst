@@ -16,7 +16,7 @@ Modify the configuration file as necessary.
 
 To view aggregate configuration: ``./jbutil --config``
 
-The aggregate config file is the merged config of JBConnect and its installed jbh- (hook)
+The aggregate config file is the merged config of JBConnect and its installed jbconnect-hook-*
 modules.
 
 Edit config file: ``nano config/globals.js``
@@ -60,10 +60,10 @@ Get Galaxy API Key
 JBlast jbutil Command
 =====================
 
-``jbutil`` is a setup/configuration utility for JBConnect.  jbh-hook can extend
+``jbutil`` is a setup/configuration utility for JBConnect. JBConnect hooks can extend
 ``jbutil`` command options. (see: :ref:`jbs-hooks-extend`)
 
-This example shows that ``jbh-jblast`` adds a number of commands to ``jbutil``
+This example shows that ``jbconnect-hook-jblast`` adds a number of commands to ``jbutil``
 
 ::
 
