@@ -75,6 +75,7 @@
   },
   "sails": {
     "isHook": true,
+    "isJBConnectHook":true,
     "hookName": "jblast"
   }
 }
