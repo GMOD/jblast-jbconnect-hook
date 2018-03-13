@@ -12,6 +12,8 @@ var fs = Promise.promisifyAll(require("fs"));
 var deferred = require('deferred');
 var merge = require('deepmerge');
 var util = require("./utils");
+const _ = require("lodash");
+
 module.exports = {
 
     /**
@@ -130,6 +132,8 @@ module.exports = {
                 var dataSet = requestData.dataset;
                 var g = sails.config.globals.jbrowse;
                 var filterfile = g.jbrowsePath + dataSet +'/'+ g.jblast.blastResultPath+'/'+asset+'_filtersettings.json';
+
+                fsettings = _.merge(fsettings,filterData);
                 
                 fs.writeFileSync(filterfile,JSON.stringify(fsettings));
             } catch (err) {
@@ -205,7 +209,7 @@ module.exports = {
      *     filterSummary (eg. { result: 'success', hits: 792, filteredHits: 24 }
      */
     getHitDataFiltered(filterData,requestData,cb) {
-        sails.log.debug('passiveApplyFilter()',requestData);
+        sails.log.debug('getHitDataFiltered()',filterData,requestData);
         var thisb = this;
         var g = sails.config.globals.jbrowse;
         var asset = requestData.asset;
