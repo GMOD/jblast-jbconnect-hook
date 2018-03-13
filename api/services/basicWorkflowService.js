@@ -86,7 +86,7 @@
  *         },
  *         "blastData": {
  *           "name": "JBlast",
- *           "blastSeq": "/var/www/html/3jbserver/node_modules/jbrowse//sample_data/json/volvox/jblastdata/blast_region1517044304838.fa",
+ *           "blastSeq": "/var/www/html/jbconnect/node_modules/jbrowse//sample_data/json/volvox/jblastdata/blast_region1517044304838.fa",
  *           "offset": "44705"
  *         },
  *         "seqFile": "http://localhost:1337/jbrowse/sample_data/json/volvox/jblastdata/blast_region1517044304838.fa",
@@ -440,7 +440,7 @@ module.exports = {
                     offsetfix.process(kJob,newTrackJson,function() {
                         jblastPostAction.processFilter(kJob,newTrackJson,function(hitdata) {
                             
-                            // postAction service is in JBServer 
+                            // postAction service is in JBConnect 
                             postAction.addToTrackList(kJob,newTrackJson);
                         });
                     });

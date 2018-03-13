@@ -2,10 +2,10 @@
 JBlast
 ******
 
-**JBlast - A BLAST service for JBServer and JBrowse**
+**JBlast - A BLAST service for JBConnect and JBrowse**
 
-JBlast is JBServer hook module (jbh).  It contains both server-side integration
-with JBServer as well as a client-side plugin.
+JBlast is JBConnect hook module (jbh).  It contains both server-side integration
+with JBConnect as well as a client-side plugin.
 
 .. image:: img/filter-panel.jpg
 

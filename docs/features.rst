@@ -35,7 +35,7 @@ User selects workflow from the list and the region is submitted to the server.
 Details:
 
 The software enumerates the available workflows from the server.  The workflows
-may be Galaxy workflows or JBServer workflows (stand-alone).  The user should
+may be Galaxy workflows or JBConnect workflows (stand-alone).  The user should
 choose workflows with blast operations and the result files are blastxml.
 
 See: :ref:`jblast-select-workflow`
@@ -60,7 +60,7 @@ The result files for JBlast workflows are generally blastxml files.
 
 The workflow monitor is designed to monitor a workflow that may generate multiple result files, assuming
 blast searches may occur in serial or parallel, depending on the configureation of Galaxy
-or the JBServer workflow engine.
+or the JBConnect workflow engine.
 
 The workflow monitor code is specific to the blast operation monitoring.
 

@@ -75,7 +75,7 @@ module.exports = {
             })
             .catch(function (err) {
                 console.log(err.name,err.message);
-                console.log("Is JBServer running?");
+                console.log("Is JBConnect running?");
                 cb(null);
             });
     },

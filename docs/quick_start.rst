@@ -6,7 +6,7 @@ Instructions for installing JBlast with stand-alone NCBI Blast tools (non-Galaxy
 
 To setup Galaxy integration, see `Setup Galaxy Integration`_
 
-(Since JBServer is generally intended to be a companion of JBrowse.  
+(Since JBConnect is generally intended to be a companion of JBrowse.  
 JBrowse may also be installed in a separate directory.
 (See :ref:`jbs-separate-dir`.)
 
@@ -28,13 +28,13 @@ Install and run *redis*
 Install
 =======
 
-Install the JBServer and JBrowse.  jb_setup.js ensures the sample data is loaded.
+Install the JBConnect and JBrowse.  jb_setup.js ensures the sample data is loaded.
 
 ::
 
-    # install jbserver
-    git clone http://github.com/gmod/jbserver
-    cd jbserver
+    # install jbconnect
+    git clone http://github.com/gmod/jbconnect
+    cd jbconnect
     npm install
 
     # install jbrowse & setup jbrowse demo
@@ -62,7 +62,7 @@ From a web browser, access the application (default login: juser/password).
 
 ---------------------
 
-Configure JBServer with Galaxy Info
+Configure JBConnect with Galaxy Info
 ===================================
 
 In the ``jbrowse`` directory, edit ``config/globals.js`` and create a ``galaxy:`` section under ``jbrowse:`` section.  Add the Galaxy installation path.
@@ -77,7 +77,7 @@ In the ``jbrowse`` directory, edit ``config/globals.js`` and create a ``galaxy:`
       }
     }
 
-These settings will override any settings in ``node_modules/jbh-jblast/config/globals.js`` and ``jbserver/config/globals.js``. 
+These settings will override any settings in ``node_modules/jbh-jblast/config/globals.js`` and ``jbconnect/config/globals.js``. 
 
 From the JBrowse directory, type ``./jbutil --setuptools``
 
@@ -119,7 +119,7 @@ Now, restart galaxy: ``sh run.sh``
 Install NCBI Blast+ Tools
 *************************
 
-At the same level as ``jbserver`` and ``galaxy`` directories, create a directory called ``shed_tools``, making sure it has the same permissions as the ``galaxy`` and ``jbserver`` directories.
+At the same level as ``jbconnect`` and ``galaxy`` directories, create a directory called ``shed_tools``, making sure it has the same permissions as the ``galaxy`` and ``jbconnect`` directories.
 
 Select the **Admin** menu and **Search Tool Shed** from the left side bar.
 
@@ -171,7 +171,7 @@ In the ``galaxy`` directory, edit ``tool-data/blastdb.loc``.
 
 Add this line to the end of the file:
 
-``htgs{tab}High Throughput Genomic Sequences (htgs){tab}/var/www/jbserver/blastdb/htgs/htgs``
+``htgs{tab}High Throughput Genomic Sequences (htgs){tab}/var/www/jbconnect/blastdb/htgs/htgs``
 
 *It's important to get the name "htgs" correct.  The name counts in our demo workflow.
 The directory should reflect the directory of the installed BLAST database.*
@@ -180,7 +180,7 @@ The directory should reflect the directory of the installed BLAST database.*
 Setup Galaxy Job Service
 ************************
 
-In ``jbserver`` directory, edit ``node_modules/jbh-jblast/config/globals.js`` and add the galaxy job service.
+In ``jbconnect`` directory, edit ``node_modules/jbh-jblast/config/globals.js`` and add the galaxy job service.
 
 ::
 

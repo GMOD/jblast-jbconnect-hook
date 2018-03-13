@@ -137,7 +137,7 @@ function doCompleteAction(kJob,hista) {
                         else {
                             offsetfix.process(kJob,newTrackJson,function() {
                                 processFilter(kJob,newTrackJson,function(hitdata) {
-                                    // postAction is a service in JBServer
+                                    // postAction is a service in JBConnect
                                     postAction.addToTrackList(kJob,newTrackJson);
                                 });
                             });

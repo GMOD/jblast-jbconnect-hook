@@ -16,7 +16,7 @@ Modify the configuration file as necessary.
 
 To view aggregate configuration: ``./jbutil --config``
 
-The aggregate config file is the merged config of JBServer and its installed jbh- (hook)
+The aggregate config file is the merged config of JBConnect and its installed jbh- (hook)
 modules.
 
 Edit config file: ``nano config/globals.js``
@@ -60,7 +60,7 @@ Get Galaxy API Key
 JBlast jbutil Command
 =====================
 
-``jbutil`` is a setup/configuration utility for JBServer.  jbh-hook can extend
+``jbutil`` is a setup/configuration utility for JBConnect.  jbh-hook can extend
 ``jbutil`` command options. (see: :ref:`jbs-hooks-extend`)
 
 This example shows that ``jbh-jblast`` adds a number of commands to ``jbutil``
@@ -121,7 +121,7 @@ In ``trackList.json``, within the dataset's path, add ``JBlast`` and ``JBClient`
   ],
 
 *Note: the JBlast and JBClient plugins are not physically in the JBrowse plugin directory.
-They are made available as route by the JBServer framework and are only accessible at runtime.*
+They are made available as route by the JBConnect framework and are only accessible at runtime.*
 
 See :ref:`jblast-integrated-gui` for more details.
 
@@ -133,15 +133,15 @@ Setup Galaxy Integration
 Galaxy integration is optional and allows for using Galaxy workflows to process BLAST searches.
 Note that is is a demonstration of Galaxy integration and not intended to be a robust solution.
 
-We generally assume that Galaxy and JBServer are installed in side-by-side directories.
+We generally assume that Galaxy and JBConnect are installed in side-by-side directories.
 For example:
 ::
     /var
        /www
            /galaxy
-           /jbserver
+           /jbconnect
 
-Getting JBServer fully integrated with Galaxy will require several start/stop instances of Galaxy.
+Getting JBConnect fully integrated with Galaxy will require several start/stop instances of Galaxy.
 
 
 Install Galaxy

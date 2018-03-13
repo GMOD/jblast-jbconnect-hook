@@ -9,17 +9,17 @@ then
     zipfile=$(grep -F ".tgz" pack.out | tee /dev/tty)
     echo "${zipfile} found"
 
-    jfile="./jbserver/jbutil"
+    jfile="./jbconnect/jbutil"
     if [ -f "$jfile" ]
     then
-        echo "$jfile found. JBServer alread exists"
-        cd jbserver
+        echo "$jfile found. JBConnect already exists"
+        cd jbconnect
         npm install ../$zipfile 
         
     else
-        echo "$jfile not found. Installing JBServer"
-        git clone http://github.com/gmod/jbserver
-        cd jbserver
+        echo "$jfile not found. Installing JBConnect"
+        git clone http://github.com/gmod/jbconnect
+        cd jbconnect
         npm install
         npm install ../$zipfile
         exit 0
@@ -32,13 +32,13 @@ fi
 
 exit
 
-git clone http://github.com/gmod/jbserver
+git clone http://github.com/gmod/jbconnect
 cd jbserver
 npm install
 ./jbutil --setupdata
 ./bin/blast_getBlast.js
 ./bin/blast_downloadDb.js htgs.05
-nohup sails lift --port 5001 > jbserver.log 2>&1 &
+nohup sails lift --port 5001 > jbconnect.log 2>&1 &
 echo $! > save_pid.txt #save last process pid
 cd ..
 sleep 20

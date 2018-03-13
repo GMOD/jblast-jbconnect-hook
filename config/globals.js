@@ -1,7 +1,7 @@
 /*
  * JBlast tools configuration
  * 
- * These configurations are merged with JBserver ``config/globals.js``
+ * These configurations are merged with JBConnect ``config/globals.js``
  */
 module.exports.globals = {
     jbrowse: {

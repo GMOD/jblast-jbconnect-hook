@@ -50,7 +50,7 @@ fs.ensureDir(options.outputDirectory);
 //read the file that the result will be compared against.
 //var buffer = fs.readFileSync('./test/blastresult.xml');
 
-//var outDir = '/var/www/html/3jbserver/node_modules/jbrowse/sample_data/json/volvox/jblastdata';
+//var outDir = '/var/www/html/jbconnect/node_modules/jbrowse/sample_data/json/volvox/jblastdata';
 //var outDir = jbrowsePath
 
 var fakeParams = { 

@@ -7,14 +7,14 @@ install:
   - npm install
   - npm install -g sails
 before_script:
-  - git clone http://github.com/gmod/jbserver
-  - cd jbserver
+  - git clone http://github.com/gmod/jbconnect
+  - cd jbconnect
   - npm install
   - npm install gmod/jblast
   - ./jbutil --setupdata
   - ./bin/blast_getBlast.js
   - ./bin/blast_downloadDb.js htgs.05
-  - nohup sails lift --port 5001 > jbserver.log 2>&1 &
+  - nohup sails lift --port 5001 > jbconnect.log 2>&1 &
   - echo $! > save_pid.txt #save last process pid
   - cd ..
   - sleep 20
@@ -24,7 +24,7 @@ script:
   - wget http://localhost:5001/login
   - wget http://localhost:5001/register
   - wget http://localhost:5001/loginstate
-  - kill -9 `cat jbserver/save_pid.txt`
-  - cat jbserver/jbserver.log
+  - kill -9 `cat jbconnect/save_pid.txt`
+  - cat jbconnect/jbconnect.log
 after_failure:
   
