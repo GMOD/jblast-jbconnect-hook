@@ -8,16 +8,18 @@ var util = require('./util.js');
 var Finder = require('fs-finder');
 var approot = require('app-root-path');
 var shelljs = require('shelljs');
+var kue = require('kue');
 
 module.exports = {
     getOptions: function() {
         return [
-            //['' , 'blastdbpath=PATH' , '(jblast - galaxy) existing database path'],
-            //['' , 'setupblastdemodb' , '(jblast - setup blast demo database'],
             ['' , 'setupworkflows'   , '(jblast - galaxy) installs demo galaxy workflows (must have API key configured'],
             ['' , 'setuptools'       , '(jblast - galaxy) setup jblast tools for galaxy'],
+            ['' , 'setupdata'        , '(jblast) setup jblast demo data and samples (JBrowse Volvox must exist)'],
+            ['' , 'cleankue'         , "(jblast) purge the kue's redis entries"]
+            //['' , 'blastdbpath=PATH' , '(jblast - galaxy) existing database path'],
+            //['' , 'setupblastdemodb' , '(jblast - setup blast demo database'],
             //['' , 'setuphistory'     , '(jblast - galaxy) setup history'],
-            ['' , 'setupdata'        , '(jblast) setup jblast demo data and samples (JBrowse Volvox must exist)']
             //['' , 'setupindex'       , '(jblast) setup index.html in the jbrowse directory']
         ];        
     },
@@ -35,6 +37,23 @@ module.exports = {
             console.log("jblast - failed to initialize");
             return;
         }
+        var setuptools = opt.options['setuptools'];
+        if (typeof setuptools !== 'undefined') {
+            exec_setuptools(this);
+        }
+        var setupworkflows = opt.options['setupworkflows'];
+        if (typeof setupworkflows !== 'undefined') {
+            exec_setupworkflows(this);
+        }
+        var setupdata = opt.options['setupdata'];
+        if (typeof setupdata !== 'undefined') {
+            exec_setupdata(this);
+            exec_setuptrack(this);
+        }
+        var cleankue = opt.options['cleankue'];
+        if (typeof cleankue !== 'undefined') {
+            exec_cleankue(this);
+        }
         
         //var tool = opt.options['setupindex'];
         //if (typeof tool !== 'undefined') {
@@ -45,28 +64,15 @@ module.exports = {
 //        if (typeof setupblastdemodb !== 'undefined') {
 //            exec_setupblastdemodb(this);
 //        }
-        var setuptools = opt.options['setuptools'];
-        if (typeof setuptools !== 'undefined') {
-            exec_setuptools(this);
-        }
 //        var blastdbpath = opt.options['blastdbpath'];
 //        if (typeof blastdbpath !== 'undefined') {
 //            this.blastdbpath = blastdbpath
 //            exec_blastdbpath(this);
 //        }
-        var setupworkflows = opt.options['setupworkflows'];
-        if (typeof setupworkflows !== 'undefined') {
-            exec_setupworkflows(this);
-        }
 //        var setuphistory = opt.options['setuphistory'];
 //        if (typeof setuphistory !== 'undefined') {
 //            exec_setuphistory(this);
 //        }
-        var setupdata = opt.options['setupdata'];
-        if (typeof setupdata !== 'undefined') {
-            exec_setupdata(this);
-            exec_setuptrack(this);
-        }
         //var setupdata = opt.options['setupblastdemodb'];
         //if (typeof setupdata !== 'undefined') {
         //    exec_setupblastdemo(this);
@@ -349,7 +355,7 @@ function exec_setuphistory(params) {
 function exec_blastdbpath(params) {
     
     var gdatapath = params.gdatapath;
-    var blastdbpath = params.blastdbpath
+    var blastdbpath = params.blastdbpath;
 
     console.log("Setting BLAST DB path");
 
@@ -430,13 +436,36 @@ function exec_setuptools(params) {
     
     console.log("Restart Galaxy server for changes to take effect.");
 }
+/*
 function exec_setupblastdemodb(params) {
     var srcpath = params.srcpath;
     var gdatapath = params.gdatapath;
     var gdataroot = params.gdataroot;
     
     util.cmd('node blast_downloadDb htgs.05');
-    
-    
 }
+*/
+
+function exec_cleankue(params) {
+    kue.Job.rangeByType( 'workflow', 'failed', 0, 10000, 'asc', function( err, jobs ) {
+        jobs.forEach( function( job ) {
+            removejob(job);
+        });
+    });
+    kue.Job.rangeByType( 'workflow', 'active', 0, 10000, 'asc', function( err, jobs ) {
+        jobs.forEach( function( job ) {
+            removejob(job);
+        });
+    });
+    kue.Job.rangeByType( 'workflow', 'completed', 0, 10000, 'asc', function( err, jobs ) {
+        jobs.forEach( function( job ) {
+            removejob(job);
+        });
+    });
     
+    function removejob(job) {
+        job.remove( function(){
+          console.log( 'removed ', job.id ,job.data.name);
+        });
+    }
+}
