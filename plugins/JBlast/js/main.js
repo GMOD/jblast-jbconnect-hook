@@ -46,6 +46,33 @@ return declare( JBrowsePlugin,
             console.log("loaded BlastPanel.html");
             $('body').append(data);
         });            
+
+        browser.afterMilestone( 'loadConfig', function() {
+            thisB.loginState = false;
+            $.get("/loginstate",function(data) {
+                //console.log("loginstate",data);
+                thisB.loginState = data.loginstate;
+                if (!thisB.loginState) {
+                    browser.config.tracks.forEach( function(conf){
+                        //console.log("conf.label",conf.label,conf.urlTemplate);
+                        if (typeof conf.urlTemplate !== 'undefined' && conf.urlTemplate.charAt(0) === "/") {
+                            console.log(conf.label, "track requires login");
+                            browser.config.tracks.remove(conf);
+                        }
+                    },this);
+                }
+            });
+            Array.prototype.remove = function() {
+                var what, a = arguments, L = a.length, ax;
+                while (L && this.length) {
+                    what = a[--L];
+                    while ((ax = this.indexOf(what)) !== -1) {
+                        this.splice(ax, 1);
+                    }
+                }
+                return this;
+            };
+        });
         
         browser.jblast = {
             asset: null,
