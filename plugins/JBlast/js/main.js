@@ -48,6 +48,7 @@ return declare( JBrowsePlugin,
         });            
 
         browser.afterMilestone( 'loadConfig', function() {
+            // if we are not logged in, hide REST tracks.
             thisB.loginState = false;
             $.get("/loginstate",function(data) {
                 //console.log("loginstate",data);
