@@ -87,7 +87,7 @@ module.exports = {
         get_hit_details:    'get'
     },
     init: function(params,cb) {
-        sails.log(">>> galaxyService.init");
+        //sails.log(">>> galaxyService.init");
         //galaxyProc.init(cb);        var cb2 = cb;
         // TODO: check that galaxy is running
 
