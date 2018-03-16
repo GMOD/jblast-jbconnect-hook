@@ -18,8 +18,8 @@ define([
            "dijit/form/ComboBox",
             'dijit/Menu',
             'dijit/MenuItem',
-           'JBrowse/has',
-        './slidersMixin'
+           'JBrowse/has'
+        //'./slidersMixin'
        ],
        function(
         declare,
@@ -28,8 +28,8 @@ define([
         domConstruct,
         query,
         JBrowsePlugin,
-        Button, Dialog, Memory, ComboBox,Menu,MenuItem,has,
-        slidersMixin
+        Button, Dialog, Memory, ComboBox,Menu,MenuItem,has
+        //slidersMixin
        ) {
 return declare( JBrowsePlugin,
 {
@@ -40,10 +40,10 @@ return declare( JBrowsePlugin,
         var thisB = this;
         var browser = this.browser;
 
-        var sliders = new slidersMixin(this,browser);
+        //var sliders = new slidersMixin(this,browser);
         
         $.get("plugins/JBlast/BlastPanel.html", function(data){
-            console.log("loaded BlastPanel.html");
+            //console.log("loaded BlastPanel.html");
             $('body').append(data);
         });            
 
