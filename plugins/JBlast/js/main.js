@@ -54,25 +54,18 @@ return declare( JBrowsePlugin,
                 //console.log("loginstate",data);
                 thisB.loginState = data.loginstate;
                 if (!thisB.loginState) {
-                    browser.config.tracks.forEach( function(conf){
-                        //console.log("conf.label",conf.label,conf.urlTemplate);
-                        if (typeof conf.urlTemplate !== 'undefined' && conf.urlTemplate.charAt(0) === "/") {
-                            console.log(conf.label, "track requires login");
-                            browser.config.tracks.remove(conf);
+                    let conf = dojo.clone(browser.config.tracks);
+                    browser.config.tracks = [];
+                    for(let i=0; i < conf.length;i++) {
+                        if (typeof conf[i].urlTemplate === 'undefined' || conf[i].urlTemplate.charAt(0) !== "/") {
+                            browser.config.tracks.push(conf[i]);
                         }
-                    },this);
-                }
-            });
-            Array.prototype.remove = function() {
-                var what, a = arguments, L = a.length, ax;
-                while (L && this.length) {
-                    what = a[--L];
-                    while ((ax = this.indexOf(what)) !== -1) {
-                        this.splice(ax, 1);
+                        else {
+                            console.log(conf[i].label, "track requires login");
+                        }
                     }
                 }
-                return this;
-            };
+            });
         });
         
         browser.jblast = {
