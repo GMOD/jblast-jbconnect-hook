@@ -18,8 +18,8 @@ define([
            "dijit/form/ComboBox",
             'dijit/Menu',
             'dijit/MenuItem',
-           'JBrowse/has'
-        //'./slidersMixin'
+           'JBrowse/has',
+           './tabs'
        ],
        function(
         declare,
@@ -28,8 +28,8 @@ define([
         domConstruct,
         query,
         JBrowsePlugin,
-        Button, Dialog, Memory, ComboBox,Menu,MenuItem,has
-        //slidersMixin
+        Button, Dialog, Memory, ComboBox,Menu,MenuItem,has,
+        JBTabs
        ) {
 return declare( JBrowsePlugin,
 {
@@ -79,6 +79,12 @@ return declare( JBrowsePlugin,
          * class override function intercepts
          */
         browser.afterMilestone( 'initView', function() {
+            
+            thisB.jblastTabs = new JBTabs({
+                plugin: thisB,
+                browser: browser
+            });
+            
             if (!thisB.browser.loginState) return;
 
             if (typeof browser.config.classInterceptList === 'undefined') {
@@ -447,46 +453,7 @@ return declare( JBrowsePlugin,
         },300);
     },
     processAction: function() {
-        
-        var queue = this.browser.jblast.focusQueue;
-
-        var thisB = this;
-        var task = queue.shift();
-        this.browser.jblast.focusQueueProc++;
-
-        
-        if (task.action === 'show') {
-            $('#blast-filter-group').clone().prependTo('.jbrowseHierarchicalTrackSelector');
-            thisB.setupFilterSliders(task.trackConfig);
-            //$('#blast-filter-group').show(500,function() {
-            $('#blast-filter-group').show(0,function() {
-                $('.blast-group-descript').html(task.trackConfig.key);
-                if (typeof task.trackConfig.metadata != 'undefined' && typeof task.trackConfig.metadata.description !== 'undefined') {
-                    $('.blast-group-descript').attr('title',task.trackConfig.metadata.description);
-                    $('.blast-group-descript').attr('alt',task.trackConfig.metadata.description);
-
-                    $.get("/service/exec/get_blastdata/?asset="+JBrowse.jblast.asset+'&dataset='+encodeURIComponent(JBrowse.config.dataRoot), function(data){
-                        console.log( data );
-                        $('.blast-hit-data').html("Hits: ("+data.filteredHits+'/'+data.hits+")");
-                    });
-                    
-                    
-                }
-                thisB.browser.jblast.focusQueueProc--;
-            });
-        }
-        else if (task.action === 'hide') {
-            $(".jbrowseHierarchicalTrackSelector > #blast-filter-group").hide(100,function complete() {
-                $(".jbrowseHierarchicalTrackSelector > #blast-filter-group").remove();
-            });
-            if ($('#blast-filter-group').length) {
-                //$('#blast-filter-group').hide(500);
-                $('#blast-filter-group').hide();
-                setTimeout(function() { // hide complete event is broke in jquery, so we use a timer.
-                    thisB.browser.jblast.focusQueueProc--;
-                },700);
-            }
-        }
+        this.jblastTabs.processAction(this,this.browser);
     },
     
     insertBlastPanel: function(trackConfig) {

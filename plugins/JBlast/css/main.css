@@ -153,3 +153,11 @@ div.blastSummary td.blastSummaryItem {
     border-spacing: 2px;
 }
        
+
+/*
+   hierarchicalTrackPane panel 
+*/
+
+div#hierarchicalTrackPane > div.header {
+    display: none;
+}
