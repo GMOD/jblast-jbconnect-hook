@@ -6,7 +6,7 @@ define([
         constructor: function(args) {
             var thisb = this;
             var browser = args.browser;
-            console.log("tabs constructor",args);
+            //console.log("tabs constructor",args);
             
             browser.afterMilestone( 'initView', function() {
 
