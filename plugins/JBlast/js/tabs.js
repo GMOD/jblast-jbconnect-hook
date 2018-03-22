@@ -34,8 +34,8 @@ define([
                 };
                 
                 // create the panel from template
-                var tabs = $('#tabs-panel').html();
-                $( tabs ).insertBefore( "#hierarchicalTrackPane" );
+                var tabsTemplate = $('#tabs-panel').html();
+                $( tabsTemplate ).insertBefore( "#hierarchicalTrackPane" );
 
                 // handle tab click (either tab)
                 $('.jblast-tabs > li').on('click',function( event, param1, param2 ) {
