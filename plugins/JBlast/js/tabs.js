@@ -42,7 +42,7 @@ define([
                     if (tabs.selected === '#'+event.currentTarget.id) return; // already selected, skip
                     var lastSelected = tabs.selected;
                     tabs.selected = '#'+event.currentTarget.id;
-                    console.log("tab id",tabs.selected);
+                    //console.log("tab id",tabs.selected);
                     
                     (tabs[lastSelected].hide)();
                     (tabs[tabs.selected].show)();                    
