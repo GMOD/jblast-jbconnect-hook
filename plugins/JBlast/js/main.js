@@ -678,7 +678,7 @@ return declare( JBrowsePlugin,
         }
         //console.log("postData",postData);
         $.post( "/service/exec/set_filter", postData , function( data) {
-            console.log( data );
+            //console.log( "/set_filter",postData,data );
             $('.blast-hit-data').html("Hits: ("+data.filteredHits+'/'+data.hits+")");
         }, "json");
     },
