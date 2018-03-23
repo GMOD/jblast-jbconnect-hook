@@ -5,6 +5,7 @@
  * 
  */
 var fs = require('fs-extra');
+var filter = require('./filter');
 
 module.exports = {
 
@@ -39,6 +40,9 @@ module.exports = {
     set_filter: function(req, res) {
         var g = sails.config.globals;
         var requestData = req.allParams();
+        
+        if (typeof requestData.filterParams !== 'undefined')
+            requestData.filterParams = fixNumber(requestData.filterParams);
 
         var err = filter.writeFilterSettings(requestData,function(filterData) {
             console.log(">>> filterData",filterData);
@@ -114,3 +118,9 @@ module.exports = {
     }
 };
 
+function fixNumber(fSettings) {
+    if (typeof fSettings.evalue !== 'undefined') {
+        fSettings.evalue.val = Number(fSettings.evalue.val);
+    }
+    return fSettings;
+}
