@@ -200,6 +200,7 @@ return declare( JBrowsePlugin,
              */
             dojo.subscribe("/jbrowse/v1/n/tracks/focus", function(track){
                 console.log("jblast plugin event: /jbrowse/v1/n/tracks/focus",track);
+                if (track===null) return;
                 if (typeof track.config.jblast !== 'undefined') {
                     // for jblast tracks, the label is the asset and also the reference to the filterSettings of the asset
                     thisB.browser.jblast.asset = track.config.label;
@@ -253,8 +254,10 @@ return declare( JBrowsePlugin,
 
         var tracks = this.browser.view.tracks;
         
+        //console.log(">> trackLabel",trackLabel,tracks.length);
         for(var i in tracks) {
-            if (tracks[i].config.label === trackLabel)
+            //console.log(tracks[i]);
+            if (typeof tracks[i].config !== 'undefined' && tracks[i].config.label === trackLabel)
                 return tracks[i];
         }
         return null;
