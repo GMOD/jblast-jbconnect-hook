@@ -40,12 +40,45 @@ return declare( JBrowsePlugin,
         var thisB = this;
         var browser = this.browser;
 
-        //var sliders = new slidersMixin(this,browser);
-        
         $.get("plugins/JBlast/BlastPanel.html", function(data){
             //console.log("loaded BlastPanel.html");
             $('body').append(data);
-        });            
+        });
+        
+        // remove array element by name
+        Array.prototype.remove = function() {
+            var what, a = arguments, L = a.length, ax;
+            while (L && this.length) {
+                what = a[--L];
+                while ((ax = this.indexOf(what)) !== -1) {
+                    this.splice(ax, 1);
+                }
+            }
+            return this;
+        };            
+
+        // intercept Browser.showTracks
+        // when not logged in, filter out REST tracks
+        // we are basically checking to see if the url tracks are in the pruned track list.
+        browser.orig_showTracks = browser.showTracks,
+        browser.showTracks = function( trackNames ) {
+            //trackNames = trackNames.remove('jblast_sample');
+            if (thisB.browser.loginState) return browser.orig_showTracks(trackNames);
+
+            let trackNames1 = [];
+            let confTracks = browser.config.tracks;
+            
+            for(let i=0; i < trackNames.length;i++) {
+                for(let j=0;j<confTracks.length;j++) {
+                    if ( confTracks[j].label === trackNames[i] ){
+                        trackNames1.push(trackNames[i]);
+                        break;
+                    }
+                }
+            }
+            return browser.orig_showTracks(trackNames1);
+        };
+        
 
         browser.afterMilestone( 'loadConfig', function() {
             // if we are not logged in, hide REST tracks.
@@ -85,6 +118,7 @@ return declare( JBrowsePlugin,
                 browser: browser
             });
             
+            // skip the following if not logged  <-------------------------
             if (!thisB.browser.loginState) return;
 
             if (typeof browser.config.classInterceptList === 'undefined') {
@@ -129,7 +163,7 @@ return declare( JBrowsePlugin,
                 });
             });
             browser.jblastDialog = thisB.Browser_jblastDialog;
-            
+
             
             // setup right click menu for highlight region - for arbitrary region selection
             thisB.jblastRightClickMenuInit();
