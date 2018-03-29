@@ -64,17 +64,6 @@ module.exports.globals = {
             'filterService':            {name: 'filterService',         type: 'service'},
             'entrezService':            {name: 'entrezService',         type: 'service'}
         },
-        /*
-        libRoutes: {
-                'SliderPips':    {module:'jQuery-ui-Slider-Pips', vroute:'/jblib/slider-pips'}
-        },
-        */
-        /*
-        webIncludes: {
-            "jblast-css-SliderPips":    {lib: "/jblib/slider-pips/dist/jquery-ui-slider-pips.min.css" },
-            "jblast-js-SliderPips":     {lib: "/jblib/slider-pips/dist/jquery-ui-slider-pips.min.js" }
-        }
-        */
         webIncludes: {
             "jblast-css-SliderPips":    {lib: "/jblib/jquery-ui-slider-pips.min.css" },
             "jblast-js-SliderPips":     {lib: "/jblib/jquery-ui-slider-pips.min.js" }
