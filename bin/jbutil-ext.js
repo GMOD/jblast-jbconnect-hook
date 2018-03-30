@@ -65,7 +65,10 @@ module.exports = {
             console.log(this.srcpath,'source path does not exist');
             return 0;   // failed init
         }
+        
         if (typeof opt.options['setupdata'] !== 'undefined') 
+            return 1;
+        if (typeof opt.options['removeall'] !== 'undefined') 
             return 1;
 
         /*
@@ -180,12 +183,12 @@ function exec_setuptrack(params) {
     
     var conf = JSON.parse(trackListData);
 
-    console.log("Adding plugins JBClient & JBlast in trackList.json");
+    //console.log("Adding plugins JBClient & JBlast in trackList.json");
     
     
     // add the JBlast & JBClient plugin, if they don't already exist  
-    if (conf.plugins.indexOf('JBClient') === -1) conf.plugins.push("JBClient");
-    if (conf.plugins.indexOf('JBlast') === -1) conf.plugins.push("JBlast");
+    //if (conf.plugins.indexOf('JBClient') === -1) conf.plugins.push("JBClient");
+    //if (conf.plugins.indexOf('JBlast') === -1) conf.plugins.push("JBlast");
     //if (conf.plugins.indexOf('ServerSearchSeq') === -1) conf.plugins.push("ServerSearchSeq");
 
 
