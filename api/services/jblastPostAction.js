@@ -295,7 +295,8 @@ function processFilter(kJob,newTrackJson,cb) {
         var asset = {
             "asset": kJob.data.blastData.outputs.blastxml, //newTrackJson[0].label,
             "dataset": kJob.data.dataset,   //g.dataSet[0].dataPath
-            "noAnnounce": true
+            "noAnnounce": true,
+            "contig": kJob.data.sequence.seq
         };
         filter.applyFilter(0,asset,function(hitdata) {
             kJob.data.blastData.hits = hitdata.hits;

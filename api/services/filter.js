@@ -43,6 +43,7 @@ module.exports = {
         this.blastData = JSON.parse(content);
         
         var filter = {
+            "contig": kJob.data.sequence.seq,
             "score": {
                 "type": "abs",
                 "min": Math.floor(this.getLowest('Hsp_bit-score')),
@@ -84,6 +85,7 @@ module.exports = {
      * @param {object} cb - function(filterData)
      * ::
      *       eg. filterData: { 
+     *           contig: "ctgA",
      *           score: {type: 'abs', min: 58, max: 593, val: 421 },
      *           evalue: { type: 'exp', min: 5.96151e-165, max: 0.000291283, val: 0.000291283 },
      *           identity: { type: 'pct', min: 78, max: 100, val: 78 },
@@ -115,6 +117,7 @@ module.exports = {
      * @param {object} cb - updated filterData function(filterData)
      * ::
      *       eg. filterData: { 
+     *           contig: "ctgA",
      *           score: {type: 'abs', min: 58, max: 593, val: 421 },
      *           evalue: { type: 'exp', min: 5.96151e-165, max: 0.000291283, val: 0.000291283 },
      *           identity: { type: 'pct', min: 78, max: 100, val: 78 },
@@ -204,7 +207,9 @@ module.exports = {
      * Todo: for larger hit results, it may not be practical to keep the results in a memory buffer (gff string).
      * 
      * @param {object} filterData - the output of writeFilterSettings or getFilterSettings.
-     * @param {type} requestData - eg. { asset: 'jblast_sample', dataset: 'sample_data/json/volvox' }
+     *   if filterData == 0, then result will be unfiltered.
+     * @param {type} requestData - eg. { asset: 'jblast_sample', dataset: 'sample_data/json/volvox',config:'ctgA' }
+     *   contig is optional
      * @param {function} cb - function(filterSummary, gff string)
      *     filterSummary (eg. { result: 'success', hits: 792, filteredHits: 24 }
      */
@@ -214,6 +219,8 @@ module.exports = {
         var g = sails.config.globals.jbrowse;
         var asset = requestData.asset;
         var dataSet = requestData.dataset; //typeof dataSet !== 'string' ? Dataset.Resolve(requestData.dataset) : dataSet;
+        var contig = typeof requestData.contig !== 'undefined' ? requestData.contig : false;
+        contig = filterData === 0 ? contig : filterData.contig;
         //var filterData = requestData.filterParams;
         
         //sails.log('dataSet',dataSet);
@@ -266,7 +273,7 @@ module.exports = {
                 var strand = hend - hstart > 0 ? "+" : "-";
                 var score = blastData[x].Hsp["Hsp_bit-score"];
                 var seq = sequence;
-                str += "ctgA\t";                            // 1 seqid
+                str += contig+"\t";                         // 1 seqid
                 str += "blastn:blastdb\t";                  // 2 source
                 str += "blastn\t";                          // 3 type
                 str += qstart+"\t";                         // 4 start
