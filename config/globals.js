@@ -51,6 +51,9 @@ module.exports.globals = {
                 'htgs': {
                     'db': 'htgs'
                 },
+                'algae': {
+                    'db': 'algae'
+                },
                 'remote_htgs': {
                     'db': 'htgs',
                     'remote': ""
