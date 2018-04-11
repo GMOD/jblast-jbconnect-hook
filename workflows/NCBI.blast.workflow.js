@@ -98,7 +98,7 @@ fs.ensureDir(options.outputDirectory);
  */
 blast.blast(options, function(err, results) {
     if (err) {
-        var ret = results;
+        var ret = results || {};
         ret.err = err;
         console.log('workflowResults:',ret);
         process.exit(1);
