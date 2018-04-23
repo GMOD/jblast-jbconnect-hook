@@ -118,22 +118,25 @@ return declare( JBrowsePlugin,
                 browser: browser
             });
             
-            // skip the following if not logged  <-------------------------
+            // skip the following if not logged in  <-------------------------
             if (!thisB.browser.loginState) return;
 
             if (typeof browser.config.classInterceptList === 'undefined') {
                 browser.config.classInterceptList = {};
             }
+            
+            setInterval(function() {
+                if ($('div.popup-dialog div.feature-detail')[0]) {
+                    thisB.insertFeatureDetail();
+                } 
+            },2000);
             // override _FeatureDetailMixin
-            require(["dojo/_base/lang", "JBrowse/View/Track/_FeatureDetailMixin"], function(lang, _FeatureDetailMixin){
-                lang.extend(_FeatureDetailMixin, {
-                    extendedRender: function(track, f, featDiv, container) {
-                        setTimeout(function() {
-                            thisB.insertFeatureDetail(track);
-                        },1000);
-                    }
-                });
-            });
+//            require(["dojo/_base/lang", "JBrowse/View/Track/_FeatureDetailMixin"], function(lang, _FeatureDetailMixin){
+//                lang.extend(_FeatureDetailMixin, {
+//                    extendedRender: thisB.FeatureDetailMixin_extendedRender,
+//                    blah: "blah"
+//                });
+//            });
             
             // override BlockBased
             require(["dojo/_base/lang", "JBrowse/View/Track/BlockBased"], function(lang, BlockBased){
@@ -306,26 +309,29 @@ return declare( JBrowsePlugin,
     },
     /**
      * inserts blast feature details if appropriate blast track
-     * @param {type} track
+     * @param {object} track (optional)
      * @returns {undefined}
      */
     insertFeatureDetail: function(track) {
-        console.log("insertFeatureDetail track", track);
         var thisB = this;
+        var browser = this.browser;
         var blastPlugin = this.browser.jblastPlugin;
         var lastBlastKey = "";
         var blastShow = 0;
         var blastField = $('div.popup-dialog div.feature-detail h2.blasthit')[0];
+
+        var asset = '';
+        if (!track) asset = this.getTrackAssetId();
+        else asset = track.config.label;
 
         if (typeof blastField !== 'undefined') blastShow = $(blastField).attr('blastshown');
 
         //console.log("monitor",blastField,blastShow,typeof blastShow);
 
         if (typeof blastField !== 'undefined') {// && blastShow !== '1') {
-            //$(blastField).attr('blastshown',1);
             var blastKey = $('div.popup-dialog div.feature-detail div.value_container div.blasthit').html();
             if (blastKey !== lastBlastKey) {
-                console.log("new blast dialog key = "+blastKey);
+                //console.log("new blast dialog key = "+blastKey);
                 var regionObj = $('div.popup-dialog div.feature-detail div.field_container h2.feature_sequence');
                 var rObjP = $(regionObj).parent();
                 //console.log(regionObj,rObjP);
@@ -335,8 +341,7 @@ return declare( JBrowsePlugin,
                     console.log('blastDialogDetail created');
                     $('<div id="blastDialogDetail"><h2 class="blastDetailTitle sectiontitle">BLAST Results</h2><div id="blastHspBlock">Rendering...</div></div>').insertBefore(rObjP);
 
-                    var asset = track.config.label;
-                    var dataset = encodeURIComponent(track.browser.config.dataRoot);
+                    var dataset = encodeURIComponent(browser.config.dataRoot);
                     var hitkey = blastKey;
                     var url = '/service/exec/get_hit_details/?asset='+asset+'&dataset='+dataset+'&hitkey='+hitkey;
                     $.get( url, function(hitData) {
@@ -344,7 +349,7 @@ return declare( JBrowsePlugin,
                         
                         var blastContent = "";
                         var count = 0;
-                        for(i in hitData) {
+                        for(let i in hitData) {
                             var hit = hitData[i];
                             
                             // do only on first iteration because other iteratons have same data
@@ -383,6 +388,13 @@ return declare( JBrowsePlugin,
             }
         }
             
+    },
+    // get track asset id from the feature detail dialog box
+    getTrackAssetId() {
+        let n1 = $('div.popup-dialog div.feature-detail').attr('class').split(' ');
+        let trackkey = n1[n1.length-1].split('feature-detail-')[1];
+
+        return trackkey;
     },
     blastRenderHitCommon: function(hit) {
         var txt = '';
@@ -689,7 +701,12 @@ return declare( JBrowsePlugin,
 /*************************************************
  * Class overrides
  *************************************************/               
-               
+    FeatureDetailMixin_extendedRender: function(track, f, featDiv, container) {
+        setTimeout(function() {
+            thisB.insertFeatureDetail(track);
+        },1000);
+    },
+              
     // adds Blast button
     FASTA_addButtons: function (region,seq, toolbar) {
         var text = this.renderText( region, seq );
