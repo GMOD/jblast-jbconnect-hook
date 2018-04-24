@@ -368,6 +368,7 @@ return declare( JBrowsePlugin,
                                         $('#details_accession').html(data.result[idx].caption);
                                     }
                                     else {
+                                        $('#details_accession').html('N/A');
                                         console.log("lookup accession failed -", hit.Hit_accession);
                                     }
                                 });
@@ -406,7 +407,7 @@ return declare( JBrowsePlugin,
         txt +=    '<td class="field blast-field">Sequence ID</td>';
         txt +=    '<td class="field blast-field">Length</td>';
         txt += '</tr><tr>';
-        txt +=    '<td class="blast-value"><a class="value" id="details_accession" target="_blank"></a></td>';
+        txt +=    '<td class="blast-value"><a class="value" id="details_accession" target="_blank">...</a></td>';
         txt +=    '<td class="blast-value">'+ hit.Hit_id+'</td>';
         txt +=    '<td class="blast-value">'+hit.Hit_len+'</td>';
         txt += '</tr></table>';
