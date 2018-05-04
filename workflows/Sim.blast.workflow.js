@@ -1,7 +1,7 @@
 var getopt = require('node-getopt');
 var fs = require("fs-extra");
 var shelljs = require("shelljs");
-var blast = require('blastjs');
+var blast = require('blast-ncbi-tools');
 
 var appPath = require("app-root-path").path;
 var jbrowsePath = appPath;
