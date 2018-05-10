@@ -393,6 +393,8 @@ module.exports = {
         sails.log.debug('monitorWorkflow starting, wId',wId);
 
         var timerloop = setInterval(function(){
+            if (sails.exiting) return clearInterval(timerloop);
+            
             var hId = kJob.data.workflowData.history_id;
 
             // TODO: if workflow fails, output will not exist.  Need to handle this.
