@@ -46,13 +46,13 @@ module.exports.globals = {
              * Our example uses a subset of htgs, an NCBI curated blast database.
              * So, it is our default profile.
             */
-            defaultBlastProfile: 'htgs',
+            defaultBlastProfile: 'faux',
             blastProfiles: {
                 'htgs': {
                     'db': 'htgs'
                 },
-                'algae': {
-                    'db': 'algae'
+                'faux': {
+                    'db': 'faux'
                 },
                 'remote_htgs': {
                     'db': 'htgs',
