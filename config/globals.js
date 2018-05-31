@@ -67,6 +67,7 @@ module.exports.globals = {
             'filterService':            {name: 'filterService',         type: 'service'},
             'entrezService':            {name: 'entrezService',         type: 'service'}
         },
+        /**/
         webIncludes: {
             "jblast-css-SliderPips":    {lib: "/jblib/jquery-ui-slider-pips.min.css" },
             "jblast-js-SliderPips":     {lib: "/jblib/jquery-ui-slider-pips.min.js" }
