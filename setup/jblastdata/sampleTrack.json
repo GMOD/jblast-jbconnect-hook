@@ -4,7 +4,7 @@
   "maxHeight": 1200,
   "storeClass": "JBrowse/Store/SeqFeature/GFF3",
   "blastData": "[[blastResultPath]]/sampleResult.json",
-  "type": "JBrowse/View/Track/HTMLFeatures",
+  "type": "JBrowse/View/Track/CanvasFeatures",
   "metadata": {
     "description": "Sample JBlast result track"
   },
