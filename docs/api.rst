@@ -223,7 +223,7 @@ Job queue entry example:
         },
         "blastData": {
           "name": "JBlast",
-          "blastSeq": "/var/www/html/3jbserver/node_modules/jbrowse//sample_data/json/volvox/jblastdata/blast_region1517044304838.fa",
+          "blastSeq": "/var/www/html/jbconnect/node_modules/jbrowse//sample_data/json/volvox/jblastdata/blast_region1517044304838.fa",
           "offset": "44705"
         },
         "seqFile": "http://localhost:1337/jbrowse/sample_data/json/volvox/jblastdata/blast_region1517044304838.fa",
@@ -525,6 +525,7 @@ get filterData
     :param object cb: function(filterData)
     ::
           eg. filterData: { 
+              contig: "ctgA",
               score: {type: 'abs', min: 58, max: 593, val: 421 },
               evalue: { type: 'exp', min: 5.96151e-165, max: 0.000291283, val: 0.000291283 },
               identity: { type: 'pct', min: 78, max: 100, val: 78 },
@@ -546,6 +547,7 @@ write new data to filter settings file, given requestData
     :param object cb: updated filterData function(filterData)
     ::
           eg. filterData: { 
+              contig: "ctgA",
               score: {type: 'abs', min: 58, max: 593, val: 421 },
               evalue: { type: 'exp', min: 5.96151e-165, max: 0.000291283, val: 0.000291283 },
               identity: { type: 'pct', min: 78, max: 100, val: 78 },
@@ -814,30 +816,18 @@ Fetch the GFF3 file of the prior filter operation
     :param type req: request
     :param type res: response
     
+.. _module-services_filterService.fixNumber:
 
-.. _module-services_filterService.err:
 
-Member: ``err``: 
+Function: ``fixNumber``
+=======================
 
-.. _module-services_filterService.status:
 
-Member: ``status``: 
 
-.. _module-services_filterService.err:
+.. js:function:: fixNumber()
 
-Member: ``err``: 
-
-.. _module-services_filterService.status:
-
-Member: ``status``: 
-
-.. _module-services_filterService.msg:
-
-Member: ``msg``: 
-
-.. _module-services_filterService.err:
-
-Member: ``err``: 
+    
+    
 
 
 

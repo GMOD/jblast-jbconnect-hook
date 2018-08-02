@@ -10,7 +10,7 @@ var path = require('path');
 var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require("fs"));
 var deferred = require('deferred');
-var merge = require('deepmerge');
+//var merge = require('deepmerge');
 var util = require("./utils");
 const _ = require("lodash");
 
@@ -147,7 +147,7 @@ module.exports = {
 
             // special case if no filter data, then don't merge
             if (typeof filterData !== 'undefined')
-                merged = merge(fsettings,filterData);
+                merged = _.merge(fsettings,filterData);
 
             convert2Num(merged);
             cb(merged);
@@ -182,16 +182,19 @@ module.exports = {
             
             // write filtered gff
             var error = false;
-            try {
-                fs.writeFileSync(blastGffFile,filteredGffStr);
-            } catch (err) {
-                sails.log.error('applyFilter failed to write',blastGffFile);
-                error = true;
+            let write = true;  // for testing
+            if (write) {
+                try {
+                    fs.writeFileSync(blastGffFile,filteredGffStr);
+                } catch (err) {
+                    sails.log.error('applyFilter failed to write',blastGffFile);
+                    error = true;
+                }
             }
             if (error) {
                 return cb({result:'fail', error: 'applyFilter failed to write '+blastGffFile});    
             }
-            sails.log("file written",blastGffFile);
+            if (write) sails.log("file written",blastGffFile);
             
             if (!requestData.noAnnounce)
                 thisb._announceTrack(Dataset.Resolve(requestData.dataset).id,asset);
@@ -207,23 +210,28 @@ module.exports = {
      * Todo: for larger hit results, it may not be practical to keep the results in a memory buffer (gff string).
      * 
      * @param {object} filterData - the output of writeFilterSettings or getFilterSettings.
-     *   if filterData == 0, then result will be unfiltered.
-     * @param {type} requestData - eg. { asset: 'jblast_sample', dataset: 'sample_data/json/volvox',config:'ctgA' }
+     *   if filterData == 0, then result will be unfiltered.  (no features will be omitted)
+     * @param {type} requestData - eg. { asset: 'jblast_sample', dataset: 'sample_data/json/volvox',contig:'ctgA' }
      *   contig is optional
      * @param {function} cb - function(filterSummary, gff string)
      *     filterSummary (eg. { result: 'success', hits: 792, filteredHits: 24 }
      */
     getHitDataFiltered(filterData,requestData,cb) {
-        sails.log.debug('getHitDataFiltered()',filterData,requestData);
+        sails.log.debug('getHitDataFiltered()',filterData,"requestData",requestData);
         var thisb = this;
         var g = sails.config.globals.jbrowse;
         var asset = requestData.asset;
         var dataSet = requestData.dataset; //typeof dataSet !== 'string' ? Dataset.Resolve(requestData.dataset) : dataSet;
-        var contig = typeof requestData.contig !== 'undefined' ? requestData.contig : false;
-        contig = filterData === 0 ? contig : filterData.contig;
-        //var filterData = requestData.filterParams;
+        //var contig = typeof requestData.contig !== 'undefined' ? requestData.contig : "none";
+        var contig = requestData.contig;
+        //contig = filterData === 0 ? contig : filterData.contig;
+        if (typeof filterData.contig !== 'undefined') contig = filterData.contig;
         
-        //sails.log('dataSet',dataSet);
+        sails.log.debug('contig:',contig,filterData.contig);
+        if (typeof contig === 'undefined') {
+            sails.log.error('invalid contig');
+            cb({result:'fail', error: 'Invalid config'});
+        }    
         
         var resultFile = g.jbrowsePath + dataSet +'/'+ g.jblast.blastResultPath+'/'+asset+'.json';
         //var blastGffFile = g.jbrowsePath + dataSet + '/' + g.jblast.blastResultPath+'/'+asset+'.gff3';
