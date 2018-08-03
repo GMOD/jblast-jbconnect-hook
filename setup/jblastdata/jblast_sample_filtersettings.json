@@ -1,5 +1,5 @@
 {
-   "config":"ctgA",
+   "contig":"ctgA",
    "score":{
       "type":"abs",
       "min":58,
