@@ -1,0 +1,92 @@
+{
+    "src_folders" : ["test/bootstrap","test/jblast"],
+    "output_folder" : "test/reports",
+    "page_objects_path" : "",
+    "custom_assertions_path" : "",
+    "globals_path" : "",
+    "live_output" : false,
+    "parallel_process_delay" : 10,
+    "disable_colors": false,
+    "custom_commands_path": "",
+    
+    "test_runner" : {
+        "type" : "mocha",
+        "options" : {
+                "ui" : "bdd",
+                "reporter" : "list"
+        }
+    },
+
+    "test_settings" : {
+        "default" : {
+            "filter": "**/*.test.js",
+            
+            "launch_url" : "http://localhost",
+            "selenium_host" : "localhost",
+            "selenium_port" : 4444,
+            "silent" : true,
+            "disable_colors": false,
+            "screenshots" : {
+                "enabled" : false,
+                "path" : ""
+            },
+            "desiredCapabilities" : {
+                "browserName" : "firefox",
+                "javascriptEnabled" : true,
+                "acceptSslCerts" : true
+            }
+        }
+    },
+
+    "selenium" : {
+        "start_process" : true,
+        "server_path" : "node_modules/selenium-standalone/.selenium/selenium-server/3.12.0-server.jar",
+        "log_path" : "./test/reports",
+        "host" : "127.0.0.1",
+        "port" : 4444,
+        "cli_args" : {
+            "webdriver.chrome.driver" : "node_modules/selenium-standalone/.selenium/chromedriver/2.40-x64-chromedriver",
+            "webdriver.gecko.driver" : "node_modules/selenium-standalone/.selenium/geckodriver/0.20.1-x64-geckodriver",
+            "webdriver.edge.driver" : ""
+        }
+    },
+
+    "phantomjs" : {
+        "xxx_custom_commands_path": "./test/commands",
+        "desiredCapabilities" : {
+            "browserName" : "phantomjs",
+            "javascriptEnabled" : true,
+            "acceptSslCerts" : true,
+            "phantomjs.binary.path" : "node_modules/phantomjs-prebuilt/bin/phantomjs"
+        }
+    },
+
+    "browserstack" : {
+        "selenium" : {
+            "start_process" : false
+        },
+        "selenium_host" : "hub.browserstack.com",
+        "selenium_port" : 80,
+        "silent" : true,
+        "desiredCapabilities": {
+            "name" : "test-example",
+            "browserName": "firefox",
+            "browserstack.user" : "...",
+            "browserstack.key" : "..."
+        }
+    },
+    
+    "chrome" : {
+        "desiredCapabilities": {
+            "browserName": "chrome"
+        }
+    },
+
+    "edge" : {
+        "desiredCapabilities": {
+            "browserName": "MicrosoftEdge"
+        }
+    }
+}
+
+
