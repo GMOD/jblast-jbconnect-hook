@@ -27,7 +27,9 @@ if (modPath === approot)
 
 // list of directories to copy
 var dirList = [
-    {src:'workflows',trg:'workflows'}
+    {src:'workflows',trg:'workflows'},
+    {src:'test/jblast',trg:'test/jblast'},
+    {src:'test/jblast-int',trg:'test/jblast-int'}
 ];
 
 async.each(dirList,
@@ -71,3 +73,11 @@ fs.ensureDirSync(targDir);
 
 // slider-pips
 fs.copySync(approot+'/node_modules/jQuery-ui-Slider-Pips/dist',targDir,{overwrite:true});
+
+
+
+// add jblast tests to jbconnect/package.json
+console.log("Modifying package.json in approot...");
+let package = require(approot+'/package.json');
+package.scripts['jblast-test'] = "mocha test/jblast-int/**/*.test.js test/bootstrap/bootstrap.test.js";
+fs.writeFileSync(approot+'/package.json', JSON.stringify(package,null,2));
