@@ -39,7 +39,7 @@ jbconnect
 nbproject
 
 # jblast specific
-blastdb
-blastbin
-utils
+/blastdb
+/blastbin
+/utils
 *.tgz
