@@ -768,7 +768,7 @@ return declare( JBrowsePlugin,
                             var fasta = new FASTA();
                             var fastaData = fasta.renderText(hilite,seq);
                             console.log('FASTA',fastaData);
-                            delete fasta;
+                            //delete fasta;
                             browser.jblastDialog(fastaData);
                         });                                
 
@@ -812,9 +812,9 @@ return declare( JBrowsePlugin,
             
             function destroyBlastDialog() {
                 dialog.destroyRecursive();
-                delete stateStore;
-                delete cancelBtn;
-                delete submitBtn;
+                //delete stateStore;
+                //delete cancelBtn;
+                //delete submitBtn;
 
             };
             var dialog = new Dialog({ 
