@@ -15,7 +15,8 @@ module.exports = {
         return [
             ['' , 'setupworkflows'   , '(jblast-galaxy) installs demo galaxy workflows (must have API key configured'],
             ['' , 'setuptools'       , '(jblast-galaxy) setup jblast tools for galaxy'],
-            ['' , 'setupdata'        , '(jblast) setup jblast demo data and samples (JBrowse Volvox must exist)']
+            ['' , 'setupdata'        , '(jblast) setup jblast demo data and samples'],
+            ['o', 'overwrite'        , '(jblast) used with --setupdata - overwrite samples']
             //['' , 'blastdbpath=PATH' , '(jblast - galaxy) existing database path'],
             //['' , 'setupblastdemodb' , '(jblast - setup blast demo database'],
             //['' , 'setuphistory'     , '(jblast - galaxy) setup history'],
@@ -45,6 +46,7 @@ module.exports = {
             exec_setupworkflows(this);
         }
         var setupdata = opt.options['setupdata'];
+        this.opt = opt; // todo: hack to pass opt
         if (typeof setupdata !== 'undefined') {
             exec_setupdata(this);
             exec_setuptrack(this);
@@ -150,13 +152,13 @@ function exec_setuptrack(params) {
         break;  // only take the first one
     }
     
-    var trackListPath = g.jbrowsePath + dataSet + '/trackList.json';
-    var sampleTrackFile = g.jbrowsePath + dataSet;
-    sampleTrackFile += '/'+g.jblast.blastResultPath+'/sampleTrack.json';
-    //var dataSet = g.dataSet.dataPath;
+    let trackListPath = g.jbrowsePath + dataSet + '/trackList.json';
+    let error = 0;
+    
+    console.log(">>> cwd",process.cwd());
+    var sampleTrackFile = approot+'/node_modules/jblast-jbconnect-hook/setup/jblastdata/sampleTrack.json';
     
     // read sampleTrack.json file
-    var error = 0;
     try {
       var sampleTrackData = fs.readFileSync (sampleTrackFile,'utf8');
     }
@@ -167,10 +169,12 @@ function exec_setuptrack(params) {
     if (error) return;
     
     // insert blastResultPath
+
     //console.log("typeof sampleTrackData",typeof sampleTrackData,sampleTrackData);
     sampleTrackData = sampleTrackData.replace("[[blastResultPath]]",g.jblast.blastResultPath);
     sampleTrackData = sampleTrackData.replace("[[blastResultPath]]",g.jblast.blastResultPath);
     var sampleTrack = JSON.parse(sampleTrackData);
+    
     // read trackList.json
     try {
       var trackListData = fs.readFileSync (trackListPath);
@@ -182,15 +186,6 @@ function exec_setuptrack(params) {
     if (error) return;
     
     var conf = JSON.parse(trackListData);
-
-    //console.log("Adding plugins JBClient & JBlast in trackList.json");
-    
-    
-    // add the JBlast & JBClient plugin, if they don't already exist  
-    //if (conf.plugins.indexOf('JBClient') === -1) conf.plugins.push("JBClient");
-    //if (conf.plugins.indexOf('JBlast') === -1) conf.plugins.push("JBlast");
-    //if (conf.plugins.indexOf('ServerSearchSeq') === -1) conf.plugins.push("ServerSearchSeq");
-
 
     // check if sample track exists in trackList.json (by checking for the label)
     var hasLabel = 0;
@@ -218,25 +213,36 @@ function exec_setuptrack(params) {
  */
 function exec_setupdata(params) {
     
-    var config = params.config;
-    var srcpath = params.srcpath;
-    var g = config;
-
-    console.log("Setting up data directory...");
+    let config = params.config;
+    let srcpath = params.srcpath;
+    let g = config;
+    let overwrite = params.opt.options['overwrite'];
+    console.log("Setting up sample data directory...");
     
+
     // get dataSet
-    var dataSet = "-----";
-    for(var i in g.dataSet) {
-        dataSet = g.dataSet[i].path;
+    for(let i in g.dataSet) {
+
+        let dataSet = g.dataSet[i].path;
+        let copy = false;
+
+        console.log("Dataset: "+dataSet);
+        let targetdir = config.jbrowsePath + dataSet;
+
+        let checkDir = targetdir+"/"+config.jblast.blastResultPath;
+
+        if (!fs.existsSync(checkDir)) copy = true;
+        if(typeof overwrite !== 'undefined') copy = true;
+
+        if (copy) {
+            fs.ensureDirSync(checkDir);
+            let cmd = 'cp -R -v "'+srcpath+'/jblastdata" "'+checkDir+'"'; 
+            console.log('cmd',cmd);
+
+            shelljs.exec(cmd);
+        }
         break;  // only take the first one
     }
-    
-    var targetdir = config.jbrowsePath + dataSet;
-    
-    fs.ensureDirSync(targetdir+"/"+config.jblast.blastResultPath);
-    
-    util.cmd('cp -R -v "'+srcpath+'/jblastdata" "'+targetdir+'"');
-
 }
 /*
  * import the package workflows
