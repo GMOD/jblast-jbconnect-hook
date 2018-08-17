@@ -216,7 +216,7 @@ function exec_setupdata(params) {
     let config = params.config;
     let srcpath = params.srcpath;
     let g = config;
-    let overwrite = params.opt.options['overwrite'];
+    let overwrite = params.opt.options['overwrite'];    // --overwrite flag
     console.log("Setting up sample data directory...");
     
 
@@ -234,12 +234,17 @@ function exec_setupdata(params) {
         if (!fs.existsSync(checkDir)) copy = true;
         if(typeof overwrite !== 'undefined') copy = true;
 
+        let cmd = 'cp -R -v "'+srcpath+'/jblastdata" "'+targetdir+'"'; 
         if (copy) {
-            fs.ensureDirSync(checkDir);
-            let cmd = 'cp -R -v "'+srcpath+'/jblastdata" "'+checkDir+'"'; 
-            console.log('cmd',cmd);
+            try {
+                fs.ensureDirSync(targetdir);
+                console.log('cmd',cmd);
 
-            shelljs.exec(cmd);
+                shelljs.exec(cmd);
+            }
+            catch(err) {
+                console.log("error",cmd,err);
+            }
         }
         break;  // only take the first one
     }
