@@ -156,6 +156,7 @@ describe('integration test', function(){
             .end((err,res) => {
                 expect(res).to.have.status(200, 'get_trackdata status 200');
                 console.log("return data: ",res.text);
+                expect(res.text).to.not.be.undefined;
                 let lines = res.text.split('\n');
                 console.log(">> string length",lines.length);
                 expect(lines.length).to.equal(23,"result is not 23");
