@@ -15,7 +15,7 @@ Pre-Install
 ===========
 
 JBlast requires `redis <https://redis.io/>`_ as a pre-requisite, which is only used by the queue framework 
-(`kue <https://www.npmjs.com/package/kue>`_).
+(`kue <https://www.npmjs.com/package/kue>`_).  JBConnect depends on Sails.js.
 
 Install and run *redis*
 
@@ -23,6 +23,7 @@ Install and run *redis*
 
     yum install redis
     redis-server
+    npm install -g sails
 
 
 Install
@@ -31,7 +32,7 @@ Install
 Install the JBConnect and JBrowse.  jb_setup.js ensures the sample data is loaded.
 
 ::
-
+    
     # install jbconnect
     git clone http://github.com/gmod/jbconnect
     cd jbconnect
@@ -39,14 +40,12 @@ Install the JBConnect and JBrowse.  jb_setup.js ensures the sample data is loade
 
     # install jbrowse & setup jbrowse demo
     npm install @gmod/jbrowse
-    ./jb_setup.js
+    npm run jbrowse-setup
 
     # install jblast
     npm install gmod/jblast
     ./bin/blast_getBlast.js             (installs the NCBI BLAST commands)
-    ./bin/blast_downloadDb.js htgs.05   (setup sample database)
-            // you can also download the full "htgs" database, but this will
-            // take a while on slower lines. (ie. "./blast_downloadDb.js htgs" )
+
 
 Run
 ===
@@ -62,8 +61,8 @@ From a web browser, access the application (default login: juser/password).
 
 ---------------------
 
-Configure JBConnect with Galaxy Info
-===================================
+Configure JBConnect with Galaxy
+===============================
 
 In the ``jbrowse`` directory, edit ``config/globals.js`` and create a ``galaxy:`` section under ``jbrowse:`` section.  Add the Galaxy installation path.
 
