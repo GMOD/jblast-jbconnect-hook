@@ -1,5 +1,5 @@
 {
-  "name": "jbconnect-hook-jblast",
+  "name": "jblast-jbconnect-hook",
   "version": "0.0.634",
   "description": "JBlast - Integrated JBrowse BLAST with Galaxy (JBConnect Hook)",
   "main": "api/hooks/jblast/index.js",
@@ -22,7 +22,6 @@
     "app-root-path": "^2.0.1",
     "blast-ncbi-tools": "github:enuggetry/blast-ncbi-tools",
     "bluebird": "^3.5.0",
-    "deepmerge": "^1.5.0",
     "deferred": "^0.7.8",
     "fs": "0.0.1-security",
     "fs-extra": "^3.0.1",

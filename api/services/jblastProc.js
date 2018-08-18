@@ -16,6 +16,7 @@ var deferred = require('deferred');
 var filter = require("./filter");   // filter processing
 var galaxy = require("./galaxyUtils");
 var util = require("./utils");
+var sh = require("shelljs");
 
 module.exports = {
 
@@ -32,7 +33,13 @@ module.exports = {
 
         sails.on('hook:orm:loaded', function() {
         //sails.on('lifted', function() {
+
             sails.log(">>> jblastProc.initialize.lifted");
+
+            // copy sample data
+            //console.log(">>>> cwd",process.cwd());
+            sh.exec('./jbutil --setupdata');
+
             // do something after hooks are loaded
             return cb();
         });

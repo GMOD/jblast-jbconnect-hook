@@ -38,3 +38,9 @@ jbconnect
 
 nbproject
 
+# jblast specific
+/blastdb
+/blastbin
+/utils
+*.tgz
+/docs/genapi-rst
