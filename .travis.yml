@@ -18,7 +18,7 @@ before_script:
 #  - cd ..
 #  - sleep 20
 script:
-  - npm jblast-test
+  - npm run jblast-test
 #  - wget http://localhost:5001/jbrowse
 #  - wget http://localhost:5001/login
 #  - wget http://localhost:5001/register
