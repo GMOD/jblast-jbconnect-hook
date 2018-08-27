@@ -4,27 +4,26 @@ before_install:
 services:
   - redis-server
 install:
-  - npm install
-  - npm install -g sails
 before_script:
+  - npm i -g sails@1.0.2
   - git clone http://github.com/gmod/jbconnect
   - cd jbconnect
   - npm install
-  - npm install gmod/jblast
-  - ./jbutil --setupdata
-  - ./bin/blast_getBlast.js
-  - ./bin/blast_downloadDb.js htgs.05
-  - nohup sails lift --port 5001 > jbconnect.log 2>&1 &
-  - echo $! > save_pid.txt #save last process pid
-  - cd ..
-  - sleep 20
+  - npm install gmod/jblast-jbconnect-hook
+  - npm install @gmod/jbrowse@1.15.2
+  - node ./utils/jb_setup.js
+  - ./utils/blast_getBlastUtils.js
+#  - nohup sails lift --port 5001 > jbconnect.log 2>&1 &
+#  - echo $! > save_pid.txt #save last process pid
+#  - cd ..
+#  - sleep 20
 script:
-  - npm test
-  - wget http://localhost:5001/jbrowse
-  - wget http://localhost:5001/login
-  - wget http://localhost:5001/register
-  - wget http://localhost:5001/loginstate
-  - kill -9 `cat jbconnect/save_pid.txt`
-  - cat jbconnect/jbconnect.log
+  - npm jblast-test
+#  - wget http://localhost:5001/jbrowse
+#  - wget http://localhost:5001/login
+#  - wget http://localhost:5001/register
+#  - wget http://localhost:5001/loginstate
+#  - kill -9 `cat jbconnect/save_pid.txt`
+#  - cat jbconnect/jbconnect.log
 after_failure:
   
