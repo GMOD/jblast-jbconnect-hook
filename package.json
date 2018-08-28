@@ -20,7 +20,6 @@
   "license": "MIT",
   "dependencies": {
     "app-root-path": "^2.0.1",
-    "blast-ncbi-tools": "github:enuggetry/blast-ncbi-tools",
     "bluebird": "^3.5.0",
     "deferred": "^0.7.8",
     "fs": "0.0.1-security",
@@ -50,6 +49,7 @@
     "lodash"
   ],
   "devDependencies": {
+    "blast-ncbi-tools": "github:enuggetry/blast-ncbi-tools",
     "chai": "^4.0.2",
     "chai-as-promised": "^7.1.1",
     "chai-shallow-deep-equal": "^1.4.6",
@@ -64,9 +64,7 @@
     "nightwatch": "^0.9.16",
     "node-pre-gyp": "^0.6.36",
     "nyc": "^11.0.3",
-    "phantomjs-prebuilt": "^2.1.14",
     "sails": "^0.12.14",
-    "selenium-webdriver": "^3.4.0",
     "supertest": "^3.0.0"
   },
   "engines": {
