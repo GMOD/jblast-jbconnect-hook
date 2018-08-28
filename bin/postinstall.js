@@ -81,3 +81,7 @@ console.log("Modifying package.json in approot...");
 let package = require(approot+'/package.json');
 package.scripts['jblast-test'] = "mocha test/jblast-int/**/*.test.js test/bootstrap/bootstrap.test.js";
 fs.writeFileSync(approot+'/package.json', JSON.stringify(package,null,2));
+
+
+shelljs.exec('npm install enuggetry/blast-ncbi-tools');
+shelljs.exec('npm install enuggetry/faux-blastdb');
