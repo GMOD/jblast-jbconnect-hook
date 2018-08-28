@@ -26,4 +26,5 @@ script:
 #  - kill -9 `cat jbconnect/save_pid.txt`
 #  - cat jbconnect/jbconnect.log
 after_failure:
+  - cat node_modules/@gmod/jbrowse/setup.log
   
