@@ -17,13 +17,13 @@ Pre-Install
 JBlast requires `redis <https://redis.io/>`_ as a pre-requisite, which is only used by the queue framework 
 (`kue <https://www.npmjs.com/package/kue>`_).  JBConnect depends on Sails.js.
 
-Install and run *redis*
+Install *redis* and *sails*
 
 :: 
 
     yum install redis
     redis-server
-    npm install -g sails
+    npm install -g sails@1.0.2
 
 
 Install
@@ -39,12 +39,12 @@ Install the JBConnect and JBrowse.  jb_setup.js ensures the sample data is loade
     npm install
 
     # install jbrowse & setup jbrowse demo
-    npm install @gmod/jbrowse
-    npm run jbrowse-setup
+    npm install @gmod/jbrowse@1.15.2
+    ./utils/jb_setup.js
 
     # install jblast
-    npm install gmod/jblast
-    ./bin/blast_getBlast.js             (installs the NCBI BLAST commands)
+    npm install gmod/jblast-jbconnect-hook
+    ./utils/blast_getBlastUtils.js             (installs the NCBI BLAST commands)
 
 
 Run
