@@ -61,6 +61,32 @@ From a web browser, access the application (default login: juser/password).
 
 ---------------------
 
+JBrowse Peer Configuration
+==========================
+
+JBrowse can be configured in a peer directory instead of a module.
+
+For example:
+
+::
+
+    /home
+      /zuser
+        /JBConnect
+        /jbrowse
+
+Create a file called ``jbconnect.config.js`` in the JBConnect app directory that contains the following:
+
+::
+
+    module.exports  = {
+        jbrowse: {
+            jbrowsePath: "/home/zuser/jbrowse/"
+        }
+    };
+
+
+
 Configure JBConnect with Galaxy
 ===============================
 
