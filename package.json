@@ -66,8 +66,8 @@
     "supertest": "^3.0.0"
   },
   "engines": {
-    "node": ">= 0.12",
-    "npm": ">= 2.11"
+    "node": ">= 10.3.0",
+    "npm": ">= 6.4.0"
   },
   "sails": {
     "isHook": true,
