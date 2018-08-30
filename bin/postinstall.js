@@ -82,6 +82,7 @@ let package = require(approot+'/package.json');
 package.scripts['jblast-test'] = "mocha test/jblast-int/**/*.test.js test/bootstrap/bootstrap.test.js";
 fs.writeFileSync(approot+'/package.json', JSON.stringify(package,null,2));
 
+/*
 let cwd = shell.pwd();
 shell.cd(approot);
 
@@ -97,3 +98,4 @@ if (shell.exec('npm install enuggetry/faux-blastdb').code !== 0) {
 }
 
 shell.cd(cwd);  // restore working directory
+*/
