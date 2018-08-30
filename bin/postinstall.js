@@ -5,7 +5,7 @@
 
 
 var approot = require("app-root-path").path;
-var shelljs = require("shelljs");
+var shell = require("shelljs");
 var modPath = ""+shelljs.pwd();
 var fs = require("fs-extra");
 var async = require("async");
@@ -82,6 +82,13 @@ let package = require(approot+'/package.json');
 package.scripts['jblast-test'] = "mocha test/jblast-int/**/*.test.js test/bootstrap/bootstrap.test.js";
 fs.writeFileSync(approot+'/package.json', JSON.stringify(package,null,2));
 
-
-shelljs.exec('npm install enuggetry/blast-ncbi-tools');
-shelljs.exec('npm install enuggetry/faux-blastdb');
+// install ncbi tools
+if (shell.exec('npm install enuggetry/blast-ncbi-tools').code !== 0) {
+    shell.echo('Error installing blast-ncbi-tools');
+    shell.exit(1);
+}
+// install faux blast database
+if (shell.exec('npm install enuggetry/faux-blastdb').code !== 0) {
+    shell.echo('Error install faux-blastdb');
+    shell.exit(1);
+}
