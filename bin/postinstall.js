@@ -6,7 +6,7 @@
 
 var approot = require("app-root-path").path;
 var shell = require("shelljs");
-var modPath = ""+shelljs.pwd();
+var modPath = ""+shell.pwd();
 var fs = require("fs-extra");
 var async = require("async");
 
