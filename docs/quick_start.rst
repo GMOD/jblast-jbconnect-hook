@@ -52,11 +52,16 @@ Run
 
 Launch the server.
 
-``sails lift``
+:: 
+
+    sails lift
+
 
 From a web browser, access the application (default login: juser/password).
 
-``http://localhost:1337/jbrowse``
+::
+
+    http://localhost:1337/jbrowse
 
 
 ---------------------
