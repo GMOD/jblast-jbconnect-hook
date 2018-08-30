@@ -64,7 +64,8 @@ From a web browser, access the application (default login: juser/password).
 JBrowse Peer Configuration
 ==========================
 
-JBrowse can be configured in a peer directory instead of a module.
+JBrowse can be configured in a peer directory instead of a module. 
+In this case, bypass the Install JBrowse and Setup Demo step.
 
 For example:
 
@@ -74,6 +75,7 @@ For example:
       /zuser
         /JBConnect
         /jbrowse
+
 
 Create a file called ``jbconnect.config.js`` in the JBConnect app directory that contains the following:
 
