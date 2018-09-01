@@ -1,9 +1,5 @@
 //var shelljs = require('shelljs');
 
-// gets the blast util - (module blastjs)
-//shelljs.exec('node blast_getBlast.js');
-
-
 var approot = require("app-root-path").path;
 var shell = require("shelljs");
 var modPath = ""+shell.pwd();
