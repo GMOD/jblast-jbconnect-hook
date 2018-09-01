@@ -10,9 +10,9 @@ before_script:
   - cd jbconnect
   - npm install
   - npm install gmod/jblast-jbconnect-hook
+  - ./utils/blast_getBlastUtils.js
   - npm install @gmod/jbrowse@1.15.2
   - node ./utils/jb_setup.js
-  - ./utils/blast_getBlastUtils.js
   - ls
   - ls ./utils
   - ls ./blastdb
