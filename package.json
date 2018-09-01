@@ -49,12 +49,10 @@
     "lodash"
   ],
   "devDependencies": {
-    "blast-ncbi-tools": "github:enuggetry/blast-ncbi-tools",
     "chai": "^4.0.2",
     "chai-as-promised": "^7.1.1",
     "chai-shallow-deep-equal": "^1.4.6",
     "chromedriver": "^2.30.1",
-    "faux-blastdb": "github:enuggetry/faux-blastdb",
     "grunt": "^1.0.1",
     "grunt-version-bump": "^1.0.8",
     "jsdoc": "^3.5.5",

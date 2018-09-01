@@ -13,7 +13,8 @@ before_script:
   - npm install @gmod/jbrowse@1.15.2
   - node ./utils/jb_setup.js
   - ls ./utils
-  - ls .blastdb
+  - ls ./blastdb
+  - ls ./blastbin
   - ./utils/blast_getBlastUtils.js
 #  - nohup sails lift --port 5001 > jbconnect.log 2>&1 &
 #  - echo $! > save_pid.txt #save last process pid
