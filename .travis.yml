@@ -14,8 +14,10 @@ before_script:
   - node ./utils/jb_setup.js
   - ls ./utils
   - ls ./blastdb
-  - ls ./blastbin
   - ./utils/blast_getBlastUtils.js
+  - ls ./blastbin
+  - ls ./node_modules/blast-ncbi-tools
+  - ls ./node_modules/faus-blastdb
 #  - nohup sails lift --port 5001 > jbconnect.log 2>&1 &
 #  - echo $! > save_pid.txt #save last process pid
 #  - cd ..
