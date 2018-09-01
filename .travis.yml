@@ -12,9 +12,10 @@ before_script:
   - npm install gmod/jblast-jbconnect-hook
   - npm install @gmod/jbrowse@1.15.2
   - node ./utils/jb_setup.js
+  - ./utils/blast_getBlastUtils.js
+  - ls
   - ls ./utils
   - ls ./blastdb
-  - ./utils/blast_getBlastUtils.js
   - ls ./blastbin
   - ls ./node_modules/blast-ncbi-tools
   - ls ./node_modules/faus-blastdb
