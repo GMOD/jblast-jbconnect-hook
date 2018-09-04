@@ -9,8 +9,8 @@ before_script:
   - git clone http://github.com/gmod/jbconnect
   - cd jbconnect
   - npm install
-  - npm install enuggetry/blast-ncbi-tools
-  - npm install enuggetry/faux-blastdb
+#  - npm install enuggetry/blast-ncbi-tools
+#  - npm install enuggetry/faux-blastdb
   - npm install gmod/jblast-jbconnect-hook
   - ./utils/blast_getBlastUtils.js
   - npm install @gmod/jbrowse@1.15.2
@@ -20,6 +20,8 @@ before_script:
   - ls utils
   - ls blastdb
   - ls blastbin
+  - ls node_modules/blast-ncbi-tools
+  - ls node_modules/faus-blastdb
 #  - ls node_modules/blast-ncbi-tools
 #  - ls node_modules/faux-blastdb
 #  - nohup sails lift --port 5001 > jbconnect.log 2>&1 &
