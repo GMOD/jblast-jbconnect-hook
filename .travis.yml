@@ -6,7 +6,7 @@ services:
 install:
 before_script:
   - npm -v
-  - node -v
+  - node -v 
   - npm i -g sails@1.0.2
   - git clone http://github.com/gmod/jbconnect
   - cd jbconnect
