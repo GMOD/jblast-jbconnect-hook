@@ -5,6 +5,8 @@ services:
   - redis-server
 install:
 before_script:
+  - npm install --global update-travis
+  - update-travis --versions 6.4.1
   - npm -v
   - node -v 
   - npm i -g sails@1.0.2
