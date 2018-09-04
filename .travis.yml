@@ -1,5 +1,7 @@
 sudo: false
-language: node-js
+language: node_js
+node_js:
+  - "10.3.0"
 before_install:
 services:
   - redis-server
