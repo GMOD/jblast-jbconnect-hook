@@ -12,12 +12,12 @@ before_script:
 #  - npm install enuggetry/blast-ncbi-tools
 #  - npm install enuggetry/faux-blastdb
   - npm install gmod/jblast-jbconnect-hook
-  - ./utils/blast_getBlastUtils.js
-  - npm install @gmod/jbrowse@1.15.2
-  - node ./utils/jb_setup.js
   - pwd
   - ls
   - ls utils
+  - ./utils/blast_getBlastUtils.js
+  - npm install @gmod/jbrowse@1.15.2
+  - node ./utils/jb_setup.js
   - ls blastdb
   - ls blastbin
   - ls node_modules/blast-ncbi-tools
