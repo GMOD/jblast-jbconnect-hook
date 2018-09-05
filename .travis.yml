@@ -1,11 +1,14 @@
 sudo: false
-language: node-js
+language: node_js
+node_js:
+  - "10.3.0"
 before_install:
 services:
   - redis-server
 install:
 before_script:
-  - if [[ `npm -v` != 6.4* ]]; then npm i -g npm@6.4.1; fi
+  - echo "******************** before_script ************************"
+  - npm i -g npm@6.4.1
   - npm -v
   - node -v 
   - npm i -g sails@1.0.2
@@ -17,6 +20,7 @@ before_script:
   - npm install gmod/jblast-jbconnect-hook
   - pwd
   - ls
+  - ls ..
   - ls utils
   - ./utils/blast_getBlastUtils.js
   - npm install @gmod/jbrowse@1.15.2
