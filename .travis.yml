@@ -12,11 +12,11 @@ before_script:
   - npm -v
   - node -v 
   - npm i -g sails@1.0.2
+  - cd ..
+  - pwd
   - git clone http://github.com/gmod/jbconnect
   - cd jbconnect
   - npm install
-#  - npm install enuggetry/blast-ncbi-tools
-#  - npm install enuggetry/faux-blastdb
   - npm install gmod/jblast-jbconnect-hook
   - pwd
   - ls
