@@ -23,6 +23,7 @@ before_script:
   - ls ..
   - ls utils
   - ls node_modules
+  - ls node_modules/jblast-jbconnect-hook/node_modules
   - ./utils/blast_getBlastUtils.js
   - npm install @gmod/jbrowse@1.15.2
   - node ./utils/jb_setup.js
