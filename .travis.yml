@@ -14,10 +14,10 @@ before_script:
   - npm i -g sails@1.0.2
   - cd ..
   - pwd
-  - git clone http://github.com/gmod/jbconnect
+  - git clone --depth=50 http://github.com/gmod/jbconnect
   - cd jbconnect
   - npm install
-  - npm install gmod/jblast-jbconnect-hook
+  - git clone --depth=50 http://github.com/enuggetry/jblast-jbconnect-hook
   - pwd
   - ls
   - ls ..
