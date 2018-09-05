@@ -27,7 +27,7 @@ before_script:
   - ls node_modules
   - ls node_modules/jblast-jbconnect-hook/node_modules
   - ls node_modules/blast-ncbi-tools
-  - ls node_modules/faus-blastdb
+  - ls node_modules/faux-blastdb
   - ./utils/blast_getBlastUtils.js
   - npm install @gmod/jbrowse@1.15.2
   - node ./utils/jb_setup.js
