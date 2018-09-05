@@ -78,20 +78,19 @@ let package = require(approot+'/package.json');
 package.scripts['jblast-test'] = "mocha test/jblast-int/**/*.test.js test/bootstrap/bootstrap.test.js";
 fs.writeFileSync(approot+'/package.json', JSON.stringify(package,null,2));
 
-/*
+
 let cwd = shell.pwd();
 shell.cd(approot);
 
 // install ncbi tools
-if (shell.exec('npm install enuggetry/blast-ncbi-tools').code !== 0) {
+if (shell.exec('npm install blast-ncbi-tools').code !== 0) {
     shell.echo('Error installing blast-ncbi-tools');
     shell.exit(1);
 }
 // install faux blast database
-if (shell.exec('npm install enuggetry/faux-blastdb').code !== 0) {
+if (shell.exec('npm install faux-blastdb').code !== 0) {
     shell.echo('Error install faux-blastdb');
     shell.exit(1);
 }
 
 shell.cd(cwd);  // restore working directory
-*/
