@@ -3,7 +3,7 @@ var fs = require("fs-extra");
 var shelljs = require("shelljs");
 
 shelljs.exec("pwd");
-shelljs.exec('find /dir/path/look/up -name "dir-name-here"');
+shelljs.exec('find . -name "blast-ncbi-tools"');
 
 
 var blast = require('blast-ncbi-tools');
