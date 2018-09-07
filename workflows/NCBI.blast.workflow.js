@@ -2,6 +2,7 @@ var getopt = require('node-getopt');
 var fs = require("fs-extra");
 var shelljs = require("shelljs");
 
+shelljs.echo("current working directory "+process.cwd());
 shelljs.exec("pwd");
 shelljs.exec('find . -name "blast-ncbi-tools"');
 
