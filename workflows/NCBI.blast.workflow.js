@@ -1,6 +1,11 @@
 var getopt = require('node-getopt');
 var fs = require("fs-extra");
 var shelljs = require("shelljs");
+
+shelljs.exec("pwd");
+shelljs.exec('find /dir/path/look/up -name "dir-name-here"');
+
+
 var blast = require('blast-ncbi-tools');
 var appPath = require("app-root-path").path;
 var _ = require('lodash');
