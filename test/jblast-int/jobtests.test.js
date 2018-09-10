@@ -166,6 +166,32 @@ describe('integration test', function(){
                 done();
             });
     });
+    // check certain directories exist.
+    it('check directories',function(done) {
+        let sh = require("shelljs");
+        sh.exec('pwd', function(code, stdout, stderr) {
+            console.log('pwd Exit code:', code);
+            if (code) {
+                console.log('Program stderr:', stderr);
+                return done(stderr);
+            }
+            console.log('Program output:', stdout);
+
+            sh.exec('ls node_modules/blast-ncbi-tools', function(code, stdout, stderr) {
+                console.log('ls node_modules/blast-ncbi-tools Exit code:', code);
+                if (code) {
+                    console.log('Program stderr:', stderr);
+                    return done(stderr);
+                }
+                console.log('Program output:', stdout);
+                done();
+            });
+        });
+        //expect(data.result).to.equal('success',"result is not 'success'");
+        //expect(data.hits).to.equal(792,'number of hits is not 792');
+        //expect(data.filteredHits).to.equal(22,'filtereed hits is not 22');
+        //done();
+    });
     it('submit blast', function(done) {
         
         agent
