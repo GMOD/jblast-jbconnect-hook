@@ -21,14 +21,14 @@ before_script:
   - npm install blast-ncbi-tools
   - npm install faux-blastdb
   - npm install enuggetry/jblast-jbconnect-hook
-  - ls
+#  - ls
 #  - ls ..
-  - ls utils
-  - ls workflows
+#  - ls utils
+#  - ls workflows
 #  - find . -name "blast-ncbi-tools"
 #  - find . -name "faux-blastdb"
-  - ls node_modules/blast-ncbi-tools
-  - ls node_modules/faux-blastdb
+  - ls -d node_modules/blast-ncbi-tools
+  - ls -d node_modules/faux-blastdb
   - ./utils/blast_getBlastUtils.js
   - npm install @gmod/jbrowse@1.15.2
   - node ./utils/jb_setup.js
