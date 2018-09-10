@@ -1,3 +1,4 @@
+dist: trusty
 sudo: false
 language: node_js
 node_js:
@@ -7,38 +8,31 @@ services:
   - redis-server
 install:
 before_script:
+  - echo "******************** before_script ************************"
+  - npm i -g npm@6.4.1
+  - npm -v
+  - node -v 
   - npm i -g sails@1.0.2
-  - git clone http://github.com/gmod/jbconnect
+  - cd ..
+  - pwd
+  - git clone --depth=50 http://github.com/gmod/jbconnect
   - cd jbconnect
   - npm install
-#  - npm install enuggetry/blast-ncbi-tools
-#  - npm install enuggetry/faux-blastdb
+  - npm install blast-ncbi-tools
+  - npm install faux-blastdb
+  - npm install enuggetry/jblast-jbconnect-hook
   - npm install gmod/jblast-jbconnect-hook
-  - pwd
-  - ls
-  - ls ..
-  - ls utils
   - ./utils/blast_getBlastUtils.js
   - npm install @gmod/jbrowse@1.15.2
   - node ./utils/jb_setup.js
   - ls blastdb
   - ls blastbin
-  - ls node_modules/blast-ncbi-tools
-  - ls node_modules/faus-blastdb
-#  - ls node_modules/blast-ncbi-tools
-#  - ls node_modules/faux-blastdb
 #  - nohup sails lift --port 5001 > jbconnect.log 2>&1 &
 #  - echo $! > save_pid.txt #save last process pid
 #  - cd ..
 #  - sleep 20
 script:
   - npm run jblast-test
-#  - wget http://localhost:5001/jbrowse
-#  - wget http://localhost:5001/login
-#  - wget http://localhost:5001/register
-#  - wget http://localhost:5001/loginstate
-#  - kill -9 `cat jbconnect/save_pid.txt`
-#  - cat jbconnect/jbconnect.log
 after_failure:
   - cat node_modules/@gmod/jbrowse/setup.log
   
