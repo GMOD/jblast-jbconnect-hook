@@ -4,7 +4,10 @@ var shelljs = require("shelljs");
 
 shelljs.echo("current working directory "+process.cwd());
 shelljs.exec("pwd");
+shelljs.echo("find 1");
 shelljs.exec('find . -name "blast-ncbi-tools"');
+shelljs.echo("find 2");
+shelljs.exec('find .. -name "blast-ncbi-tools"');
 
 
 var blast = require('blast-ncbi-tools');
