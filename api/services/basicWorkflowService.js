@@ -359,6 +359,7 @@ module.exports = {
         let cmd = 'node '+ wf + ' --in '+kJob.data.blastData.blastSeq + ' --ext blastxml --out '+outPath+' --profile '+optionFile;
         sails.log.debug("cmd",cmd);
 
+        shelljs.echo("basicWorkflowService");
         shelljs.exec('ls');
         shelljs.exec('ls node_modules/blast-ncbi-tools');
         shelljs.exec('ls node_modules/faux-blastdb');
