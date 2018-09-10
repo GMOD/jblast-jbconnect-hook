@@ -4,11 +4,15 @@ var shelljs = require("shelljs");
 
 shelljs.echo("current working directory "+process.cwd());
 shelljs.exec("pwd");
-shelljs.echo("find 1");
-shelljs.exec('find . -name "blast-ncbi-tools"');
-shelljs.echo("find 2");
-shelljs.exec('find .. -name "blast-ncbi-tools"');
-
+//shelljs.echo("find 1");
+//shelljs.exec('find . -name "blast-ncbi-tools"');
+//shelljs.echo("find 2");
+//shelljs.exec('find .. -name "blast-ncbi-tools"');
+        shelljs.exec('ls');
+        shelljs.exec('ls node_modules/blast-ncbi-tools');
+        shelljs.exec('ls node_modules/faux-blastdb');
+        shelljs.exec('ls blastbin');
+        shelljs.exec('ls blastdb');
 
 var blast = require('blast-ncbi-tools');
 var appPath = require("app-root-path").path;
