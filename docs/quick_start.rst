@@ -44,7 +44,12 @@ Install the JBConnect and JBrowse.  jb_setup.js ensures the sample data is loade
 
     # install jblast
     npm install gmod/jblast-jbconnect-hook
-    ./utils/blast_getBlastUtils.js             (installs the NCBI BLAST commands)
+
+    # install blast tools and sample data
+    npm install blast-ncbi-tools faux-blastdb
+
+    # pull in NCBI blast executables
+    ./utils/blast_getBlastUtils.js
 
 
 Run
