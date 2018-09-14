@@ -75,7 +75,7 @@ fs.copySync(approot+'/node_modules/jQuery-ui-Slider-Pips/dist',targDir,{overwrit
 // add jblast tests to jbconnect/package.json
 console.log("Modifying package.json in approot...");
 let package = require(approot+'/package.json');
-package.scripts['jblast-test'] = "mocha test/jblast-int/**/*.test.js test/bootstrap/bootstrap.test.js";
+package.scripts['jblast-test'] = "nyc mocha test/jblast-int/**/*.test.js test/bootstrap/bootstrap.test.js";
 fs.writeFileSync(approot+'/package.json', JSON.stringify(package,null,2));
 
 /*
