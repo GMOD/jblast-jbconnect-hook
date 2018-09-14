@@ -55,6 +55,7 @@ Edit config file: ``nano config/globals.js``
 Get Galaxy API Key
 ==================
 
+.. image:: img/galaxy-apikey.png
 
 
 JBlast jbutil Command
