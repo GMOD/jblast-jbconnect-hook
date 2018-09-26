@@ -39,7 +39,7 @@ Install the JBConnect and JBrowse.  jb_setup.js ensures the sample data is loade
     npm install
 
     # install jbrowse & setup jbrowse demo
-    npm install @gmod/jbrowse@1.15.2
+    npm install @gmod/jbrowse@1.15.1
     ./utils/jb_setup.js
 
     # install jblast
