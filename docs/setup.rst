@@ -55,6 +55,7 @@ Edit config file: ``nano config/globals.js``
 Get Galaxy API Key
 ==================
 
+.. image:: img/galaxy-apikey.png
 
 
 JBlast jbutil Command
@@ -148,6 +149,8 @@ Install Galaxy
 **************
 
 Instructions for installing galaxy: `Get Galaxy <https://galaxyproject.org/admin/get-galaxy/>`_
+
+``git clone -b release_17.09 https://github.com/galaxyproject/galaxy.git`` (tested)
 
 Run galaxy: ``sh run.sh``  (From galaxy dir. First time run will take a while)
 
