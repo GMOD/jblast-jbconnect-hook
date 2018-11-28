@@ -3,8 +3,9 @@
       "!**/node_modules/"
     ],
     "include": [
+      "**/api",
       "**/node_modules/jblast-jbconnect-hook/api"
     ]
 
 }
-
+ 
