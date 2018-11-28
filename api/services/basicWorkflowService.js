@@ -110,8 +110,8 @@ var resolvePath = require('resolve-path');
 var fs = require("fs-extra");
 var util = require("./utils");
 var shelljs = require('shelljs'); 
-var appPath = require("app-root-path").path;
-
+//var appPath = require("app-root-path").path;
+var appPath = path.dirname(require.main.filename);
 module.exports = {
 
     fmap: {

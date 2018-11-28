@@ -1,14 +1,12 @@
 #!/usr/bin/env node
 
-//var requestp = require('request-promise');
 var fs = require('fs-extra');
 var path = require('path');
-//var getopt = require('node-getopt');
 var util = require('./util.js');
 var Finder = require('fs-finder');
-var approot = require('app-root-path');
+//var approot = require('app-root-path');
+var approot = path.dirname(require.main.filename);
 var shelljs = require('shelljs');
-var kue = require('kue');
 
 module.exports = {
     getOptions: function() {
