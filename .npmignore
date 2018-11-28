@@ -4,6 +4,7 @@
 logs
 *.log
 .idea/
+*.tgz
 
 # Runtime data
 pids
