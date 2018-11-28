@@ -4,8 +4,8 @@ var fs = require('fs-extra');
 var path = require('path');
 var util = require('./util.js');
 var Finder = require('fs-finder');
-//var approot = require('app-root-path');
-var approot = path.dirname(require.main.filename);
+var approot = require('app-root-path');
+//var approot = path.dirname(require.main.filename);
 var shelljs = require('shelljs');
 
 module.exports = {

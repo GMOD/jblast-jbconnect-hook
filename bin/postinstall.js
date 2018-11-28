@@ -1,8 +1,6 @@
-//var shelljs = require('shelljs');
-
-//var approot = require("app-root-path").path;
-var path = require('require');
-var approot = path.dirname(require.main.filename);
+var approot = require("app-root-path").path;
+//var path = require('path');
+//var approot = path.dirname(require.main.filename);
 var shell = require("shelljs");
 var modPath = ""+shell.pwd();
 var fs = require("fs-extra");
