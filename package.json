@@ -8,7 +8,9 @@
     "test": "node ./node_modules/mocha/bin/mocha test/bootstrap.test.js test/**/*.test.js --nightwatch-test phantomjs",
     "xxtest": "nyc node ./node_modules/mocha/bin/mocha test/**/*.test.js --nightwatch-test phantomjs",
     "postinstall": "node bin/postinstall.js",
-    "gendocs": "node docs/gendocs_run.js"
+    "gendocs": "node docs/gendocs_run.js",
+    "jblast-test": "mocha test/jblast-int/**/*.test.js test/bootstrap/bootstrap.test.js",
+    "jblast-coverage": "nyc mocha test/jblast-int/**/*.test.js test/bootstrap/bootstrap.test.js"
   },
   "keywords": [
     "sails",
@@ -52,16 +54,13 @@
     "chai": "^4.0.2",
     "chai-as-promised": "^7.1.1",
     "chai-shallow-deep-equal": "^1.4.6",
-    "chromedriver": "^2.30.1",
     "grunt": "^1.0.1",
     "grunt-version-bump": "^1.0.8",
     "jsdoc": "^3.5.5",
     "jsdoc-sphinx": "0.0.6",
     "minimist": "^1.2.0",
     "mocha": "^3.4.2",
-    "nightwatch": "^0.9.16",
     "node-pre-gyp": "^0.6.36",
-    "nyc": "^11.0.3",
     "sails": "^0.12.14",
     "supertest": "^3.0.0"
   },
