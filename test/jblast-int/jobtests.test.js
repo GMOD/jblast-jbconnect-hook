@@ -1,4 +1,5 @@
-const tlib = require('../share/test-lib');
+const approot = require('app-root-path');
+const tlib = require(approot+'/test/share/test-lib');
 const chai = require('chai')
 const chaiHttp = require('chai-http');
 chai.use(chaiHttp);
