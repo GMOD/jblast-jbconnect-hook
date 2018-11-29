@@ -6,7 +6,7 @@
 'use strict';
 
 //var mapRoutes = require('./mapRoutes');
-var jblastProc = require('../../services/jblastProc');
+//var jblastProc = require('../../services/jblastProc');
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -64,7 +64,23 @@ if (!thisHook) {
       key: 'initialize',
       value: function initialize(next) {
         // http://sailsjs.org/documentation/concepts/extending-sails/hooks/hook-specification/initialize
-        jblastProc.initialize(next);
+        //jblastProc.initialize(next);
+        
+        let sh = require("shelljs");
+
+        sails.on('hook:orm:loaded', function() {
+          //sails.on('lifted', function() {
+  
+              //sails.log(">>> jblastProc.initialize.lifted");
+  
+              // copy sample data
+              //console.log(">>>> cwd",process.cwd());
+              sh.exec('./jbutil --setupdata');
+  
+              // do something after hooks are loaded
+              return next();
+          });
+  
         //return next();
       }
     }, {
