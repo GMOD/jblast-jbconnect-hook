@@ -23,9 +23,9 @@ if (modPath === approot)
 
 // list of directories to copy
 var dirList = [
-    {src:'workflows',trg:'workflows'},
-    {src:'test/jblast-dev.sh',trg: 'test/jblast-dev.sh'},
-    {src:'test/.nycrc-jblast.sh',trg: 'test/.nycrc-jblast.sh'}
+    {src:'workflows',trg:'workflows'}
+//    {src:'test/jblast-dev.sh',trg: 'test/jblast-dev.sh'},
+//    {src:'test/.nycrc-jblast',trg: 'test/.nycrc-jblast'}
 //    {src:'test/jblast',trg:'test/jblast'},
 //    {src:'test/jblast-int',trg:'test/jblast-int'}
 ];
@@ -79,7 +79,7 @@ console.log("Modifying package.json in approot...");
 let package = require(approot+'/package.json');
 package.scripts['jblast-test'] = "mocha node_modules/jblast-jbconnect-hook/test/jblast-int/**/*.test.js test/bootstrap/bootstrap.test.js";
 package.scripts['jblast-coverage'] = "nyc --nycrc-path node_modules/jblast-jbconnect-hook/test/.nycrc-jblast mocha node_modules/jblast-jbconnect-hook/test/jblast-int/**/*.test.js test/bootstrap/bootstrap.test.js";
-package.scripts['jblast-dev'] = "sh ./test/jblast-dev.sh";
+package.scripts['jblast-dev'] = "sh node_modules/jblast-jbconnect-hook/test/jblast-dev.sh";
 fs.writeFileSync(approot+'/package.json', JSON.stringify(package,null,2));
 
 /*
