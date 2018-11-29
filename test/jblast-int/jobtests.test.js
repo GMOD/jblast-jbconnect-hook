@@ -194,12 +194,12 @@ describe('integration test', function(){
         //done();
     });
     it('submit blast', function(done) {
-        
+        let ds = Dataset.Resolve('sample_data/json/volvox');        
         agent
           .post('/job/submit')
           .send({
               'service': 'jblast',
-              'dataset':'sample_data/json/volvox',
+              'dataset':ds.path,
               'region': '>ctgA ctgA:23755..25049 length=1295\ntcccatagcccgccgaccgggtctgactcaactgtgttttcgctatcccaggctagcacttctattctttgttacgtc\ncagtcatagtgttactatagggtaattttagtcatagtagacggccgctttttcgtatggcccgagaccgtccaccgg\nctacccaattaagtcacatccggatcttgggtctagatattcctatcgaaaatagtctcgccgcctcactgcgtagtt\ncagggggcgtcacacttgttcgcggcttttcctcatgggatctttacccgatggttgatgcaataaatgtctacaccg\ngactggcgtgtccgagacgactttatacacgtgtgacgagtagatcagatcgtacgaatggtctgtctcacctatccc\nagtgggaggatggaaaacactcctgcctaccgggtcgaattatttacgcgtgttacaatatgtaatttagaaaaaggg\nattgctggtcgatgcgtctccaagggattttttatctaaaagcatccttttgggtgtactctgatcgcacgtcgcaga\ncagcagtgggttttgacgcagtccgtaggcccacagactcgtttgttgtttattaatcccaggggagcgttgaagcca\ncacctattctgtagctgtttgaaaggtagctagcccggatattactcaaggtgactcccttcagaatcacacgtcgct\nggagtcgccacagggtggcatatacgagtgatagagcaccttactttcgaggtagcggtacattagtgcaacgatgaa\ncccactatagtcttagtgatttcatgttttacttacgcgaaaacgtggggttttgtcaacacgtatacgttgaatgca\ncatgcctcatcctaaactgatgcactgccacaagtctgaaagagcgacagtctgcaacatagcggaaggttacgccca\nagccagtggtgatcccccataagcttggagggactccccttagcgttggatgtctttgccccagcggcctcggtgtac\ngggttctccaccccactatggtttggaactatgaagaggtacggcaacctacccgaggcaccaaatcgtgaacctacg\ncctatatatacggatagcagggtatccattcttaccatgagctcgtaaaccactccgctgaattcgatgggctttggc\ngcacatcaccgtttctatcacagatctgtcaacggaatctaacgctatttactcggcgcacacagatcggaaaaccca\nactgtggcgcgggacggactccaggaatcgttacgcgttatcacctt',
               'workflow':'NCBI.blast.workflow.js'
           })
@@ -218,11 +218,12 @@ describe('integration test', function(){
                     expect(data.data.track,"should have a result track").to.not.be.undefined;
 
                     let trackLabel = data.data.track.label;
-                    console.log("Track Label = "+trackLabel);
+                    let lkey = trackLabel+'|'+ds.id;
+                    console.log("lkey = ",lkey);
                     
                     //done();
                     
-                    agent.get("/track/get?lkey="+trackLabel)
+                    agent.get("/track/get?lkey="+lkey)
                       .set('content-type','application/json; charset=utf-8')
                       .end((err,res,body) => {
                           let trackData = res.body[0];
@@ -230,8 +231,8 @@ describe('integration test', function(){
                           
                           expect(res).to.have.status(200,'/track/get status 200');
                           expect(trackData.trackData.jblast).to.equal(1,'the new track jblast field should be 1');
-                          expect(trackData.trackData.label).to.equal(trackLabel,'track label confirmed '+trackLabel);
-                          expect(trackData.lkey).to.equal(trackLabel,'track label confirmed '+trackLabel);
+                          expect(trackData.trackData.label).to.equal(trackLabel,'track label verify '+trackLabel);
+                          expect(trackData.lkey).to.equal(trackLabel+'|'+ds.id,'lkey verify'+trackData.lkey);
 
                           done();
                      });
