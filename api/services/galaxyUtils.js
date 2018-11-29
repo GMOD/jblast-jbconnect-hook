@@ -4,6 +4,7 @@
  * This provides functional support to galaxyService job service.
  * 
  */
+/* istanbul ignore file */
 var request = require('request');
 var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require("fs-extra"));
