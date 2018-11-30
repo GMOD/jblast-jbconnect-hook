@@ -41,7 +41,7 @@ module.exports = {
         sails.log.debug('blastxml2json',blastxml,jsonfile);
 
         fs.readFile(blastxml, function(err, xml) {
-
+            // istanbul ignore next
             if (err) {
                 sails.log.error(err);
                 cb({status:'error',err:err});
@@ -133,6 +133,7 @@ module.exports = {
                 //console.log(obj);
 
                 fs.writeFile(jsonfile,JSON.stringify(data,null,2), function (err) {
+                    // istanbul ignore next
                     if (err) {
                         sails.log.error('failed to write',jsonfile,err);
                         cb({status:'error',err:err});
