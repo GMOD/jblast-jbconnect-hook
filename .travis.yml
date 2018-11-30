@@ -32,7 +32,7 @@ before_script:
 #  - cd ..
 #  - sleep 20
 script:
-  - npm run jblast-test
+  - npm run jblast-coverage
 after_failure:
   - cat node_modules/@gmod/jbrowse/setup.log
   
