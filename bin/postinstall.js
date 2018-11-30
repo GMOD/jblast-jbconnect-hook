@@ -77,8 +77,8 @@ fs.copySync(approot+'/node_modules/jQuery-ui-Slider-Pips/dist',targDir,{overwrit
 // add jblast tests to jbconnect/package.json
 console.log("Modifying package.json in approot...");
 let package = require(approot+'/package.json');
-package.scripts['jblast-test'] = "mocha node_modules/jblast-jbconnect-hook/test/jblast-int/**/*.test.js test/bootstrap/bootstrap.test.js";
-package.scripts['jblast-coverage'] = "nyc --nycrc-path node_modules/jblast-jbconnect-hook/test/.nycrc-jblast mocha node_modules/jblast-jbconnect-hook/test/jblast-int/**/*.test.js test/bootstrap/bootstrap.test.js";
+package.scripts['jblast-test'] = "mocha test/unit/**/*.test.js test/integration/**/*.test.js node_modules/jblast-jbconnect-hook/test/jblast-int/**/*.test.js test/bootstrap/bootstrap.test.js";
+package.scripts['jblast-coverage'] = "nyc --nycrc-path node_modules/jblast-jbconnect-hook/test/.nycrc-jblast mocha test/unit/**/*.test.js test/integration/**/*.test.js node_modules/jblast-jbconnect-hook/test/jblast-int/**/*.test.js test/bootstrap/bootstrap.test.js";
 package.scripts['jblast-dev'] = "sh node_modules/jblast-jbconnect-hook/test/jblast-dev.sh";
 fs.writeFileSync(approot+'/package.json', JSON.stringify(package,null,2));
 

@@ -1,9 +1,14 @@
 {
     "exclude": [
-      "!**/node_modules/"
+      "!**/node_modules/jblast-jbconnect-hook"
     ],
     "include": [
-      "**/api",
+      "**/api/models",
+      "**/api/controllers",
+      "**/api/services",
+      "**/api/hooks",
+      "!**/api/services/protocols",
+
       "**/node_modules/jblast-jbconnect-hook/api"
     ]
 
