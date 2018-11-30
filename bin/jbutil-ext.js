@@ -187,10 +187,12 @@ function exec_setuptrack(params) {
 
     // check if sample track exists in trackList.json (by checking for the label)
     var hasLabel = 0;
-    for(var i in config.tracks) {
-        if (config.tracks[i].label===sampleTrack.label) hasLabel=1;
+    for(var i in conf.tracks) {
+        if (conf.tracks[i].label===sampleTrack.label) {
+            hasLabel=1;
+            break;
+        }
     }
-
     if (hasLabel) {
         console.log('Sample track already exists');
         return;
