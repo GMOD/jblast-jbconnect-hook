@@ -20,7 +20,7 @@ before_script:
   - npm install
   - npm install blast-ncbi-tools
   - npm install faux-blastdb
-  - npm install enuggetry/jblast-jbconnect-hook
+  - npm install gmod/jblast-jbconnect-hook
 #  - npm install gmod/jblast-jbconnect-hook
   - ./utils/blast_getBlastUtils.js
   - npm install @gmod/jbrowse@1.15.1
