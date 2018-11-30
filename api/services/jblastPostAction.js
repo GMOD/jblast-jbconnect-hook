@@ -15,6 +15,7 @@ var filter = require("./filter");   // filter processing
 var offsetfix = require("./offsetfix");
 var blast2json = require("./blastxml2json");
 var galaxy = require("./galaxyUtils");
+var _ = require('lodash');
 
 module.exports = {
     postMoveResultFiles: function(kJob,cb) {
@@ -112,18 +113,12 @@ function postMoveResultFiles(kJob,cb) {
             }
         });
         
+        // merge trackData from job submit options, if any
+        if (kJob.data.trackData)
+            newTrackJson[0] = _.merge(newTrackJson[0],kJob.data.trackData);
+
         var dateFormat = require('dateformat');
         var ts = new Date();  
-        //var trackLabel = kJob.data.blastData.name+'-'+dateFormat(ts,"isoDateTime");
-        
-        // galaxy history id
-        //var galaxyHistId = kJob.data.blastData.outputs.json.split("_")[0];
-        
-        //var trackLabel = 'blast '+kJob.id+' ('+kJob.data.sequence.start+'..'+kJob.data.sequence.end+')'
-        //    +' '+kJob.data.blastData.hits + ' hits';
-        //var trackLabel = newTrackJson[0].key;
-    
-        //sails.log.info('trackLabel',trackLabel);
 
         var fileGffOnly = kJob.data.blastData.outputs.gff3 +'.gff3';
         var fileJsonOnly = kJob.data.blastData.outputs.json + '.json';
