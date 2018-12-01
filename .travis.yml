@@ -18,8 +18,8 @@ before_script:
   - git clone --depth=50 http://github.com/gmod/jbconnect
   - cd jbconnect
   - npm install
-  - npm install blast-ncbi-tools
-  - npm install faux-blastdb
+  - npm install enuggetry/blast-ncbi-tools
+  - npm install enuggetry/faux-blastdb
   - npm install gmod/jblast-jbconnect-hook
 #  - npm install gmod/jblast-jbconnect-hook
   - ./utils/blast_getBlastUtils.js
