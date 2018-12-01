@@ -176,9 +176,13 @@ module.exports = {
         this.getHitDataFiltered(filterData,requestData,function(filterSummary,filteredGffStr) {
 
             var g = sails.config.globals.jbrowse;
+
+            if (_.isUndefined(requestData.asset)) return cb({result:'fail', error: 'applyFilter - asset not defined'});
+            if (_.isUndefined(requestData.dataset)) return cb({result:'fail', error: 'applyFilter - dataset not defined'});
+
             var asset = requestData.asset;
-            var dataSet = typeof Dataset !== 'undefined' ? Dataset.Resolve(requestData.dataset).path : requestData.dataset;
-            var blastGffFile = g.jbrowsePath + dataSet + '/' + g.jblast.blastResultPath+'/'+asset+'.gff3';
+            var ds = Dataset.Resolve(requestData.dataset);
+            var blastGffFile = g.jbrowsePath + ds.path + '/' + g.jblast.blastResultPath+'/'+asset+'.gff3';
             
             // write filtered gff
             var error = false;
@@ -197,7 +201,7 @@ module.exports = {
             if (write) sails.log("file written",blastGffFile);
             
             if (!requestData.noAnnounce)
-                thisb._announceTrack(Dataset.Resolve(requestData.dataset).id,asset);
+                thisb._announceTrack(ds.id,asset);
             
             cb(filterSummary);
         });
@@ -313,7 +317,8 @@ module.exports = {
      */
     _announceTrack: function(dataset,key) {
         //var dataSet = Dataset.Resolve(dataset);
-        var srch = {dataset:dataset,lkey:key};
+        let lkey = key+"|"+dataset;
+        let srch = {lkey:lkey};
         sails.log('_announceTrack',srch);
         
         Track.findOne(srch).then(function(found) {
