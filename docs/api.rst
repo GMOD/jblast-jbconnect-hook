@@ -1198,6 +1198,20 @@ Monitor workflow and exit upon completion of the workflow
     
     :param object kJob: Monitor workflow and exit upon completion of the workflow
     
+.. _module-services_galaxyUtils.doCompleteAction:
+
+
+Function: ``doCompleteAction``
+==============================
+
+Read output of last generated file, copy results to /jblastdata, insert track to trackList.json.
+
+.. js:function:: doCompleteAction(kJob, hista)
+
+    
+    :param object kJob: kue job object
+    :param object hista: associative array of histories
+    
 
 
 
@@ -1223,18 +1237,6 @@ This module implements the actions that occur after a galaxy workflow completes.
 It supports galaxyService job service.
 
 
-.. _module-services_jblastPostAction.doCompleteAction:
-
-
-Function: ``doCompleteAction``
-==============================
-
-
-
-.. js:function:: doCompleteAction()
-
-    
-    
 .. _module-services_jblastPostAction.postMoveResultFiles:
 
 
@@ -1270,48 +1272,6 @@ Function: ``processFilter``
 .. js:function:: processFilter()
 
     
-    
-.. _module-services_jblastPostAction.doCompleteAction:
-
-
-Function: ``doCompleteAction``
-==============================
-
-Read output of last generated file, copy results to /jblastdata, insert track to trackList.json.
-
-.. js:function:: doCompleteAction(kJob, hista)
-
-    
-    :param object kJob: kue job object
-    :param object hista: associative array of histories
-    
-.. _module-services_jblastPostAction.processResults:
-
-
-Function: ``processResults``
-============================
-
-
-
-.. js:function:: processResults()
-
-    
-    
-.. _module-services_jblastPostAction.processResultStep:
-
-
-Function: ``processResultStep``
-===============================
-
-processResultStep
-
-.. js:function:: processResultStep(stepctx, kJob, trackJson, cb)
-
-    
-    :param object stepctx: galaxy workflow step context
-    :param object kJob: kue job object
-    :param JSON trackJson: working new track object
-    :param function cb: callback function
     
 .. _module-services_jblastPostAction.postMoveResultFiles:
 
@@ -1358,122 +1318,49 @@ return number of hits
     :return Number: number of hits
     
 
+.. _module-services_jblastPostAction.requestp:
 
+Member: ``requestp``: 
 
+.. _module-services_jblastPostAction.path:
 
+Member: ``path``: 
 
+.. _module-services_jblastPostAction.Promise:
 
-.. raw:: html
+Member: ``Promise``: 
 
-   <hr style="border-color: black; border-width: 2px;">
+.. _module-services_jblastPostAction.fs:
 
-Module: ``services/jblastProc``
-*******************************
+Member: ``fs``: 
 
+.. _module-services_jblastPostAction.deferred:
 
-.. contents:: Local Navigation
-   :local:
+Member: ``deferred``: 
 
-   
-Description
-===========
+.. _module-services_jblastPostAction.filter:
 
-This module implements the various Galaxy REST APIs for JBlast.
-It supports galaxyService job service.  
+Member: ``filter``: 
 
-todo: remove obsolete functions.
+.. _module-services_jblastPostAction.offsetfix:
 
+Member: ``offsetfix``: 
 
-.. _module-services_jblastProc.initialize:
+.. _module-services_jblastPostAction.blast2json:
 
+Member: ``blast2json``: 
 
-Function: ``initialize``
-========================
+.. _module-services_jblastPostAction.galaxy:
 
-Initialize the service
+Member: ``galaxy``: 
 
-.. js:function:: initialize(cb)
+.. _module-services_jblastPostAction._:
 
-    
-    :param type cb: callback function
-    
-.. _module-services_jblastProc.workflowSubmit:
+Member: ``_``: 
 
+.. _module-services_jblastPostAction.newTrackJson:
 
-Function: ``workflowSubmit``
-============================
-
-Submit a workflow
-
-``POST /jbapi/workflowsubmit``
-
-.. js:function:: workflowSubmit(req, res)
-
-    
-    :param type req: request
-    :param type res: response
-    
-.. _module-services_jblastProc.getWorkflows:
-
-
-Function: ``getWorkflows``
-==========================
-
-Get Workflows
-
-``GET /jbapi/getworkflows``
-
-.. js:function:: getWorkflows(req, res)
-
-    
-    :param type req: request
-    :param type res: response
-    
-.. _module-services_jblastProc.getHitDetails:
-
-
-Function: ``getHitDetails``
-===========================
-
-Return hits data given hit key
-
-``GET /jbapi/gethitdetails called``
-
-.. js:function:: getHitDetails(req, res)
-
-    
-    :param type req: request
-    :param type res: response
-    
-.. _module-services_jblastProc.lookupAccession:
-
-
-Function: ``lookupAccession``
-=============================
-
-returns accession data given accesion number.
-Utilizes Entrez service
-
-``GET /jbapi/lookupaccession``
-
-.. js:function:: lookupAccession(req, res)
-
-    
-    :param type req: request
-    :param type res: response
-    
-.. _module-services_jblastProc.rest_getHitDetails:
-
-
-Function: ``rest_getHitDetails``
-================================
-
-
-
-.. js:function:: rest_getHitDetails()
-
-    
-    
+Member: ``newTrackJson``: 
 
 
 
