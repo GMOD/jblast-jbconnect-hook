@@ -9,7 +9,7 @@ const expect = chai.expect;
 const assert = chai.assert;
 
 describe('integration test', function(){
-    this.timeout(25000);
+    this.timeout(240000);
     it('login', function(done) {
         
         //let app = sails.hooks.http.app;
@@ -41,6 +41,9 @@ describe('integration test', function(){
           });
     });
     it('get_workflows api',function(done) {
+        let conf = sails.config.globals.jbrowse.services;
+        let isGalaxy = (conf.galaxyService && conf.galaxyService.enable===true) ? true : false;
+
         agent
             .get('/service/exec/get_workflows')
             .set('content-type','application/json; charset=utf-8')
@@ -48,8 +51,13 @@ describe('integration test', function(){
                 expect(res).to.have.status(200, 'get_blastdata api status 200');
                 let data = res.body;
                 console.log("return data: ",data);
-                expect(data[0].id).to.equal('NCBI.blast.workflow.js','id[0] is not NCBI.blast.workflow.js');
-                expect(data[1].id).to.equal('Sim.blast.workflow.js','id[1] is Sim.blast.workflow.js');
+                if (isGalaxy) {
+                    console.log('**** galaxyService enabled');
+                }
+                else {
+                    expect(data[0].id).to.equal('NCBI.blast.workflow.js','id[0] is not NCBI.blast.workflow.js');
+                    expect(data[1].id).to.equal('Sim.blast.workflow.js','id[1] is Sim.blast.workflow.js');
+                }
                 done();
             });
     });
@@ -193,54 +201,101 @@ describe('integration test', function(){
         //expect(data.filteredHits).to.equal(22,'filtereed hits is not 22');
         //done();
     });
-    it('submit blast', function(done) {
-        let ds = Dataset.Resolve('sample_data/json/volvox');        
-        agent
-          .post('/job/submit')
-          .send({
-              'service': 'jblast',
-              'dataset':ds.path,
-              'region': '>ctgA ctgA:23755..25049 length=1295\ntcccatagcccgccgaccgggtctgactcaactgtgttttcgctatcccaggctagcacttctattctttgttacgtc\ncagtcatagtgttactatagggtaattttagtcatagtagacggccgctttttcgtatggcccgagaccgtccaccgg\nctacccaattaagtcacatccggatcttgggtctagatattcctatcgaaaatagtctcgccgcctcactgcgtagtt\ncagggggcgtcacacttgttcgcggcttttcctcatgggatctttacccgatggttgatgcaataaatgtctacaccg\ngactggcgtgtccgagacgactttatacacgtgtgacgagtagatcagatcgtacgaatggtctgtctcacctatccc\nagtgggaggatggaaaacactcctgcctaccgggtcgaattatttacgcgtgttacaatatgtaatttagaaaaaggg\nattgctggtcgatgcgtctccaagggattttttatctaaaagcatccttttgggtgtactctgatcgcacgtcgcaga\ncagcagtgggttttgacgcagtccgtaggcccacagactcgtttgttgtttattaatcccaggggagcgttgaagcca\ncacctattctgtagctgtttgaaaggtagctagcccggatattactcaaggtgactcccttcagaatcacacgtcgct\nggagtcgccacagggtggcatatacgagtgatagagcaccttactttcgaggtagcggtacattagtgcaacgatgaa\ncccactatagtcttagtgatttcatgttttacttacgcgaaaacgtggggttttgtcaacacgtatacgttgaatgca\ncatgcctcatcctaaactgatgcactgccacaagtctgaaagagcgacagtctgcaacatagcggaaggttacgccca\nagccagtggtgatcccccataagcttggagggactccccttagcgttggatgtctttgccccagcggcctcggtgtac\ngggttctccaccccactatggtttggaactatgaagaggtacggcaacctacccgaggcaccaaatcgtgaacctacg\ncctatatatacggatagcagggtatccattcttaccatgagctcgtaaaccactccgctgaattcgatgggctttggc\ngcacatcaccgtttctatcacagatctgtcaacggaatctaacgctatttactcggcgcacacagatcggaaaaccca\nactgtggcgcgggacggactccaggaatcgttacgcgttatcacctt',
-              'workflow':'NCBI.blast.workflow.js',
-              'trackData': {
-                  'testtrack':true
-              }
-          })
-          .end((err,res) => {
-                console.log('/job/submit status',res.status);
-                expect(res).to.have.status(200);
-                console.log('/job/submit body',res.body);
-                let jobId = res.body.jobId;
-                console.log("Job id=",jobId);
-                
-                tlib.waitForJobComplete(jobId,function(complete,data){
-                    
-                    expect(complete).to.equal(true);
-                    expect(data.state).to.equal('complete','job should be completed');
-                    
-                    expect(data.data.track,"should have a result track").to.not.be.undefined;
 
-                    let trackLabel = data.data.track.label;
-                    let lkey = trackLabel+'|'+ds.id;
-                    console.log("lkey = ",lkey);
-                    
-                    //done();
-                    
-                    agent.get("/track/get?lkey="+lkey)
-                      .set('content-type','application/json; charset=utf-8')
-                      .end((err,res,body) => {
-                          let trackData = res.body[0];
-                          console.log("track data",trackData);
-                          
-                          expect(res).to.have.status(200,'/track/get status 200');
-                          expect(trackData.trackData.jblast).to.equal(1,'the new track jblast field should be 1');
-                          expect(trackData.trackData.label).to.equal(trackLabel,'track label verify '+trackLabel);
-                          expect(trackData.lkey).to.equal(trackLabel+'|'+ds.id,'lkey verify'+trackData.lkey);
+    describe('submit blast test', function(){
+        it('should submit blast', function(done) {
+            let conf = sails.config.globals.jbrowse.services;
+            let isGalaxy = (conf.galaxyService && conf.galaxyService.enable===true) ? true : false;
 
-                          done();
-                     });
+            let ds = Dataset.Resolve('sample_data/json/volvox');      
+            
+            let testWorkflow = 'NCBI.blast.workflow.js';
+            let testRegion = '>ctgA ctgA:23755..25049 length=1295\ntcccatagcccgccgaccgggtctgactcaactgtgttttcgctatcccaggctagcacttctattctttgttacgtc\n'+
+            'cagtcatagtgttactatagggtaattttagtcatagtagacggccgctttttcgtatggcccgagaccgtccaccgg\nctacccaattaagtcacatccggatcttgggtctagatattcctatcgaaaatagtctcgccgcctcactgcgtagtt\n'+
+            'cagggggcgtcacacttgttcgcggcttttcctcatgggatctttacccgatggttgatgcaataaatgtctacaccg\ngactggcgtgtccgagacgactttatacacgtgtgacgagtagatcagatcgtacgaatggtctgtctcacctatccc\n'+
+            'agtgggaggatggaaaacactcctgcctaccgggtcgaattatttacgcgtgttacaatatgtaatttagaaaaaggg\nattgctggtcgatgcgtctccaagggattttttatctaaaagcatccttttgggtgtactctgatcgcacgtcgcaga\n'+
+            'cagcagtgggttttgacgcagtccgtaggcccacagactcgtttgttgtttattaatcccaggggagcgttgaagcca\ncacctattctgtagctgtttgaaaggtagctagcccggatattactcaaggtgactcccttcagaatcacacgtcgct\n'+
+            'ggagtcgccacagggtggcatatacgagtgatagagcaccttactttcgaggtagcggtacattagtgcaacgatgaa\ncccactatagtcttagtgatttcatgttttacttacgcgaaaacgtggggttttgtcaacacgtatacgttgaatgca\n'+
+            'catgcctcatcctaaactgatgcactgccacaagtctgaaagagcgacagtctgcaacatagcggaaggttacgccca\nagccagtggtgatcccccataagcttggagggactccccttagcgttggatgtctttgccccagcggcctcggtgtac\n'+
+            'gggttctccaccccactatggtttggaactatgaagaggtacggcaacctacccgaggcaccaaatcgtgaacctacg\ncctatatatacggatagcagggtatccattcttaccatgagctcgtaaaccactccgctgaattcgatgggctttggc\n'+
+            'gcacatcaccgtttctatcacagatctgtcaacggaatctaacgctatttactcggcgcacacagatcggaaaaccca\nactgtggcgcgggacggactccaggaatcgttacgcgttatcacctt';
+
+            if (isGalaxy) {
+                testWorkflow = 'f597429621d6eb2b';
+                testRegion = ">ctgA ctgA:44705..47713 (- strand) class=remark length=3009\nacatccaatggcgaacataagcgagttttgttggccccgcaaaaaagcaccgtccattctgt\n"+
+                "catcattttccgcgcgacggttcatggtaagcctaaaacacactcgttccacccgccctgag\nttcctaatacgactccacctacaatcgtgtgcacgttttgcgtaaatttagggtctatattc\n"+
+                "tttctgacctacgccggaaatgtttacctctagtccataatccaccgtcacctccggcttta\naactagaacccatttattatgttgaatacacgattgtccgggcccaacgatcccctaataaa\n"+
+                "cgtggagtcaggtcctttcctcctgcaaggacgaaaaaagtccgggagagttttgggtataa\ngctggatttgggacccgaggcacctgtacacaggacaatagtcgcggaatggacggctgtgt\n"+
+                "ttgaacaatgccggtcttcgtgcactgtatgagcagaggtgtgcttatcattacgtcgccca\nataagtccgagagttggaccgcctccttaaataccccgaacttttccttggggtcccgttga\n"+
+                "atgtacccctggaatacgccccgtaatccgcgcccggttactgaacaaaaaatcagtgcgtt\nagtcatacatccctctgacggagcagattctgtggagattggaagacggataaacgcacgcg\n"+
+                "tcgcccagttaccacaggtcttcctgaatcaagagtaaacagatgtggtggtatgtctccaa\ngtctagtgttgctctcgccttgtctcgttgctgttcctgatatggactcgctgaacagcatg\n"+
+                "cgagcggacctcatgtctgggaggctgagaggtcctttaggagtcgcctgatcggttgtcag\ntaccctaacggttggtcagggtgtctagcggtgaggcgaggtaagagtcgtgagccgaaatg\n"+
+                "gtgaaggcaacgttataccttgtagctcatatcgaataaacatcgcgaagtaccattacgag\ncccttaggcttaccctatgctcaacccacacttgtagcagacgagcgtccggcagatctcag\n"+
+                "actatcatcccgtgtgcggggatctgatcatgaatgttggccttctcttaaggcagcctcgt\naactgataactggggcctgtaagccaagagatgtgtaatgagaagcagtagatagtagagta\n"+
+                "actcgcaccaccaccttgagtcatggtctacacaattccccggcaaaagtgtaacagactgc\ngtggcataaacttcaacccccctatgttgtcagagaggtaccaatttactccgattgtatat\n"+
+                "agaacaattagtagggagcgaggagagtctgggataaatgaccgtcggagagtcacttctcc\nctgttatgcatagggacatactactatgtttgcgttcctatataccgtgctgtgtgcagcta\n"+
+                "caccctcgtagctcaccgtgctccctaggtaacgcgcgaaatgtacaacgggactagctact\ntcgttgggtgacccttgataccccacagactcattaatgcccagagcggacttaagtgggag\n"+
+                "acagtaaactcgaggcttgactgtaccgtcgatagaacccagtagacctgggttgtcagtac\nccaggagaatatccgttccttgggccgacccagccacaatggcggttgcacttctgtacaag\n"+
+                "gttgcctcaccatcgcttggagtaaagcataaggttgttgcatcggaatcgtcctacctcta\nagttcgaggccccgccacgatacgcaggacacacatagtccagtgatgctcgacccaaaaaa\n"+
+                "aaacatcccacaaacacccttcttaaatacccaacaaaaccaatccaaagtccgaactgacc\ngaaccgaaactaaaacaaaagcaggttctaatctcatcgggacagccaaccatctcccgcaa\n"+
+                "tttaaaaaaaaccatgtcgcgcaaatcttgtcctgcccccttgtactccatgcgacccccgt\naaacacatagcccctgttccgctttatcagggaaacttacctccaaaacacatacacgcttg\n"+
+                "accgtaacgcgcgttggtttcgctcagcacgtacattccgcgatacccgctcttcgttttcc\nttcttccgacacttcgcgtttccccgaagctaaaacgggctcctttagttccgataagtctc\n"+
+                "acgcacctgacccaaaaaactgattggtgatgtcacgtagtgcaatcgcctgatgacgtttc\ntcgcccttgacgtgcagtcaacgttctttatagtgacctctgtcccaaaactgaacacactc\n"+
+                "aaaccctatctcggactatgctttgatttatagggcatttgcccgattcggaatccacatca\ncaacaggaatttcgccctgctgggcaaaccccgcgtgtacgcttgctgcaactctctcagcc\n"+
+                "cagccggtgagggcaatcagctgtgcccgtctcactgttgagagaaataaccacctgcggca\ncaatacgcaaaaccgcatctccccgcgcgatgaccgatcattaaatgcagctgtcacgacag\n"+
+                "tttccccgactgaaaagcggcagtgagcgcaaacgcaaattaatgtgagttagctcactcat\nacgccaccccaggctctacactgtatgcttccggctcgtatgttgtgtgcaatgtgagcgca\n"+
+                "taacaatttcacacagcaaacagctatgaccatgattacgccaagcttgcatgcctgcaggt\ncgactctagaggatctggctgggtcatttattgtcctgagcacccaagaagatggccaaatt\n"+
+                "gtgggagatgactgagtagaccaggactctttggggaaaggccagaacctagggtcatctgg\naaggtgttaggctagatcaacccctagacatttctacaccccctcaccacacaacacaacca\n"+
+                "cacccccaagcagtagttatataattattcagtatacaaattgtttatttaatgtctatgtt\nagtcagagttctcaaaagaaacaacttatagga";
+            }
+
+            agent
+            .post('/job/submit')
+            .send({
+                'service': 'jblast',
+                'dataset':ds.path,
+                'region': testRegion,
+                'workflow':testWorkflow,
+                'trackData': {
+                    'testtrack':true
+                }
+            })
+            .end((err,res) => {
+                    console.log('/job/submit status',res.status);
+                    expect(res).to.have.status(200);
+                    console.log('/job/submit body',res.body);
+                    let jobId = res.body.jobId;
+                    console.log("Job id=",jobId);
                     
-                });
-          });
+                    tlib.waitForJobComplete(jobId,function(complete,data){
+                        
+                        expect(complete).to.equal(true);
+                        expect(data.state).to.equal('complete','job should be completed');
+                        
+                        expect(data.data.track,"should have a result track").to.not.be.undefined;
+
+                        let trackLabel = data.data.track.label;
+                        let lkey = trackLabel+'|'+ds.id;
+                        console.log("lkey = ",lkey);
+                        
+                        //done();
+                        
+                        agent.get("/track/get?lkey="+lkey)
+                        .set('content-type','application/json; charset=utf-8')
+                        .end((err,res,body) => {
+                            let trackData = res.body[0];
+                            console.log("track data",trackData);
+                            
+                            expect(res).to.have.status(200,'/track/get status 200');
+                            expect(trackData.trackData.jblast).to.equal(1,'the new track jblast field should be 1');
+                            expect(trackData.trackData.label).to.equal(trackLabel,'track label verify '+trackLabel);
+                            expect(trackData.lkey).to.equal(trackLabel+'|'+ds.id,'lkey verify'+trackData.lkey);
+
+                            done();
+                        });
+                        
+                    });
+            });
+        });
     });
 });
