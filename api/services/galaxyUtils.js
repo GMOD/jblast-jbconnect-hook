@@ -540,10 +540,10 @@ module.exports = {
                     //kJob.update(function() {});
 
                         // insert track into trackList.json
-                        postMoveResultFiles(kJob,function(newTrackJson){
+                        jblastPostAction.postMoveResultFiles(kJob,function(newTrackJson){
 
                         // convert xml to json
-                        blast2json.convert(kJob,newTrackJson,function(err) {
+                        blastxml2json.convert(kJob,newTrackJson,function(err) {
                             // istanbul ignore next
                             if (err) {
                                 sails.log.error(err.msg);
@@ -554,7 +554,7 @@ module.exports = {
 
                             // check if there were any hits.
                             // istanbul ignore if
-                            if (getHits(kJob,newTrackJson)===0) {
+                            if (jblastPostAction.getHits(kJob,newTrackJson)===0) {
 
                                 kJob.data.name = kJob.data.name+' No Hits';
                                 kJob.update();
@@ -565,7 +565,7 @@ module.exports = {
                             }
                             else {
                                 offsetfix.process(kJob,newTrackJson,function() {
-                                    processFilter(kJob,newTrackJson,function(hitdata) {
+                                    jblastPostAction.processFilter(kJob,newTrackJson,function(hitdata) {
                                         // postAction is a service in JBConnect
                                         postAction.addToTrackList(kJob,newTrackJson);
                                     });
