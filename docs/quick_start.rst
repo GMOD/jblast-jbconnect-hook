@@ -102,7 +102,7 @@ Create a file called ``jbconnect.config.js`` in the JBConnect app directory that
 Configure JBConnect with Galaxy
 ===============================
 
-In the ``jbrowse`` directory, edit ``config/globals.js`` and create a ``galaxy:`` section under ``jbrowse:`` section.  Add the Galaxy installation path.
+In your ``jbconnect`` directory, edit ``jbconnect.config.js`` and create a ``galaxy:`` section under ``jbrowse:`` section.  Add the Galaxy installation path.
 
 ::
 
@@ -121,7 +121,7 @@ From the JBrowse directory, type ``./jbutil --setuptools``
 This will copy some JBlast specific Galaxy tools into the ``galaxy`` directory as as well as replace 
 ``config.galaxy.ini`` in the ``galaxy`` directory.
 
-In ``galaxy`` directory, add the following line to ``congfig/galaxy.ini`` add the user email for the user you created as an admin:
+In ``galaxy`` directory, add the following line to ``config/galaxy.ini`` add the user email for the user you created as an admin:
 
 ::
 
@@ -138,7 +138,7 @@ Create an API key (**User** Menu --> Preference), then select **Manage API Key**
 
 .. image:: img/galaxy-apikey.png
 
-In the JBlast directory, add the API key to config/globals.js under the galaxy: section.
+In the JBConnect directory, add the API key to jbconnect.config.js under the galaxy: section.
 
 ::
 
