@@ -1,0 +1,11 @@
+{
+  "groups": {
+    "default": {
+      "packages": [
+        "jblast-simtool/package.json",
+        "package.json",
+        "src/slider-pips/src/jquery-ui/package.json"
+      ]
+    }
+  }
+}
