@@ -13,16 +13,16 @@
     "jblast-simblast": "./simblast.js"
   },
   "dependencies": {
-    "fs": "^0.0.2",
-    "node-getopt": "^0.2.3",
+    "fs": "0.0.2",
+    "node-getopt": "^0.3.2",
     "path": "^0.12.7",
-    "shelljs": "^0.7.7"
+    "shelljs": "^0.8.3"
   },
   "devDependencies": {
     "grunt": "^1.0.1",
     "grunt-bump": "^0.8.0",
-    "grunt-contrib-jshint": "^1.1.0",
+    "grunt-contrib-jshint": "^2.0.0",
     "grunt-version-bump": "^1.0.8",
-    "mocha": "^3.1.0" 
+    "mocha": "^5.2.0" 
   }
 }
