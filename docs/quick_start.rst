@@ -4,7 +4,7 @@ JBlast Quick Start
 
 Instructions for installing JBlast with stand-alone NCBI Blast tools (non-Galaxy). 
 
-To setup Galaxy integration, see `Setup Galaxy Integration`_
+To setup Galaxy integration, see `Configure JBConnect with Galaxy`_
 
 (Since JBConnect is generally intended to be a companion of JBrowse.  
 JBrowse may also be installed in a separate directory.
