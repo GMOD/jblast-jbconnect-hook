@@ -173,7 +173,7 @@ Galaxy Blast Job Service
 
 The galaxyService requres the presence of Galaxy.
 
-See jbs-setup-galaxy_ for instructions on how to configure Galaxy for JBlast.
+See :ref:`jbs-setup-galaxy` for instructions on how to configure Galaxy for JBlast.
 
 
 JBlast jbutil Command
