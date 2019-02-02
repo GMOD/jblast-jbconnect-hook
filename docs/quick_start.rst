@@ -99,8 +99,13 @@ Create a file called ``jbconnect.config.js`` in the JBConnect app directory that
 
 
 
-Configure JBConnect with Galaxy
-===============================
+.. _jbs-setup-galaxy :
+
+Setup Galaxy
+============
+
+Instructions for installing and configuring Galaxy for use with JBlast.
+
 
 Install Galaxy
 --------------

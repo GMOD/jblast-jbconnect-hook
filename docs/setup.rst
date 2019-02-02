@@ -173,49 +173,7 @@ Galaxy Blast Job Service
 
 The galaxyService requres the presence of Galaxy.
 
-
-Configuration
--------------
-
-::
-
-    module.exports = {
-      jbrowse: {
-        galaxy: {
-          galaxyPath: '/var/www/galaxy',
-          galaxyAPIKey: "c7be32db9329841598b1a5705655f633"
-        }
-        services: {
-            'basicWorkflowService':     {enable: false, name: 'basicWorkflowService',  type: 'workflow', alias: "jblast"},
-            'galaxyService':            {enable: true,  name: 'galaxyService',         type: 'workflow', alias: "jblast"},
-            'filterService':            {name: 'filterService',         type: 'service'},
-            'entrezService':            {name: 'entrezService',         type: 'service'}
-        },
-      }
-    }
-
-
-Setup Galaxy Integration
-------------------------
-
-Galaxy integration is optional and allows for using Galaxy workflows to process BLAST searches.
-Note that is is a demonstration of Galaxy integration and not intended to be a robust solution.
-
-We generally assume that Galaxy and JBConnect are installed in side-by-side directories.
-For example:
-
-::
-
-    /var
-       /www
-           /galaxy
-           /jbconnect
-
-
-Getting JBConnect fully integrated with Galaxy will require several start/stop instances of Galaxy.
-
-
-
+See jbs-setup-galaxy_ for instructions on how to configure Galaxy for JBlast.
 
 
 JBlast jbutil Command
@@ -229,14 +187,21 @@ This example shows that ``jbconnect-hook-jblast`` adds a number of commands to `
 ::
 
     $ ./jbutil --help
-    Usage: jbutil [OPTION]
-          --config            display merged config
-          --setupworkflows    (jblast) [install|<path>] "install" project wf, or specify .ga file 
-          --setuptools        (jblast) setup jblast tools for galaxy
-          --setupdata         (jblast) setup data and samples
-      -h, --help              display this help
+    Usage: node jbutil
 
-
+    -c, --config           display merged configuration
+        --setupworkflows   (jblast-galaxy) installs demo galaxy workflows (must have API key configured
+        --setuptools       (jblast-galaxy) setup jblast tools for galaxy
+        --setupdata        (jblast) setup jblast demo data and samples
+    -o, --overwrite        (jblast) used with --setupdata - overwrite samples
+    -d, --dbreset          reset the database to default and clean kue db
+    -f, --force            --dbreset without verifying
+    -a, --setadmin         set admin flag
+    -r, --removeall        remove JBConnect components from JBrowse
+        --pushplugins      link plugins into JBrowse dir
+        --coverage=PLUGIN  used with --pushplugins to add coverage instrumentation
+        --buildwebpack     build jbrowse webpack
+    -h, --help             display this help
 
 
 --setupworkflows
