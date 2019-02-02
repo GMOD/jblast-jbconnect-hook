@@ -51,11 +51,171 @@ Edit config file: ``nano config/globals.js``
 * ``import`` is the file extension to process from the Galaxy workflow.
 
 
+Standalone Blast Job Service
+============================
 
-Get Galaxy API Key
-==================
+The job service, basicWorkdlowService, is the job runner service that manages stand-alone 
+Blast processing.
 
-.. image:: img/galaxy-apikey.png
+Requirements
+------------
+
+These requirements are generally installed as part of the JBlast project.
+
+::
+
+    npm install enuggetry/blast-ncbi-tools  (NCBI blast)
+    npm install enuggetry/faux-blastdb      (a small sample blast database)
+
+
+Configuration
+-------------
+
+Add the following to the jbconnect.config.js file, enabling basicWorkflowService:
+
+::
+
+    module.exports  = {
+        jbrowse: {
+            services: {
+                'basicWorkflowService':     {enable: true,  name: 'basicWorkflowService',  type: 'workflow', alias: "jblast"},
+                'galaxyService':            {enable: false, name: 'galaxyService',         type: 'workflow', alias: "jblast"}
+        },
+        }
+    };
+
+
+
+Blast profiles
+--------------
+
+Blast profiles are parameter lists that translate to NCBI blast command line parameters sets.
+
+For example: for the following blast command
+
+    ``blastn –db nt –query nt.fsa –out results.out``
+
+the blast profile would look like:
+
+::
+
+                'myprofile': {
+                    'db': 'nt',
+                    'query': 'nt.fsa',
+                    'out': 'result.out'
+                },
+
+
+``config/globals.js`` defines the blast profiles that are preconfigured with jblast.
+(note, only faux blast database is autoatically loaded by JBlast project.  So, 'htgs' shouldn't be used unless htgs blast database is first installed.)
+
+::
+
+        jblast:
+            defaultBlastProfile: 'faux',
+
+            blastProfiles: {
+                'htgs': {
+                    'db': 'htgs'
+                },
+                'faux': {
+                    'db': 'faux'
+                },
+                'remote_htgs': {
+                    'db': 'htgs',
+                    'remote': ""
+                }
+            }
+        }
+
+
+The blastProfile can be specified the ``/job/submit``.  For example: 
+::
+
+    var postData = {
+          service: "jblast",  // this can be the name of the job service or its alias
+          dataset: "sample_data/json/volvox",
+          region: ">ctgA ctgA:44705..47713 (- strand) class=remark length=3009\nacatccaatggcgaacataa...gcgagttt",
+          workflow: "NCBI.blast.workflow.js"
+          blastProfile: 'faux'    // selects the 'faux' profile that is defined in globals.js.
+      };
+    $.post( "/job/submit", postData , function( result ) {
+        console.log( result );
+    }, "json");
+
+
+Alternatively, an previously undefined profiled may be specified in ``/job/submit``.
+::
+
+    var postData = {
+          service: "jblast",  // this can be the name of the job service or its alias
+          dataset: "sample_data/json/volvox",
+          region: ">ctgA ctgA:44705..47713 (- strand) class=remark length=3009\nacatccaatggcgaacataa...gcgagttt",
+          workflow: "NCBI.blast.workflow.js"
+          blastProfile: {
+            'db': 'nt',
+            'query': 'nt.fsa',
+            'out': 'result.out'
+          }
+      };
+    $.post( "/job/submit", postData , function( result ) {
+        console.log( result );
+    }, "json");
+
+
+If defaultBlastProfile is defined in globals.js will be used if no blast profile is specified in the ``/job/submit`` call.
+
+Blast profiles only apply to basicWorkflowService.
+
+
+Galaxy Blast Job Service
+========================
+
+The galaxyService requres the presence of Galaxy.
+
+
+Configuration
+-------------
+
+::
+
+    module.exports = {
+      jbrowse: {
+        galaxy: {
+          galaxyPath: '/var/www/galaxy',
+          galaxyAPIKey: "c7be32db9329841598b1a5705655f633"
+        }
+        services: {
+            'basicWorkflowService':     {enable: false, name: 'basicWorkflowService',  type: 'workflow', alias: "jblast"},
+            'galaxyService':            {enable: true,  name: 'galaxyService',         type: 'workflow', alias: "jblast"},
+            'filterService':            {name: 'filterService',         type: 'service'},
+            'entrezService':            {name: 'entrezService',         type: 'service'}
+        },
+      }
+    }
+
+
+Setup Galaxy Integration
+------------------------
+
+Galaxy integration is optional and allows for using Galaxy workflows to process BLAST searches.
+Note that is is a demonstration of Galaxy integration and not intended to be a robust solution.
+
+We generally assume that Galaxy and JBConnect are installed in side-by-side directories.
+For example:
+
+::
+
+    /var
+       /www
+           /galaxy
+           /jbconnect
+
+
+Getting JBConnect fully integrated with Galaxy will require several start/stop instances of Galaxy.
+
+
+
 
 
 JBlast jbutil Command
@@ -125,42 +285,5 @@ In ``trackList.json``, within the dataset's path, add ``JBlast`` and ``JBClient`
 They are made available as route by the JBConnect framework and are only accessible at runtime.*
 
 See :ref:`jblast-integrated-gui` for more details.
-
-------
-
-Setup Galaxy Integration
-========================
-
-Galaxy integration is optional and allows for using Galaxy workflows to process BLAST searches.
-Note that is is a demonstration of Galaxy integration and not intended to be a robust solution.
-
-We generally assume that Galaxy and JBConnect are installed in side-by-side directories.
-For example:
-::
-    /var
-       /www
-           /galaxy
-           /jbconnect
-
-Getting JBConnect fully integrated with Galaxy will require several start/stop instances of Galaxy.
-
-
-Install Galaxy
-**************
-
-Instructions for installing galaxy: `Get Galaxy <https://galaxyproject.org/admin/get-galaxy/>`_
-
-``git clone -b release_17.09 https://github.com/galaxyproject/galaxy.git`` (tested)
-
-Run galaxy: ``sh run.sh``  (From galaxy dir. First time run will take a while)
-
-By default Galaxy is hosted on port 8080: ``http://localhost:8080``
-
-Create a user with admin privilage
-**********************************
-
-Register a new user (**User** Menu --> Register).
-
-.. image:: img/galaxy-newuser.png
 
 

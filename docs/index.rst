@@ -4,8 +4,15 @@ JBlast
 
 **JBlast - A BLAST service for JBConnect and JBrowse**
 
-JBlast is JBConnect hook module.  It contains both server-side integration
-with JBConnect as well as a client-side plugin.
+JBlast (jblast-jbconnect-hook) is JBConnect hook module. It contains both server-side integration with 
+JBConnect and JBrowse that enables Blast analysis that is tightly integrated with JBrowse.   
+JBlast can execute stand-alone NCBI blast commands directly, or it can be configured to use Galaxy for workflow processing. 
+Through the JBrowse user interface the user can choose to submit an existing feature as a blast query or highlight a 
+region to blast. The user can monitor blast execution processing through JBConnect’s job queue 
+and the blast search results will appear directly as an inserted track in the track selector.  
+The resulting hits can be filtered through a Filter Panel. The details of the hit can further be 
+displayed in the Feature Details dialog box.
+
 
 .. image:: img/filter-panel.jpg
 

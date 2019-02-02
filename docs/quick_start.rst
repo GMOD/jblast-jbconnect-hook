@@ -102,6 +102,27 @@ Create a file called ``jbconnect.config.js`` in the JBConnect app directory that
 Configure JBConnect with Galaxy
 ===============================
 
+Install Galaxy
+--------------
+
+Instructions for installing galaxy: `Get Galaxy <https://galaxyproject.org/admin/get-galaxy/>`_
+
+``git clone -b release_17.09 https://github.com/galaxyproject/galaxy.git`` (tested)
+
+Run galaxy: ``sh run.sh``  (From galaxy dir. First time run will take a while)
+
+By default Galaxy is hosted on port 8080: ``http://localhost:8080``
+
+
+Create a user with admin privilage
+----------------------------------
+
+Register a new user (**User** Menu --> Register).
+
+.. image:: img/galaxy-newuser.png
+
+
+
 In your ``jbconnect`` directory, edit ``jbconnect.config.js`` and create a ``galaxy:`` section under ``jbrowse:`` section.  Add the Galaxy installation path.
 
 ::
@@ -113,6 +134,7 @@ In your ``jbconnect`` directory, edit ``jbconnect.config.js`` and create a ``gal
         }
       }
     }
+
 
 These settings will override any settings in ``node_modules/jbconnect-hook-jblast/config/globals.js`` and ``jbconnect/config/globals.js``. 
 
@@ -127,12 +149,14 @@ In ``galaxy`` directory, add the following line to ``config/galaxy.ini`` add the
 
     admin_users = me-user@gmail.com
 
+
 Start Galaxy again from the galaxy directory (``sh run.sh``)
 
 Now you should see and **Admin** menu appear in Galaxy.
 
+
 Generating the Galaxy API key
-*****************************
+-----------------------------
 
 Create an API key (**User** Menu --> Preference), then select **Manage API Key**, click the **Create a new key** button.
 
@@ -154,7 +178,7 @@ In the JBConnect directory, add the API key to jbconnect.config.js under the gal
 Now, restart galaxy: ``sh run.sh``
 
 Install NCBI Blast+ Tools
-*************************
+-------------------------
 
 At the same level as ``jbconnect`` and ``galaxy`` directories, create a directory called ``shed_tools``, making sure it has the same permissions as the ``galaxy`` and ``jbconnect`` directories.
 
@@ -182,7 +206,7 @@ Sometimes you will have to do this procedure a 2nd or 3rd time to ensure all the
 
 
 Install demo workflows
-************************
+----------------------
 
 Install sample workflows used in demo.  (this step require the API key to be configured and Galaxy
 should be running.)
@@ -191,7 +215,11 @@ should be running.)
 
 
 Registering a Blast Database
-****************************
+----------------------------
+
+A default database called faux is a small sample blast database is loaded by the project.
+
+Additional databases may be loaded if necessary.
 
 Download the blast database if you haven't already done it.
 
@@ -215,15 +243,15 @@ The directory should reflect the directory of the installed BLAST database.*
 
 
 Setup Galaxy Job Service
-************************
+------------------------
 
 In ``jbconnect`` directory, edit ``node_modules/jbconnect-hook-jblast/config/globals.js`` and add the galaxy job service.
 
 ::
 
         services: {
-            //'basicWorkflowService':     {name: 'basicWorkflowService',  type: 'workflow', alias: "jblast"},
-            'galaxyService':          {name: 'galaxyService',         type: 'workflow', alias: "jblast"},
+            'basicWorkflowService':     {enable: false, name: 'basicWorkflowService',  type: 'workflow', alias: "jblast"},
+            'galaxyService':            {enable: true,  name: 'galaxyService',         type: 'workflow', alias: "jblast"},
             'filterService':            {name: 'filterService',         type: 'service'},
             'entrezService':            {name: 'entrezService',         type: 'service'}
         },
