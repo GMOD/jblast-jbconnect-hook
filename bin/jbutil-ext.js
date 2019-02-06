@@ -246,7 +246,7 @@ function exec_setupdata(params) {
                 console.log("error",cmd,err);
             }
         }
-        break;  // only take the first one
+        //break;  // only take the first one
     }
 }
 /*
