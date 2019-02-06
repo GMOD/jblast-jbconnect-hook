@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+ 
 var fs = require('fs-extra');
 var path = require('path');
 var util = require('./util.js');
@@ -142,71 +142,72 @@ function exec_setuptrack(params) {
     var config = params.config;
     console.log("Setting up sample track...");
     var g = config;
-    
+
     // get dataSet
     var dataSet = "-----";
     for(var i in g.dataSet) {
+		console.log("processing dataset",g.dataSet[i].path);
+		
         dataSet = g.dataSet[i].path;
-        break;  // only take the first one
-    }
     
-    let trackListPath = g.jbrowsePath + dataSet + '/trackList.json';
-    let error = 0;
-    
-    console.log(">>> cwd",process.cwd());
-    var sampleTrackFile = approot+'/node_modules/jblast-jbconnect-hook/setup/jblastdata/sampleTrack.json';
-    
-    // read sampleTrack.json file
-    try {
-      var sampleTrackData = fs.readFileSync (sampleTrackFile,'utf8');
-    }
-    catch(err){
-        console.log("failed read",trackListPath,err);
-        error = 1;
-    }
-    if (error) return;
-    
-    // insert blastResultPath
+		let trackListPath = g.jbrowsePath + dataSet + '/trackList.json';
+		let error = 0;
+		
+		//console.log(">>> cwd",process.cwd());
+		var sampleTrackFile = approot+'/node_modules/jblast-jbconnect-hook/setup/jblastdata/sampleTrack.json';
+		
+		// read sampleTrack.json file
+		try {
+		  var sampleTrackData = fs.readFileSync (sampleTrackFile,'utf8');
+		}
+		catch(err){
+			console.log("failed read",trackListPath,err);
+			error = 1;
+		}
+		if (error) continue;
+		
+		// insert blastResultPath
 
-    //console.log("typeof sampleTrackData",typeof sampleTrackData,sampleTrackData);
-    sampleTrackData = sampleTrackData.replace("[[blastResultPath]]",g.jblast.blastResultPath);
-    sampleTrackData = sampleTrackData.replace("[[blastResultPath]]",g.jblast.blastResultPath);
-    var sampleTrack = JSON.parse(sampleTrackData);
-    
-    // read trackList.json
-    try {
-      var trackListData = fs.readFileSync (trackListPath);
-    }
-    catch(err) {
-        console.log("failed read",trackListPath,err);
-        error = 1;
-    }
-    if (error) return;
-    
-    var conf = JSON.parse(trackListData);
+		//console.log("typeof sampleTrackData",typeof sampleTrackData,sampleTrackData);
+		sampleTrackData = sampleTrackData.replace("[[blastResultPath]]",g.jblast.blastResultPath);
+		sampleTrackData = sampleTrackData.replace("[[blastResultPath]]",g.jblast.blastResultPath);
+		var sampleTrack = JSON.parse(sampleTrackData);
+		
+		// read trackList.json
+		try {
+		  var trackListData = fs.readFileSync (trackListPath);
+		}
+		catch(err) {
+			console.log("failed read",trackListPath,err);
+			error = 1;
+		}
+		if (error) continue;
+		
+		var conf = JSON.parse(trackListData);
 
-    // check if sample track exists in trackList.json (by checking for the label)
-    var hasLabel = 0;
-    for(var i in conf.tracks) {
-        if (conf.tracks[i].label===sampleTrack.label) {
-            hasLabel=1;
-            break;
-        }
-    }
-    if (hasLabel) {
-        console.log('Sample track already exists');
-        return;
-    }
-    // add the sample track
-    conf.tracks.push(sampleTrack);
-    
-    // write trackList.json
-    try {
-      fs.writeFileSync(trackListPath,JSON.stringify(conf,null,4));
-    }
-    catch(err) {
-      console.log("failed write",trackListPath,err);
-    }
+		// check if sample track exists in trackList.json (by checking for the label)
+		var hasLabel = 0;
+		for(var i in conf.tracks) {
+			if (conf.tracks[i].label===sampleTrack.label) {
+				hasLabel=1;
+				break;
+			}
+		}
+		if (hasLabel) {
+			console.log('Sample track already exists');
+			continue;
+		}
+		// add the sample track
+		conf.tracks.push(sampleTrack);
+		
+		// write trackList.json
+		try {
+		  fs.writeFileSync(trackListPath,JSON.stringify(conf,null,4));
+		}
+		catch(err) {
+		  console.log("failed write",trackListPath,err);
+		}
+	}
 }
 /*
  * setup data directory and sample
