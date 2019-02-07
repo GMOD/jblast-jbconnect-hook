@@ -17,9 +17,11 @@ define([
                         panel: "#hierarchicalTrackPane",
                         show: function() {
                             $('#hierarchicalTrackPane > .dijitTitlePane').show();
+                            $('#hierarchicalTrackPane > .uncategorized').show();
                         },
                         hide: function() {
                             $('#hierarchicalTrackPane > .dijitTitlePane').hide();
+                            $('#hierarchicalTrackPane > .uncategorized').hide();
                         }
                     },
                     "#tab-jblast-filter": {
