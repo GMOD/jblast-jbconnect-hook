@@ -351,8 +351,15 @@ return declare( JBrowsePlugin,
                         var count = 0;
                         for(let i in hitData) {
                             var hit = hitData[i];
-                            
+
+							// display Hit HSP info
+							if (i === hitkey) {
+								blastContent += thisB.blastRenderHitCommon(hit);
+								blastContent += blastPlugin.blastRenderHit(hit);
+								blastContent += blastPlugin.blastRenderHitBp(hit);
+							}
                             // do only on first iteration because other iteratons have same data
+							/*
                             if (count===0) {
                                 blastContent += thisB.blastRenderHitCommon(hit);
                                 //console.log("lookup_accession get");
@@ -373,15 +380,10 @@ return declare( JBrowsePlugin,
                                     }
                                 });
                             }
-                            
-//                            blastContent += "<div><h2 class='field'>Hsp Num</h2><span class='value'>"+hit.Hsp.Hsp_num+"</span></div>";
-                            console.log(hitkey,i);
-							if (i === hitkey) {
-								blastContent += blastPlugin.blastRenderHit(hit);
-								blastContent += blastPlugin.blastRenderHitBp(hit);
-							}
+                            */
                             count++;
                         }
+						// display other HSPs of the hit
 						blastContent += "<h2>Other HSPs of the hit</h2>";
 						for (i in hitData) {
                             var hit = hitData[i];
@@ -393,9 +395,9 @@ return declare( JBrowsePlugin,
 						}
                         $('#blastHspBlock').html(blastContent);
                     })
-                        .fail(function() {
-                            console.log("error",url);
-                        });                    
+					.fail(function() {
+						console.log("error",url);
+					});                    
                 }
             }
         }
@@ -418,7 +420,7 @@ return declare( JBrowsePlugin,
         txt +=    '<td class="field blast-field">Sequence ID</td>';
         txt +=    '<td class="field blast-field">Length</td>';
         txt += '</tr><tr>';
-        txt +=    '<td class="blast-value"><a class="value" id="details_accession" target="_blank">...</a></td>';
+        txt +=    '<td class="blast-value">'+ hit.Hit_accession+'</td>';
         txt +=    '<td class="blast-value">'+ hit.Hit_id+'</td>';
         txt +=    '<td class="blast-value">'+hit.Hit_len+'</td>';
         txt += '</tr></table>';
