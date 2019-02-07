@@ -348,7 +348,6 @@ return declare( JBrowsePlugin,
                         console.log("get_hit_details data",hitkey,hitData);
                         
                         var blastContent = "";
-                        var count = 0;
                         for(let i in hitData) {
                             var hit = hitData[i];
 
@@ -358,30 +357,6 @@ return declare( JBrowsePlugin,
 								blastContent += blastPlugin.blastRenderHit(hit);
 								blastContent += blastPlugin.blastRenderHitBp(hit);
 							}
-                            // do only on first iteration because other iteratons have same data
-							/*
-                            if (count===0) {
-                                blastContent += thisB.blastRenderHitCommon(hit);
-                                //console.log("lookup_accession get");
-                                $.get('/service/exec/lookup_accession/?accession='+hit.Hit_accession,function(data) {
-                                    
-                                    console.log("lookup_access result",data);
-                                    var count = 0;
-                                    
-                                    if (typeof data.result.uids[0] !== 'undefined') {
-                                        var idx = data.result.uids[0];
-                                        var link = data.result[idx].link;
-                                        $('#details_accession').attr('href',link);
-                                        $('#details_accession').html(data.result[idx].caption);
-                                    }
-                                    else {
-                                        $('#details_accession').html('N/A');
-                                        console.log("lookup accession failed -", hit.Hit_accession);
-                                    }
-                                });
-                            }
-                            */
-                            count++;
                         }
 						// display other HSPs of the hit
 						blastContent += "<h2>Other HSPs of the hit</h2>";
@@ -420,7 +395,7 @@ return declare( JBrowsePlugin,
         txt +=    '<td class="field blast-field">Sequence ID</td>';
         txt +=    '<td class="field blast-field">Length</td>';
         txt += '</tr><tr>';
-        txt +=    '<td class="blast-value">'+ hit.Hit_accession+'</td>';
+        txt +=    '<td class="blast-value"> id="details_accession"'+ hit.Hit_accession+'</td>';
         txt +=    '<td class="blast-value">'+ hit.Hit_id+'</td>';
         txt +=    '<td class="blast-value">'+hit.Hit_len+'</td>';
         txt += '</tr></table>';
