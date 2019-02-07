@@ -345,7 +345,7 @@ return declare( JBrowsePlugin,
                     var hitkey = blastKey;
                     var url = '/service/exec/get_hit_details/?asset='+asset+'&dataset='+dataset+'&hitkey='+hitkey;
                     $.get( url, function(hitData) {
-                        //console.log("gethitdetails data",hitData);
+                        console.log("get_hit_details data",hitkey,hitData);
                         
                         var blastContent = "";
                         var count = 0;
@@ -375,11 +375,22 @@ return declare( JBrowsePlugin,
                             }
                             
 //                            blastContent += "<div><h2 class='field'>Hsp Num</h2><span class='value'>"+hit.Hsp.Hsp_num+"</span></div>";
-                            blastContent += blastPlugin.blastRenderHit(hit);
-                            blastContent += blastPlugin.blastRenderHitBp(hit);
-                            blastContent += "<hr>";
+                            console.log(hitkey,i);
+							if (i === hitkey) {
+								blastContent += blastPlugin.blastRenderHit(hit);
+								blastContent += blastPlugin.blastRenderHitBp(hit);
+							}
                             count++;
                         }
+						blastContent += "<h2>Other HSPs of the hit</h2>";
+						for (i in hitData) {
+                            var hit = hitData[i];
+							if (i !== hitkey) {
+								blastContent += blastPlugin.blastRenderHit(hit);
+								blastContent += blastPlugin.blastRenderHitBp(hit);
+								blastContent += "<hr>";
+							}
+						}
                         $('#blastHspBlock').html(blastContent);
                     })
                         .fail(function() {
