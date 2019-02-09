@@ -238,11 +238,16 @@ module.exports = {
         }    
 
 		// determine the contigHandler function (in jbconnect.config.js), if any
+		// and determine featureMapping value if defined, 
 		let cfgDataSet = g.dataSet;
 		let contigHandler = null;
+		let featureMapping = "query";	// default feature mapping
 		for(let j in cfgDataSet) {
-			if (cfgDataSet[j].path === dataSet)
+			if (cfgDataSet[j].path === dataSet) {
 				contigHandler = cfgDataSet[j].contigHandler;
+				if (cfgDataSet[j].featureMapping && cfgDataSet[j].featureMapping === "hit") 
+					featureMapping = cfgDataSet[j].featureMapping;
+			}
 		}
         
         var resultFile = g.jbrowsePath + dataSet +'/'+ g.jblast.blastResultPath+'/'+asset+'.json';
@@ -300,7 +305,8 @@ module.exports = {
                 filteredHits++;
 
 				// if defined, use the contigHandler defined in jbconnect.config.js
-				if (contigHandler)
+				// configHandler only applies when featureMapping = "hit"
+				if (contigHandler && featureMapping !== "query")
 					contig = contigHandler(blastData[x]);
 					//contig = configHandler(blastData[x].Hit_accession;
 				
@@ -315,8 +321,15 @@ module.exports = {
                 str += contig+"\t";                         // 1 seqid
                 str += bDb+"\t";                  			// 2 source
                 str += bProgram+"\t";                       // 3 type
-                str += qstart+"\t";                         // 4 start
-                str += qend+"\t";                           // 5 end
+				
+				if (featureMapping === "hit") {				// features mapped to target (hit) space
+					str += hstart+"\t";                         // 4 start
+					str += hend+"\t";                           // 5 end
+				} else {									// feature mapped to query space
+					str += qstart+"\t";                         // 4 start
+					str += qend+"\t";                           // 5 end
+				}
+				
                 str += score+"\t";                          // 6 score
                 str += strand+"\t";                         // 7 strand
                 str += ".\t";                               // 8 phase
