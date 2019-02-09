@@ -220,22 +220,30 @@ module.exports = {
      * @param {function} cb - function(filterSummary, gff string)
      *     filterSummary (eg. { result: 'success', hits: 792, filteredHits: 24 }
      */
-    getHitDataFiltered(filterData,requestData,cb) {
+    getHitDataFiltered(filterData,requestData,cb) { 
         sails.log.debug('getHitDataFiltered()',filterData,"requestData",requestData);
-        var thisb = this;
-        var g = sails.config.globals.jbrowse;
-        var asset = requestData.asset;
-        var dataSet = requestData.dataset; //typeof dataSet !== 'string' ? Dataset.Resolve(requestData.dataset) : dataSet;
-        //var contig = typeof requestData.contig !== 'undefined' ? requestData.contig : "none";
-        var contig = requestData.contig;
-        //contig = filterData === 0 ? contig : filterData.contig;
-        if (typeof filterData.contig !== 'undefined') contig = filterData.contig;
+        let thisb = this;
+        let g = sails.config.globals.jbrowse;
+        let asset = requestData.asset;
+        let dataSet = requestData.dataset; //typeof dataSet !== 'string' ? Dataset.Resolve(requestData.dataset) : dataSet;
         
-        sails.log.debug('contig:',contig,filterData.contig);
+		// figure the default contig from the request
+		let contig = requestData.contig;
+        if (typeof filterData.contig !== 'undefined') contig = filterData.contig;
+        //sails.log.debug('contig:',contig,filterData.contig);
         if (typeof contig === 'undefined') {
-            sails.log.error('invalid contig');
-            cb({result:'fail', error: 'Invalid config'});
+			contig = "undefined";
+            //sails.log.error('invalid contig');
+            //cb({result:'fail', error: 'Invalid config'});
         }    
+
+		// determine the contigHandler function (in jbconnect.config.js), if any
+		let cfgDataSet = g.dataSet;
+		let contigHandler = null;
+		for(let j in cfgDataSet) {
+			if (cfgDataSet[j].path === dataSet)
+				contigHandler = cfgDataSet[j].contigHandler;
+		}
         
         var resultFile = g.jbrowsePath + dataSet +'/'+ g.jblast.blastResultPath+'/'+asset+'.json';
         //var blastGffFile = g.jbrowsePath + dataSet + '/' + g.jblast.blastResultPath+'/'+asset+'.gff3';
@@ -261,6 +269,19 @@ module.exports = {
         var filteredHits = 0;
 
         var str = "";
+		
+		let bProgram = blastJSON.BlastOutput.BlastOutput_program;
+		
+		// determine the dDb source(s)
+		let bDbStr = blastJSON.BlastOutput.BlastOutput_db;
+		let bDb = "";
+		let bDbList = bDbStr.split(" ");
+		let c = 0;
+		for (let i in bDbList) {
+		  if (c++ > 0) bDb += ":";
+		  var t = bDbList[i].split("/");
+		  bDb += t[t.length -1];
+		}
        
         for(var x in blastData) {
             hitCount++;
@@ -277,7 +298,12 @@ module.exports = {
        
             if (selected) {
                 filteredHits++;
-                
+
+				// if defined, use the contigHandler defined in jbconnect.config.js
+				if (contigHandler)
+					contig = contigHandler(blastData[x]);
+					//contig = configHandler(blastData[x].Hit_accession;
+				
                 var qstart = blastData[x].Hsp["Hsp_query-from"];
                 var qend = blastData[x].Hsp["Hsp_query-to"];
                 var hstart = parseInt(blastData[x].Hsp["Hsp_hit-from"]);
@@ -285,18 +311,19 @@ module.exports = {
                 var strand = hend - hstart > 0 ? "+" : "-";
                 var score = blastData[x].Hsp["Hsp_bit-score"];
                 var seq = sequence;
+				
                 str += contig+"\t";                         // 1 seqid
-                str += "blastn:blastdb\t";                  // 2 source
-                str += "blastn\t";                          // 3 type
+                str += bDb+"\t";                  			// 2 source
+                str += bProgram+"\t";                       // 3 type
                 str += qstart+"\t";                         // 4 start
                 str += qend+"\t";                           // 5 end
                 str += score+"\t";                          // 6 score
-                str += strand+"\t";                        // 7 strand
+                str += strand+"\t";                         // 7 strand
                 str += ".\t";                               // 8 phase
                 str += "blastHit="+x;
                     str += ";Name="+blastData[x].Hit_def;
                     str += ";HitNum="+blastData[x].Hit_num;
-                str += "\t\n";
+                str += "\n";
             }
         }
         
