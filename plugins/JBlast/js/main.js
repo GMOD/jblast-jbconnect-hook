@@ -553,18 +553,27 @@ return declare( JBrowsePlugin,
 			function setup_evalue_slider() {
 				var hi = Math.log10(data.evalue.max);
 				var lo = Math.log10(data.evalue.min);
+				var same = data.evalue.max===data.evalue.min;
+				if (!isFinite(lo)) lo = 0;
 				var nstep = 99;
 				var step = (hi - lo) / nstep;
 
+				//console.log("evalue step",hi,lo,hi-lo,step);
 				// setup labels
 				var pstep = 5;
 				var labels = [];
 				for(var i=0;i < 99;i++) {
 					var v = lo + i*step;
-					labels.push(Math.pow(10,v).toExponential(1));
+					if (same) labels.push("");
+					else labels.push(Math.pow(10,v).toExponential(1));
 				}
-				labels.push(Math.pow(10,hi).toExponential(1));
-				labels.push(""+99);
+				if (same) {
+					labels.push("");
+				}
+				else {
+					labels.push(Math.pow(10,hi).toExponential(1));
+					//labels.push(""+99);
+				}
 				//console.log("evalue labels",labels);
 
 				// map evalue into 0-99 space
@@ -577,13 +586,14 @@ return declare( JBrowsePlugin,
 					slide: function(event,ui) {
 						var i = +ui.value;
 						var ev = i*step + lo;
-						$('#slider-evalue-data').html(Math.pow(10,ev).toExponential(1));
+						if (!same) $('#slider-evalue-data').html(Math.pow(10,ev).toExponential(1));
 					},
 					change: function(event,ui) {
 						var i = +ui.value;
 						var val = Math.pow(10,i*step + lo);
 						var data = {evalue:{val:val}};
-						thisB.sendChange(data,trackConfig);
+						if (!same)
+							thisB.sendChange(data,trackConfig);
 					}
 				}).slider("pips",{
 					rest:'label',
@@ -591,7 +601,11 @@ return declare( JBrowsePlugin,
 					step: 25
 				});
 				setTimeout(function() {	// initial render value
-					$('#slider-evalue-data').html(data.evalue.val.toExponential(1));
+					if (same) {
+						$('#slider-evalue-data').html("N/A");
+						$("#slider-evalue").css("pointer-events","none");
+					}
+					else $('#slider-evalue-data').html(data.evalue.val.toExponential(1));
 				},100);
 			}
             // setup identity slider ************************

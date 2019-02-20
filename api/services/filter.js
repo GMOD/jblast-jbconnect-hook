@@ -403,7 +403,7 @@ module.exports = {
     getHighest10: function(variable) {
         var blastData = this.blastData.BlastOutput.BlastOutput_iterations.Iteration.Hit;
         //var val = Math.log10(Number.MIN_VALUE);
-        var minval = Number.MIN_VALUE;
+        var minval = 0;	//Number.MIN_VALUE;
         for(var x in blastData) {
             //var v = Math.log10(+blastData[x].Hsp[variable]);
             var v = +blastData[x].Hsp[variable];
