@@ -22,7 +22,7 @@ before_script:
   - npm install enuggetry/faux-blastdb
   - npm install gmod/jblast-jbconnect-hook
 #  - npm install gmod/jblast-jbconnect-hook
-  - ./utils/blast_getBlastUtils.js
+  - ./utils/blast_getBlastUtils.js 2.8.1
   - npm install @gmod/jbrowse@1.15.1
   - node ./utils/jb_setup.js
   - ls blastdb
