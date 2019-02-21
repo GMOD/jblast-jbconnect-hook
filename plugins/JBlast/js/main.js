@@ -730,7 +730,7 @@ return declare( JBrowsePlugin,
         }));
     },
     jblastRightClickMenuInit: function(highlight) {
-        console.log("jblastRightClickMenuInit");
+        //console.log("jblastRightClickMenuInit");
         var thisB = this;
         var browser = this.browser;
         var handlers = {
@@ -770,11 +770,11 @@ return declare( JBrowsePlugin,
                     hilite,
                     dojo.hitch( this, function( seq ) {
 						let bpSize = hilite.end-hilite.start;
-                        console.log('startBlast() found sequence',hilite,bpSize);
+                        //console.log('startBlast() found sequence',hilite,bpSize);
                         require(["JBrowse/View/FASTA"], function(FASTA){
                             var fasta = new FASTA();
                             var fastaData = fasta.renderText(hilite,seq);
-                            console.log('FASTA',fastaData);
+                            //console.log('FASTA',fastaData);
                             //delete fasta;
                             browser.jblastDialog(fastaData,bpSize);
                         });                                
@@ -806,7 +806,7 @@ return declare( JBrowsePlugin,
         var comboData = [];
 		let bpSizeLimit = JBrowse.jblast.bpSizeLimit;
 
-		console.log("blastDialog sizelimit",JBrowse.jblast,bpSizeLimit);
+		//console.log("blastDialog sizelimit",JBrowse.jblast,bpSizeLimit);
 
 		if (bpSizeLimit && bpSize > bpSizeLimit) {
 			alert("Query size is "+bpSize+".  The query size is limited to "+bpSizeLimit+" bp for demonstration purposes.");
