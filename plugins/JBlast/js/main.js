@@ -34,7 +34,7 @@ define([
 return declare( JBrowsePlugin,
 {
     constructor: function( args ) {
-        console.log("plugin: JBlast");
+        console.log("plugin: JBlast ",args);
         //console.dir(args);
         
         var thisB = this;
@@ -105,8 +105,9 @@ return declare( JBrowsePlugin,
             asset: null,
             focusQueue: [],
             focusQueueProc: 0,
-            panelDelayTimer: null
-        };
+            panelDelayTimer: null,
+			bpSizeLimit: args.bpSizeLimit || 0
+		};
         
         /*
          * class override function intercepts
@@ -712,8 +713,11 @@ return declare( JBrowsePlugin,
               
     // adds Blast button
     FASTA_addButtons: function (region,seq, toolbar) {
-        var text = this.renderText( region, seq );
-        thisB = this;
+        let text = this.renderText( region, seq );
+		//console.log("addButtons region, size",region,region.end-region.start,text);
+        let thisB = this;
+		let bpSize = region.end-region.start;
+		
         toolbar.addChild( new Button({ 
             iconClass: 'dijitIconFunction',
             label: 'BLAST',
@@ -721,7 +725,7 @@ return declare( JBrowsePlugin,
             disabled: ! has('save-generated-files'),
             onClick: function() {
                 //thisB.blastDialog(text);
-                JBrowse.jblastDialog(text);
+                JBrowse.jblastDialog(text,bpSize);
             }
         }));
     },
@@ -765,13 +769,14 @@ return declare( JBrowsePlugin,
                 refSeqStore.getReferenceSequence(
                     hilite,
                     dojo.hitch( this, function( seq ) {
-                        //console.log('found sequence',hilite,seq);
+						let bpSize = hilite.end-hilite.start;
+                        console.log('startBlast() found sequence',hilite,bpSize);
                         require(["JBrowse/View/FASTA"], function(FASTA){
                             var fasta = new FASTA();
                             var fastaData = fasta.renderText(hilite,seq);
                             console.log('FASTA',fastaData);
                             //delete fasta;
-                            browser.jblastDialog(fastaData);
+                            browser.jblastDialog(fastaData,bpSize);
                         });                                
 
                     })
@@ -795,10 +800,18 @@ return declare( JBrowsePlugin,
         }
     },
     // display blast dialog
-    Browser_jblastDialog: function (region) {
+    Browser_jblastDialog: function (region,bpSize) {
         var regionB = region;
         var thisB = this;
         var comboData = [];
+		let bpSizeLimit = JBrowse.jblast.bpSizeLimit;
+
+		console.log("blastDialog sizelimit",JBrowse.jblast,bpSizeLimit);
+
+		if (bpSizeLimit && bpSize > bpSizeLimit) {
+			alert("Query size is "+bpSize+".  The query size is limited to "+bpSizeLimit+" bp for demonstration purposes.");
+			return;
+		}
 
 
         getWorkflows(function(workflows){
@@ -814,10 +827,6 @@ return declare( JBrowsePlugin,
             
             function destroyBlastDialog() {
                 dialog.destroyRecursive();
-                //delete stateStore;
-                //delete cancelBtn;
-                //delete submitBtn;
-
             };
             var dialog = new Dialog({ 
                 title: 'Process BLAST',
@@ -902,6 +911,8 @@ return declare( JBrowsePlugin,
                 }
             }, "cancel-btn").startup();
             
+			console.log("query region: ",regionB);
+			
             if (dialog) dialog.show();
 
         });
