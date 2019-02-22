@@ -178,8 +178,9 @@ function processFilter(kJob,newTrackJson,cb) {
         };
         filter.applyFilter(0,asset,function(hitdata) {
             kJob.data.blastData.hits = hitdata.hits;
+			var seq = kJob.data.sequence;
             
-            var trackLabel = 'blast '+kJob.id+' ('+kJob.data.sequence.start+'..'+kJob.data.sequence.end+')'
+            var trackLabel = 'blast '+kJob.id+' ('+seq.seq+':'+seq.start+'..'+seq.end+')'
                 +' '+hitdata.hits + ' hits';
             
             newTrackJson[0].key = trackLabel;

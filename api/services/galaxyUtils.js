@@ -301,7 +301,7 @@ module.exports = {
     beginProcessing2: function(kJob) {
         
         var thisb = this;
-        
+        var seq = kJob.data.sequence;
         kJob.progress(0,10,{file_upload:0});
 
         // send the file
@@ -362,9 +362,7 @@ module.exports = {
                         var wf = data[i];
                         if (wf.id === kJob.data.workflow) {
                             sails.log.info("Workflow starting: "+wf.name+' - '+wf.id);
-                            //kJob.data.name = wf.name;
-                            //kJob.data.workflowData = wf;
-                            kJob.data.name = "Galaxy workflow: "+wf.name;
+                            kJob.data.name = wf.name+' '+seq.seq+':'+seq.start+'..'+seq.end;
                             kJob.update(function() {});
 
                             kJob.progress(2,10,{start_workflow:'done'});
