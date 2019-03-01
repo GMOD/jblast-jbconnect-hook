@@ -24,7 +24,6 @@
     "app-root-path": "^2.0.1",
     "bluebird": "^3.5.0",
     "deferred": "^0.7.8",
-    "fs": "0.0.1-security",
     "fs-extra": "^3.0.1",
     "fs-finder": "^1.8.1",
     "grunt-bump": "^0.8.0",

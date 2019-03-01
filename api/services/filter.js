@@ -318,6 +318,12 @@ module.exports = {
                 var score = blastData[x].Hsp["Hsp_bit-score"];
                 var seq = sequence;
 				
+				if (hstart > hend) {
+					let t = hend;
+					hend = hstart;
+					hstart = t;
+				}
+				
                 str += contig+"\t";                         // 1 seqid
                 str += bDb+"\t";                  			// 2 source
                 str += bProgram+"\t";                       // 3 type
