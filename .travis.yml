@@ -34,8 +34,9 @@ before_script:
 script:
   - npm run jblast-coverage
 after_success:
+  - cd ../jblast-jbconnect-hook
   - ls coverage
-  - npm run coveralls
+  - cat ../jbconnect/coverage/lcov.info | ./node_modules/.bin/coveralls
   - ./node_modules/nyc/bin/nyc.js report
 after_failure:
   - cat node_modules/@gmod/jbrowse/setup.log
