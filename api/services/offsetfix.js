@@ -25,8 +25,11 @@ module.exports = {
         // attempt to read the file
         try {
             var content = fs.readFileSync(blastfile, 'utf8');
-        } catch(e) {
+        }
+        catch(e) {
+            // istanbul ignore next
             sails.log.error("failed to read blast file",blastfile);
+            // istanbul ignore next
             return cb(e);
         }
         var data = JSON.parse(content);
@@ -39,14 +42,16 @@ module.exports = {
         // fix offsets
         for(var x in hits) {
             fixHsp(hits[x].Hsp);
-            //sails.log.debug(hits[x]);
         }
         
         // write file
         try {
             fs.writeFileSync(blastfile,JSON.stringify(data,null,2));
-        } catch (err) {
+        }
+        catch (err) {
+            // istanbul ignore next
             sails.log.error('failed to write',blastfile);
+            // istanbul ignore next
             return cb(eerr);
         }
         cb();

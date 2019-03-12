@@ -31,6 +31,7 @@ module.exports = {
         // i.e. /var/www/html/jbrowse/sample_data/json/volvox/jblastdata
         var jblastDataPath = g.jbrowsePath + kJob.data.dataset + '/' + g.jblast.blastResultPath + '/';
         var assetId = kJob.data.blastData.outputs['blastxml'];
+        // istanbul ignore next
         if (typeof assetId === 'undefined') {
             cb({status:'error',msg:'error in blastxml to json - assetId undefined'});
             return;
@@ -61,6 +62,7 @@ module.exports = {
                 for (var x in hits) {
 
                     // add offset to HSP query from/to
+                    /*
                     var fixHsp = function(hsp) {
 
                         var start = parseInt(hsp['Hsp_query-from']) + offset;
@@ -73,7 +75,7 @@ module.exports = {
 
                         return hsp;
                     };
-
+                    */
                     var insertHsp = function(hit,hsp) {
                         return {
                             Hit_num: hit.Hit_num,
@@ -96,6 +98,7 @@ module.exports = {
                         return;
                     }
                     */
+                    // istanbul ignore else
                     if (typeof hits[x].Hit_hsps.Hsp.Hsp_num !== 'undefined') { 
                         //console.log("hit single hsp", hits[x].Hit_num);
                         var key = hits[x].Hit_id + sep + hits[x].Hit_hsps.Hsp.Hsp_num;
@@ -113,7 +116,6 @@ module.exports = {
                         for(var h in hsps){
                             hsp_count++;
                         }
-
                         for (var h in hsps) {
                             var key = hits[x].Hit_id + sep + hsps[h].Hsp_num;
                             key = key.replace(/[|.]/g,'-');
@@ -121,11 +123,7 @@ module.exports = {
                             obj[key] = insertHsp(hits[x],hsps[h]);
                             hspNum++;
                         }
-                        //console.log(util.inspect(hsps, false, null));
-                        //return;
                     }
-
-                    //if (count++ > 30) return;   // debug
                 }
                 // remove the original hit list
                 delete data.BlastOutput.BlastOutput_iterations.Iteration.Iteration_hits;

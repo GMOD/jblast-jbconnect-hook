@@ -56,8 +56,10 @@ module.exports = {
                 }
                 return res.ok(data);
             })
-            .catch(function (err) {
-                res.serverError(err);
+            .catch(
+                // istanbul ignore next
+                function (err) {
+                  res.serverError(err);
             });    
     }
   

@@ -399,7 +399,9 @@ module.exports = {
         try {
             var content = fs.readFileSync(resultFile, 'utf8');
         } catch(e) {
+            // istanbul ignore next
             sails.log.error("failed to read blast json in getHitDetails()",resultFile);
+            // istanbul ignore next
             return;
         }
         var blastJSON = JSON.parse(content);

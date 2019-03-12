@@ -99,6 +99,7 @@ function postMoveResultFiles(kJob,cb) {
         var newTrackJson = JSON.parse(newTrackData);
 
         //if it's a single definition, coerce to an array
+        // istanbul ignore next
         if (Object.prototype.toString.call(newTrackJson) !== '[object Array]') {
             newTrackJson = [ newTrackJson ];
         }
@@ -114,6 +115,7 @@ function postMoveResultFiles(kJob,cb) {
         });
         
         // merge trackData from job submit options, if any
+        // istanbul ignore next
         if (kJob.data.trackData)
             newTrackJson[0] = _.merge(newTrackJson[0],kJob.data.trackData);
 
