@@ -886,6 +886,7 @@ return declare( JBrowsePlugin,
                       };
                     $.post( "/job/submit", postData , function( result ) {
                         console.log( result );
+                        $('#extruderRight').openMbExtruder(true);$('#extruderRight').openPanel();
                     }, "json");
 
 
