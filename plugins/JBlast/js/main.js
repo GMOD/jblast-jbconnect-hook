@@ -44,6 +44,13 @@ return declare( JBrowsePlugin,
             //console.log("loaded BlastPanel.html");
             $('body').append(data);
         });
+        // tune blast panel
+        setInterval(function() {
+            var h = $("#blastPanel div.extruder-content").height();
+            var w = $('.tg-yw4l').width();
+            $("#j-blast").height(h-12);
+            $('#j-blast').width(w-19);
+        },1000);
         
         // remove array element by name
         Array.prototype.remove = function() {
