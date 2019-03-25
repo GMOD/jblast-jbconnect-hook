@@ -256,9 +256,10 @@ module.exports = {
 
         var region = params.region;
         var workflow = params.workflow;
+        var refseq = params.refseq;
 
         // validate DNA sequence
-        region = utils.validateSequence(region);
+        region = utils.validateSequence(region,refseq);
         if (region === false)
             return kJob.kDoneFn(Error('invalid sequence '));
 

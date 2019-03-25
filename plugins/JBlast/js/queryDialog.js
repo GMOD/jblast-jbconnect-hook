@@ -120,7 +120,8 @@ _fillActionBar: function ( actionBar ) {
                     service: "jblast",
                     dataset: browser.config.dataRoot,
                     region: searchParams.sequence,
-                    workflow: searchParams.workflow
+                    workflow: searchParams.workflow,
+                    refseq:Object.keys(browser.allRefs)[0]
                 };
                 console.log("post data",postData);
                 $.post( "/job/submit", postData , function( result ) {
