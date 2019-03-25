@@ -257,6 +257,11 @@ module.exports = {
         var region = params.region;
         var workflow = params.workflow;
 
+        // validate DNA sequence
+        region = utils.validateSequence(region);
+        if (region === false)
+            return kJob.kDoneFn(Error('invalid sequence '));
+
         // get starting coord of region
         var startCoord = util.getRegionStart(region);
         var seq = util.parseSeqData(region);

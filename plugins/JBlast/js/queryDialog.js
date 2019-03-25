@@ -1,0 +1,170 @@
+define([
+    'dojo/_base/declare',
+    'dojo/dom-construct',
+    'dojo/aspect',
+    'dijit/focus',
+    'dijit/Dialog',
+    'dijit/form/Button',
+    'dijit/form/RadioButton',
+    'dijit/form/CheckBox',
+    'dijit/form/TextBox',
+    'dijit/form/Textarea',
+    "dojo/store/Memory",
+    "dijit/form/ComboBox",
+    'JBrowse/View/Dialog/WithActionBar'
+],
+function(
+    declare,
+    dom,
+    aspect,
+    focus,
+    Dialog,
+    dButton,
+    dRButton,
+    dCheckBox,
+    dTextBox,
+    dTextArea,
+    Memory,
+    ComboBox,
+    ActionBarDialog
+) {
+
+return declare( ActionBarDialog, {
+
+constructor: function(args) {
+    this.plugin = args.plugin;
+    this.browser = args.browser;
+    this.workflows = args.workflows;
+    var thisB = this;
+
+    aspect.after( this, 'hide', function() {
+          focus.curNode && focus.curNode.blur();
+          setTimeout( function() { thisB.destroyRecursive(); }, 500 );
+    });
+},
+
+_dialogContent: function () {
+    
+    let workflows =this.workflows;
+    let wfStr = "";
+    for(var i in workflows) {
+        //console.log("workflow",workflows[i]);
+        if (!workflows[i].deleted) {
+            //comboData.push({'name': workflows[i].name, 'id':workflows[i].id});
+            wfStr += "<option value='"+workflows[i].id+"'>"+workflows[i].name+"</option>";
+        }
+    }
+    var content = this.content = {};
+    var container = dom.create('div', { className: 'search-dialog' } );
+
+    var introdiv = dom.create('div', {
+        className: 'search-dialog intro',
+        innerHTML: 'Submit a DNA sequence to BLAST.'
+    }, container );
+
+    let workflowCombo = dom.create('div', {
+        id: 'workflow-div',
+        className: 'section',
+        innerHTML:
+            '<span classs="header">Select Workflow</span><br />'+ 
+            '<select id="workflow-combo" name="workflow">'+wfStr+'</select>'
+
+    },container);
+
+    // Render textarea box
+    var searchBoxDiv = dom.create('div', {
+        className: "section",
+        innerHTML:
+            '<span classs="header">Input sequence to BLAST</span><br />'+ 
+            '<textarea id="sequence-text" class="seq-text" />'
+    }, container );
+
+    /*
+    function makeRadio( args, parent ) {
+        var label = dom.create('label', {}, parent );
+        var radio = new dRButton( args ).placeAt( label );
+        dom.create('span', { innerHTML: args.label }, label );
+        return radio;
+    }
+    
+    makeRadio( { name: 'translate', value: 'no', label: 'DNA', checked: true }, translateDiv );
+    content.translate = makeRadio( { name: 'translate', value: 'yes', label: 'AA' }, translateDiv );
+    */
+
+
+    return container;
+},
+
+_getSearchParams: function() {
+    var content = this.content;
+    console.log("dialog result",$('.search-dialog #workflow-combo').find('option:selected').val(),$('.search-dialog #sequence-text').val());
+    return {
+        workflow: $('.search-dialog #workflow-combo').find('option:selected').val(),
+        sequence: $('.search-dialog #sequence-text').val()
+    };
+},
+
+_fillActionBar: function ( actionBar ) {
+    let thisB = this;
+    let browser = this.browser;
+
+    new dButton({
+            label: 'Submit',
+            //iconClass: 'dijitIconBookmark',
+            onClick: function() {
+                var searchParams = thisB._getSearchParams();
+                thisB.callback( searchParams );
+                thisB.hide();
+
+                var postData = {
+                    service: "jblast",
+                    dataset: browser.config.dataRoot,
+                    region: searchParams.sequence,
+                    workflow: searchParams.workflow
+                };
+                console.log("post data",postData);
+                $.post( "/job/submit", postData , function( result ) {
+                    console.log( result );
+                }, "json");
+
+
+                // show confirm submit box
+                var confirmBox = new Dialog({ title: 'Confirmation' });
+                dojo.create('div', {
+                    id: 'confirm-btn',
+                    innerHTML: 'BLAST submitted...'
+                }, confirmBox.containerNode );
+                confirmBox.show();
+                $('#extruderRight').openMbExtruder(true);$('#extruderRight').openPanel();
+
+                setTimeout(function(){
+                    confirmBox.destroyRecursive();
+                }, 2000);
+
+
+
+
+            }
+        })
+        .placeAt( actionBar );
+    new dButton({
+            label: 'Cancel',
+            iconClass: 'dijitIconDelete',
+            onClick: function() {
+                thisB.callback( false );
+                thisB.hide();
+            }
+        })
+        .placeAt( actionBar );
+},
+
+show: function ( callback ) {
+    this.callback = callback || function() {};
+    this.set( 'title', "BLAST a DNA sequence");
+    this.set( 'content', this._dialogContent() );
+    this.inherited( arguments );
+    focus.focus( this.closeButtonNode );
+}
+
+});
+});

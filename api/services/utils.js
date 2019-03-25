@@ -1,3 +1,5 @@
+let S = require('string');
+
 /*
  * @module
  * @description
@@ -7,20 +9,20 @@ module.exports = {
     /**
      * return the starting coordinate
      * >ctgA ctgA:3014..6130 (+ strand) class=remark length=3117
-     * @param {type} str
-     * @returns {unresolved}
+     * @param {string} str fasta header
+     * @returns {int} starting coordinate
      */
-    getRegionStart: function (str) {
+    getRegionStart(str) {
         var line = str.split("\n")[0];
         var re = line.split(":")[1].split("..")[0];
         return re;
     },
     /**
      * Get parsed sequence data from FASTA file header
-     * @param {type} str
-     * @returns (JSON) sequence data
+     * @param {string} str - fasta header string
+     * @returns {JSON} fasta header parsed into JSON struct
      */
-    parseSeqData: function (str) {
+    parseSeqData(str) {
         var line = str.split("\n")[0];
         return {
             seq: line.split(">")[1].split(" ")[0],
@@ -30,5 +32,38 @@ module.exports = {
             class: line.indexOf('class') >= 0 ? line.split("class=")[1].split(" ")[0] : '',
             length: line.split("length=")[1]
         };
+    },
+    /**
+     * make sure it's a DNA sequence - containing AGCT
+     * if he sequence doesn't have a fasta header, add a fasta header
+     * @param {string} seq sequence string
+     * @returns {string} valid sequence, or false if sequence not valid
+     */
+    validateSequence(seq) {
+        let first = "";
+        let lines = seq.split("\n");
+        let count = 0;
+
+        for(let i in lines) {
+            if (S(lines[i]).left(1) !== ">") {
+                if (lines[i].search(/^[AGCTagct]*$/) !== 0) {
+                    sails.log.error("non-DNA sequence");
+                    return false;                   // invalid character
+                }
+                count += lines[i].length;
+            }
+        }
+        if (S(lines[0]).left(1) !== ">") {
+            //>chr3A chr3A:372670656..372671021 (- strand) class=gene length=366
+            first = ">seq seq:1.."+count+" (+ strand) class=none length="+count;
+        }
+        let newSeq = [];
+        if (first)
+            newSeq.push(first);
+        for(let i in lines)
+            newSeq.push(lines[i]);
+        
+        return newSeq.join();
+
     }
 };

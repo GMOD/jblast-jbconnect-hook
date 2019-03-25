@@ -113,7 +113,8 @@ return declare( JBrowsePlugin,
             focusQueue: [],
             focusQueueProc: 0,
             panelDelayTimer: null,
-			bpSizeLimit: args.bpSizeLimit || 0
+            bpSizeLimit: args.bpSizeLimit || 0,
+            getWorkflows: this.getWorkflows
 		};
         
         /*
@@ -138,6 +139,12 @@ return declare( JBrowsePlugin,
                     thisB.insertFeatureDetail();
                 } 
             },2000);
+
+            // load menu
+            require(["plugins/JBlast/js/toolmenu"], function(toolmenu){
+                toolmenu.init(browser,thisB);
+            });        
+
 
             // setup callbacks for job queue panel
             setTimeout(function() {
@@ -831,8 +838,8 @@ return declare( JBrowsePlugin,
 			return;
 		}
 
-
-        getWorkflows(function(workflows){
+        //console.log("plugin",this);
+        this.jblast.getWorkflows(function(workflows){
 
             if (workflows.length==0) {
                 alert("no workflows found");
@@ -935,39 +942,38 @@ return declare( JBrowsePlugin,
             if (dialog) dialog.show();
 
         });
-        
+    },
+    /**
+     * get galaxy workflows (using jbrowse api)
+     * @param {type} cb - cb(workflows]]
+     * @returns {getWorkflows}
+     */
+    getWorkflows(cb) {
+        var thisB = this;
+
+        var xhrArgs = {
+        url: "/jbapi/getworkflows",
+        handleAs: "json",
+        preventCache: true,
+        load: function(data){
+                console.log("get workflows result", data);
+                cb(data);
+        },
+        error: function(error){
+        }
+        }
+
+        // Call the asynchronous xhrGet
+        //var deferred = dojo.xhrGet(xhrArgs);
+        $.get( "/service/exec/get_workflows", function( data ) {
+            console.log("get workflows result", data);
+            cb(data);
+        });
     }
     
 });
 });
 
-/**
- * get galaxy workflows (using jbrowse api)
- * @param {type} cb - cb(workflows]]
- * @returns {getWorkflows}
- */
-function getWorkflows(cb) {
-    var thisB = this;
-
-    var xhrArgs = {
-      url: "/jbapi/getworkflows",
-      handleAs: "json",
-      preventCache: true,
-      load: function(data){
-            console.log("get workflows result", data);
-            cb(data);
-      },
-      error: function(error){
-      }
-    }
-
-    // Call the asynchronous xhrGet
-    //var deferred = dojo.xhrGet(xhrArgs);
-    $.get( "/service/exec/get_workflows", function( data ) {
-        console.log("get workflows result", data);
-        cb(data);
-    });
-}
 
 // overwrite a string with another string at the given location
 function overwriteStr(subjStr, at, withStr) {

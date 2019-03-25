@@ -3,6 +3,12 @@
     Author     : ey
 */
 
+/* search-dialog */
+.search-dialog .seq-text {
+    height:100px;
+    width: 300px;
+}
+
 /* toolbar blast button */
 
 #jblast-toolbtn {
