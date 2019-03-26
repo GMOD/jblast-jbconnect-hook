@@ -12,7 +12,7 @@ define(function(){
                 'plugins/JBlast/js/queryDialog'
             ], function(dijitMenuItem,Dialog,queryDialog){
                 
-                browser.addGlobalMenuItem( 'jblast', new dijitMenuItem({
+                browser.addGlobalMenuItem( 'tools', new dijitMenuItem({
                     id: 'menubar_blast_seq',
                     label: 'BLAST DNA sequence',
                     //iconClass: 'dijitIconFilter',
@@ -36,7 +36,7 @@ define(function(){
                     }
                 }));
                 
-                browser.addGlobalMenuItem( 'jblast', new dijitMenuItem({
+                browser.addGlobalMenuItem( 'tools', new dijitMenuItem({
                     id: 'menubar_blast_hilite',
                     label: 'BLAST highlighted region',
                     //iconClass: 'dijitIconFilter',
@@ -67,9 +67,9 @@ define(function(){
                     }
                 }));
                 
-                browser.renderGlobalMenu( 'jblast','Tools', browser.menuBar );
+                browser.renderGlobalMenu( 'tools','JBlastTools', browser.menuBar );
     
-                $("[widgetid*='dropdownbutton_jblast']").insertBefore("[widgetid*='dropdownbutton_help']");
+                $("[widgetid*='dropdownbutton_tools']").insertBefore("[widgetid*='dropdownbutton_help']");
             });
 
         }
