@@ -259,10 +259,11 @@ module.exports = {
         var refseq = params.refseq;
 
         // validate DNA sequence
-        region = utils.validateSequence(region,refseq);
-        if (region === false)
-            return kJob.kDoneFn(Error('invalid sequence '));
-
+        if (refseq) {
+            region = utils.validateSequence(region,refseq);
+            if (region === false)
+                return kJob.kDoneFn(Error('invalid sequence '));
+        }
         // get starting coord of region
         var startCoord = util.getRegionStart(region);
         var seq = util.parseSeqData(region);
