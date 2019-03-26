@@ -111,8 +111,9 @@ module.exports = {
      * @returns {val} 0 if successful, otherwise failure
      */
     validateParams: function(params) {
-        if (typeof params.workflow === 'undefined') return "workflow not defined";
-        if (typeof params.region === 'undefined') return "region not undefined";
+        if (typeof params.workflow === 'undefined') return "Workflow not defined";
+        if (typeof params.region === 'undefined') return "Region/Sequence not undefined";
+        if (utils.validateSequence(params.region,params.refseq)===false) return "Invalid query DNA sequence";
         return 0;   // success
     },
     /**
