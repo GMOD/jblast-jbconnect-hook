@@ -5,18 +5,19 @@ define(function(){
             let thisb = this;
             this.browser = browser;
             this.plugin = plugin; 
-            console.log("JBlast toolmenu init");
+            //console.log("JBlast toolmenu init");
             require([
                 'dijit/MenuItem',
+                'dijit/Dialog',
                 'plugins/JBlast/js/queryDialog'
-            ], function(dijitMenuItem,queryDialog){
+            ], function(dijitMenuItem,Dialog,queryDialog){
                 
                 browser.addGlobalMenuItem( 'jblast', new dijitMenuItem({
                     id: 'menubar_blast_seq',
                     label: 'BLAST DNA sequence',
                     //iconClass: 'dijitIconFilter',
                     onClick: function() {
-                        console.log(thisb,thisb.plugin);
+                        //console.log(thisb,thisb.plugin);
                         thisb.plugin.getWorkflows(function(workflows){
 
                             if (workflows.length==0) {
@@ -40,11 +41,33 @@ define(function(){
                     label: 'BLAST highlighted region',
                     //iconClass: 'dijitIconFilter',
                     onClick: function() {
-                        alert("BLAST highlight region");
+                        let btnState = $("[widgetid*='highlight-btn'] > input").attr('aria-checked');
+                        if (btnState==='false') {
+                            // it takes a few iterations for the state to change.
+                            let check = setInterval(function(){
+                                $("[widgetid*='highlight-btn'] > input").click();
+                                btnState = $("[widgetid*='highlight-btn'] > input").attr('aria-checked');
+                                if (btnState !== 'false') {
+                                    clearInterval(check);
+
+                                    // show highlight instruct box
+                                    var confirmBox = new Dialog({ title: 'Highlight region to BLAST' });
+                                    dojo.create('div', {
+                                        id: 'confirm-btn',
+                                        innerHTML: 'Highlight region by clicking the start start coordinate and dragging to the end coordinate.  Then click "BLAST" button.'
+                                    }, confirmBox.containerNode );
+                                    confirmBox.show();
+
+                                    // close confirm box
+                                    setTimeout(function(){ confirmBox.destroyRecursive(); }, 4000);
+
+                                }
+                            },100);   
+                        }
                     }
                 }));
                 
-                browser.renderGlobalMenu( 'jblast','JBlast', browser.menuBar );
+                browser.renderGlobalMenu( 'jblast','Tools', browser.menuBar );
     
                 $("[widgetid*='dropdownbutton_jblast']").insertBefore("[widgetid*='dropdownbutton_help']");
             });
