@@ -45,9 +45,11 @@ module.exports = {
         let lines = seq.split("\n");
         let count = 0;
 
+        //if (typeof refseq !== 'undefined') return seq;
+
         for(let i in lines) {
             if (S(lines[i]).left(1) !== ">") {
-                if (lines[i].search(/^[AGCTagct]*$/) !== 0) {
+                if (lines[i].search(/^[NAGCTnagct]*$/) !== 0) {
                     sails.log.error("non-DNA sequence");
                     return false;                   // invalid character
                 }
