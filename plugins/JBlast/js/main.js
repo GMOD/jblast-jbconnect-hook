@@ -140,7 +140,7 @@ return declare( JBrowsePlugin,
                 } 
             },2000);
 
-            // load menu
+            // load toolmenu "JBlast menu"
             require(["plugins/JBlast/js/toolmenu"], function(toolmenu){
                 toolmenu.init(browser,thisB);
             });        
