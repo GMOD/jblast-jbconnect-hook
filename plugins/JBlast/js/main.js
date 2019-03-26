@@ -910,22 +910,25 @@ return declare( JBrowsePlugin,
                           workflow: selWorkflow
                       };
                     $.post( "/job/submit", postData , function( result ) {
-                        console.log( result );
+
+                        // open the job queue panel
                         $('#extruderRight').openMbExtruder(true);$('#extruderRight').openPanel();
-                    }, "json");
+                        
+                        // show confirm submit box
+                        var confirmBox = new Dialog({ title: 'Confirmation' });
+                        dojo.create('div', {
+                            id: 'confirm-btn',
+                            innerHTML: 'BLAST submitted...'
+                        }, confirmBox.containerNode );
+                        confirmBox.show();
 
+                        // close confirm box
+                        setTimeout(function(){ confirmBox.destroyRecursive();  }, 2000);
 
-                    // show confirm submit box
-                    var confirmBox = new Dialog({ title: 'Confirmation' });
-                    dojo.create('div', {
-                        id: 'confirm-btn',
-                        innerHTML: 'BLAST submitted...'
-                    }, confirmBox.containerNode );
-                    confirmBox.show();
-
-                    setTimeout(function(){
-                        confirmBox.destroyRecursive();
-                    }, 2000);
+                    }, "json")
+                    .fail(function(jqxhr, textStatus, errorThrown) {
+                        alert( "Job submit failed: "+jqxhr.responseText+" ("+jqxhr.status+"-"+jqxhr.statusText+")" );
+                    });
 
                     destroyBlastDialog();
                 }

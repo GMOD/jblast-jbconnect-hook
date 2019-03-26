@@ -125,26 +125,25 @@ _fillActionBar: function ( actionBar ) {
                 };
                 console.log("post data",postData);
                 $.post( "/job/submit", postData , function( result ) {
-                    console.log( result );
-                }, "json");
 
+                    // open job queue panel
+                    $('#extruderRight').openMbExtruder(true);$('#extruderRight').openPanel();
 
-                // show confirm submit box
-                var confirmBox = new Dialog({ title: 'Confirmation' });
-                dojo.create('div', {
-                    id: 'confirm-btn',
-                    innerHTML: 'BLAST submitted...'
-                }, confirmBox.containerNode );
-                confirmBox.show();
-                $('#extruderRight').openMbExtruder(true);$('#extruderRight').openPanel();
+                    // show confirm submit box
+                    var confirmBox = new Dialog({ title: 'Confirmation' });
+                    dojo.create('div', {
+                        id: 'confirm-btn',
+                        innerHTML: 'BLAST submitted...'
+                    }, confirmBox.containerNode );
+                    confirmBox.show();
 
-                setTimeout(function(){
-                    confirmBox.destroyRecursive();
-                }, 2000);
+                    // close confirm box
+                    setTimeout(function(){ confirmBox.destroyRecursive(); }, 2000);
 
-
-
-
+                }, "json")
+                .fail(function(jqxhr, textStatus, errorThrown) {
+                    alert( "Job submit failed: "+jqxhr.responseText+" ("+jqxhr.status+"-"+jqxhr.statusText+")" );
+                });
             }
         })
         .placeAt( actionBar );
