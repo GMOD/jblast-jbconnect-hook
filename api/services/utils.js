@@ -70,5 +70,24 @@ module.exports = {
         
         return newSeq.join("\n");
 
+    },
+    /**
+     * count DNA letters in sequence
+     * ignore fasta header if any
+     * @param {string} seq sequence string
+     * @returns {int} count
+     */
+    countSequence(seq) {
+        let lines = seq.split("\n");
+        let count = 0;
+
+        for(let i in lines) {
+            if (S(lines[i]).left(1) !== ">") {
+                count += lines[i].length;
+            }
+        }
+       
+        return count;
+
     }
 };

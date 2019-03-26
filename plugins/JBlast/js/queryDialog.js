@@ -97,7 +97,7 @@ _dialogContent: function () {
 
 _getSearchParams: function() {
     var content = this.content;
-    console.log("dialog result",$('.search-dialog #workflow-combo').find('option:selected').val(),$('.search-dialog #sequence-text').val());
+    //console.log("dialog result",$('.search-dialog #workflow-combo').find('option:selected').val(),$('.search-dialog #sequence-text').val());
     return {
         workflow: $('.search-dialog #workflow-combo').find('option:selected').val(),
         sequence: $('.search-dialog #sequence-text').val()
@@ -115,6 +115,14 @@ _fillActionBar: function ( actionBar ) {
                 var searchParams = thisB._getSearchParams();
                 thisB.callback( searchParams );
                 thisB.hide();
+
+                let bpSizeLimit = browser.jblast.bpSizeLimit;
+                let bpSize = thisB.countSequence(searchParams.sequence);
+
+                if (bpSizeLimit && bpSize > bpSizeLimit) {
+                    alert("Query size is "+bpSize+".  The query size is limited to "+bpSizeLimit+" bp for demonstration purposes.");
+                    return;
+                }
 
                 var postData = {
                     service: "jblast",
@@ -164,7 +172,22 @@ show: function ( callback ) {
     this.set( 'content', this._dialogContent() );
     this.inherited( arguments );
     focus.focus( this.closeButtonNode );
+},
+
+countSequence(seq) {
+    let lines = seq.split("\n");
+    let count = 0;
+
+    for(let i=0;i<lines.length;i++) {
+        console.log(i,lines[i]);
+        if (lines[i].charAt(0) !== ">") {
+            count += lines[i].length;
+        }
+    }
+   
+    return count;
 }
+
 
 });
 });

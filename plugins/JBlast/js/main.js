@@ -955,16 +955,16 @@ return declare( JBrowsePlugin,
         var thisB = this;
 
         var xhrArgs = {
-        url: "/jbapi/getworkflows",
-        handleAs: "json",
-        preventCache: true,
-        load: function(data){
-                console.log("get workflows result", data);
-                cb(data);
-        },
-        error: function(error){
-        }
-        }
+            url: "/jbapi/getworkflows",
+            handleAs: "json",
+            preventCache: true,
+            load: function(data){
+                    console.log("get workflows result", data);
+                    cb(data);
+            },
+            error: function(error){
+            }
+        };
 
         // Call the asynchronous xhrGet
         //var deferred = dojo.xhrGet(xhrArgs);
