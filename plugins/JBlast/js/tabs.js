@@ -113,9 +113,14 @@ define([
                         browser.jblast.resultTable.on( 'select', function ( e, dt, type, indexes ) {
                             console.log(e,dt,type,indexes);
                             if ( type === 'row' ) {
-                                var data = browser.jblast.resultTable.rows( indexes ).data().pluck( 'seq' );
-                         
-                                console.log('plucked',data);
+                                let rowData = browser.jblast.resultTable.rows( indexes ).data().toArray();
+                                let loc = rowData[0][0]+":"+rowData[0][5]+".."+rowData[0][6];
+                                console.log('row data',rowData,loc);
+                                $('input#location').val(loc);
+                                let e = $.Event("keypress");
+                                e.which = 13; //choose the one you want
+                                e.keyCode = 13;
+                                $("input#location").trigger(e);
                             }
                         } );                        
                     }

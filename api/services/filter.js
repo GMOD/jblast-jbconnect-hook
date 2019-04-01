@@ -362,7 +362,10 @@ module.exports = {
                     parseInt(score),
                     thisb.getDisplayEvalue(blastData[x].Hsp['Hsp_evalue']),
                     thisb.getDisplayPct('Hsp_identity',blastData[x]),
-                    thisb.getDisplayPct('Hsp_gaps',blastData[x])
+                    thisb.getDisplayPct('Hsp_gaps',blastData[x]),
+                    hstart, // not displayed
+                    hend    // not displayed
+
                 ]);
             }
         }
