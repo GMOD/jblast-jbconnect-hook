@@ -173,7 +173,7 @@ module.exports = {
         sails.log.debug('applyFilter()',requestData);
         let thisb = this;
         
-        this.getHitDataFiltered(filterData,requestData,function(filterSummary,filteredGffStr) {
+        this.getHitDataFiltered(filterData,requestData,function(filterSummary,filteredData) {
 
             var g = sails.config.globals.jbrowse;
 
@@ -183,21 +183,31 @@ module.exports = {
             var asset = requestData.asset;
             var ds = Dataset.Resolve(requestData.dataset);
             var blastGffFile = g.jbrowsePath + ds.path + '/' + g.jblast.blastResultPath+'/'+asset+'.gff3';
+            var blastTableFile = g.jbrowsePath + ds.path + '/' + g.jblast.blastResultPath+'/'+asset+'_table.json';
             
             // write filtered gff
             var error = false;
             let write = true;  // for testing
             if (write) {
                 try {
-                    fs.writeFileSync(blastGffFile,filteredGffStr);
+                    fs.writeFileSync(blastGffFile,filteredData.gff);
                 } catch (err) {
-                    sails.log.error('applyFilter failed to write',blastGffFile);
+                    sails.log.error('applyFilter failed to write gff',blastGffFile);
+                    error = true;
+                }
+            }
+            if (write) {
+                try {
+                    fs.writeFileSync(blastTableFile,JSON.stringify(filteredData.table,null,4));
+                } catch (err) {
+                    sails.log.error('applyFilter failed to write table',blastTableFile);
                     error = true;
                 }
             }
             if (error) {
                 return cb({result:'fail', error: 'applyFilter failed to write '+blastGffFile});    
             }
+
             if (write) sails.log("file written",blastGffFile);
             
             if (!requestData.noAnnounce)
@@ -274,6 +284,7 @@ module.exports = {
         var filteredHits = 0;
 
         var str = "";
+        let table = {data:[]};
 		
 		let bProgram = blastJSON.BlastOutput.BlastOutput_program;
 		
@@ -300,7 +311,7 @@ module.exports = {
                     ((parseFloat(blastData[x].Hsp['Hsp_identity']) / parseFloat(blastData[x].Hsp['Hsp_align-len'])) * 100) >= filterData.identity.val &&    
                     ((parseFloat(blastData[x].Hsp['Hsp_gaps']) / parseFloat(blastData[x].Hsp['Hsp_align-len'])) * 100) <= filterData.gaps.val   &&  
                 1 ) selected = 1;
-       
+            
             if (selected) {
                 filteredHits++;
 
@@ -343,6 +354,16 @@ module.exports = {
                     str += ";Name="+blastData[x].Hit_def;
                     str += ";HitNum="+blastData[x].Hit_num;
                 str += "\n";
+
+
+                // build table entry
+                table.data.push([
+                    contig,
+                    parseInt(score),
+                    thisb.getDisplayEvalue(blastData[x].Hsp['Hsp_evalue']),
+                    thisb.getDisplayPct('Hsp_identity',blastData[x]),
+                    thisb.getDisplayPct('Hsp_gaps',blastData[x])
+                ]);
             }
         }
         
@@ -353,7 +374,7 @@ module.exports = {
             hits: hitCount,
             filteredHits: filteredHits
         };
-        cb(filterSummary,filteredGff);
+        cb(filterSummary,{gff:filteredGff,table:table});
     },
     /*
     /*
@@ -492,6 +513,14 @@ module.exports = {
             if (cval < val) val = cval;
         }
         return val;
+    },
+    // get percent  for identity or gaps, returns as a % string
+    getDisplayPct(variable,hit) {
+        return (parseFloat(hit.Hsp[variable]) / parseFloat(hit.Hsp['Hsp_align-len']) * 100).toFixed(2) + "%";
+    },
+    // convert evalue to displayable returns a string
+    getDisplayEvalue(evalstr) {
+        return parseFloat(evalstr).toExponential(1);
     }
 };
 function convert2Num(obj) {

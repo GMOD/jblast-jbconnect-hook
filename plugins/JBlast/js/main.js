@@ -754,6 +754,7 @@ return declare( JBrowsePlugin,
         
     },
     sendChange: function(data,trackConfig) {
+        let thisb = this;
         // do http post
         var postData = {
               filterParams: data,
@@ -764,7 +765,17 @@ return declare( JBrowsePlugin,
         $.post( "/service/exec/set_filter", postData , function( data) {
             //console.log( "/set_filter",postData,data );
             $('.blast-hit-data').html("Hits: ("+data.filteredHits+'/'+data.hits+")");
+
+            let get_tabledata_cmd = "/service/exec/get_tabledata/?asset="+thisb.browser.jblast.asset+'&dataset='+encodeURIComponent(thisb.browser.config.dataRoot); 
+            console.log('get_tabledata',get_tabledata_cmd);
+            $.get(get_tabledata_cmd,function(data) {
+                console.log("data",data);
+                if (thisb.browser.jblast.resultTable)
+                    thisb.browser.jblast.resultTable.ajax.reload();
+            });
+
         }, "json");
+
     },
 
 /*************************************************

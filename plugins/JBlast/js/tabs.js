@@ -74,12 +74,52 @@ define([
                     if (typeof task.trackConfig.metadata != 'undefined' && typeof task.trackConfig.metadata.description !== 'undefined') {
                         $('.blast-group-descript').attr('title',task.trackConfig.metadata.description);
                         $('.blast-group-descript').attr('alt',task.trackConfig.metadata.description);
-
-                        $.get("/service/exec/get_blastdata/?asset="+browser.jblast.asset+'&dataset='+encodeURIComponent(browser.config.dataRoot), function(data){
-                            console.log( data );
-                            $('.blast-hit-data').html("Hits: ("+data.filteredHits+'/'+data.hits+")");
+                        console.log('blast-filter-group show');
+                        let get_blastdata = "/service/exec/get_blastdata/?asset="+browser.jblast.asset+'&dataset='+encodeURIComponent(browser.config.dataRoot);
+                        $.get(get_blastdata, function(data){
+                            console.log("get_blastdata", data );
+                            //$('.blast-hit-data').html("Hits: ("+data.filteredHits+'/'+data.hits+")");
+                        })
+                        .fail(function() {
+                            alert( "get_blastdata error" );
                         });
+
+                        let get_tabledata_cmd = "/service/exec/get_tabledata/?asset="+browser.jblast.asset+'&dataset='+encodeURIComponent(browser.config.dataRoot); 
+                        console.log('get_tabledata',get_tabledata_cmd);
+                        //$.get(get_tabledata_cmd,function(data) {
+                        //    console.log("data",data);
+                        //});
+                        browser.jblast.resultTable = $('#blast-result-table').DataTable( {
+                            scrollY:        '50vh',
+                            scrollCollapse: true,
+                            paging:         false,
+                            searching: false,
+                            autoWidth: true ,
+                            select: {
+                                items:'row',
+                                style: 'single'
+                            },
+                            ajax: get_tabledata_cmd,
+                            //data: data,
+                            columns: [
+                                { title: "Seq" },
+                                { title: "Score" },
+                                { title: "E-value"},
+                                { title: "Identity" },
+                                { title: "Gaps" }
+                            ]
+                        } );
+                        //browser.jblast.resultTable.select.style('single');
+                        browser.jblast.resultTable.on( 'select', function ( e, dt, type, indexes ) {
+                            console.log(e,dt,type,indexes);
+                            if ( type === 'row' ) {
+                                var data = browser.jblast.resultTable.rows( indexes ).data().pluck( 'seq' );
+                         
+                                console.log('plucked',data);
+                            }
+                        } );                        
                     }
+
                     browser.jblast.focusQueueProc--;
                 });
             }

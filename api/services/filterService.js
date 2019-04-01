@@ -12,7 +12,8 @@ module.exports = {
     fmap: {
         set_filter:         'post',
         get_blastdata:      'get',
-        get_trackdata:      'get'
+        get_trackdata:      'get',
+        get_tabledata:      'get'
     },
     init: function(params,cb) {
         return cb();
@@ -85,11 +86,11 @@ module.exports = {
         }
     },
     /**
-     * Fetch the GFF3 file of the prior filter operation
+     * Fetch filtered GFF3 file of the prior filter operation
      * 
-     * ``GET /service/exec/set_filter``
+     * ``GET /service/exec/get_trackdata``
      * 
-     * @param {type} req - request
+     * @param {object} req - {asset id,dataset}
      * @param {type} res - response
      * 
      */
@@ -98,22 +99,46 @@ module.exports = {
 
         var asset = params.asset;
         var dataset = params.dataset;
-
         var g = sails.config.globals.jbrowse;
-
-        //var gfffile = g.jbrowsePath + dataset +'/'+ g.jblast.blastResultPath + '/' + 'sampleResult.gff3';
         var gfffile = g.jbrowsePath + dataset + '/'+ g.jblast.blastResultPath + '/' + asset +'.gff3';
+        var content = "";
 
         try {
-            var content = fs.readFileSync(gfffile);
+            content = fs.readFileSync(gfffile);
+        }
+        catch (err) {
+            var str = JSON.stringify(err);
+            sails.log.error("failed to retrieve gff3 file",str);
+            return sails.hooks['jbcore'].resSend(res,{status: 'error', msg: str, err:err});
+        }
+        return res.send(content);
+    },
+    /**
+     * Fetch filtered JSON result file of the prior filter operation
+     * 
+     * ``GET /service/exec/get_tabledata``
+     * 
+     * @param {object} req - {asset id, dataset}
+     * @param {type} res - response
+     * 
+     */
+    get_tabledata: function(req, res) {
+        var params = req.allParams();
+
+        let asset = params.asset;
+        let dataset = params.dataset;
+        let g = sails.config.globals.jbrowse;
+        let tablefile = g.jbrowsePath + dataset + '/'+ g.jblast.blastResultPath + '/' + asset +'_table.json';
+        let content = "";
+        try {
+            content = fs.readFileSync(tablefile);
         }
         catch (err) {
             var str = JSON.stringify(err);
             //var str = str.split("\n");
-            sails.log.error("failed to retrieve gff3 file",str);
+            sails.log.error("failed to retrieve table file",str);
             return sails.hooks['jbcore'].resSend(res,{status: 'error', msg: str, err:err});
-        };
-
+        }
         return res.send(content);
     }
 };

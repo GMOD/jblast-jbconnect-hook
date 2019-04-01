@@ -70,7 +70,10 @@ module.exports.globals = {
         /**/
         webIncludes: {
             "jblast-css-SliderPips":    {lib: "/jblib/jquery-ui-slider-pips.min.css" },
-            "jblast-js-SliderPips":     {lib: "/jblib/jquery-ui-slider-pips.min.js" }
+            "jblast-js-SliderPips":     {lib: "/jblib/jquery-ui-slider-pips.min.js" },
+            "datatables-css": {lib: "https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"},
+            "datatables-js":  {lib: "https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"},
+            'datatables-select-js': {lib: "https://cdn.datatables.net/select/1.3.0/js/dataTables.select.min.js"}
         }
     }
 };
