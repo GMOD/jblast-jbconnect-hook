@@ -531,7 +531,9 @@ return declare( JBrowsePlugin,
         queue.push({action:'hide'});
     },
     setupFilterSliders: function(trackConfig) {
-        //console.log("setupFilterSliders1");
+        console.log("setupFilterSliders()");
+//        return;
+
         var thisB = this;
         var config = this.browser.config;
         var url = config.dataRoot + '/' + trackConfig.filterSettings;
@@ -552,6 +554,21 @@ return declare( JBrowsePlugin,
 				var lo = data.score.min;
 				var hi = data.score.max;
 				var step = Math.round((hi-lo) / 4);
+				var same = data.score.max===data.score.min;
+
+                if (same) {
+                    $("#slider-score").slider({
+                        min: lo,
+                        max: hi,
+                        step: step,
+                        values: [data.score.val]
+                    }).slider("pips",{ });
+                    setTimeout(function() {	// initial render value
+                        $('#slider-score-data').html(lo);
+                        $("#slider-score").css("pointer-events","none");
+                    },100);
+                    return;
+                }
 
 				$("#slider-score").slider({
 					min: lo,
@@ -639,7 +656,21 @@ return declare( JBrowsePlugin,
 				var hi = data.identity.max;
 				var lo = data.identity.min;
 				var step = (hi - lo) / 20;
+				var same = data.identity.max===data.identity.min;
 
+                if (same) {
+                    $("#slider-identity").slider({
+                        min: lo,
+                        max: hi,
+                        step: step,
+                        values: [data.identity.val]
+                    }).slider("pips",{ });
+                    setTimeout(function() {	// initial render value
+                        $('#slider-identity-data').html(lo);
+                        $("#slider-identity").css("pointer-events","none");
+                    },100);
+                    return;
+                }
 				// pip setup
 				var pstep = 5;
 				var labels = [];
@@ -677,12 +708,26 @@ return declare( JBrowsePlugin,
 			function setup_gap_slider() {
 				var hi = data.gaps.max;
 				var lo = data.gaps.min;
+				var same = data.gaps.max===data.gaps.min;
 				var step = (hi - lo) / 20;
 
+                if (same) {
+                    $("#slider-gap").slider({
+                        min: lo,
+                        max: hi,
+                        step: step,
+                        values: [data.gaps.val]
+                    }).slider("pips",{ });
+                    setTimeout(function() {	// initial render value
+                        $('#slider-gap-data').html(lo);
+                        $("#slider-gap").css("pointer-events","none");
+                    },100);
+                    return;
+                }
 				var pstep = 5;
 				var labels = [];
 				for(var i=lo;i <= hi; i += pstep*step) {
-					labels.push(i);
+                    labels.push(i);
 				}
 				$("#slider-gap").slider({
 					min: lo,
@@ -691,7 +736,7 @@ return declare( JBrowsePlugin,
 					values: [data.gaps.val],
 					slide: function(event,ui) {
 						var v = ui.value + '%';
-						$('#slider-gap-data').html(v);
+					    $('#slider-gap-data').html(v);
 					},
 					change: function(event,ui) {
 						var v = ui.value;
@@ -707,7 +752,7 @@ return declare( JBrowsePlugin,
 					suffix: '%'
 				});
 				setTimeout(function() {	// initial render value
-					$('#slider-gap-data').html(data.gaps.val+'%');
+                    $('#slider-gap-data').html(data.gaps.val+'%');
 				},100);
 			}
         });
