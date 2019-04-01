@@ -111,16 +111,21 @@ define([
                         } );
                         //browser.jblast.resultTable.select.style('single');
                         browser.jblast.resultTable.on( 'select', function ( e, dt, type, indexes ) {
-                            console.log(e,dt,type,indexes);
+                            //console.log(e,dt,type,indexes);
                             if ( type === 'row' ) {
                                 let rowData = browser.jblast.resultTable.rows( indexes ).data().toArray();
-                                let loc = rowData[0][0]+":"+rowData[0][5]+".."+rowData[0][6];
-                                console.log('row data',rowData,loc);
-                                $('input#location').val(loc);
-                                let e = $.Event("keypress");
-                                e.which = 13; //choose the one you want
-                                e.keyCode = 13;
-                                $("input#location").trigger(e);
+                                if (rowData[0] && rowData[0].length >= 7) {
+                                    let refseq = rowData[0][0], start = rowData[0][5], end = rowData[0][6];
+                                    let loc = refseq+":"+start+".."+end;
+                                    console.log('row data',rowData,loc);
+
+                                    if (browser.allRefs[refseq])
+                                        browser.navigateTo(loc);
+                                    else
+                                        alert("Refseq does not exist: "+refseq);
+                                }
+                                else
+                                    console.log('invalid data returned');
                             }
                         } );                        
                     }
