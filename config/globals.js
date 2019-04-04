@@ -71,9 +71,10 @@ module.exports.globals = {
         webIncludes: {
             "jblast-css-SliderPips":    {lib: "/jblib/jquery-ui-slider-pips.min.css" },
             "jblast-js-SliderPips":     {lib: "/jblib/jquery-ui-slider-pips.min.js" },
-            "datatables-css": {lib: "https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"},
-            "datatables-js":  {lib: "https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"},
-            'datatables-select-js': {lib: "https://cdn.datatables.net/select/1.3.0/js/dataTables.select.min.js"}
+            "datatables-css": {lib: "https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css"},                // datatables.net
+            "datatables-js":  {lib: "https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"},                  // datatables.net
+            'datatables-select-js': {lib: "https://cdn.datatables.net/select/1.3.0/js/dataTables.select.min.js"},       // datatables.net
+            'jquery-onresize-js': {lib: 'https://cdn.rawgit.com/ChrisAckerman/jquery-onresize/1.0.5/jquery.onresize.min.js'}   // npm jquery-onresize
         }
     }
 };

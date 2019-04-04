@@ -64,6 +64,9 @@ return declare( JBrowsePlugin,
             return this;
         };            
 
+        //this.setupTrackSelectorTracking();
+
+        
         // intercept Browser.showTracks
         // when not logged in, filter out REST tracks
         // we are basically checking to see if the url tracks are in the pruned track list.
@@ -115,7 +118,8 @@ return declare( JBrowsePlugin,
             panelDelayTimer: null,
             bpSizeLimit: args.bpSizeLimit || 0,
             getWorkflows: this.getWorkflows
-		};
+        };
+        
         
         /*
          * class override function intercepts
@@ -262,6 +266,53 @@ return declare( JBrowsePlugin,
                     thisB.removeBlastPanel(trackConfigs[0]);
             });        
         });
+    },
+    setupTrackSelectorTracking() {
+        let thisb = this;
+        let browser = this.browser;
+        thisb.w = 0, thisb.h = 0;
+
+        browser.afterMilestone( 'initView', function() {
+
+            // skip the following if not logged in  <-------------------------
+            if (!browser.loginState) return;
+
+            // utilize npm jquery-onresize
+            $('#hierarchicalTrackPane').onresize(function(e) {
+                let t = this;
+                if ($(t).width() !== thisb.w) {
+                    _change(t);
+                    thisb.w = $(t).width();
+                }
+                if ($(t).height() !== thisb.h) {
+                
+                    // debounce height change event
+                    if (thisb.htime) clearTimeout(thisb.htime);
+                    thisb.htime = setTimeout(function() {
+                        _change(t);
+                        delete thisb.htime;
+                        thisb.h = $(t).height();
+                    },500);
+                }
+            });
+            function _change(obj) {
+                console.log('%s x %s', $(obj).width(),$(obj).height());
+                thisb.handleSizeChange(Math.floor($(obj).width(),$(obj).height()));
+            }
+        });
+    },
+    handleSizeChange(w,h) {
+        let browser = this.browser;
+        let pane = $('#hierarchicalTrackPane');
+        let sliders = $('table.blast-filter-sliders');
+        let table = $('#result-table-container');
+
+        console.log("position w h",table.position(),pane.width(),pane.height());
+        console.log("%s,%s %s,%s",sliders.width(),sliders.height(),table.width(),table.height());
+
+        if (browser.jblast.resultTable)
+            browser.jblast.resultTable.ajax.reload();        
+
     },
     // look in the browser's track configuration for the track with the given label
     findTrackConfig: function( trackLabel ) {
