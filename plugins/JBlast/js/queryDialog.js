@@ -57,10 +57,10 @@ _dialogContent: function () {
     var content = this.content = {};
     var container = dom.create('div', { className: 'search-dialog' } );
 
-    var introdiv = dom.create('div', {
-        className: 'search-dialog intro',
-        innerHTML: 'Submit a DNA sequence to BLAST.'
-    }, container );
+    // var introdiv = dom.create('div', {
+    //     className: 'search-dialog intro',
+    //     innerHTML: 'Submit a DNA sequence to BLAST.'
+    // }, container );
 
     let workflowCombo = dom.create('div', {
         id: 'workflow-div',
