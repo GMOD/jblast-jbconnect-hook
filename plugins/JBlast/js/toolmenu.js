@@ -66,10 +66,21 @@ define(function(){
                         }
                     }
                 }));
+                browser.addGlobalMenuItem( 'tools', new dijitMenuItem({
+                    id: 'menubar_jblast_dbclean',
+                    label: 'Clear demo data',
+                    //iconClass: 'dijitIconFilter',
+                    onClick: function() {
+                        alert("demo clean");
+                    }
+                }));
                 
                 browser.renderGlobalMenu( 'tools','JBlastTools', browser.menuBar );
     
+                // reorder the menubar
                 $("[widgetid*='dropdownbutton_tools']").insertBefore("[widgetid*='dropdownbutton_help']");
+                $("[widgetid*='dropdownbutton_tools'] span.dijitButtonNode").html(" JBlast");
+
             });
 
         }
