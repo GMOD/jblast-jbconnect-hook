@@ -10,8 +10,9 @@ define(function(){
                 'dojo/dom-construct',
                 'dijit/MenuItem',
                 'dijit/Dialog',
+                'dijit/form/Button',
                 'plugins/JBlast/js/queryDialog'
-            ], function(dom,dijitMenuItem,Dialog,queryDialog){
+            ], function(dom,dijitMenuItem,Dialog,dButton,queryDialog){
                 
                 browser.addGlobalMenuItem( 'tools', new dijitMenuItem({
                     id: 'menubar_blast_seq',
@@ -74,31 +75,39 @@ define(function(){
                     onClick: function() {
 
                         // show confirm dialog
-                        let confirmBox = new Dialog({ title: 'Confirmation',id:'demo-clean-confirm' });
+                        let confirmCleanBox = new Dialog({ title: 'Confirm Demo Cleanup',id:'demo-clean-confirm-dialog' });
 
                         dom.create('div', {
-                            className: 'descript',
+                            id: 'descript',
                             innerHTML: 'This is a demo-only feature that will clean up the<br>job queue and tracks.  Are you sure you want to do this?'
-                        }, confirmBox.containerNode );
+                        }, confirmCleanBox.containerNode );
 
-                        dojo.create('button', {
-                            id: 'confirm-btn',
-                            innerHTML: 'Yes',
+                        new dButton({
+                            id: 'yes',
+                            label: 'Yes',
+                            //iconClass: 'dijitIconDelete',
                             onClick: function() {
-                                alert('ding');
-                            }
-                        }, confirmBox.containerNode );
+                                //alert('ding');
+                                $.post( "/democleanup",{}, function( data) {
+                                    console.log("demo cleaned up");
+                                });
+
                         
-                        dojo.create('button', {
-                            id: 'cancel-btn',
-                            className: 'default',
-                            innerHTML: 'No',
+                            }
+                        })
+                        .placeAt( confirmCleanBox.containerNode );
+                
+                        new dButton({
+                            id: 'no',
+                            label: 'No',
+                            //iconClass: 'dijitIconDelete',
                             onClick: function() {
                                 confirmBox.destroyRecursive();
                             }
-                        }, confirmBox.containerNode );
-
-                        confirmBox.show();
+                        })
+                        .placeAt( confirmCleanBox.containerNode );
+                
+                        confirmCleanBox.show();
                     
                     }
                 }));

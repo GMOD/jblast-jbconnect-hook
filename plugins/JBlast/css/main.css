@@ -23,6 +23,13 @@
     min-width: 400px !important;
 }
 
+/*
+    Demo clean confirm dialog
+*/
+#demo-clean-confirm-dialog {
+    padding-top: 10px;
+    padding-bottom: 10px;    
+}
 
 /*
     blast filter sliders
