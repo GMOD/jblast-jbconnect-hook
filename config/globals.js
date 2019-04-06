@@ -22,6 +22,9 @@ module.exports.globals = {
         
         // JBlast settings
         jblast: {
+            // include demo features
+            demo: true,
+
             // The subdir where blast results will be deposited (i.e. ``sample_data/json/volvox/jblastdata``)
             blastResultPath: "jblastdata",
             
