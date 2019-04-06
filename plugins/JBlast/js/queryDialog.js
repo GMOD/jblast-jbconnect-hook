@@ -48,19 +48,12 @@ _dialogContent: function () {
     let workflows =this.workflows;
     let wfStr = "";
     for(var i in workflows) {
-        //console.log("workflow",workflows[i]);
         if (!workflows[i].deleted) {
-            //comboData.push({'name': workflows[i].name, 'id':workflows[i].id});
             wfStr += "<option value='"+workflows[i].id+"'>"+workflows[i].name+"</option>";
         }
     }
     var content = this.content = {};
     var container = dom.create('div', { className: 'search-dialog' } );
-
-    // var introdiv = dom.create('div', {
-    //     className: 'search-dialog intro',
-    //     innerHTML: 'Submit a DNA sequence to BLAST.'
-    // }, container );
 
     let workflowCombo = dom.create('div', {
         id: 'workflow-div',
@@ -157,7 +150,7 @@ _fillActionBar: function ( actionBar ) {
         .placeAt( actionBar );
     new dButton({
             label: 'Cancel',
-            iconClass: 'dijitIconDelete',
+            //iconClass: 'dijitIconDelete',
             onClick: function() {
                 thisB.callback( false );
                 thisB.hide();
