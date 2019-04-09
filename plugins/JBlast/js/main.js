@@ -153,10 +153,12 @@ return declare( JBrowsePlugin,
             // setup callbacks for job queue panel
             setTimeout(function() {
                 browser.jbconnect.queue.registerCallback('job-item-in',function(track) {
-                    $('label.tracklist-label > span:contains("'+track.key+'")').parent().css("border-style","solid").css("border-color","red");
+                    //$('label.tracklist-label > span:contains("'+track.key+'")').parent().css("border-style","solid").css("border-color","red");
+                    $('label.tracklist-label > span:contains("'+track.key+'")').parent().addClass('highlight');
                 });
                 browser.jbconnect.queue.registerCallback('job-item-out',function(track) {
-                    $('label.tracklist-label > span:contains("'+track.key+'")').parent().css("border-style","none");
+                    //$('label.tracklist-label > span:contains("'+track.key+'")').parent().css("border-style","none");
+                    $('label.tracklist-label > span:contains("'+track.key+'")').parent().removeClass('highlight');
                 });
             },2000);
 

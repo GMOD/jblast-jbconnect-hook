@@ -174,3 +174,10 @@ div.blastSummary td.blastSummaryItem {
 div#hierarchicalTrackPane > div.header {
     display: none;
 }
+
+/*
+    handle track selector highlight based on job queue item hover
+*/
+label.tracklist-label.highlight {
+    background-color: #bbb;
+}
