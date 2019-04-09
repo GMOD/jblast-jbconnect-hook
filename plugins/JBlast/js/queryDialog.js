@@ -122,7 +122,8 @@ _fillActionBar: function ( actionBar ) {
                     dataset: browser.config.dataRoot,
                     region: searchParams.sequence,
                     workflow: searchParams.workflow,
-                    refseq:Object.keys(browser.allRefs)[0]
+                    refseq:Object.keys(browser.allRefs)[0],
+                    unmappedSeq: true
                 };
                 console.log("post data",postData);
                 $.post( "/job/submit", postData , function( result ) {
