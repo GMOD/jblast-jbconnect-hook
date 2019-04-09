@@ -88,11 +88,11 @@ define(function(){
                             //iconClass: 'dijitIconDelete',
                             onClick: function() {
                                 //alert('ding');
-                                $.post( "/democleanup",{}, function( data) {
+                                $.post( "/util/democleanup",{}, function( data) {
                                     console.log("demo cleaned up");
                                 });
-
-                        
+                                confirmCleanBox.destroyRecursive();
+                                //confirmCleanBox.hide();
                             }
                         })
                         .placeAt( confirmCleanBox.containerNode );
@@ -102,7 +102,8 @@ define(function(){
                             label: 'No',
                             //iconClass: 'dijitIconDelete',
                             onClick: function() {
-                                confirmBox.destroyRecursive();
+                                confirmCleanBox.destroyRecursive();
+                                //confirmCleanBox.hide();
                             }
                         })
                         .placeAt( confirmCleanBox.containerNode );
