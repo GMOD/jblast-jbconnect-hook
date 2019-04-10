@@ -153,19 +153,23 @@ return declare( JBrowsePlugin,
             // setup callbacks for job queue panel
             setTimeout(function() {
                 browser.jbconnect.queue.registerCallback('job-item-in',function(track) {
-                    //$('label.tracklist-label > span:contains("'+track.key+'")').parent().css("border-style","solid").css("border-color","red");
                     $('label.tracklist-label > span:contains("'+track.key+'")').parent().addClass('highlight');
                 });
                 browser.jbconnect.queue.registerCallback('job-item-out',function(track) {
-                    //$('label.tracklist-label > span:contains("'+track.key+'")').parent().css("border-style","none");
                     $('label.tracklist-label > span:contains("'+track.key+'")').parent().removeClass('highlight');
+                });
+                browser.jbconnect.queue.registerCallback('job-item-click',function(track) {
+                    let sel = 'label.tracklist-label > span:contains("'+track.key+'")';
+                    let checkbox = $(sel).parent().children('input.check'); 
+                    let checked = $(sel).parent().children('input.check').is(':checked');
+                    checkbox.click();
                 });
             },2000);
 
             // override _FeatureDetailMixin
 //            require(["dojo/_base/lang", "JBrowse/View/Track/_FeatureDetailMixin"], function(lang, _FeatureDetailMixin){
 //                lang.extend(_FeatureDetailMixin, {
-//                    extendedRender: thisB.FeatureDetailMixin_extendedRender,
+//                    extendedRender: thisB.FeatureD.is(":checked")etailMixin_extendedRender,
 //                    blah: "blah"
 //                });
 //            });
