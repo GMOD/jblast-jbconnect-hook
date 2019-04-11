@@ -90,6 +90,9 @@ define(function(){
                                 //alert('ding');
                                 $.post( "/util/democleanup",{}, function( data) {
                                     console.log("demo cleaned up");
+                                    setTimeout(function() {
+                                        location.reload();
+                                    },1000);
                                 });
                                 confirmCleanBox.destroyRecursive();
                                 //confirmCleanBox.hide();
