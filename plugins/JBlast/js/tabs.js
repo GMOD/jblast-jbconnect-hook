@@ -84,50 +84,19 @@ define([
                             alert( "get_blastdata error" );
                         });
 
+                        // get table data and display
                         let get_tabledata_cmd = "/service/exec/get_tabledata/?asset="+browser.jblast.asset+'&dataset='+encodeURIComponent(browser.config.dataRoot); 
-                        console.log('get_tabledata',get_tabledata_cmd);
-                        //$.get(get_tabledata_cmd,function(data) {
-                        //    console.log("data",data);
-                        //});
-                        browser.jblast.resultTable = $('#blast-result-table').DataTable( {
-                            scrollY:        '50vh',
-                            scrollCollapse: true,
-                            paging:         false,
-                            searching: false,
-                            autoWidth: true ,
-                            select: {
-                                items:'row',
-                                style: 'single'
-                            },
-                            ajax: get_tabledata_cmd,
-                            //data: data,
-                            columns: [
-                                { title: "Seq" },
-                                { title: "Score" },
-                                { title: "E-value"},
-                                { title: "Identity" },
-                                { title: "Gaps" }
-                            ]
-                        } );
-                        //browser.jblast.resultTable.select.style('single');
-                        browser.jblast.resultTable.on( 'select', function ( e, dt, type, indexes ) {
-                            //console.log(e,dt,type,indexes);
-                            if ( type === 'row' ) {
-                                let rowData = browser.jblast.resultTable.rows( indexes ).data().toArray();
-                                if (rowData[0] && rowData[0].length >= 7) {
-                                    let refseq = rowData[0][0], start = rowData[0][5], end = rowData[0][6];
-                                    let loc = refseq+":"+start+".."+end;
-                                    console.log('row data',rowData,loc);
+                        //console.log('get_tabledata',get_tabledata_cmd);
 
-                                    if (browser.allRefs[refseq])
-                                        browser.navigateTo(loc);
-                                    else
-                                        alert("Refseq does not exist: "+refseq);
-                                }
-                                else
-                                    console.log('invalid data returned');
+
+                        // only display the table if the featureMapping='hit' for the dataset.  get the dataset data first.
+                        let getdataset_cmd = '/dataset/get?path='+browser.config.dataRoot;
+                        $.get(getdataset_cmd,function(found) {
+                            let dataset = found[0];
+                            if (dataset.featureMapping==='hit') {
+                                setupTable(get_tabledata_cmd);
                             }
-                        } );                        
+                        })
                     }
 
                     browser.jblast.focusQueueProc--;
@@ -146,6 +115,48 @@ define([
                         browser.jblast.focusQueueProc--;
                     },700);
                 }
+            }
+            function setupTable(get_tabledata_cmd) {
+
+                browser.jblast.resultTable = $('#blast-result-table').DataTable( {
+                    scrollY:        '50vh',
+                    scrollCollapse: true,
+                    paging:         false,
+                    searching: false,
+                    autoWidth: true ,
+                    select: {
+                        items:'row',
+                        style: 'single'
+                    },
+                    ajax: get_tabledata_cmd,
+                    //data: data,
+                    columns: [
+                        { title: "Seq" },
+                        { title: "Score" },
+                        { title: "Evalue"},
+                        { title: "Identity" },
+                        { title: "Gaps" }
+                    ]
+                } );
+                //browser.jblast.resultTable.select.style('single');
+                browser.jblast.resultTable.on( 'select', function ( e, dt, type, indexes ) {
+                    //console.log(e,dt,type,indexes);
+                    if ( type === 'row' ) {
+                        let rowData = browser.jblast.resultTable.rows( indexes ).data().toArray();
+                        if (rowData[0] && rowData[0].length >= 7) {
+                            let refseq = rowData[0][0], start = rowData[0][5], end = rowData[0][6];
+                            let loc = refseq+":"+start+".."+end;
+                            console.log('row data',rowData,loc);
+
+                            if (browser.allRefs[refseq])
+                                browser.navigateTo(loc);
+                            else
+                                alert("Refseq does not exist: "+refseq);
+                        }
+                        else
+                            console.log('invalid data returned');
+                    }
+                } );                        
             }
         }
     });
