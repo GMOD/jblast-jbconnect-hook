@@ -15,24 +15,19 @@ before_script:
   - npm i -g sails@1.0.2
   - cd ..
   - pwd
+script:
   - git clone --depth=50 http://github.com/gmod/jbconnect
   - cd jbconnect
   - npm install
   - npm install enuggetry/blast-ncbi-tools
   - npm install enuggetry/faux-blastdb
   - npm install gmod/jblast-jbconnect-hook
-#  - npm install gmod/jblast-jbconnect-hook
   - ./utils/blast_getBlastUtils.js 2.8.1
   - npm install @gmod/jbrowse@1.15.1
   - patch node_modules/@gmod/jbrowse/setup.sh fix_jbrowse_setup.patch
   - node ./utils/jb_setup.js
   - ls blastdb
   - ls blastbin
-#  - nohup sails lift --port 5001 > jbconnect.log 2>&1 &
-#  - echo $! > save_pid.txt #save last process pid
-#  - cd ..
-#  - sleep 20
-script:
   - npm run jblast-coverage
 after_success:
   - cd ../jblast-jbconnect-hook
