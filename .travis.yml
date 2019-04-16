@@ -24,6 +24,7 @@ before_script:
 #  - npm install gmod/jblast-jbconnect-hook
   - ./utils/blast_getBlastUtils.js 2.8.1
   - npm install @gmod/jbrowse@1.15.1
+  - patch node_modules/@gmod/jbrowse/setup.sh fix_jbrowse_setup.patch
   - node ./utils/jb_setup.js
   - ls blastdb
   - ls blastbin
