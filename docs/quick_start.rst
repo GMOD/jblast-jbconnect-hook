@@ -40,6 +40,7 @@ Install the JBConnect and JBrowse.  jb_setup.js ensures the sample data is loade
 
     # install jbrowse & setup jbrowse demo
     npm install @gmod/jbrowse@1.15.1
+    patch node_modules/@gmod/jbrowse/setup.sh fix_jbrowse_setup.patch
     ./utils/jb_setup.js
 
     # install jblast
@@ -50,6 +51,10 @@ Install the JBConnect and JBrowse.  jb_setup.js ensures the sample data is loade
 
     # pull in NCBI blast executables
     ./utils/blast_getBlastUtils.js
+
+
+The patch operation is needed to make JBrowse 1.15.1 setup.sh run properly.
+If JBrowse is installed in another location, the patch should be run before setup.sh.
 
 
 Run
