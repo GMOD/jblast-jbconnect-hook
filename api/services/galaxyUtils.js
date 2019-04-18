@@ -368,8 +368,10 @@ module.exports = {
                     for(var i in data) {
                         var wf = data[i];
                         if (wf.id === kJob.data.workflow) {
+                            let seq1 = seq.seq;
+                            if (kJob.data.unmappedSeq === "true") seq1 = "unmapped"
                             sails.log.info("Workflow starting: "+wf.name+' - '+wf.id);
-                            kJob.data.name = wf.name+' '+seq.seq+':'+seq.start+'..'+seq.end;
+                            kJob.data.name = wf.name+' '+seq1+':'+seq.start+'..'+seq.end;
                             kJob.update(function() {});
 
                             kJob.progress(2,10,{start_workflow:'done'});

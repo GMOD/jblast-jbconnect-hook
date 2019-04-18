@@ -125,7 +125,7 @@ module.exports = {
      * @returns {string} name of job
      */
     generateName(params) {
-        return params.workflow;
+        return 'Galaxy Workflow: '+params.workflow;
     },
     /**
      * job service begin
