@@ -38,19 +38,20 @@ Install the JBConnect and JBrowse.  jb_setup.js ensures the sample data is loade
     cd jbconnect
     npm install
 
+    # install blast tools and sample data
+    npm install blast-ncbi-tools faux-blastdb
+
+    # pull in NCBI blast executables
+    ./utils/blast_getBlastUtils.js 2.8.1
+
+    # install jblast
+    npm install gmod/jblast-jbconnect-hook
+
     # install jbrowse & setup jbrowse demo
     npm install @gmod/jbrowse@1.15.1
     patch node_modules/@gmod/jbrowse/setup.sh fix_jbrowse_setup.patch
     ./utils/jb_setup.js
 
-    # install jblast
-    npm install gmod/jblast-jbconnect-hook
-
-    # install blast tools and sample data
-    npm install blast-ncbi-tools faux-blastdb
-
-    # pull in NCBI blast executables
-    ./utils/blast_getBlastUtils.js
 
 
 The patch operation is needed to make JBrowse 1.15.1 setup.sh run properly.
