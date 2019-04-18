@@ -231,15 +231,39 @@ of each job and whether completed jobs are completed or errored.
 .. image:: img/job-panel.png
 
 
+3 Ways to BLAST
+---------------
+
+There are three ways to select a query sequence to BLAST:
+
+1 BLAST an arbitrary query sequence (from JBlast Menu)
+2 BLAST a highlighted region (from JBlast Menu or click the highlight button)
+3 BLAST an existing feature from another track (from the feature's Detail dialog).
+
+
+JBlast Menu
+-----------
+
+When logged in, the JBlast menu appears next to the View menu on the menu bar.
+
+.. image:: img/jblast-menu.jpg
+
+
+
 Filter Panel
 ------------
 
-When a blast result track is selected with the track selector, the blast filter
-panel will appear when the result track is in focus.  Sliders are available for filtering 
+The filter panel consists of filter sliders and the result table.
+
+When a blast result track is selected with the track selector, the BLAST Filter
+panel will appear asa tab next to the Select Tracks tab when the result track is in focus.  Filter Sliders (top are available for filtering by
 score, e-value, identity, and gaps.  As the slider positions are moved, the filtered result
-track will be updated reflecting the new filter settings.
+track will be updated reflecting the filtered hits.
 
 .. image:: img/filter-panel.jpg
+
+The Result Table (bottom) which shows the filtered results and allows the user to click the row to jump to the selected location. 
+Note: the Result Table only appears if the `featureMapping='hit'` (see: _featureMappingFlag)
 
 
 View Feature Details
