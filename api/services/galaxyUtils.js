@@ -398,6 +398,7 @@ module.exports = {
     monitorWorkflow: function(kJob){
         var thisb = this;
         var wId = kJob.data.workflow;
+        let complete = false;
         sails.log.debug('monitorWorkflow starting, wId',wId);
 
         var timerloop = setInterval(function(){
@@ -419,8 +420,7 @@ module.exports = {
                     var msg = wId + " monitorWorkflow: failed to get history "+hId;
                     sails.log.error(msg,err);
                     clearInterval(timerloop);
-                    kJob.kDoneFn(new Error(msg));
-                    return;
+                    return kJob.kDoneFn(new Error(msg));
                 }
                 // reorg to assoc array
                 var hista = {};
@@ -449,10 +449,9 @@ module.exports = {
                 kJob.progress(okCount,outputCount+1,{workflow_id:wId});
 
                 // complete if all states ok
-                if (outputCount === okCount) {
+                if (outputCount === okCount && !complete) {
+                    complete = true;
                     clearInterval(timerloop);
-                    //kJob.state('complete');
-                    //kJob.update(function() {});
                     sails.log.debug(wId,'workflow completed');
                     setTimeout(function() {
                         thisb.doCompleteAction(kJob,hista);            // workflow completed
@@ -544,10 +543,10 @@ module.exports = {
             var t = setInterval(function() {
                 if (filecount === 0) {
                     sails.log.debug("done moving files");
-                    //kJob.update(function() {});
+                    clearInterval(t);
 
-                        // insert track into trackList.json
-                        jblastPostAction.postMoveResultFiles(kJob,function(newTrackJson){
+                    // insert track into trackList.json
+                    jblastPostAction.postMoveResultFiles(kJob,function(newTrackJson){
 
                         // convert xml to json
                         blastxml2json.convert(kJob,newTrackJson,function(err) {
@@ -582,7 +581,6 @@ module.exports = {
                         });
 
                     });
-                    clearInterval(t);
                 }
             },100);
         }
