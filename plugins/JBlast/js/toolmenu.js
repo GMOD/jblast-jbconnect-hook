@@ -56,12 +56,27 @@ define(function(){
                                     var confirmBox = new Dialog({ title: 'Highlight region to BLAST' });
                                     dojo.create('div', {
                                         id: 'confirm-btn',
-                                        innerHTML: 'Highlight region by clicking the start start coordinate and dragging to the end coordinate.  Then click "BLAST" button.'
+                                        style: "width: 700px;padding:15px",
+                                        innerHTML: 'Highlight the region by clicking the start coordinate in the track area of the genome browser, ' +
+                                            'holding down and dragging to the end coordinate and releasing. The BLAST button will then appear in the ' +
+                                            'tool button area. '
+                    
                                     }, confirmBox.containerNode );
+                                    new dButton({
+                                        id: 'ok-btn',
+                                        label: 'Ok',
+                                        //iconClass: 'dijitIconDelete',
+                                        onClick: function() {
+                                            confirmBox.destroyRecursive();
+                                            //confirmCleanBox.hide();
+                                        }
+                                    })
+                                    .placeAt( confirmBox.containerNode );
+            
                                     confirmBox.show();
 
                                     // close confirm box
-                                    setTimeout(function(){ confirmBox.destroyRecursive(); }, 4000);
+                                    //setTimeout(function(){ confirmBox.destroyRecursive(); }, 4000);
 
                                 }
                             },100);   
