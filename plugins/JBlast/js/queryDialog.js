@@ -79,8 +79,8 @@ _dialogContent: function () {
                 label: btn[i].button,
                 title: btn[i].description,
                 onClick: function() {
-                    console.log("click demo",btn[i].sequence.join());
-                    $('#sequence-text').val(btn[i].sequence.join());
+                    console.log("click demo",btn[i].sequence.join(""));
+                    $('#sequence-text').val(btn[i].sequence.join(""));
                 }
             })
             .placeAt( blastButtons );
