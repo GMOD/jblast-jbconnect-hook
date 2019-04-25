@@ -25,9 +25,9 @@ JBlast Brief Tutorial
 
 There are three ways to select a query sequence to BLAST:
 
-1 BLAST an arbitrary query sequence (from JBlast Menu)
-2 BLAST a highlighted region (from JBlast Menu or click the highlight button)
-3 BLAST an existing feature from another track (from the feature's Detail dialog).
+1. BLAST an arbitrary query sequence (from JBlast Menu)
+2. BLAST a highlighted region (from JBlast Menu or click the highlight button)
+3. BLAST an existing feature from another track (from the feature's Detail dialog).
 
 
 BLAST a DNA sequence
@@ -63,6 +63,8 @@ Selecting an arbitrary region to BLAST.  This is done with the highlight feature
 
 .. image:: img/blast-from-region.jpg
 
+
+This can also be accessed from the JBlast menu.
 
 BLAST an existing feature
 -------------------------
