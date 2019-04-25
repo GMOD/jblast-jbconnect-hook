@@ -61,7 +61,7 @@ Selecting an arbitrary region to BLAST.  This is done with the highlight feature
     the highlight button on the toolbar, when pressed, will allow you to select an arbitrary region to highlight.
     After highlighting, right click the highlighted region (where there is no track).
 
-.. image:: img/blast-region-select.jpg
+.. image:: img/blast-region-select.png
 
 
 This can also be accessed from the JBlast menu.
@@ -71,8 +71,9 @@ BLAST an existing feature
 
 Double click any existing feature to open its Details dialog and click the BLAST button.
 
-.. image:: img/blast-from-feature.jpg
+.. image:: img/select-feature-a.PNG
 
+.. image:: img/blast-from-feature.jpg
 
 
 .. _jblast-select-workflow:
@@ -122,7 +123,7 @@ View Feature Details
 When a blast hit feature is selected, it's feature details will contain information about 
 the blast hit and organism information, accession link, etc.
 
-.. image:: img/feature-details.jpg
+.. image:: img/feature-details2.png
 
 
 Galaxy
