@@ -61,7 +61,7 @@ Selecting an arbitrary region to BLAST.  This is done with the highlight feature
     the highlight button on the toolbar, when pressed, will allow you to select an arbitrary region to highlight.
     After highlighting, right click the highlighted region (where there is no track).
 
-.. image:: img/blast-from-region.jpg
+.. image:: img/blast-region-select.jpg
 
 
 This can also be accessed from the JBlast menu.
