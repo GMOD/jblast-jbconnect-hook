@@ -322,3 +322,41 @@ In dataset's trackList.json, define `bpSizeLimit` to limit the size of the seque
             "bpSizeLimit": 15000
         }
     ],
+
+
+
+.. _jbs-sample-seq-button:
+
+Sample Sequence Button
+----------------------
+
+Configure a Sample Sequence Button in the BLAST a DNA sequence dialog box.
+
+.. figure:: img/blast-dna-seq.png
+
+    BLAST DNA Sequence Dialog box
+
+
+
+Add the following section in the JBrowse trackList.json file.
+
+::
+
+    "demo": {
+        "blastButtons": [
+            {
+                "button": "Sample Sequence",
+                "description": "Insert sample sequence",
+                "sequence": [
+                    "ATGCCACTTCGGCACATGCTTCTCCAAGCGCGGCAGCGCTGGTCTCAGCAGCCTCCGCAGCTCTCCGAGCTCCTGCATATCTTCCGCTCGCTCTCTATTCTA",
+                    "CCATCCGGAGCCTCTGCCGCGCCATCCAACCGCTCTCCTAGGCAAATTCAGCTGCCCCAAACCTTGCCTTGCTCCAATGCCAACCCACTTGGCGCCGGCTTC",
+                    "CACATCGACGTTGTTGACGATGACCTCTGGCCCACTTCCTTCGGCTTCTCCTCAGATCCCATGACTGGTGATGAGTGTCTTGATACCTTCCAAGAACACGGA",
+                    "GAAGAACAAGTGCACGACTCGGATGATGAGATAGATGACATGAGGCACCGCAAGCAGCTGTTCTACAAGCTGGACAGGGGGTCCAAGGAGTTTGAGGAATAT",
+                    "AACTTGCCCTTGCGCCGCAGATGGAAGAGAGATAAACCCAATGCCAAGAATCCATCCGATTGCG"
+                ]
+            }
+        ]
+    },
+
+
+
