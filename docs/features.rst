@@ -69,12 +69,17 @@ This can also be accessed from the JBlast menu.
 BLAST an existing feature
 -------------------------
 
-Double click any existing feature to open its Details dialog and click the BLAST button.
+Select a feature from an existing track.
 
-.. image:: img/select-feature-a.PNG
+.. figure:: img/select-feature-a.PNG
     :width: 400px
 
-.. image:: img/blast-from-feature.jpg
+    Open the Details dialog box for the selected feature.
+
+
+.. figure:: img/blast-from-feature.jpg
+
+    Click the BLAST button in the feature Details dialog box.
 
 
 .. _jblast-select-workflow:
