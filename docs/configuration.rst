@@ -85,6 +85,8 @@ Add the following to the jbconnect.config.js file, enabling basicWorkflowService
     };
 
 
+.. _jblast-feature-mapping:
+
 featureMapping flag
 -------------------
 

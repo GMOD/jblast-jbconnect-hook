@@ -95,7 +95,7 @@ The job queue side panel is revealed by clicking the Jobs tab on the upper right
 This contains list of executing jobs, in our case, for processing workflows.  It tells the current state
 of each job and whether completed jobs are completed or errored. 
 
-.. image:: img/job-panel.png
+.. image:: img/job-panel2.PNG
 
 
 
@@ -109,10 +109,11 @@ panel will appear asa tab next to the Select Tracks tab when the result track is
 score, e-value, identity, and gaps.  As the slider positions are moved, the filtered result
 track will be updated reflecting the filtered hits.
 
-.. image:: img/filter-panel.jpg
+.. image:: img/filter-panel-target-mode.png
+
 
 The Result Table (bottom) which shows the filtered results and allows the user to click the row to jump to the selected location. 
-Note: the Result Table only appears if the `featureMapping='hit'` (see: _featureMappingFlag)
+Note: the Result Table only appears if the `featureMapping='hit'` (see :ref:`jblast-feature-mapping`)
 
 
 View Feature Details
