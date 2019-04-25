@@ -72,6 +72,7 @@ BLAST an existing feature
 Double click any existing feature to open its Details dialog and click the BLAST button.
 
 .. image:: img/select-feature-a.PNG
+    :width: 400px
 
 .. image:: img/blast-from-feature.jpg
 
@@ -183,7 +184,7 @@ The typical JBlast process starts with the JBrowse client.
 .. figure:: img/blast-workflow-g.PNG
 
     Processing for Galaxy integration mode
-    
+
 
 Select Region
 -------------
