@@ -18,23 +18,58 @@ JBlast Brief Tutorial
         <iframe width="560" height="315" src="https://www.youtube.com/embed/SnJ5sewHJBk" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
 
+.. _jblast-3-ways-blast:
+
+3 Ways to BLAST
+---------------
+
+There are three ways to select a query sequence to BLAST:
+
+1 BLAST an arbitrary query sequence (from JBlast Menu)
+2 BLAST a highlighted region (from JBlast Menu or click the highlight button)
+3 BLAST an existing feature from another track (from the feature's Detail dialog).
+
+
+BLAST a DNA sequence
+--------------------
+
+This feature provides a way to BLAST an arbitrary sequence.
+
+When logged in, the JBlast menu appears next to the View menu on the menu bar.
+
+.. figure:: img/jblast-menu.PNG
+
+    JBlast Menu
+
+
+.. figure:: img/blast-dna-seq.png
+
+    BLAST a DNA sequence dialog box
+
+
+Choose a workflow that will perform the BLAST operation.  In the field *Input Sequence to BLAST*, Paste (Ctrl-V) a sequence. 
+The Sample Sequence button may or may not be there depending on the configuration (See :ref:`jbs-sample-seq-button`).
+
 
 .. _jblast-select-region:
 
-Selecting Feature/Region
-------------------------
+BLAST a region
+--------------
 
-There are two way to select the region to blast.
 
-1) by selecting an existing feature.  Open the details dialog for the feature and click the Blast button.
-
-.. image:: img/blast-from-feature.jpg
-
-2) by selecting selecting an arbitrary region to blast.  This is done with the highlight feature of JBrowse.
+Selecting an arbitrary region to BLAST.  This is done with the highlight feature of JBrowse.
     the highlight button on the toolbar, when pressed, will allow you to select an arbitrary region to highlight.
     After highlighting, right click the highlighted region (where there is no track).
 
 .. image:: img/blast-from-region.jpg
+
+
+BLAST an existing feature
+-------------------------
+
+Double click any existing feature to open its Details dialog and click the BLAST button.
+
+.. image:: img/blast-from-feature.jpg
 
 
 
@@ -50,6 +85,7 @@ and click Submit. This will submit the selected region for processing using the 
 
 
 
+
 Job Queue Panel
 ---------------
 
@@ -58,24 +94,6 @@ This contains list of executing jobs, in our case, for processing workflows.  It
 of each job and whether completed jobs are completed or errored. 
 
 .. image:: img/job-panel.png
-
-
-3 Ways to BLAST
----------------
-
-There are three ways to select a query sequence to BLAST:
-
-1 BLAST an arbitrary query sequence (from JBlast Menu)
-2 BLAST a highlighted region (from JBlast Menu or click the highlight button)
-3 BLAST an existing feature from another track (from the feature's Detail dialog).
-
-
-JBlast Menu
------------
-
-When logged in, the JBlast menu appears next to the View menu on the menu bar.
-
-.. image:: img/jblast-menu.jpg
 
 
 
