@@ -2,6 +2,150 @@
 Features
 ********
 
+.. _jblast-integrated-gui:
+
+Integrated GUI
+==============
+
+JBlast extends JBrowse with a number of GUI elements.
+
+JBlast Brief Tutorial
+---------------------
+
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 20%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/SnJ5sewHJBk" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+
+
+.. _jblast-select-region:
+
+Selecting Feature/Region
+------------------------
+
+There are two way to select the region to blast.
+
+1) by selecting an existing feature.  Open the details dialog for the feature and click the Blast button.
+
+.. image:: img/blast-from-feature.jpg
+
+2) by selecting selecting an arbitrary region to blast.  This is done with the highlight feature of JBrowse.
+    the highlight button on the toolbar, when pressed, will allow you to select an arbitrary region to highlight.
+    After highlighting, right click the highlighted region (where there is no track).
+
+.. image:: img/blast-from-region.jpg
+
+
+
+.. _jblast-select-workflow:
+
+Select Workflow
+---------------
+
+When a region is selected, this dialog box will appear.  Choose from the list of workflows to be executed 
+and click Submit. This will submit the selected region for processing using the selected workflow.
+
+.. image:: img/select-dialog.jpg
+
+
+
+Job Queue Panel
+---------------
+
+The job queue side panel is revealed by clicking the Jobs tab on the upper right of JBrowse screen.
+This contains list of executing jobs, in our case, for processing workflows.  It tells the current state
+of each job and whether completed jobs are completed or errored. 
+
+.. image:: img/job-panel.png
+
+
+3 Ways to BLAST
+---------------
+
+There are three ways to select a query sequence to BLAST:
+
+1 BLAST an arbitrary query sequence (from JBlast Menu)
+2 BLAST a highlighted region (from JBlast Menu or click the highlight button)
+3 BLAST an existing feature from another track (from the feature's Detail dialog).
+
+
+JBlast Menu
+-----------
+
+When logged in, the JBlast menu appears next to the View menu on the menu bar.
+
+.. image:: img/jblast-menu.jpg
+
+
+
+Filter Panel
+------------
+
+The filter panel consists of filter sliders and the result table.
+
+When a blast result track is selected with the track selector, the BLAST Filter
+panel will appear asa tab next to the Select Tracks tab when the result track is in focus.  Filter Sliders (top are available for filtering by
+score, e-value, identity, and gaps.  As the slider positions are moved, the filtered result
+track will be updated reflecting the filtered hits.
+
+.. image:: img/filter-panel.jpg
+
+The Result Table (bottom) which shows the filtered results and allows the user to click the row to jump to the selected location. 
+Note: the Result Table only appears if the `featureMapping='hit'` (see: _featureMappingFlag)
+
+
+View Feature Details
+--------------------
+
+When a blast hit feature is selected, it's feature details will contain information about 
+the blast hit and organism information, accession link, etc.
+
+.. image:: img/feature-details.jpg
+
+
+Galaxy
+======
+
+The following show how JBlast affects the Galaxy interface.
+
+
+Workflow Graph
+--------------
+
+This screen shows a sample JBlast workflow's graph.
+
+.. image:: img/galaxy-graph.jpg
+
+History
+-------
+
+JBlast operations are processin in a specific Galaxy history.
+This history name is defined in the config file (see :ref:`jbl-globals-js`).
+
+.. image:: img/galaxy-history.jpg
+
+JBlast Tools
+------------
+
+This shows the JBlast and NCBI tools in the tools sidebar.
+
+.. image:: img/galaxy-jblast-tools.jpg
+
+*Note: NCBI Blast tools are not installed by the ``jbutils --setuptools`` script. 
+the user must manually install these through the Tool Shed as admin.*
+
+
+
+JBlast Galaxy Workflows
+-----------------------
+
+JBlast has a fully functional workflow and 2 simulation workflows.
+The simulation workflows will only simulate a fixed blast result for demonstration purposes.
+
+.. image:: img/galaxy-workflows.jpg
+
+
 
 
 JBlast Process
@@ -171,150 +315,6 @@ This is the basic track config that is built:
 
 Note ``storeCache: false`` configuration.  This tells JBrowse not to cache the track so that
 each time the GFF track is redrawn, it will reread the data from the filtered GFF file. 
-
-
-.. _jblast-integrated-gui:
-
-Integrated GUI
-==============
-
-JBlast extends JBrowse with a number of GUI elements.
-
-JBlast Brief Tutorial
----------------------
-
-.. raw:: html
-
-    <div style="position: relative; padding-bottom: 20%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe width="560" height="315" src="https://www.youtube.com/embed/SnJ5sewHJBk" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-    </div>
-
-
-.. _jblast-select-region:
-
-Selecting Feature/Region
-------------------------
-
-There are two way to select the region to blast.
-
-1) by selecting an existing feature.  Open the details dialog for the feature and click the Blast button.
-
-.. image:: img/blast-from-feature.jpg
-
-2) by selecting selecting an arbitrary region to blast.  This is done with the highlight feature of JBrowse.
-    the highlight button on the toolbar, when pressed, will allow you to select an arbitrary region to highlight.
-    After highlighting, right click the highlighted region (where there is no track).
-
-.. image:: img/blast-from-region.jpg
-
-
-
-.. _jblast-select-workflow:
-
-Select Workflow
----------------
-
-When a region is selected, this dialog box will appear.  Choose from the list of workflows to be executed 
-and click Submit. This will submit the selected region for processing using the selected workflow.
-
-.. image:: img/select-dialog.jpg
-
-
-
-Job Queue Panel
----------------
-
-The job queue side panel is revealed by clicking the Jobs tab on the upper right of JBrowse screen.
-This contains list of executing jobs, in our case, for processing workflows.  It tells the current state
-of each job and whether completed jobs are completed or errored. 
-
-.. image:: img/job-panel.png
-
-
-3 Ways to BLAST
----------------
-
-There are three ways to select a query sequence to BLAST:
-
-1 BLAST an arbitrary query sequence (from JBlast Menu)
-2 BLAST a highlighted region (from JBlast Menu or click the highlight button)
-3 BLAST an existing feature from another track (from the feature's Detail dialog).
-
-
-JBlast Menu
------------
-
-When logged in, the JBlast menu appears next to the View menu on the menu bar.
-
-.. image:: img/jblast-menu.jpg
-
-
-
-Filter Panel
-------------
-
-The filter panel consists of filter sliders and the result table.
-
-When a blast result track is selected with the track selector, the BLAST Filter
-panel will appear asa tab next to the Select Tracks tab when the result track is in focus.  Filter Sliders (top are available for filtering by
-score, e-value, identity, and gaps.  As the slider positions are moved, the filtered result
-track will be updated reflecting the filtered hits.
-
-.. image:: img/filter-panel.jpg
-
-The Result Table (bottom) which shows the filtered results and allows the user to click the row to jump to the selected location. 
-Note: the Result Table only appears if the `featureMapping='hit'` (see: _featureMappingFlag)
-
-
-View Feature Details
---------------------
-
-When a blast hit feature is selected, it's feature details will contain information about 
-the blast hit and organism information, accession link, etc.
-
-.. image:: img/feature-details.jpg
-
-
-Galaxy
-======
-
-The following show how JBlast affects the Galaxy interface.
-
-
-Workflow Graph
---------------
-
-This screen shows a sample JBlast workflow's graph.
-
-.. image:: img/galaxy-graph.jpg
-
-History
--------
-
-JBlast operations are processin in a specific Galaxy history.
-This history name is defined in the config file (see :ref:`jbl-globals-js`).
-
-.. image:: img/galaxy-history.jpg
-
-JBlast Tools
-------------
-
-This shows the JBlast and NCBI tools in the tools sidebar.
-
-.. image:: img/galaxy-jblast-tools.jpg
-
-*Note: NCBI Blast tools are not installed by the ``jbutils --setuptools`` script. 
-the user must manually install these through the Tool Shed as admin.*
-
-
-
-JBlast Galaxy Workflows
------------------------
-
-JBlast has a fully functional workflow and 2 simulation workflows.
-The simulation workflows will only simulate a fixed blast result for demonstration purposes.
-
-.. image:: img/galaxy-workflows.jpg
 
 
 
