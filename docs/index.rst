@@ -10,11 +10,16 @@ JBlast can execute stand-alone NCBI blast commands directly, or it can be config
 Through the JBrowse user interface the user can choose to submit an existing feature as a blast query or highlight a 
 region to blast. The user can monitor blast execution processing through JBConnect’s job queue 
 and the blast search results will appear directly as an inserted track in the track selector.  
-The resulting hits can be filtered through a Filter Panel. The details of the hit can further be 
-displayed in the Feature Details dialog box.
 
 
-.. image:: img/filter-panel.jpg
+.. figure:: img/filter-panel2.PNG
+
+    Filter Panel with results mapped to query space
+
+
+.. figure:: img/blast-filter-target-mode.png
+
+    Filter Panel where feature mapping mode is in target space.
 
 
 **JBlast User Quick Tutorial**
