@@ -142,7 +142,7 @@ This screen shows a sample JBlast workflow's graph.
 History
 -------
 
-JBlast operations are processin in a specific Galaxy history.
+JBlast operations are processed in a specific Galaxy history.
 This history name is defined in the config file (see :ref:`jbl-globals-js`).
 
 .. image:: img/galaxy-history.jpg
@@ -175,8 +175,15 @@ JBlast Process
 
 The typical JBlast process starts with the JBrowse client.  
 
-.. image:: img/blast-workflow.png
+.. figure:: img/blast-workflow-sa.PNG
 
+    Processing for Stand-Alone mode
+
+
+.. figure:: img/blast-workflow-g.PNG
+
+    Processing for Galaxy integration mode
+    
 
 Select Region
 -------------
