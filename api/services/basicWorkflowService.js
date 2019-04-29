@@ -390,7 +390,8 @@ module.exports = {
                 
                 // extract workflow results
                 var results = extractjson(stdout);
-                
+                if (results===false)    return kJob.kDoneFn(Error('workflow failed'));
+
                 // the script may generate any number of files so we rely on the script results to tell us the generated file
                 
                 kJob.data.workflowResult = results;
@@ -407,8 +408,17 @@ module.exports = {
                 
                 // extract the json from the result string
                 function extractjson(str) {
-                    var jstr = str.split("workflowResults:")[1];
-                    return JSON.parse(jstr);
+                    let results = null;
+                    try {
+                        let jstr = str.split("workflowResults:")[1];
+                        console.log(">>>>> workflowresults",jstr);
+                        results = JSON.parse(jstr);
+                    }
+                    catch(err) {
+                        sails.log.error("extractjson() failed", err);
+                        return false;   
+                    }
+                    return results;
                 }
                 // rename to file asset name
                 function renamefile(theFile) {

@@ -826,7 +826,7 @@ return declare( JBrowsePlugin,
             let get_tabledata_cmd = "/service/exec/get_tabledata/?asset="+thisb.browser.jblast.asset+'&dataset='+encodeURIComponent(thisb.browser.config.dataRoot); 
             console.log('get_tabledata',get_tabledata_cmd);
             $.get(get_tabledata_cmd,function(data) {
-                console.log("data",data);
+                //console.log("data",data);
                 if (thisb.browser.jblast.resultTable)
                     thisb.browser.jblast.resultTable.ajax.reload();
             });
