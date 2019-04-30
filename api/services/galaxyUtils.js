@@ -173,8 +173,9 @@ module.exports = {
             if (err !== null) {
                 var errmsg = 'init_history failed - is galaxy running?';
                 sails.log.error(errmsg);
-                cb(histlist,{status:'error',msg:errmsg,err:err});
-                return;
+                process.exit(1);
+                //cb(histlist,{status:'error',msg:errmsg,err:err});
+                //return;
             }
             for(var i in histlist) {
                 //sails.log.debug("historylist[i].name",histlist[i].name,thisb.historyName);

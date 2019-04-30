@@ -87,10 +87,6 @@ module.exports = {
         get_hit_details:    'get'
     },
     init: function(params,cb) {
-        //sails.log(">>> galaxyService.init");
-        //galaxyProc.init(cb);        var cb2 = cb;
-        // TODO: check that galaxy is running
-
         galaxyUtils.init(function(history) {
 
             historyId = history.historyId;
@@ -100,9 +96,6 @@ module.exports = {
             sails.log.error("failed galaxy.init",err);
             cb(err);
         });
-
-        
-        
     },
     /**
      * job service validation
