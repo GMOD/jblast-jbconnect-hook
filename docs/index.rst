@@ -94,7 +94,7 @@ Install the JBConnect and JBrowse.  jb_setup.js ensures the sample data is loade
     npm install
 
     # install blast tools and sample data
-    npm install blast-ncbi-tools faux-blastdb
+    npm install enuggetry/blast-ncbi-tools enuggetry/faux-blastdb
 
     # pull in NCBI blast executables
     ./utils/blast_getBlastUtils.js 2.8.1
