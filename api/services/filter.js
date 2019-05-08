@@ -398,7 +398,7 @@ module.exports = {
                 return;
             }
             sails.log("Announced track update",found.id,found.lkey);
-            return Track.publishUpdate(found.id,found);
+            return Track.publishUpdate(0,found);
         }).catch(function(err) {
             sails.log.error("_announceTrack failed",err);
         });
