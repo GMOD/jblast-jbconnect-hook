@@ -117,7 +117,19 @@ return declare( JBrowsePlugin,
             focusQueueProc: 0,
             panelDelayTimer: null,
             bpSizeLimit: args.bpSizeLimit || 0,
-            getWorkflows: this.getWorkflows
+            getWorkflows: this.getWorkflows,
+
+            // check if bpSize > bpSizeLimit, if bpSizeLimit is defined
+            isOversized(bpSize) {
+                let bpSizeLimit = JBrowse.jblast.bpSizeLimit;
+
+                if (bpSizeLimit && bpSize > bpSizeLimit) {
+                    // oversize message
+                    alert("Query size is "+bpSize+".  The query size is limited to "+bpSizeLimit+" bp for demonstration purposes.  bpSizeLimit is set in trackList.json.");
+                    return true;
+                }
+                else return false;
+            }
         };
         
         
@@ -222,7 +234,7 @@ return declare( JBrowsePlugin,
                 id: "jblast-toolbtn",
                 //width: "24px",
 				//height: "17px",
-				label: "Blast",
+				label: "BLAST",
                 onClick: dojo.hitch( thisB, function(event) {
                     //thisB.browser.showTrackLabels("toggle");
 					//console.log("blast click");
@@ -857,7 +869,9 @@ return declare( JBrowsePlugin,
             title: 'BLAST this feature',
             disabled: ! has('save-generated-files'),
             onClick: function() {
-                //thisB.blastDialog(text);
+                // check if query size too big
+                let bpSize = JBrowse._highlight.end - JBrowse._highlight.start;
+                if (JBrowse.jblast.isOversized(bpSize)) return;
                 JBrowse.jblastDialog(text,bpSize);
             }
         }));
@@ -869,9 +883,8 @@ return declare( JBrowsePlugin,
         var handlers = {
             // handler for clicks on task context menu items
             onTaskItemClick: function(event) {
-                //browser.jblastDialog();
                 // get sequence store and ac
-		thisB.startBlast();
+		        thisB.startBlast();
             }
         };
         // create task menu as context menu for task nodes.
@@ -896,6 +909,10 @@ return declare( JBrowsePlugin,
     startBlast: function() {
         var thisB = this;
         var browser = this.browser;
+        let bpSize = browser._highlight.end - browser._highlight.start;
+
+        if (browser.jblast.isOversized(bpSize))  return;
+
         browser.getStore('refseqs', dojo.hitch(this,function( refSeqStore ) {
             if( refSeqStore ) {
                 var hilite = browser._highlight;
@@ -937,14 +954,6 @@ return declare( JBrowsePlugin,
         var regionB = region;
         var thisB = this;
         var comboData = [];
-		let bpSizeLimit = JBrowse.jblast.bpSizeLimit;
-
-		//console.log("blastDialog sizelimit",JBrowse.jblast,bpSizeLimit);
-
-		if (bpSizeLimit && bpSize > bpSizeLimit) {
-			alert("Query size is "+bpSize+".  The query size is limited to "+bpSizeLimit+" bp for demonstration purposes.");
-			return;
-		}
 
         //console.log("plugin",this);
         this.jblast.getWorkflows(function(workflows){

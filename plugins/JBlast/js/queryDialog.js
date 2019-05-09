@@ -133,13 +133,9 @@ _fillActionBar: function ( actionBar ) {
                 thisB.callback( searchParams );
                 thisB.hide();
 
-                let bpSizeLimit = browser.jblast.bpSizeLimit;
+                // check if query size too big
                 let bpSize = thisB.countSequence(searchParams.sequence);
-
-                if (bpSizeLimit && bpSize > bpSizeLimit) {
-                    alert("Query size is "+bpSize+".  The query size is limited to "+bpSizeLimit+" bp for demonstration purposes.");
-                    return;
-                }
+                if (browser.jblast.isOversized(bpSize)) return;
 
                 var postData = {
                     service: "jblast",
