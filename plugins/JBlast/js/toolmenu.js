@@ -44,42 +44,55 @@ define(function(){
                     //iconClass: 'dijitIconFilter',
                     onClick: function() {
                         let btnState = $("[widgetid*='highlight-btn'] > input").attr('aria-checked');
-                        if (btnState==='false') {
-                            // it takes a few iterations for the state to change.
-                            let check = setInterval(function(){
-                                $("[widgetid*='highlight-btn'] > input").click();
-                                btnState = $("[widgetid*='highlight-btn'] > input").attr('aria-checked');
-                                if (btnState !== 'false') {
-                                    clearInterval(check);
+                        console.log("btnState",btnState,typeof btnState);
+                        if (btnState==='mixed') {
+                            // launch blast dialog
+                            console.log("launch blast dialog");
+                            plugin.startBlast();
 
-                                    // show highlight instruct box
-                                    var confirmBox = new Dialog({ title: 'Highlight region to BLAST' });
-                                    dojo.create('div', {
-                                        id: 'confirm-btn',
-                                        style: "width: 700px;padding:15px",
-                                        innerHTML: 'Highlight the region by clicking the start coordinate in the track area of the genome browser, ' +
-                                            'holding down and dragging to the end coordinate and releasing. The BLAST button will then appear in the ' +
-                                            'tool button area. '
-                    
-                                    }, confirmBox.containerNode );
-                                    new dButton({
-                                        id: 'ok-btn',
-                                        label: 'Ok',
-                                        //iconClass: 'dijitIconDelete',
-                                        onClick: function() {
-                                            confirmBox.destroyRecursive();
-                                            //confirmCleanBox.hide();
-                                        }
-                                    })
-                                    .placeAt( confirmBox.containerNode );
+                        }
+                        if (btnState==='false' || btnState==='true') {
+                            // false - highlight button hasn't been pressed
+                            // true - highlight button has been pressed but region not selected yet.
+
+                            let txt = "";
+                            txt += 'This feature allows you to select an arbitrary region to BLAST using the highlight region feature of JBrowse. <p/>';
+                            
+                            if (btnState==='false') {
+                                txt += 'To begin, click the highlight button <img src="plugins/JBlast/img/hilite_unselected.PNG" height="22px" /> on the toolbar to begin the highlight mode. ';
+                            }
+                            if (btnState==='true') {
+                                txt += 'You have selected the highlight button, which now appears yellow <img src="plugins/JBlast/img/hilite_selected.PNG" height="22px" />. ';
+                            }
+                            txt += 'Highlight the region by clicking the start coordinate in the track area of the genome browser, ';
+                            txt += 'holding down and dragging to the end coordinate and releasing. ';
+
+                            txt += 'The BLAST button <img src="plugins/JBlast/img/blast_btn.PNG" height="22px"/> will ';
+                            txt += 'then appear in the tool button area. Click the BLAST button to blast the highlighted region.';                                            
+    
+
+
+                            // show highlight instruct box
+                            var confirmBox = new Dialog({ title: 'Highlight region to BLAST' });
+                            dojo.create('div', {
+                                id: 'confirm-btn',
+                                style: "width: 700px;padding:15px",
+                                innerHTML: txt
             
-                                    confirmBox.show();
-
-                                    // close confirm box
-                                    //setTimeout(function(){ confirmBox.destroyRecursive(); }, 4000);
-
+                            }, confirmBox.containerNode );
+                            new dButton({
+                                id: 'ok-btn1',
+                                label: 'Ok',
+                                //iconClass: 'dijitIconDelete',
+                                onClick: function() {
+                                    confirmBox.destroyRecursive();
+                                    //confirmCleanBox.hide();
                                 }
-                            },100);   
+                            })
+                            .placeAt( confirmBox.containerNode );
+    
+                            confirmBox.show();
+
                         }
                     }
                 }));
