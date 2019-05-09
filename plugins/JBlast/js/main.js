@@ -242,7 +242,7 @@ return declare( JBrowsePlugin,
                     dojo.stopEvent(event);
                 })
             }, dojo.create('button',{},navBox));   //thisB.browser.navBox));
-        
+
             // save the reference to the blast plugin in browser
             browser.jblastPlugin = thisB;
 
@@ -947,6 +947,14 @@ return declare( JBrowsePlugin,
             JBrowse.jblastHiliteMenu.bindDomNode(node);
             $("[widgetid='jblast-toolbtn']").show();
             //domStyle.set(thisB.browser.jblast.blastButton, 'display', 'inline'); // dont work, why??
+
+            // flash the BLAST button
+            $("[widgetid='jblast-toolbtn']")
+			.fadeIn(100).fadeOut(100).fadeIn(100)
+			.fadeOut(100).fadeIn(100)
+			.fadeOut(100).fadeIn(100)
+			.fadeOut(100).fadeIn(100);            
+
         }
     },
     // display blast dialog
