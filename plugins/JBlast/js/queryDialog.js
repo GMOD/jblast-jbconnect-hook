@@ -65,7 +65,8 @@ _dialogContent: function () {
 
     let cfg = this.browser.config;
     
-    console.log("demo",cfg);
+    //console.log("demo",cfg);
+    // if demo.blastButtons section is defined in trackList, display the buttons.
     if (cfg.demo && cfg.demo.blastButtons && cfg.demo.blastButtons[0]) {
         let blastButtons = dom.create('div', {
             id: 'blastButtons',
