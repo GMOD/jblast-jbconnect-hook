@@ -30,6 +30,16 @@
     padding-top: 10px;
     padding-bottom: 10px;    
 }
+/* 
+    Blast Submit dialogs
+*/
+
+#workflow-combo {
+    width: 250px;
+}
+#widget_workflow-combo {
+    width: 250px;
+}
 
 /*
     blast filter sliders
