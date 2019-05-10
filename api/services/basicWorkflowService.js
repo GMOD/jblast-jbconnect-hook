@@ -111,7 +111,8 @@ var fs = require("fs-extra");
 var util = require("./utils");
 var shelljs = require('shelljs'); 
 var appPath = require("app-root-path").path;
-//var appPath = path.dirname(require.main.filename);
+const _ = require('lodash');
+
 module.exports = {
 
     fmap: {
@@ -152,6 +153,9 @@ module.exports = {
      * 
      */
     get_workflows: function(req, res) {
+        let params = req.allParams();
+        let g = sails.config.globals.jbrowse;
+        let ds = params.dataset;
         
         var wfpath = './workflows/';
         
@@ -174,6 +178,23 @@ module.exports = {
                 });
             }
         });
+
+        // handle filtering of workflow names (ref #225)
+        if (g.jblast.workflowFilterEnable && g.jblast.workflowFilter && g.jblast.workflowFilter.galaxy && g.jblast.workflowFilter.galaxy[ds]) {
+            let workflows = _.cloneDeep(wflist);
+            let nf = g.jblast.workflowFilter.galaxy[ds].nameFilter;
+            let filtered = [];
+            
+            for(let i in workflows) {
+                if (workflows[i].name.indexOf(nf) >= 0) {
+                    workflows[i].name = workflows[i].name.replace(nf,"");
+                    filtered.push(workflows[i]);
+                }
+            }
+            console.log("get_workflows filtered",filtered);
+            return res.ok(filtered);
+        }
+
         res.ok(wflist);
     },
     get_hit_details: function(req, res) {
