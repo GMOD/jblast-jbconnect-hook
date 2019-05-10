@@ -870,7 +870,6 @@ return declare( JBrowsePlugin,
             disabled: ! has('save-generated-files'),
             onClick: function() {
                 // check if query size too big
-                let bpSize = JBrowse._highlight.end - JBrowse._highlight.start;
                 if (JBrowse.jblast.isOversized(bpSize)) return;
                 JBrowse.jblastDialog(text,bpSize);
             }
