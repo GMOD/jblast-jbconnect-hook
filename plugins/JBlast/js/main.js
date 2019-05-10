@@ -113,6 +113,7 @@ return declare( JBrowsePlugin,
         
         browser.jblast = {
             asset: null,
+            browser: browser,
             focusQueue: [],
             focusQueueProc: 0,
             panelDelayTimer: null,
@@ -1076,23 +1077,9 @@ return declare( JBrowsePlugin,
      * @returns {getWorkflows}
      */
     getWorkflows(cb) {
-        var thisB = this;
-
-        var xhrArgs = {
-            url: "/jbapi/getworkflows",
-            handleAs: "json",
-            preventCache: true,
-            load: function(data){
-                    console.log("get workflows result", data);
-                    cb(data);
-            },
-            error: function(error){
-            }
-        };
-
-        // Call the asynchronous xhrGet
-        //var deferred = dojo.xhrGet(xhrArgs);
-        $.get( "/service/exec/get_workflows", function( data ) {
+        let browser = this.browser;
+        
+        $.get( "/service/exec/get_workflows?dataset="+browser.config.dataRoot, function( data ) {
             console.log("get workflows result", data);
             cb(data);
         });

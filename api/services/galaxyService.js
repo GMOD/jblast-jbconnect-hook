@@ -78,7 +78,10 @@
  * 
  * 
  */
+
 /*istanbul ignore file */
+
+const _ = require('lodash');
 
 module.exports = {
 
@@ -130,12 +133,32 @@ module.exports = {
         //params.monitorFn = this.monitorWorkflow;
         return galaxyUtils.beginProcessing(kJob);
     },
-    get_workflows:  function(req,res) {     
-        //return galaxyProc.getWorkflows(req,res);
+    get_workflows:  function(req,res) {  
+        let params = req.allParams();
+        let g = sails.config.globals.jbrowse;
+        let ds = params.dataset;
+   
+        console.log('get_workflow params',params);
+
         galaxyUtils.galaxyGET("/api/workflows",function(workflows,err) {
             if (err !== null) {
                 return res.serverError({status:'error',msg:"galaxy GET /api/workflows failed",err:err});
             }
+
+            // handle filtering of workflow names (ref #225)
+            if (g.jblast.workflowFilterEnable && g.jblast.workflowFilter && g.jblast.workflowFilter.galaxy && g.jblast.workflowFilter.galaxy[ds]) {
+                let nf = g.jblast.workflowFilter.galaxy[ds].nameFilter;
+                let filtered = [];
+                for(let i in workflows) {
+                    if (workflows[i].name.indexOf(nf) >= 0) {
+                        workflows[i].name = workflows[i].name.replace(nf,"");
+                        filtered.push(workflows[i]);
+                    }
+                }
+                console.log("get_workflows filtered",filtered);
+                return res.ok(filtered);
+            }
+
             return res.ok(workflows);
         });
     },
