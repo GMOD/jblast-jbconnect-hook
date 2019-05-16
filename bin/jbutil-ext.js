@@ -140,8 +140,8 @@ function exec_setupindex(params) {
  */
 function exec_setuptrack(params) {
     var config = params.config;
-    console.log("Setting up sample track...");
     var g = config;
+    console.log("Setting up sample track...",g.dataSet);
 
     // get dataSet
     var dataSet = "-----";
@@ -175,7 +175,8 @@ function exec_setuptrack(params) {
 		
 		// read trackList.json
 		try {
-		  var trackListData = fs.readFileSync (trackListPath);
+            console.log("reading ",trackListPath);
+		    var trackListData = fs.readFileSync (trackListPath);
 		}
 		catch(err) {
 			console.log("failed read",trackListPath,err);
@@ -183,7 +184,12 @@ function exec_setuptrack(params) {
 		}
 		if (error) continue;
 		
-		var conf = JSON.parse(trackListData);
+        var conf = JSON.parse(trackListData);
+        
+        // check if demo.injectSampleTrack == false then skip
+        if (conf.demo && typeof conf.demo.injectSampleTrack !== 'undefined' && conf.demo.injectSampleTrack===false) {
+            continue;
+        }
 
 		// check if sample track exists in trackList.json (by checking for the label)
 		var hasLabel = 0;
@@ -197,7 +203,8 @@ function exec_setuptrack(params) {
 			console.log('Sample track already exists');
 			continue;
 		}
-		// add the sample track
+        // add the sample track
+        console.log("inject sample track", g.dataSet[i].path);
 		conf.tracks.push(sampleTrack);
 		
 		// write trackList.json
