@@ -17,7 +17,7 @@ and the blast search results will appear directly as an inserted track in the tr
     Filter Panel with results mapped to query space
 
 
-.. figure:: img/blast-filter-target-mode.png
+.. figure:: img/blast-panel-target-mode.png
 
     Filter Panel where feature mapping mode is in target space.
 
