@@ -97,6 +97,7 @@ define(function(){
                         }
                     }
                 }));
+/*
                 browser.addGlobalMenuItem( toolMenu, new dijitMenuItem({
                     id: 'menubar_jblast_dbclean',
                     label: 'Clear demo data',
@@ -144,7 +145,7 @@ define(function(){
                     
                     }
                 }));
-                
+*/                
                 browser.renderGlobalMenu( 'tools','JBlastTools', browser.menuBar );
     
                 // reorder the menubar
