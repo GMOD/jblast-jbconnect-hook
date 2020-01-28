@@ -70,6 +70,10 @@ module.exports.globals = {
             'filterService':            {name: 'filterService',         type: 'service'},
             'entrezService':            {name: 'entrezService',         type: 'service'}
         },
+        plugins: {
+            JBlast: {filter: '.blast.wf'}
+        },
+  
         /**/
         webIncludes: {
             "jblast-css-SliderPips":    {lib: "/jblib/jquery-ui-slider-pips.min.css" },

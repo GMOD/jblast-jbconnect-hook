@@ -146,7 +146,7 @@ function exec_setuptrack(params) {
     // get dataSet
     var dataSet = "-----";
     for(var i in g.dataSet) {
-		console.log("processing dataset",g.dataSet[i].path);
+		console.log("processing dataset",i, g.dataSet[i].path);
 		
         dataSet = g.dataSet[i].path;
     
@@ -204,6 +204,7 @@ function exec_setuptrack(params) {
 			continue;
 		}
         // add the sample track
+        console.log(">>",g.dataSet,i);
         console.log("inject sample track", g.dataSet[i].path);
 		conf.tracks.push(sampleTrack);
 		

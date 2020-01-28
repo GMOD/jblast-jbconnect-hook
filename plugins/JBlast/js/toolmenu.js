@@ -5,6 +5,7 @@ define(function(){
             let thisb = this;
             this.browser = browser;
             this.plugin = plugin; 
+            let toolMenu = "analyze";
             //console.log("JBlast toolmenu init");
             require([
                 'dojo/dom-construct',
@@ -14,7 +15,7 @@ define(function(){
                 'plugins/JBlast/js/queryDialog'
             ], function(dom,dijitMenuItem,Dialog,dButton,queryDialog){
                 
-                browser.addGlobalMenuItem( 'tools', new dijitMenuItem({
+                browser.addGlobalMenuItem(toolMenu, new dijitMenuItem({
                     id: 'menubar_blast_seq',
                     label: 'BLAST DNA sequence',
                     //iconClass: 'dijitIconFilter',
@@ -38,7 +39,7 @@ define(function(){
                     }
                 }));
                 
-                browser.addGlobalMenuItem( 'tools', new dijitMenuItem({
+                browser.addGlobalMenuItem( toolMenu, new dijitMenuItem({
                     id: 'menubar_blast_hilite',
                     label: 'BLAST highlighted region',
                     //iconClass: 'dijitIconFilter',
@@ -96,7 +97,7 @@ define(function(){
                         }
                     }
                 }));
-                browser.addGlobalMenuItem( 'tools', new dijitMenuItem({
+                browser.addGlobalMenuItem( toolMenu, new dijitMenuItem({
                     id: 'menubar_jblast_dbclean',
                     label: 'Clear demo data',
                     //iconClass: 'dijitIconFilter',
