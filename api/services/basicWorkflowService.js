@@ -149,54 +149,11 @@ module.exports = {
      * Enumerate available workflow scripts
      * 
      * @param {object} req - request
-     * @param {object} res - response
+     * @param {object} res - responseg
      * 
      */
-    get_workflows: function(req, res) {
-        let params = req.allParams();
-        let g = sails.config.globals.jbrowse;
-        let ds = params.dataset;
-        
-        var wfpath = './workflows/';
-        
-        sails.log(wfpath,process.cwd());
-        
-        var fs = require('fs-extra');
-
-        wflist = [];
-        
-        fs.readdirSync(wfpath).forEach(function(file) {
-            if (file.indexOf('.blast.workflow.') !== -1) {
-                
-                var name = file.split('.workflow.');
-                
-                wflist.push( {
-                   id: file,
-                   name: name[0],
-                   script: file,
-                   path: resolvePath(wfpath)
-                });
-            }
-        });
-
-        // handle filtering of workflow names (ref #225)
-        if (g.jblast.workflowFilterEnable && g.jblast.workflowFilter && g.jblast.workflowFilter.galaxy && g.jblast.workflowFilter.galaxy[ds]) {
-            let workflows = _.cloneDeep(wflist);
-            let nf = g.jblast.workflowFilter.galaxy[ds].nameFilter;
-            let filtered = [];
-            
-            for(let i in workflows) {
-                if (workflows[i].name.indexOf(nf) >= 0) {
-                    workflows[i].name = workflows[i].name.replace(nf,"");
-                    filtered.push(workflows[i]);
-                }
-            }
-            console.log("get_workflows filtered",filtered);
-            return res.ok(filtered);
-        }
-
-        res.ok(wflist);
-    },
+    get_workflows: workflowService.get_workflows,
+    
     get_hit_details: function(req, res) {
         var params = req.allParams();
 

@@ -1073,16 +1073,19 @@ return declare( JBrowsePlugin,
     },
     /**
      * get galaxy workflows (using jbrowse api)
-     * @param {type} cb - cb(workflows]]
+     * @param {callback} cb - cb(workflows)
      * @returns {getWorkflows}
      */
     getWorkflows(cb) {
         let browser = this.browser;
+        let servModule = 'JBlast';
         
-        $.get( "/service/exec/get_workflows?dataset="+browser.config.dataRoot, function( data ) {
+        let xhr = $.get( "/service/exec/get_workflows?dataset="+browser.config.dataRoot+"&module="+servModule, function( data ) {
             console.log("get workflows result", data);
             cb(data);
-        });
+        }).fail(function(jqxhr, textStatus, errorThrown) {
+            alert('get_workflows failed',textStatus);
+        });;
     }
     
 });
