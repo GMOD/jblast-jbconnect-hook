@@ -72,12 +72,14 @@ if (!thisHook) {
           for(let i in items) {
             if (items[i].indexOf('Service.js') > 0) {
               let servName = items[i].split('.js')[0];
+              if (!services[servName]) continue;
               sails.log.info('JBlast service - '+servName);
               services[servName].path = hookPath+'/'+servName;
               services[servName].module = 'jblast';
             }
           }
-          sails.log.debug('>> jblast services: ',services);
+          //sails.services.jblastPostAction = require(hookPath+'/jblastPostAction');
+          //sails.log.debug('>> jblast services: ',services);
         });        
       }
     }, {
