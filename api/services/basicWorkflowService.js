@@ -152,8 +152,46 @@ module.exports = {
      * @param {object} res - responseg
      * 
      */
-    get_workflows: workflowService.get_workflows,
-    
+    get_workflows (req, res) {
+        
+        let params = req.allParams();
+        let g = sails.config.globals.jbrowse;
+        let ds = params.dataset;
+        let servModule = params.module;
+        let wfpath = './workflows/';
+        let filter = '.wf';
+        
+        //console.log(">> get_workflows params",params,g.plugins);
+        //console.log(">> get_workflows g.plugins",g.plugins);
+        //console.log(">> ",servModule,g.plugins[servModule]);
+
+        if (g.plugins && g.plugins[servModule])
+        filter = g.plugins[servModule].filter;
+        
+        sails.log(wfpath,process.cwd());
+        
+        var fs = require('fs-extra');
+
+        wflist = [];
+        
+        fs.readdirSync(wfpath).forEach(function(file) {
+            if (file.indexOf(filter) !== -1) {
+                
+                var name = file.split(filter);
+                
+                wflist.push( {
+                   id: file,
+                   name: name[0],
+                   script: file,
+                   path: resolvePath(wfpath)
+                });
+            }
+        });
+        console.log("get_workflows",wflist);
+
+        res.ok(wflist);
+    },
+
     get_hit_details: function(req, res) {
         var params = req.allParams();
 
