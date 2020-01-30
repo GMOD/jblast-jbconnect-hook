@@ -141,7 +141,7 @@ function exec_setupindex(params) {
 function exec_setuptrack(params) {
     var config = params.config;
     var g = config;
-    console.log("Setting up sample track...",g.dataSet);
+    console.log("Setting up sample track...");
 
     // get dataSet
     var dataSet = "-----";
