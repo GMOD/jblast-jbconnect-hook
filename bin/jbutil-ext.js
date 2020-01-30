@@ -193,8 +193,8 @@ function exec_setuptrack(params) {
 
 		// check if sample track exists in trackList.json (by checking for the label)
 		var hasLabel = 0;
-		for(var i in conf.tracks) {
-			if (conf.tracks[i].label===sampleTrack.label) {
+		for(var j in conf.tracks) {
+			if (conf.tracks[j].label===sampleTrack.label) {
 				hasLabel=1;
 				break;
 			}
@@ -204,7 +204,7 @@ function exec_setuptrack(params) {
 			continue;
 		}
         // add the sample track
-        console.log(">>",g.dataSet,i);
+        //console.log(">>",g.dataSet,i);
         console.log("inject sample track", g.dataSet[i].path);
 		conf.tracks.push(sampleTrack);
 		
