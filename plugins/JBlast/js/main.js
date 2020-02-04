@@ -984,8 +984,9 @@ return declare( JBrowsePlugin,
                     destroyBlastDialog();
                 }
             });
-            
+
             dojo.create('span', {
+                id: 'workflow-head',
                 innerHTML: 'Workflow '
             }, dialog.containerNode);
             
@@ -1007,11 +1008,19 @@ return declare( JBrowsePlugin,
                 store: stateStore,
                 searchAttr: "name"
             }, "blast-workflow-select").startup();            
-            
+
+            // hide workflow selectr if only one entry.
+            setTimeout(function() {
+                if (workflows.length <= 1)  {
+                    $('#widget_workflow-combo').hide();
+                    $('#workflow-head').hide();
+                }
+            },200);
+
             dojo.create('div', {
                 id: 'blast-box',
                 style: {'margin-top': '20px'},
-                innerHTML: 'This will process a BLAST search against the selected database.<br/><button id="submit-btn" type="button">Submit</button> <button id="cancel-btn" type="button">Cancel</button>'
+                innerHTML: 'This will process a BLAST search against the selected database.<br/><br/><button id="submit-btn" type="button">Submit</button> <button id="cancel-btn" type="button">Cancel</button>'
             }, dialog.containerNode);
 
             var submitBtn = new Button({

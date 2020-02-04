@@ -97,18 +97,10 @@ _dialogContent: function () {
             '<textarea id="sequence-text" class="seq-text" />'
     }, container );
 
-    /*
-    function makeRadio( args, parent ) {
-        var label = dom.create('label', {}, parent );
-        var radio = new dRButton( args ).placeAt( label );
-        dom.create('span', { innerHTML: args.label }, label );
-        return radio;
-    }
-    
-    makeRadio( { name: 'translate', value: 'no', label: 'DNA', checked: true }, translateDiv );
-    content.translate = makeRadio( { name: 'translate', value: 'yes', label: 'AA' }, translateDiv );
-    */
-
+    // hide workflow selectr if only one entry.
+    setTimeout(function() {
+        if (workflows.length <= 1)  $('#workflow-div').hide();
+    },200);
 
     return container;
 },
