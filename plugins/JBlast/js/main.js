@@ -228,7 +228,7 @@ return declare( JBrowsePlugin,
              */ 
 
             var navBox = dojo.byId("navbox");
-
+            /*
             thisB.browser.jblast.blastButton = new Button(
             {
                 title: "BLAST highlighted region",
@@ -243,7 +243,7 @@ return declare( JBrowsePlugin,
                     dojo.stopEvent(event);
                 })
             }, dojo.create('button',{},navBox));   //thisB.browser.navBox));
-
+            */
             // save the reference to the blast plugin in browser
             browser.jblastPlugin = thisB;
 
@@ -1020,7 +1020,7 @@ return declare( JBrowsePlugin,
             dojo.create('div', {
                 id: 'blast-box',
                 style: {'margin-top': '20px'},
-                innerHTML: 'This will process a BLAST search against the selected database.<br/><br/><button id="submit-btn" type="button">Submit</button> <button id="cancel-btn" type="button">Cancel</button>'
+                innerHTML: 'This will process a BLAST analysis against the selected database.<br/><br/><button id="submit-btn" type="button">Submit</button> <button id="cancel-btn" type="button">Cancel</button>'
             }, dialog.containerNode);
 
             var submitBtn = new Button({
@@ -1090,7 +1090,7 @@ return declare( JBrowsePlugin,
         let servModule = 'JBlast';
         
         let xhr = $.get( "/service/exec/get_workflows?dataset="+browser.config.dataRoot+"&module="+servModule, function( data ) {
-            console.log("get workflows result", data);
+            //console.log("get workflows result", data);
             cb(data);
         }).fail(function(jqxhr, textStatus, errorThrown) {
             alert('get_workflows failed',textStatus);

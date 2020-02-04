@@ -68,8 +68,8 @@ define(function(){
                             txt += 'Highlight the region by clicking the start coordinate in the track area of the genome browser, ';
                             txt += 'holding down and dragging to the end coordinate and releasing. ';
 
-                            txt += 'The BLAST button <img src="plugins/JBlast/img/blast_btn.PNG" height="22px"/> will ';
-                            txt += 'then appear in the tool button area. Click the BLAST button to blast the highlighted region.';                                            
+                            //txt += 'The BLAST button <img src="plugins/JBlast/img/blast_btn.PNG" height="22px"/> will ';
+                            //txt += 'then appear in the tool button area. Click the BLAST button to blast the highlighted region.';                                            
     
 
 
