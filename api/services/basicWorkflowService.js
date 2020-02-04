@@ -220,6 +220,15 @@ module.exports = {
         var region = params.region;
         var workflow = params.workflow;
         //var dataSetPath = params.dataset;
+        var refseq = params.refseq;
+
+        // validate DNA sequence
+        if (refseq) {
+            region = utils.validateSequence(region,refseq);
+            if (region === false)
+                return kJob.kDoneFn(Error('invalid sequence '));
+        }
+
         var monitorFn = this._monitorWorkflow;
 
         // get starting coord of region
