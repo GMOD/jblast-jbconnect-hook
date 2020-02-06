@@ -491,7 +491,7 @@ return declare( JBrowsePlugin,
         txt +=    '<td class="field blast-field">Sequence ID</td>';
         txt +=    '<td class="field blast-field">Length</td>';
         txt += '</tr><tr>';
-        txt +=    '<td class="blast-value"> id="details_accession"'+ hit.Hit_accession+'</td>';
+        txt +=    '<td class="blast-value" id="details_accession">'+ hit.Hit_accession+'</td>';
         txt +=    '<td class="blast-value">'+ hit.Hit_id+'</td>';
         txt +=    '<td class="blast-value">'+hit.Hit_len+'</td>';
         txt += '</tr></table>';
