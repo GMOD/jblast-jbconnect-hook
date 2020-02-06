@@ -161,14 +161,10 @@ module.exports = {
         let wfpath = './workflows/';
         let filter = '.wf';
         
-        //console.log(">> get_workflows params",params,g.plugins);
-        //console.log(">> get_workflows g.plugins",g.plugins);
-        //console.log(">> ",servModule,g.plugins[servModule]);
-
-        if (g.plugins && g.plugins[servModule])
-        filter = g.plugins[servModule].filter;
+        if (g.workflowFilterEnable && g.workflowFilter && g.workflowFilter.default)
+            filter = g.workflowFilter[ds].filter;
         
-        sails.log(wfpath,process.cwd());
+        sails.log("request data",wfpath,ds,filter);
         
         var fs = require('fs-extra');
 

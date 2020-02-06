@@ -1089,8 +1089,8 @@ return declare( JBrowsePlugin,
         let browser = this.browser;
         let servModule = 'JBlast';
         
-        let xhr = $.get( "/service/exec/get_workflows?dataset="+browser.config.dataRoot+"&module="+servModule, function( data ) {
-            //console.log("get workflows result", data);
+        let xhr = $.get( "/service/exec/get_workflows:jblast?dataset="+browser.config.dataRoot+"&module="+servModule, function( data ) {
+            for(let i=0;i<data.length;i++) console.log('getWorkflow',i,data[i]);
             cb(data);
         }).fail(function(jqxhr, textStatus, errorThrown) {
             alert('get_workflows failed',textStatus);

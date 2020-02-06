@@ -70,8 +70,6 @@ define(function(){
 
                             //txt += 'The BLAST button <img src="plugins/JBlast/img/blast_btn.PNG" height="22px"/> will ';
                             //txt += 'then appear in the tool button area. Click the BLAST button to blast the highlighted region.';                                            
-    
-
 
                             // show highlight instruct box
                             var confirmBox = new Dialog({ title: 'Highlight region to BLAST' });
