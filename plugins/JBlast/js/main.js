@@ -67,50 +67,6 @@ return declare( JBrowsePlugin,
         //this.setupTrackSelectorTracking();
 
         
-        // intercept Browser.showTracks
-        // when not logged in, filter out REST tracks
-        // we are basically checking to see if the url tracks are in the pruned track list.
-        browser.orig_showTracks = browser.showTracks,
-        browser.showTracks = function( trackNames ) {
-            //trackNames = trackNames.remove('jblast_sample');
-            if (thisB.browser.loginState) return browser.orig_showTracks(trackNames);
-
-            let trackNames1 = [];
-            let confTracks = browser.config.tracks;
-            
-            for(let i=0; i < trackNames.length;i++) {
-                for(let j=0;j<confTracks.length;j++) {
-                    if ( confTracks[j].label === trackNames[i] ){
-                        trackNames1.push(trackNames[i]);
-                        break;
-                    }
-                }
-            }
-            return browser.orig_showTracks(trackNames1);
-        };
-        
-
-        browser.afterMilestone( 'loadConfig', function() {
-            // if we are not logged in, hide REST tracks.
-            thisB.loginState = false;
-            $.get("/loginstate",function(data) {
-                //console.log("loginstate",data);
-                thisB.loginState = data.loginstate;
-                if (!thisB.loginState) {
-                    let conf = dojo.clone(browser.config.tracks);
-                    browser.config.tracks = [];
-                    for(let i=0; i < conf.length;i++) {
-                        if (typeof conf[i].urlTemplate === 'undefined' || conf[i].urlTemplate.charAt(0) !== "/") {
-                            browser.config.tracks.push(conf[i]);
-                        }
-                        else {
-                            console.log(conf[i].label, "track requires login");
-                        }
-                    }
-                }
-            });
-        });
-        
         browser.jblast = {
             asset: null,
             browser: browser,
