@@ -19,8 +19,9 @@ define([
             'dijit/Menu',
             'dijit/MenuItem',
            'JBrowse/has',
-           './tabs'
-       ],
+           './tabs',
+           'plugins/JBlast/js/queryDialog'
+        ],
        function(
         declare,
         lang,
@@ -29,7 +30,7 @@ define([
         query,
         JBrowsePlugin,
         Button, Dialog, Memory, ComboBox,Menu,MenuItem,has,
-        JBTabs
+        JBTabs,queryDialog
        ) {
 return declare( JBrowsePlugin,
 {
@@ -64,9 +65,6 @@ return declare( JBrowsePlugin,
             return this;
         };            
 
-        //this.setupTrackSelectorTracking();
-
-        
         browser.jblast = {
             asset: null,
             browser: browser,
@@ -88,6 +86,103 @@ return declare( JBrowsePlugin,
                 else return false;
             }
         };
+
+        // register analyze menu items
+        if (browser.jbconnect && browser.jbconnect.analyzeMenus) {
+            browser.jbconnect.analyzeMenus.JBlast = {
+                title: 'BLAST Analysis',
+                module: 'JBlast',
+                queryDialog: queryDialog,
+                init:initMenu,
+                contents:null,
+                process:null
+            };
+        }
+
+        function initMenu(menuName,queryDialog,container) {
+
+            browser.addGlobalMenuItem(menuName, new MenuItem({
+                id: 'menubar_blast_seq',
+                label: 'BLAST DNA sequence',
+                //iconClass: 'dijitIconFilter',
+                onClick: function() {
+                    //console.log(thisb,thisb.plugin);
+                    thisB.getWorkflows(function(workflows){
+
+                        if (workflows.length==0) {
+                            alert("no workflows found");
+                            return;
+                        }
+                                    
+                        var dialog = new queryDialog({
+                            browser:thisB.browser,
+                            plugin:thisB.plugin,
+                            workflows:workflows
+                        }); 
+                        dialog.show(function(x) {
+                        });
+                    });                       
+                }
+            }));
+            
+            browser.addGlobalMenuItem( menuName, new MenuItem({
+                id: 'menubar_blast_hilite',
+                label: 'BLAST highlighted region',
+                //iconClass: 'dijitIconFilter',
+                onClick: function() {
+                    let btnState = $("[widgetid*='highlight-btn'] > input").attr('aria-checked');
+                    console.log("btnState",btnState,typeof btnState);
+                    if (btnState==='mixed') {
+                        // launch blast dialog
+                        console.log("launch blast dialog");
+                        thisB.startBlast();
+
+                    }
+                    if (btnState==='false' || btnState==='true') {
+                        // false - highlight button hasn't been pressed
+                        // true - highlight button has been pressed but region not selected yet.
+
+                        let txt = "";
+                        txt += 'This feature allows you to select an arbitrary region to BLAST using the highlight region feature of JBrowse. <p/>';
+                        
+                        if (btnState==='false') {
+                            txt += 'To begin, click the highlight button <img src="plugins/JBlast/img/hilite_unselected.PNG" height="22px" /> on the toolbar to begin the highlight mode. ';
+                        }
+                        if (btnState==='true') {
+                            txt += 'You have selected the highlight button, which now appears yellow <img src="plugins/JBlast/img/hilite_selected.PNG" height="22px" />. ';
+                        }
+                        txt += 'Highlight the region by clicking the start coordinate in the track area of the genome browser, ';
+                        txt += 'holding down and dragging to the end coordinate and releasing. ';
+
+                        //txt += 'The BLAST button <img src="plugins/JBlast/img/blast_btn.PNG" height="22px"/> will ';
+                        //txt += 'then appear in the tool button area. Click the BLAST button to blast the highlighted region.';                                            
+
+                        // show highlight instruct box
+                        var confirmBox = new Dialog({ title: 'Highlight region to BLAST' });
+                        dojo.create('div', {
+                            id: 'confirm-btn',
+                            style: "width: 700px;padding:15px",
+                            innerHTML: txt
+        
+                        }, confirmBox.containerNode );
+                        new Button({
+                            id: 'ok-btn1',
+                            label: 'Ok',
+                            //iconClass: 'dijitIconDelete',
+                            onClick: function() {
+                                confirmBox.destroyRecursive();
+                                //confirmCleanBox.hide();
+                            }
+                        })
+                        .placeAt( confirmBox.containerNode );
+
+                        confirmBox.show();
+
+                    }
+                }
+            }));
+        }
+
         
         
         /*
@@ -114,9 +209,9 @@ return declare( JBrowsePlugin,
             },2000);
 
             // load toolmenu "JBlast menu"
-            require(["plugins/JBlast/js/toolmenu"], function(toolmenu){
-                toolmenu.init(browser,thisB);
-            });        
+            //require(["plugins/JBlast/js/toolmenu"], function(toolmenu){
+            //    toolmenu.init(browser,thisB);
+            //});        
 
 
             // setup callbacks for job queue panel
