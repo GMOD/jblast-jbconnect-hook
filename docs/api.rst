@@ -177,7 +177,7 @@ Configuration:
           // (i.e. for "remote_htgs" would translate to "blastn -db htgs -remote")
           // These will override any default parameters defined in ``blastjs``
           // 
-          // Blast profiles generally apply to basicWorkflowService only
+          // Blast profiles generally apply to localBlastService only
           // and do no apply to galaxyBlastService.
           // 
           // Our example uses a subset of htgs, an NCBI curated blast database.
@@ -195,7 +195,7 @@ Configuration:
       },
       // list of services that will get registered.
       services: {
-          'basicWorkflowService':     {name: 'basicWorkflowService',  type: 'workflow', alias: "jblast"},
+          'localBlastService':     {name: 'localBlastService',  type: 'workflow', alias: "jblast"},
           'filterService':            {name: 'filterService',         type: 'service'},
           'entrezService':            {name: 'entrezService',         type: 'service'}
       },
@@ -241,7 +241,7 @@ Job queue entry example:
     },
 
 
-.. _module-services_basicWorkflowService.init:
+.. _module-services_localBlastService.init:
 
 
 Function: ``init``
@@ -253,7 +253,7 @@ Function: ``init``
 
     
     
-.. _module-services_basicWorkflowService.validateParams:
+.. _module-services_localBlastService.validateParams:
 
 
 Function: ``validateParams``
@@ -267,7 +267,7 @@ job service validate
     :param object params: parameters
     :return int: 0 if successful
     
-.. _module-services_basicWorkflowService.generateName:
+.. _module-services_localBlastService.generateName:
 
 
 Function: ``generateName``
@@ -281,7 +281,7 @@ job service generate name.
     :param object params: parameters
     :return string: string job name
     
-.. _module-services_basicWorkflowService.get_workflows:
+.. _module-services_localBlastService.get_workflows:
 
 
 Function: ``get_workflows``
@@ -295,7 +295,7 @@ Enumerate available workflow scripts
     :param object req: request
     :param object res: response
     
-.. _module-services_basicWorkflowService.get_hit_details:
+.. _module-services_localBlastService.get_hit_details:
 
 
 Function: ``get_hit_details``
@@ -307,7 +307,7 @@ Function: ``get_hit_details``
 
     
     
-.. _module-services_basicWorkflowService.beginProcessing:
+.. _module-services_localBlastService.beginProcessing:
 
 
 Function: ``beginProcessing``
@@ -320,7 +320,7 @@ Job service - job execution entry point
     
     :param object kJob: reference to the kue job object
     
-.. _module-services_basicWorkflowService.determineBlastProfile:
+.. _module-services_localBlastService.determineBlastProfile:
 
 
 Function: ``determineBlastProfile``
@@ -332,7 +332,7 @@ Function: ``determineBlastProfile``
 
     
     
-.. _module-services_basicWorkflowService.beginProcessing2:
+.. _module-services_localBlastService.beginProcessing2:
 
 
 Function: ``beginProcessing2``
@@ -344,7 +344,7 @@ Function: ``beginProcessing2``
 
     
     
-.. _module-services_basicWorkflowService._runWorkflow:
+.. _module-services_localBlastService._runWorkflow:
 
 
 Function: ``_runWorkflow``
@@ -356,7 +356,7 @@ Function: ``_runWorkflow``
 
     
     
-.. _module-services_basicWorkflowService._postProcess:
+.. _module-services_localBlastService._postProcess:
 
 
 Function: ``_postProcess``
@@ -849,7 +849,7 @@ Module: ``services/galaxyBlastService``
 Description
 ===========
 
-This job service is functionally equivelant to basicWorkflowService, however,
+This job service is functionally equivelant to localBlastService, however,
 NCBI operations are sent through galaxy workflow for processing. 
 
 Job submission example:
@@ -900,7 +900,7 @@ Configuration:
           // (i.e. for "remote_htgs" would translate to "blastn -db htgs -remote")
           // These will override any default parameters defined in ``blastjs``
           // 
-          // Blast profiles generally apply to basicWorkflowService only
+          // Blast profiles generally apply to localBlastService only
           // and do no apply to galaxyBlastService.
           // 
           // Our example uses a subset of htgs, an NCBI curated blast database.

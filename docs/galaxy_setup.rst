@@ -154,7 +154,7 @@ In ``jbconnect`` directory, edit ``node_modules/jbconnect-hook-jblast/config/glo
 ::
 
         services: {
-            'basicWorkflowService':     {enable: false, name: 'basicWorkflowService',  type: 'workflow', alias: "jblast"},
+            'localBlastService':     {enable: false, name: 'localBlastService',  type: 'workflow', alias: "jblast"},
             'galaxyBlastService':            {enable: true,  name: 'galaxyBlastService',         type: 'workflow', alias: "jblast"},
             'filterService':            {name: 'filterService',         type: 'service'},
             'entrezService':            {name: 'entrezService',         type: 'service'}

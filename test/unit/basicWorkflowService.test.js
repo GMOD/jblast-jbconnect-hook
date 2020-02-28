@@ -1,6 +1,6 @@
 /*
  * run from app root: 
- * node ./node_modules/mocha/bin/mocha test/basicWorkflowService.test.js
+ * node ./node_modules/mocha/bin/mocha test/localBlastService.test.js
  */
 var chai = require('chai');
 var chaiAsPromised = require("chai-as-promised");
@@ -17,10 +17,10 @@ if (typeof sails === 'undefined') {
     };
 }
 
-describe('basicWorkflowService', function() {
+describe('localBlastService', function() {
 
     describe("determineBlastProfile() function", () => {
-        let basicWorkflowService = require('../../api/services/basicWorkflowService');
+        let localBlastService = require('../../api/services/localBlastService');
         let g = sails.config.globals.jbrowse;
         //console.log("config",sails.config);
         
@@ -32,7 +32,7 @@ describe('basicWorkflowService', function() {
                     return;
                 }
             };
-            basicWorkflowService.determineBlastProfile(kJob);
+            localBlastService.determineBlastProfile(kJob);
             //console.log("kJob result",kJob);
             assert.shallowDeepEqual(g.jblast.blastProfiles[g.jblast.defaultBlastProfile],kJob.data.blastOptions);
             done();
@@ -45,7 +45,7 @@ describe('basicWorkflowService', function() {
                     return;
                 }
             };
-            basicWorkflowService.determineBlastProfile(kJob);
+            localBlastService.determineBlastProfile(kJob);
             //console.log("kJob result",kJob);
             assert.shallowDeepEqual(g.jblast.blastProfiles['htgs'],kJob.data.blastOptions);
             done();
@@ -65,7 +65,7 @@ describe('basicWorkflowService', function() {
                     return;
                 }
             };
-            basicWorkflowService.determineBlastProfile(kJob);
+            localBlastService.determineBlastProfile(kJob);
             //console.log("kJob result",kJob);
             assert.shallowDeepEqual(kJob.data.blastProfile,kJob.data.blastOptions);
             done();

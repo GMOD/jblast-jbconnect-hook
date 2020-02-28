@@ -71,14 +71,14 @@ These requirements are generally installed as part of the JBlast project.
 Configuration
 -------------
 
-Add the following to the jbconnect.config.js file, enabling basicWorkflowService:
+Add the following to the jbconnect.config.js file, enabling localBlastService:
 
 ::
 
     module.exports  = {
         jbrowse: {
             services: {
-                'basicWorkflowService':     {enable: true,  name: 'basicWorkflowService',  type: 'workflow', alias: "jblast"},
+                'localBlastService':     {enable: true,  name: 'localBlastService',  type: 'workflow', alias: "jblast"},
                 'galaxyBlastService':            {enable: false, name: 'galaxyBlastService',         type: 'workflow', alias: "jblast"}
         },
         }
@@ -193,7 +193,7 @@ Alternatively, an previously undefined profiled may be specified in ``/job/submi
 
 If defaultBlastProfile is defined in globals.js will be used if no blast profile is specified in the ``/job/submit`` call.
 
-Blast profiles only apply to basicWorkflowService.
+Blast profiles only apply to localBlastService.
 
 
 JBrowse Peer Configuration
