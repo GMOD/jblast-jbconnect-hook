@@ -50,7 +50,7 @@ describe('integration test', function(){
             .end((err,res) => {
                 expect(res).to.have.status(200, 'get_blastdata api status 200');
                 let data = res.body;
-                console.log("return data: ",data);
+                console.log("***** return data: ",data);
                 if (isGalaxy) {
                     console.log('**** galaxyService enabled');
                 }
