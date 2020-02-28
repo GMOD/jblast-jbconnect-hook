@@ -55,7 +55,7 @@ describe('integration test', function(){
                     console.log('**** galaxyService enabled');
                 }
                 else {
-                    expect(data[0].id).to.equal('blast-wheat.blastv.wf.js','id[0] is not blast-wheat.blast.wf.js');
+                    expect(data[0].id).to.equal('blast-wheat.blast.wf.js','id[0] is not blast-wheat.blast.wf.js');
                     expect(data[1].id).to.equal('faux-blast.blastv.wf.js','id[1] is faux-blast.blastv.wf.js');
                 }
                 done();
