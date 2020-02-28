@@ -127,7 +127,7 @@ Function: ``value``
 
    <hr style="border-color: black; border-width: 2px;">
 
-Module: ``services/basicWorkflowService``
+Module: ``services/localBlastService``
 *****************************************
 
 

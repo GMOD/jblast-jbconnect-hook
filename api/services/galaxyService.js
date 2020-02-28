@@ -2,7 +2,7 @@
  * @module
  * @description
  * 
- * This job service is functionally equivelant to basicWorkflowService, however,
+ * This job service is functionally equivelant to localBlastService, however,
  * NCBI operations are sent through galaxy workflow for processing. 
  * 
  * Job submission example:
@@ -53,7 +53,7 @@
  *           // (i.e. for "remote_htgs" would translate to "blastn -db htgs -remote")
  *           // These will override any default parameters defined in ``blastjs``
  *           // 
- *           // Blast profiles generally apply to basicWorkflowService only
+ *           // Blast profiles generally apply to localBlastService only
  *           // and do no apply to galaxyService.
  *           // 
  *           // Our example uses a subset of htgs, an NCBI curated blast database.

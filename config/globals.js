@@ -46,7 +46,7 @@ module.exports.globals = {
              * (i.e. for "remote_htgs" would translate to "blastn -db htgs -remote")
              * These will override any default parameters defined in ``blastjs``
              * 
-             * Blast profiles generally apply to basicWorkflowService only
+             * Blast profiles generally apply to localBlastService only
              * and do no apply to galaxyService.
              * 
              * Our example uses a subset of htgs, an NCBI curated blast database.
@@ -68,7 +68,7 @@ module.exports.globals = {
         },
         // list of services that will get registered.
         services: {
-            'basicWorkflowService':     {name: 'basicWorkflowService',  type: 'workflow', alias: "jblast"},
+            'localBlastService':     {name: 'localBlastService',  type: 'workflow', alias: "jblast"},
             //'galaxyService':          {name: 'galaxyService',         type: 'workflow', alias: "jblast"},
             'filterService':            {name: 'filterService',         type: 'service'},
             'entrezService':            {name: 'entrezService',         type: 'service'}
