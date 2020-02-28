@@ -2,7 +2,7 @@
  * @module
  * @description
  * This module implements the actions that occur after a galaxy workflow completes.
- * It supports galaxyService job service.
+ * It supports galaxyBlastService job service.
  * 
  */
 var request = require('request');

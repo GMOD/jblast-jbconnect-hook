@@ -27,8 +27,8 @@
             "get_trackdata": "get",
             "get_hit_details": "get"
           },
-          "globalId": "galaxyService",
-          "identity": "galaxyservice"
+          "globalId": "galaxyBlastService",
+          "identity": "galaxyBlastService"
         },
         "createdAt": "2017-10-21T20:54:22.548Z",
         "updatedAt": "2017-10-21T20:56:02.867Z",

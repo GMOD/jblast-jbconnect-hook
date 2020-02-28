@@ -54,7 +54,7 @@
  *           // These will override any default parameters defined in ``blastjs``
  *           // 
  *           // Blast profiles generally apply to localBlastService only
- *           // and do no apply to galaxyService.
+ *           // and do no apply to galaxyBlastService.
  *           // 
  *           // Our example uses a subset of htgs, an NCBI curated blast database.
  *           // So, it is our default profile.
@@ -71,7 +71,7 @@
  *       },
  *       // list of services that will get registered.
  *       services: {
- *           'galaxyService':          {name: 'galaxyService',         type: 'workflow', alias: "jblast"},
+ *           'galaxyBlastService':          {name: 'galaxyBlastService',         type: 'workflow', alias: "jblast"},
  *           'filterService':            {name: 'filterService',         type: 'service'},
  *           'entrezService':            {name: 'entrezService',         type: 'service'}
  *       },

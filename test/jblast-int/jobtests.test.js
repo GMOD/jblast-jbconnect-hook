@@ -42,7 +42,7 @@ describe('integration test', function(){
     });
     it('get_workflows api',function(done) {
         let conf = sails.config.globals.jbrowse.services;
-        let isGalaxy = (conf.galaxyService && conf.galaxyService.enable===true) ? true : false;
+        let isGalaxy = (conf.galaxyBlastService && conf.galaxyBlastService.enable===true) ? true : false;
 
         agent
             .get('/service/exec/get_workflows')
@@ -52,7 +52,7 @@ describe('integration test', function(){
                 let data = res.body;
                 console.log("***** return data: ",data);
                 if (isGalaxy) {
-                    console.log('**** galaxyService enabled');
+                    console.log('**** galaxyBlastService enabled');
                 }
                 else {
                     expect(data[0].id).to.equal('blast-wheat.blast.wf.js','id[0] is not blast-wheat.blast.wf.js');
@@ -205,7 +205,7 @@ describe('integration test', function(){
     describe('submit blast test', function(){
         it('should submit blast', function(done) {
             let conf = sails.config.globals.jbrowse.services;
-            let isGalaxy = (conf.galaxyService && conf.galaxyService.enable===true) ? true : false;
+            let isGalaxy = (conf.galaxyBlastService && conf.galaxyBlastService.enable===true) ? true : false;
 
             let ds = Dataset.Resolve('sample_data/json/volvox');      
             

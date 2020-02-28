@@ -141,7 +141,7 @@ Description
 This is a job services that executes local NCBI blast by either excuting 
 NCBI.blast or Sim.blast, defined by the job.
 
-This job service is functionally equivelant to galaxyService, which
+This job service is functionally equivelant to galaxyBlastService, which
 does blast search through Galaxy API.
 
 Job submission example:
@@ -178,7 +178,7 @@ Configuration:
           // These will override any default parameters defined in ``blastjs``
           // 
           // Blast profiles generally apply to basicWorkflowService only
-          // and do no apply to galaxyService.
+          // and do no apply to galaxyBlastService.
           // 
           // Our example uses a subset of htgs, an NCBI curated blast database.
           // So, it is our default profile.
@@ -838,7 +838,7 @@ Function: ``fixNumber``
 
    <hr style="border-color: black; border-width: 2px;">
 
-Module: ``services/galaxyService``
+Module: ``services/galaxyBlastService``
 **********************************
 
 
@@ -901,7 +901,7 @@ Configuration:
           // These will override any default parameters defined in ``blastjs``
           // 
           // Blast profiles generally apply to basicWorkflowService only
-          // and do no apply to galaxyService.
+          // and do no apply to galaxyBlastService.
           // 
           // Our example uses a subset of htgs, an NCBI curated blast database.
           // So, it is our default profile.
@@ -918,13 +918,13 @@ Configuration:
       },
       // list of services that will get registered.
       services: {
-          'galaxyService':          {name: 'galaxyService',         type: 'workflow', alias: "jblast"},
+          'galaxyBlastService':          {name: 'galaxyBlastService',         type: 'workflow', alias: "jblast"},
           'filterService':            {name: 'filterService',         type: 'service'},
           'entrezService':            {name: 'entrezService',         type: 'service'}
       },
 
 
-.. _module-services_galaxyService.init:
+.. _module-services_galaxyBlastService.init:
 
 
 Function: ``init``
@@ -936,7 +936,7 @@ Function: ``init``
 
     
     
-.. _module-services_galaxyService.validateParams:
+.. _module-services_galaxyBlastService.validateParams:
 
 
 Function: ``validateParams``
@@ -950,7 +950,7 @@ job service validation
     :param object params: parameters
     :return val: 0 if successful, otherwise failure
     
-.. _module-services_galaxyService.generateName:
+.. _module-services_galaxyBlastService.generateName:
 
 
 Function: ``generateName``
@@ -964,7 +964,7 @@ job service generate name
     :param object params: parameters
     :return string: name of job
     
-.. _module-services_galaxyService.beginProcessing:
+.. _module-services_galaxyBlastService.beginProcessing:
 
 
 Function: ``beginProcessing``
@@ -977,7 +977,7 @@ job service begin
     
     :param object kJob: kue job object
     
-.. _module-services_galaxyService.get_workflows:
+.. _module-services_galaxyBlastService.get_workflows:
 
 
 Function: ``get_workflows``
@@ -989,7 +989,7 @@ Function: ``get_workflows``
 
     
     
-.. _module-services_galaxyService.get_hit_details:
+.. _module-services_galaxyBlastService.get_hit_details:
 
 
 Function: ``get_hit_details``
@@ -1022,7 +1022,7 @@ Module: ``services/galaxyUtils``
 Description
 ===========
 
-This provides functional support to galaxyService job service.
+This provides functional support to galaxyBlastService job service.
 
 
 .. _module-services_galaxyUtils.init:
@@ -1234,7 +1234,7 @@ Description
 ===========
 
 This module implements the actions that occur after a galaxy workflow completes.
-It supports galaxyService job service.
+It supports galaxyBlastService job service.
 
 
 .. _module-services_jblastPostAction.postMoveResultFiles:

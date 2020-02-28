@@ -4,7 +4,7 @@
  * This is a job services that executes local NCBI blast by either excuting 
  * NCBI.blast or Sim.blast, defined by the job.
  * 
- * This job service is functionally equivelant to galaxyService, which
+ * This job service is functionally equivelant to galaxyBlastService, which
  * does blast search through Galaxy API.
  * 
  * Job submission example:
@@ -41,7 +41,7 @@
  *           // These will override any default parameters defined in ``blastjs``
  *           // 
  *           // Blast profiles generally apply to localBlastService only
- *           // and do no apply to galaxyService.
+ *           // and do no apply to galaxyBlastService.
  *           // 
  *           // Our example uses a subset of htgs, an NCBI curated blast database.
  *           // So, it is our default profile.
