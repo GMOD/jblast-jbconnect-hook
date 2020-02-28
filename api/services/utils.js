@@ -37,7 +37,7 @@ module.exports = {
      * make sure it's a DNA sequence - containing AGCT
      * if he sequence doesn't have a fasta header, add a fasta header
      * @param {string} seq sequence string
-     * @param {string]} refseq reference sequence name (used for the header)
+     * @param {string} refseq reference sequence name (used for the header)
      * @returns {string} valid sequence, or false if sequence not valid
      */
     validateSequence(seq,refseq) {
