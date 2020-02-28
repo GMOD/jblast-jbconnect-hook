@@ -209,7 +209,7 @@ describe('integration test', function(){
 
             let ds = Dataset.Resolve('sample_data/json/volvox');      
             
-            let testWorkflow = 'NCBI.blast.workflow.js';
+            let testWorkflow = 'faux-blast.blastv.wf.js';
             let testRegion = '>ctgA ctgA:23755..25049 length=1295\ntcccatagcccgccgaccgggtctgactcaactgtgttttcgctatcccaggctagcacttctattctttgttacgtc\n'+
             'cagtcatagtgttactatagggtaattttagtcatagtagacggccgctttttcgtatggcccgagaccgtccaccgg\nctacccaattaagtcacatccggatcttgggtctagatattcctatcgaaaatagtctcgccgcctcactgcgtagtt\n'+
             'cagggggcgtcacacttgttcgcggcttttcctcatgggatctttacccgatggttgatgcaataaatgtctacaccg\ngactggcgtgtccgagacgactttatacacgtgtgacgagtagatcagatcgtacgaatggtctgtctcacctatccc\n'+
