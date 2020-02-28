@@ -19,8 +19,9 @@ define([
             'dijit/Menu',
             'dijit/MenuItem',
            'JBrowse/has',
-           './tabs'
-       ],
+           './tabs',
+           'plugins/JBlast/js/queryDialog'
+        ],
        function(
         declare,
         lang,
@@ -29,7 +30,7 @@ define([
         query,
         JBrowsePlugin,
         Button, Dialog, Memory, ComboBox,Menu,MenuItem,has,
-        JBTabs
+        JBTabs,queryDialog
        ) {
 return declare( JBrowsePlugin,
 {
@@ -64,53 +65,6 @@ return declare( JBrowsePlugin,
             return this;
         };            
 
-        //this.setupTrackSelectorTracking();
-
-        
-        // intercept Browser.showTracks
-        // when not logged in, filter out REST tracks
-        // we are basically checking to see if the url tracks are in the pruned track list.
-        browser.orig_showTracks = browser.showTracks,
-        browser.showTracks = function( trackNames ) {
-            //trackNames = trackNames.remove('jblast_sample');
-            if (thisB.browser.loginState) return browser.orig_showTracks(trackNames);
-
-            let trackNames1 = [];
-            let confTracks = browser.config.tracks;
-            
-            for(let i=0; i < trackNames.length;i++) {
-                for(let j=0;j<confTracks.length;j++) {
-                    if ( confTracks[j].label === trackNames[i] ){
-                        trackNames1.push(trackNames[i]);
-                        break;
-                    }
-                }
-            }
-            return browser.orig_showTracks(trackNames1);
-        };
-        
-
-        browser.afterMilestone( 'loadConfig', function() {
-            // if we are not logged in, hide REST tracks.
-            thisB.loginState = false;
-            $.get("/loginstate",function(data) {
-                //console.log("loginstate",data);
-                thisB.loginState = data.loginstate;
-                if (!thisB.loginState) {
-                    let conf = dojo.clone(browser.config.tracks);
-                    browser.config.tracks = [];
-                    for(let i=0; i < conf.length;i++) {
-                        if (typeof conf[i].urlTemplate === 'undefined' || conf[i].urlTemplate.charAt(0) !== "/") {
-                            browser.config.tracks.push(conf[i]);
-                        }
-                        else {
-                            console.log(conf[i].label, "track requires login");
-                        }
-                    }
-                }
-            });
-        });
-        
         browser.jblast = {
             asset: null,
             browser: browser,
@@ -132,6 +86,103 @@ return declare( JBrowsePlugin,
                 else return false;
             }
         };
+
+        // register analyze menu items
+        if (browser.jbconnect && browser.jbconnect.analyzeMenus) {
+            browser.jbconnect.analyzeMenus.JBlast = {
+                title: 'BLAST Analysis',
+                module: 'JBlast',
+                queryDialog: queryDialog,
+                init:initMenu,
+                contents:null,
+                process:null
+            };
+        }
+
+        function initMenu(menuName,queryDialog,container) {
+
+            browser.addGlobalMenuItem(menuName, new MenuItem({
+                id: 'menubar_blast_seq',
+                label: 'BLAST DNA sequence',
+                //iconClass: 'dijitIconFilter',
+                onClick: function() {
+                    //console.log(thisb,thisb.plugin);
+                    thisB.getWorkflows(function(workflows){
+
+                        if (workflows.length==0) {
+                            alert("no workflows found");
+                            return;
+                        }
+                                    
+                        var dialog = new queryDialog({
+                            browser:thisB.browser,
+                            plugin:thisB.plugin,
+                            workflows:workflows
+                        }); 
+                        dialog.show(function(x) {
+                        });
+                    });                       
+                }
+            }));
+            
+            browser.addGlobalMenuItem( menuName, new MenuItem({
+                id: 'menubar_blast_hilite',
+                label: 'BLAST highlighted region',
+                //iconClass: 'dijitIconFilter',
+                onClick: function() {
+                    let btnState = $("[widgetid*='highlight-btn'] > input").attr('aria-checked');
+                    console.log("btnState",btnState,typeof btnState);
+                    if (btnState==='mixed') {
+                        // launch blast dialog
+                        console.log("launch blast dialog");
+                        thisB.startBlast();
+
+                    }
+                    if (btnState==='false' || btnState==='true') {
+                        // false - highlight button hasn't been pressed
+                        // true - highlight button has been pressed but region not selected yet.
+
+                        let txt = "";
+                        txt += 'This feature allows you to select an arbitrary region to BLAST using the highlight region feature of JBrowse. <p/>';
+                        
+                        if (btnState==='false') {
+                            txt += 'To begin, click the highlight button <img src="plugins/JBlast/img/hilite_unselected.PNG" height="22px" /> on the toolbar to begin the highlight mode. ';
+                        }
+                        if (btnState==='true') {
+                            txt += 'You have selected the highlight button, which now appears yellow <img src="plugins/JBlast/img/hilite_selected.PNG" height="22px" />. ';
+                        }
+                        txt += 'Highlight the region by clicking the start coordinate in the track area of the genome browser, ';
+                        txt += 'holding down and dragging to the end coordinate and releasing. ';
+
+                        //txt += 'The BLAST button <img src="plugins/JBlast/img/blast_btn.PNG" height="22px"/> will ';
+                        //txt += 'then appear in the tool button area. Click the BLAST button to blast the highlighted region.';                                            
+
+                        // show highlight instruct box
+                        var confirmBox = new Dialog({ title: 'Highlight region to BLAST' });
+                        dojo.create('div', {
+                            id: 'confirm-btn',
+                            style: "width: 700px;padding:15px",
+                            innerHTML: txt
+        
+                        }, confirmBox.containerNode );
+                        new Button({
+                            id: 'ok-btn1',
+                            label: 'Ok',
+                            //iconClass: 'dijitIconDelete',
+                            onClick: function() {
+                                confirmBox.destroyRecursive();
+                                //confirmCleanBox.hide();
+                            }
+                        })
+                        .placeAt( confirmBox.containerNode );
+
+                        confirmBox.show();
+
+                    }
+                }
+            }));
+        }
+
         
         
         /*
@@ -158,9 +209,9 @@ return declare( JBrowsePlugin,
             },2000);
 
             // load toolmenu "JBlast menu"
-            require(["plugins/JBlast/js/toolmenu"], function(toolmenu){
-                toolmenu.init(browser,thisB);
-            });        
+            //require(["plugins/JBlast/js/toolmenu"], function(toolmenu){
+            //    toolmenu.init(browser,thisB);
+            //});        
 
 
             // setup callbacks for job queue panel
@@ -228,7 +279,7 @@ return declare( JBrowsePlugin,
              */ 
 
             var navBox = dojo.byId("navbox");
-
+            /*
             thisB.browser.jblast.blastButton = new Button(
             {
                 title: "BLAST highlighted region",
@@ -243,7 +294,7 @@ return declare( JBrowsePlugin,
                     dojo.stopEvent(event);
                 })
             }, dojo.create('button',{},navBox));   //thisB.browser.navBox));
-
+            */
             // save the reference to the blast plugin in browser
             browser.jblastPlugin = thisB;
 
@@ -491,7 +542,7 @@ return declare( JBrowsePlugin,
         txt +=    '<td class="field blast-field">Sequence ID</td>';
         txt +=    '<td class="field blast-field">Length</td>';
         txt += '</tr><tr>';
-        txt +=    '<td class="blast-value"> id="details_accession"'+ hit.Hit_accession+'</td>';
+        txt +=    '<td class="blast-value" id="details_accession">'+ hit.Hit_accession+'</td>';
         txt +=    '<td class="blast-value">'+ hit.Hit_id+'</td>';
         txt +=    '<td class="blast-value">'+hit.Hit_len+'</td>';
         txt += '</tr></table>';
@@ -984,8 +1035,9 @@ return declare( JBrowsePlugin,
                     destroyBlastDialog();
                 }
             });
-            
+
             dojo.create('span', {
+                id: 'workflow-head',
                 innerHTML: 'Workflow '
             }, dialog.containerNode);
             
@@ -1007,11 +1059,19 @@ return declare( JBrowsePlugin,
                 store: stateStore,
                 searchAttr: "name"
             }, "blast-workflow-select").startup();            
-            
+
+            // hide workflow selectr if only one entry.
+            setTimeout(function() {
+                if (workflows.length <= 1)  {
+                    $('#widget_workflow-combo').hide();
+                    $('#workflow-head').hide();
+                }
+            },200);
+
             dojo.create('div', {
                 id: 'blast-box',
                 style: {'margin-top': '20px'},
-                innerHTML: 'This will process a BLAST search against the selected database.<br/><button id="submit-btn" type="button">Submit</button> <button id="cancel-btn" type="button">Cancel</button>'
+                innerHTML: 'This will process a BLAST analysis against the selected database.<br/><br/><button id="submit-btn" type="button">Submit</button> <button id="cancel-btn" type="button">Cancel</button>'
             }, dialog.containerNode);
 
             var submitBtn = new Button({
@@ -1073,16 +1133,19 @@ return declare( JBrowsePlugin,
     },
     /**
      * get galaxy workflows (using jbrowse api)
-     * @param {type} cb - cb(workflows]]
+     * @param {callback} cb - cb(workflows)
      * @returns {getWorkflows}
      */
     getWorkflows(cb) {
         let browser = this.browser;
+        let servModule = 'JBlast';
         
-        $.get( "/service/exec/get_workflows?dataset="+browser.config.dataRoot, function( data ) {
-            console.log("get workflows result", data);
+        let xhr = $.get( "/service/exec/get_workflows:jblast?dataset="+browser.config.dataRoot+"&module="+servModule, function( data ) {
+            for(let i=0;i<data.length;i++) console.log('getWorkflow',i,data[i]);
             cb(data);
-        });
+        }).fail(function(jqxhr, textStatus, errorThrown) {
+            alert('get_workflows failed',textStatus);
+        });;
     }
     
 });

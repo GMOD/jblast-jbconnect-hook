@@ -19,7 +19,11 @@ module.exports.globals = {
             // The default Galaxy History where workflows will execute
             historyName: "Unnamed history"
         },
-        
+
+        workflowFilter: {
+            "sample_data/json/volvox": {filter: ".blastv.wf"}
+        },
+    
         // JBlast settings
         jblast: {
             // include demo features
@@ -36,7 +40,6 @@ module.exports.globals = {
             
             // Type of file that will be imported for processing blast.
             import: ["blastxml"],
-            
             /*
              * BLAST profiles
              * blast profiles are parameter lists that translate to blastn cli parameters sets
@@ -70,7 +73,7 @@ module.exports.globals = {
             'filterService':            {name: 'filterService',         type: 'service'},
             'entrezService':            {name: 'entrezService',         type: 'service'}
         },
-        /**/
+  
         webIncludes: {
             "jblast-css-SliderPips":    {lib: "/jblib/jquery-ui-slider-pips.min.css" },
             "jblast-js-SliderPips":     {lib: "/jblib/jquery-ui-slider-pips.min.js" },

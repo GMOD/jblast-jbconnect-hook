@@ -27,6 +27,10 @@ script:
   - ./utils/jb_setup.js
   - ls blastdb
   - ls blastbin
+  - git clone https://github.com/primer3-org/primer3.git primer3
+  - cd primer3/src
+  - make
+  - cd ../..
   - npm run jblast-coverage
 after_success:
   - cd ../jblast-jbconnect-hook

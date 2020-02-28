@@ -59,6 +59,28 @@ if (!thisHook) {
       value: function configure() {
         // this.sails = sails
         // http://sailsjs.org/documentation/concepts/extending-sails/hooks/hook-specification/configure
+        const fs = require('fs-extra');
+        let services = sails.config.globals.jbrowse.services;
+
+        sails.log.debug('>> jblast hookPath: ',this.hookPath);
+        let hookPath = this.hookPath.replace('api/hooks/jblast','')+'api/services';
+
+        // add .path and .module to service config for jblast services (this is sort of a hack)
+        // todo: cleanup hack
+        fs.readdir(hookPath, function(err, items) {
+          //console.log('dir',items);
+          for(let i in items) {
+            if (items[i].indexOf('Service.js') > 0) {
+              let servName = items[i].split('.js')[0];
+              if (!services[servName]) continue;
+              sails.log.info('JBlast service - '+servName);
+              services[servName].path = hookPath+'/'+servName;
+              services[servName].module = 'jblast';
+            }
+          }
+          //sails.services.jblastPostAction = require(hookPath+'/jblastPostAction');
+          //sails.log.debug('>> jblast services: ',services);
+        });        
       }
     }, {
       key: 'initialize',
@@ -69,6 +91,7 @@ if (!thisHook) {
         let sh = require("shelljs");
 
         sails.on('hook:orm:loaded', function() {
+
           //sails.on('lifted', function() {
   
               //sails.log(">>> jblastProc.initialize.lifted");

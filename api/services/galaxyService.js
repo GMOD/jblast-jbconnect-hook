@@ -146,8 +146,8 @@ module.exports = {
             }
 
             // handle filtering of workflow names (ref #225)
-            if (g.jblast.workflowFilterEnable && g.jblast.workflowFilter && g.jblast.workflowFilter.galaxy && g.jblast.workflowFilter.galaxy[ds]) {
-                let nf = g.jblast.workflowFilter.galaxy[ds].nameFilter;
+            if (g.workflowFilterEnable && g.workflowFilter && g.workflowFilter.galaxy && g.workflowFilter.galaxy[ds]) {
+                let nf = g.workflowFilter.galaxy[ds].filter;
                 let filtered = [];
                 for(let i in workflows) {
                     if (workflows[i].name.indexOf(nf) >= 0) {

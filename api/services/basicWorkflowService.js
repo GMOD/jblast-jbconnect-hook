@@ -149,26 +149,31 @@ module.exports = {
      * Enumerate available workflow scripts
      * 
      * @param {object} req - request
-     * @param {object} res - response
+     * @param {object} res - responseg
      * 
      */
-    get_workflows: function(req, res) {
+    get_workflows (req, res) {
+        
         let params = req.allParams();
         let g = sails.config.globals.jbrowse;
         let ds = params.dataset;
+        let servModule = params.module;
+        let wfpath = './workflows/';
+        let filter = '.wf';
         
-        var wfpath = './workflows/';
+        if (g.workflowFilterEnable && g.workflowFilter && g.workflowFilter.default)
+            filter = g.workflowFilter[ds].filter;
         
-        sails.log(wfpath,process.cwd());
+        sails.log("request data",wfpath,ds,filter);
         
         var fs = require('fs-extra');
 
         wflist = [];
         
         fs.readdirSync(wfpath).forEach(function(file) {
-            if (file.indexOf('.blast.workflow.') !== -1) {
+            if (file.indexOf(filter) !== -1) {
                 
-                var name = file.split('.workflow.');
+                var name = file.split(filter);
                 
                 wflist.push( {
                    id: file,
@@ -178,25 +183,11 @@ module.exports = {
                 });
             }
         });
-
-        // handle filtering of workflow names (ref #225)
-        if (g.jblast.workflowFilterEnable && g.jblast.workflowFilter && g.jblast.workflowFilter.galaxy && g.jblast.workflowFilter.galaxy[ds]) {
-            let workflows = _.cloneDeep(wflist);
-            let nf = g.jblast.workflowFilter.galaxy[ds].nameFilter;
-            let filtered = [];
-            
-            for(let i in workflows) {
-                if (workflows[i].name.indexOf(nf) >= 0) {
-                    workflows[i].name = workflows[i].name.replace(nf,"");
-                    filtered.push(workflows[i]);
-                }
-            }
-            console.log("get_workflows filtered",filtered);
-            return res.ok(filtered);
-        }
+        console.log("get_workflows",wflist);
 
         res.ok(wflist);
     },
+
     get_hit_details: function(req, res) {
         var params = req.allParams();
 
@@ -225,6 +216,15 @@ module.exports = {
         var region = params.region;
         var workflow = params.workflow;
         //var dataSetPath = params.dataset;
+        var refseq = params.refseq;
+
+        // validate DNA sequence
+        if (refseq) {
+            region = utils.validateSequence(region,refseq);
+            if (region === false)
+                return kJob.kDoneFn(Error('invalid sequence '));
+        }
+
         var monitorFn = this._monitorWorkflow;
 
         // get starting coord of region
