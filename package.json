@@ -1,6 +1,6 @@
 {
   "name": "jblast-jbconnect-hook",
-  "version": "0.10.00",
+  "version": "0.10.0",
   "description": "JBlast - Integrated JBrowse BLAST with Galaxy (JBConnect Hook)",
   "main": "api/hooks/jblast/index.js",
   "scripts": {
