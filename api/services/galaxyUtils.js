@@ -9,7 +9,7 @@ var request = require('request');
 var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require("fs-extra"));
 //var fs = require("fs-extra");
-var util = require('./utils');
+var util = require('./seqUtils');
 
 module.exports = {
     /**

@@ -11,7 +11,7 @@ var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require("fs"));
 var deferred = require('deferred');
 //var merge = require('deepmerge');
-var util = require("./utils");
+var util = require("./seqUtils");
 const _ = require("lodash");
 
 module.exports = {
