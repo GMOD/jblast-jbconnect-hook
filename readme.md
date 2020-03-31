@@ -41,10 +41,11 @@ The patch operation is needed to make JBrowse 1.15.1 setup.sh run properly. If J
 
 ### Run
 Launch the server.
-
+```
 sails lift
+```
 From a web browser, access the application (default login: juser/password).
-
+```
 http://localhost:1337/jbrowse?data=sample_data/json/volvox
 or http://localhost:1337/login
-
+```
