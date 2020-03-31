@@ -4,7 +4,7 @@
  * This is a job services that executes local NCBI blast by either excuting 
  * NCBI.blast or Sim.blast, defined by the job.
  * 
- * This job service is functionally equivelant to galaxyService, which
+ * This job service is functionally equivelant to galaxyBlastService, which
  * does blast search through Galaxy API.
  * 
  * Job submission example:
@@ -40,8 +40,8 @@
  *           // (i.e. for "remote_htgs" would translate to "blastn -db htgs -remote")
  *           // These will override any default parameters defined in ``blastjs``
  *           // 
- *           // Blast profiles generally apply to basicWorkflowService only
- *           // and do no apply to galaxyService.
+ *           // Blast profiles generally apply to localBlastService only
+ *           // and do no apply to galaxyBlastService.
  *           // 
  *           // Our example uses a subset of htgs, an NCBI curated blast database.
  *           // So, it is our default profile.
@@ -58,7 +58,7 @@
  *       },
  *       // list of services that will get registered.
  *       services: {
- *           'basicWorkflowService':     {name: 'basicWorkflowService',  type: 'workflow', alias: "jblast"},
+ *           'localBlastService':     {name: 'localBlastService',  type: 'workflow', alias: "jblast"},
  *           'filterService':            {name: 'filterService',         type: 'service'},
  *           'entrezService':            {name: 'entrezService',         type: 'service'}
  *       },
@@ -108,7 +108,7 @@
 var path = require('path');
 var resolvePath = require('resolve-path');
 var fs = require("fs-extra");
-var util = require("./utils");
+var util = require("./seqUtils");
 var shelljs = require('shelljs'); 
 var appPath = require("app-root-path").path;
 const _ = require('lodash');
@@ -207,7 +207,7 @@ module.exports = {
      * 
      */
     beginProcessing: function(kJob) {
-        sails.log.info("basicWorkflowService beginProcessing"+kJob.data);
+        sails.log.info("localBlastService beginProcessing"+kJob.data);
         var params = kJob.data;
         
         var thisb = this;

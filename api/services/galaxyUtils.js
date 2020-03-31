@@ -1,7 +1,7 @@
 /**
  * @module
  * @desc
- * This provides functional support to galaxyService job service.
+ * This provides functional support to galaxyBlastService job service.
  * 
  */
 /* istanbul ignore file */
@@ -9,7 +9,7 @@ var request = require('request');
 var Promise = require('bluebird');
 var fs = Promise.promisifyAll(require("fs-extra"));
 //var fs = require("fs-extra");
-var util = require('./utils');
+var util = require('./seqUtils');
 
 module.exports = {
     /**
@@ -249,7 +249,7 @@ module.exports = {
      * @param {object} kJob - reference to kue job object
      */
     beginProcessing: function(kJob) {
-        sails.log.info("galaxyService beginProcessing"+kJob.data);
+        sails.log.info("galaxyBlastService beginProcessing"+kJob.data);
        
         var params = kJob.data;
         var thisb = this;
