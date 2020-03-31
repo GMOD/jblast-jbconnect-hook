@@ -55,8 +55,8 @@ describe('integration test', function(){
                     console.log('**** galaxyBlastService enabled');
                 }
                 else {
-                    expect(data[0].id).to.equal('blast-wheat.blast.wf.js','id[0] is not blast-wheat.blast.wf.js');
-                    expect(data[1].id).to.equal('faux-blast.blastv.wf.js','id[1] is faux-blast.blastv.wf.js');
+                    //expect(data[0].id).to.equal('blast-wheat.blast.wf.js','id[0] is not blast-wheat.blast.wf.js');
+                    expect(data[1].id).to.equal('demo-job.demo.wf.sh','id[1] is demo-job.demo.wf.sh');
                 }
                 done();
             });
