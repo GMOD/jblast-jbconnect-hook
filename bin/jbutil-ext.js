@@ -141,17 +141,20 @@ function exec_setupindex(params) {
 function exec_setuptrack(params) {
     var config = params.config;
     var g = config;
-    console.log("Setting up sample track...");
+    console.info("Setting up sample track...");
 
     // get dataSet
     var dataSet = "-----";
     for(var i in g.dataSet) {
-		console.log("processing dataset",i, g.dataSet[i].path);
-		
         dataSet = g.dataSet[i].path;
     
-		let trackListPath = g.jbrowsePath + dataSet + '/trackList.json';
-		let error = 0;
+        // only install jblast sample track in volvox example
+        if (dataSet != "sample_data/json/volvox") continue;
+        
+		let trackListPath = g.jbrowsePath + dataSet + '/jbconnect-tracks.json';
+        console.info("injecting sample jblast",i, g.dataSet[i].path);
+        
+        let error = 0;
 		
 		//console.log(">>> cwd",process.cwd());
 		var sampleTrackFile = approot+'/node_modules/jblast-jbconnect-hook/setup/jblastdata/sampleTrack.json';
@@ -161,7 +164,7 @@ function exec_setuptrack(params) {
 		  var sampleTrackData = fs.readFileSync (sampleTrackFile,'utf8');
 		}
 		catch(err){
-			console.log("failed read",trackListPath,err);
+			console.error("failed read",trackListPath,err);
 			error = 1;
 		}
 		if (error) continue;
@@ -175,11 +178,11 @@ function exec_setuptrack(params) {
 		
 		// read trackList.json
 		try {
-            console.log("reading ",trackListPath);
+            console.info("reading ",trackListPath);
 		    var trackListData = fs.readFileSync (trackListPath);
 		}
 		catch(err) {
-			console.log("failed read",trackListPath,err);
+			console.error("failed read",trackListPath,err);
 			error = 1;
 		}
 		if (error) continue;
@@ -200,12 +203,12 @@ function exec_setuptrack(params) {
 			}
 		}
 		if (hasLabel) {
-			console.log('Sample track already exists');
+			console.info('Sample track already exists');
 			continue;
 		}
         // add the sample track
         //console.log(">>",g.dataSet,i);
-        console.log("inject sample track", g.dataSet[i].path);
+        console.info("inject sample track", g.dataSet[i].path);
 		conf.tracks.push(sampleTrack);
 		
 		// write trackList.json
@@ -213,7 +216,7 @@ function exec_setuptrack(params) {
 		  fs.writeFileSync(trackListPath,JSON.stringify(conf,null,4));
 		}
 		catch(err) {
-		  console.log("failed write",trackListPath,err);
+		  console.error("failed write",trackListPath,err);
 		}
 	}
 }

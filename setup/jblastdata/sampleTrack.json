@@ -15,5 +15,6 @@
   "urlTemplate": "/service/exec/get_trackdata/?asset=jblast_sample&dataset=sample_data%2Fjson%2Fvolvox",
   "baseUrl": "/",
   "filterSettings": "[[blastResultPath]]/jblast_sample_filtersettings.json",
-  "storeCache":false
+  "storeCache":false,
+  "user":"*"
 }
