@@ -71,12 +71,14 @@ return declare( JBrowsePlugin,
             focusQueue: [],
             focusQueueProc: 0,
             panelDelayTimer: null,
-            bpSizeLimit: args.bpSizeLimit || 0,
+            bpSizeLimit: browser.config.bpSizeLimit || 0,
             getWorkflows: this.getWorkflows,
 
             // check if bpSize > bpSizeLimit, if bpSizeLimit is defined
             isOversized(bpSize) {
                 let bpSizeLimit = JBrowse.jblast.bpSizeLimit;
+
+                console.log("jblast bpSize check",bpSize,bpSizeLimit);
 
                 if (bpSizeLimit && bpSize > bpSizeLimit) {
                     // oversize message
