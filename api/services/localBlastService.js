@@ -220,7 +220,7 @@ module.exports = {
 
         // validate DNA sequence
         if (refseq) {
-            region = utils.validateSequence(region,refseq);
+            region = util.validateSequence(region,refseq);
             if (region === false)
                 return kJob.kDoneFn(Error('invalid sequence '));
         }
