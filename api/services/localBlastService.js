@@ -465,7 +465,7 @@ module.exports = {
             blast2json.convert(kJob,newTrackJson,function(err) {
                 // istanbul ignore next
                 if (err) {
-                    sails.log.error(err.msg);
+                    sails.log.error("error blast2json",err);
                     kJob.kDoneFn(new Error(err.msg));
                     return;
                 }
