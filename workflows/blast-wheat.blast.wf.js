@@ -88,7 +88,8 @@ var options = {
 
 options = _.extend( blastProfile,options);
 
-options.db = appPath+'/blastdb/'+g.jblast.blastProfiles['wheat'].db+'/'+g.jblast.blastProfiles['wheat'].db;
+//options.db = appPath+'/blastdb/'+g.jblast.blastProfiles['wheat'].db+'/'+g.jblast.blastProfiles['wheat'].db;
+options.db = appPath+'/blastdb/'+blastProfile.db+'/'+blastProfile.db;
 
 //console.log(">>> cwd",process.cwd());
 console.log(">>> blast options",options);

@@ -300,21 +300,30 @@ module.exports = {
      * also creates blastOptionFile
      */
     determineBlastProfile(kJob) {
-        let g = sails.config.globals.jbrowse;       
+        let g = sails.config.globals.jbrowse;
+        let dataset = kJob.data.dataset;       
         
         switch (typeof kJob.data.blastProfile) {
             // istanbul ignore next
             case 'undefined':
+                sails.log.debug("blastProfile - undefined");
                 // use defaultBlastProfile
-                if (g.jblast.defaultBlastProfile) {
+                if (g.workflowFilter[dataset].defaultBlastProfile) {
+                    let bp = g.workflowFilter[dataset].defaultBlastProfile
+                    if (g.jblast.blastProfiles[bp]) {
+                        kJob.data.blastOptions = g.jblast.blastProfiles[bp];
+                    }
+                }
+                else if (g.jblast.defaultBlastProfile) {
                     let profile = g.jblast.defaultBlastProfile;
-                    if (typeof g.jblast.blastProfiles[profile] !== 'undefined') {
+                    if (g.jblast.blastProfiles[profile]) {
                         kJob.data.blastOptions = g.jblast.blastProfiles[profile];
                     }
                 }
                 break;
             // istanbul ignore next
             case 'string':
+                sails.log.debug("blastProfile - string",kJob.data.blastProfile);
                 // get blast profile based on string
                 let profile = kJob.data.blastProfile;
                 if (typeof g.jblast.blastProfiles[profile] !== 'undefined') {
@@ -323,6 +332,7 @@ module.exports = {
                 break;
             // istanbul ignore next    
             case 'object':
+                sails.log.debug("blastProfile - object",kJob.data.blastProfile);
                 kJob.data.blastOptions = kJob.data.blastProfile;
                 break;
             // istanbul ignore next    
@@ -344,7 +354,7 @@ module.exports = {
         
         // create blastOptionFile
         // istanbul ignore else
-        if (typeof kJob.data.blastOptions !== "undefined") {
+        if (kJob.data.blastOptions) {
             // create file blastOption file
             var d = new Date();
 

@@ -21,7 +21,10 @@ module.exports.globals = {
         },
 
         workflowFilter: {
-            "sample_data/json/volvox": {filter: ".blastv.wf"}
+            "sample_data/json/volvox": {
+                filter: ".blastv.wf",
+                defaultBlastProfile: "faux"
+            }
         },
     
         // JBlast settings
