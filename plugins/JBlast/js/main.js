@@ -281,7 +281,7 @@ return declare( JBrowsePlugin,
              */ 
 
             var navBox = dojo.byId("navbox");
-            /*
+            
             thisB.browser.jblast.blastButton = new Button(
             {
                 title: "BLAST highlighted region",
@@ -296,7 +296,7 @@ return declare( JBrowsePlugin,
                     dojo.stopEvent(event);
                 })
             }, dojo.create('button',{},navBox));   //thisB.browser.navBox));
-            */
+            
             // save the reference to the blast plugin in browser
             browser.jblastPlugin = thisB;
 
