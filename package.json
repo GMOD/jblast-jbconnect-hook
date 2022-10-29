@@ -63,7 +63,7 @@
     "minimist": "^1.2.0",
     "mocha": "^3.4.2",
     "node-pre-gyp": "^0.6.36",
-    "sails": "^0.12.14",
+    "sails": "^1.5.3",
     "supertest": "^3.0.0"
   },
   "engines": {
